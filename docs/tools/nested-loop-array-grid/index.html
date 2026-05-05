@@ -1,38 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-<title>Nested Loop + Arrays Sketch — CC Fest Coding Camp</title>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta charset="utf-8" />
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nested Loop Pattern Studio — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../starter-sketch.css">
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
+</head>
+<body>
+  <div class="sketch-shell">
+    <div class="sketch-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
 
-  </head>
-  <body>
-    <main>
+    <header class="sketch-header">
+      <div class="sketch-meta">
+        <span class="pill session">Session 3</span>
+        <span class="pill type">Starter Sketch</span>
+      </div>
+      <h1>Nested Loop Pattern Studio</h1>
+      <p class="sketch-subtitle">A compact seed for teaching how nested loops and spacing values build repeated grid patterns.</p>
+      <div class="tag-row">
+        <span class="tag">nested loops</span>
+        <span class="tag">patterns</span>
+        <span class="tag">grid</span>
+      </div>
+    </header>
+
+    <main class="sketch-layout">
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Live Seed</h2>
+              <p>This one draws once in <code>setup()</code>, which makes it great for pausing and talking through the nested loop structure.</p>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div id="canvas-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Try / Notice / Remix</h2>
+              <p>Starter sketches stay lighter than full tools, but still carry teaching prompts.</p>
+            </div>
+          </div>
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Try this</h3>
+              <p>Change <code>spacing</code> from <code>50</code> to <code>25</code> and notice how the grid gets denser.</p>
+            </div>
+            <div class="lesson-card">
+              <h3>Notice this</h3>
+              <p>The outer loop steps across one direction of the grid. The inner loop fills the other direction.</p>
+            </div>
+            <div class="lesson-card">
+              <h3>Remix this</h3>
+              <p>Replace <code>rect()</code> with <code>circle()</code>, or make the color depend on <code>x</code> and <code>y</code>.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
     </main>
-    <script>
-// variables
+
+    <section class="card" style="margin-top:22px;">
+      <div class="card-inner">
+        <div class="card-header">
+          <div>
+            <h2>Starter Code</h2>
+            <p>Use this as a live-coding seed, not a finished tool.</p>
+          </div>
+        </div>
+        <div class="code-panel"><pre>// variables
 let spacing = 50;
 
 function setup() {
   createCanvas(400, 400);
   
-  for(let x = 0; x < width; x = x + spacing){
-    for(let y = 0; y < height; y = y + spacing){
-      console.log(x, y)
-      if(x % 100 == 0){
-        fill(random(255))
+  for (let x = 0; x < width; x = x + spacing) {
+    for (let y = 0; y < height; y = y + spacing) {
+      if (x % 100 == 0) {
+        fill(random(255));
       } else {
-        fill(random(255), random(0, 255), random(255))
+        fill(random(255), random(0, 255), random(255));
       }
       rect(x, y, spacing);
-      
+    }
+  }
+}</pre></div>
+      </div>
+    </section>
+
+    <footer class="footer">CC Fest Coding Camp · Starter Sketch · Nested loops and pattern grids</footer>
+  </div>
+
+  <script>
+let spacing = 50;
+
+function setup() {
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
+  background(250, 246, 240);
+
+  for (let x = 0; x < width; x = x + spacing) {
+    for (let y = 0; y < height; y = y + spacing) {
+      if (x % 100 == 0) {
+        fill(random(255));
+      } else {
+        fill(random(255), random(0, 255), random(255));
+      }
+      rect(x, y, spacing);
     }
   }
 }
-
-
-</script>
-  </body>
+  </script>
+</body>
 </html>

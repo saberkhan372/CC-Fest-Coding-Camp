@@ -1,47 +1,133 @@
 <!DOCTYPE html>
-<html>
-  <head>
-<title>Array of Positions / Dot Field Sketch — CC Fest Coding Camp</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta charset="utf-8" />
-  </head>
-  <body>
-    <script>
-// two empty arrays
-var xPositions = [];
-var yPositions = [];
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dot Field Position Sketch — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../starter-sketch.css">
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
+</head>
+<body>
+  <div class="sketch-shell">
+    <div class="sketch-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
 
-var index = 0;
+    <header class="sketch-header">
+      <div class="sketch-meta">
+        <span class="pill session">Session 3</span>
+        <span class="pill type">Starter Sketch</span>
+      </div>
+      <h1>Dot Field Position Sketch</h1>
+      <p class="sketch-subtitle">A simple array seed that stores many x/y positions, then redraws them as a single related system.</p>
+      <div class="tag-row">
+        <span class="tag">arrays</span>
+        <span class="tag">coordinates</span>
+        <span class="tag">repetition</span>
+      </div>
+    </header>
 
+    <main class="sketch-layout">
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Live Seed</h2>
+              <p>This is a clean example of arrays as storage. The sketch keeps lists of positions, then loops through them to draw the field.</p>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div id="canvas-container"></div>
+          </div>
+        </div>
+      </section>
 
+      <aside class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Try / Notice / Remix</h2>
+              <p>Use this one when you want arrays to feel concrete and visual.</p>
+            </div>
+          </div>
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Try this</h3>
+              <p>Change the number of points from <code>100</code> to <code>20</code> or <code>200</code>.</p>
+            </div>
+            <div class="lesson-card">
+              <h3>Notice this</h3>
+              <p>The two arrays stay connected by index: <code>xPositions[i]</code> belongs with <code>yPositions[i]</code>.</p>
+            </div>
+            <div class="lesson-card">
+              <h3>Remix this</h3>
+              <p>Change the dots into stars, faces, or different colors based on the position values.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="card" style="margin-top:22px;">
+      <div class="card-inner">
+        <div class="card-header">
+          <div>
+            <h2>Starter Code</h2>
+            <p>Short enough to live-code, strong enough to remix.</p>
+          </div>
+        </div>
+        <div class="code-panel"><pre>let xPositions = [];
+let yPositions = [];
 
 function setup() {
   createCanvas(400, 400);
   noStroke();
   
-  // push a bunch of random positions into the arrays
-  for (var i = 0; i < 100; i++) {    
-    xPositions.push( random(400) );
-    yPositions.push( random(400) );
+  for (let i = 0; i < 100; i++) {
+    xPositions.push(random(400));
+    yPositions.push(random(400));
   }
-
 }
 
 function draw() {
   background(220);
   fill(0);
   
-  // loop through the arrays and draw ellipses at the x and y positions
-  for(var i = 0; i < xPositions.length; i++){
+  for (let i = 0; i < xPositions.length; i++) {
     ellipse(xPositions[i], yPositions[i], 10, 10);
   }
+}</pre></div>
+      </div>
+    </section>
 
+    <footer class="footer">CC Fest Coding Camp · Starter Sketch · Arrays of positions</footer>
+  </div>
+
+  <script>
+let xPositions = [];
+let yPositions = [];
+
+function setup() {
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
+  noStroke();
+
+  for (let i = 0; i < 100; i++) {
+    xPositions.push(random(400));
+    yPositions.push(random(400));
+  }
 }
 
+function draw() {
+  background(220);
+  fill(44, 42, 38);
 
-</script>
-  </body>
+  for (let i = 0; i < xPositions.length; i++) {
+    ellipse(xPositions[i], yPositions[i], 10, 10);
+  }
+}
+  </script>
+</body>
 </html>

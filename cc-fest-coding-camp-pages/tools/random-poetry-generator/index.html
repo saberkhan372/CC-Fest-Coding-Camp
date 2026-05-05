@@ -1,59 +1,134 @@
 <!DOCTYPE html>
-<html>
-  <head>
-<title>Random Poetry Generator — CC Fest Coding Camp</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    
-    
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,900" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/addons/p5.dom.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-  </head>
-  <body>
-    <script>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Poetry Generator — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../starter-sketch.css">
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
+</head>
+<body>
+  <div class="sketch-shell">
+    <div class="sketch-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
 
+    <header class="sketch-header">
+      <div class="sketch-meta">
+        <span class="pill session">Session 4</span>
+        <span class="pill type">Starter Sketch</span>
+      </div>
+      <h1>Random Poetry Generator</h1>
+      <p class="sketch-subtitle">A tiny language sketch that uses arrays and randomness to build short poetic lines.</p>
+      <div class="tag-row">
+        <span class="tag">arrays</span>
+        <span class="tag">randomness</span>
+        <span class="tag">text</span>
+      </div>
+    </header>
 
+    <main class="sketch-layout">
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Live Seed</h2>
+              <p>Click the canvas to generate a new tiny poem from the same word banks.</p>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div id="canvas-container"></div>
+          </div>
+        </div>
+      </section>
 
-var adjectives = ["baking", "blue","wet","lazy","sunburnt"];
+      <aside class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Try / Notice / Remix</h2>
+              <p>This works well as a live-coding seed for generative language.</p>
+            </div>
+          </div>
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Try this</h3>
+              <p>Add two new adjectives and two new nouns, then click again to see how the poem changes.</p>
+            </div>
+            <div class="lesson-card">
+              <h3>Notice this</h3>
+              <p>The sketch stays short because the arrays do the heavy lifting. New words create new outcomes without changing the structure.</p>
+            </div>
+            <div class="lesson-card">
+              <h3>Remix this</h3>
+              <p>Make it spooky, joyful, futuristic, or local to your neighborhood by swapping the word banks.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
 
-var nouns = ["tree", "hill","highway","sky","city"];
+    <section class="card" style="margin-top:22px;">
+      <div class="card-inner">
+        <div class="card-header">
+          <div>
+            <h2>Starter Code</h2>
+            <p>Simple enough to rewrite from scratch in front of a class.</p>
+          </div>
+        </div>
+        <div class="code-panel"><pre>let adjectives = ["baking", "blue", "wet", "lazy", "sunburnt"];
+let nouns = ["tree", "hill", "highway", "sky", "city"];
+let verbs = ["shimmers", "sweats", "melts", "swims", "gorges"];
 
-var verbs = ["shimmers", "sweats","melts","swims","gorges"];
-
-
-function setup() { 
+function setup() {
   createCanvas(400, 400);
   noLoop();
-  textFont('Helvetica',48);
-} 
-
-function draw() { 
-  background(255,255,100);
-  
-  // nb we can use random() to pick one from an array!
-  
-  var rnd_adjective = random(adjectives);
-  var rnd_noun = random(nouns);
-  var rnd_verb = random(verbs);
-  
-  text("the",50,100);
-
-  text(rnd_adjective,50,150);
-  
-  text(rnd_noun,50,200);
-
-  text(rnd_verb,50,250);
-  
+  textFont("Helvetica", 48);
 }
 
-function mousePressed(){
- draw();
+function draw() {
+  background(255, 255, 100);
+  text("the", 50, 100);
+  text(random(adjectives), 50, 150);
+  text(random(nouns), 50, 200);
+  text(random(verbs), 50, 250);
 }
 
+function mousePressed() {
+  draw();
+}</pre></div>
+      </div>
+    </section>
 
-</script>
-  </body>
+    <footer class="footer">CC Fest Coding Camp · Starter Sketch · Generative language</footer>
+  </div>
+
+  <script>
+let adjectives = ["baking", "blue", "wet", "lazy", "sunburnt"];
+let nouns = ["tree", "hill", "highway", "sky", "city"];
+let verbs = ["shimmers", "sweats", "melts", "swims", "gorges"];
+
+function setup() {
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
+  noLoop();
+  textFont("Helvetica", 48);
+}
+
+function draw() {
+  background(255, 255, 100);
+  fill(44, 42, 38);
+  text("the", 50, 100);
+  text(random(adjectives), 50, 150);
+  text(random(nouns), 50, 200);
+  text(random(verbs), 50, 250);
+}
+
+function mousePressed() {
+  draw();
+}
+  </script>
+</body>
 </html>

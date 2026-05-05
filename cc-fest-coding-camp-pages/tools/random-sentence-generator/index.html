@@ -1,40 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-<title>Random Sentence Generator — CC Fest Coding Camp</title>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta charset="utf-8" />
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Bank Sentence Generator — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../starter-sketch.css">
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
+</head>
+<body>
+  <div class="sketch-shell">
+    <div class="sketch-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
 
-  </head>
-  <body>
-    <main>
+    <header class="sketch-header">
+      <div class="sketch-meta">
+        <span class="pill session">Session 4</span>
+        <span class="pill type">Starter Sketch</span>
+      </div>
+      <h1>Word Bank Sentence Generator</h1>
+      <p class="sketch-subtitle">A lightweight sketch seed for generating simple random sentences from three small arrays.</p>
+      <div class="tag-row">
+        <span class="tag">language</span>
+        <span class="tag">arrays</span>
+        <span class="tag">randomness</span>
+      </div>
+    </header>
+
+    <main class="sketch-layout">
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Live Seed</h2>
+              <p>Click the canvas to generate a fresh set of three random sentences.</p>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div id="canvas-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Try / Notice / Remix</h2>
+              <p>This is a good bridge between array basics and more expressive text generators.</p>
+            </div>
+          </div>
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Try this</h3>
+              <p>Change the nouns and verbs so the sentences feel like a sports story, game story, or camp story.</p>
+            </div>
+            <div class="lesson-card">
+              <h3>Notice this</h3>
+              <p>The sentence structure stays the same, but the array choices make each result feel different.</p>
+            </div>
+            <div class="lesson-card">
+              <h3>Remix this</h3>
+              <p>Add punctuation, a second sentence pattern, or a background illustration tied to the words.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
     </main>
-    <script>
-// let x = 0;
-let x = [3, 7, 9, 2];
 
-let verbs = ["runs", "jumps","swims"];
+    <section class="card" style="margin-top:22px;">
+      <div class="card-inner">
+        <div class="card-header">
+          <div>
+            <h2>Starter Code</h2>
+            <p>Short, readable, and easy to extend live.</p>
+          </div>
+        </div>
+        <div class="code-panel"><pre>let verbs = ["runs", "jumps", "swims"];
 let nouns = ["saber", "meghna", "anaya"];
 let adverbs = ["fast", "slowly", "quietly"];
 
 function setup() {
   createCanvas(400, 400);
-  //console.log(x[0]);
-  
 }
 
-function mousePressed(){
+function mousePressed() {
   background(255);
-  for(let i = 0; i < 3; i = i + 1){
+  for (let i = 0; i < 3; i++) {
     textSize(20);
-    text(random(nouns) + " " + random(verbs) + " " + random(adverbs) + ".", 50 * i + 50, 50 * i + 50)
-    
+    text(
+      random(nouns) + " " + random(verbs) + " " + random(adverbs) + ".",
+      50 * i + 50,
+      50 * i + 50
+    );
+  }
+}</pre></div>
+      </div>
+    </section>
+
+    <footer class="footer">CC Fest Coding Camp · Starter Sketch · Random sentence generation</footer>
+  </div>
+
+  <script>
+let verbs = ["runs", "jumps", "swims"];
+let nouns = ["saber", "meghna", "anaya"];
+let adverbs = ["fast", "slowly", "quietly"];
+
+function setup() {
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
+  background(255);
+}
+
+function mousePressed() {
+  background(255);
+  fill(44, 42, 38);
+  for (let i = 0; i < 3; i++) {
+    textSize(20);
+    text(
+      random(nouns) + " " + random(verbs) + " " + random(adverbs) + ".",
+      50 * i + 50,
+      50 * i + 50
+    );
   }
 }
-
-
-</script>
-  </body>
+  </script>
+</body>
 </html>

@@ -1,22 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-<title>Arrays in Motion — CC Fest Coding Camp</title>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta charset="utf-8" />
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moving Sentence Machine — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../starter-sketch.css">
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
+</head>
+<body>
+  <div class="sketch-shell">
+    <div class="sketch-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
 
-  </head>
-  <body>
-    <main>
+    <header class="sketch-header">
+      <div class="sketch-meta">
+        <span class="pill session">Session 4</span>
+        <span class="pill type">Starter Sketch</span>
+      </div>
+      <h1>Moving Sentence Machine</h1>
+      <p class="sketch-subtitle">A starter sketch that turns generated phrases into moving text objects, combining arrays, language, and motion.</p>
+      <div class="tag-row">
+        <span class="tag">text</span>
+        <span class="tag">motion</span>
+        <span class="tag">arrays</span>
+      </div>
+    </header>
+
+    <main class="sketch-layout">
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Live Seed</h2>
+              <p>Click to generate new sentences, then press any key to pause or resume the motion.</p>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div id="canvas-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Try / Notice / Remix</h2>
+              <p>This seed pushes a little past simple text generation into motion and state.</p>
+            </div>
+          </div>
+          <div class="lesson-grid">
+            <div class="lesson-card">
+              <h3>Try this</h3>
+              <p>Click once to generate phrases, then press a key to freeze them and press again to restart them.</p>
+            </div>
+            <div class="lesson-card">
+              <h3>Notice this</h3>
+              <p>The sketch stores whole sentence objects with both text and position data, not just single words.</p>
+            </div>
+            <div class="lesson-card">
+              <h3>Remix this</h3>
+              <p>Make the sentences fall, bounce, fade, or react to the mouse instead of only sliding sideways.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
     </main>
-    <script>
-let sentences = [];
+
+    <section class="card" style="margin-top:22px;">
+      <div class="card-inner">
+        <div class="card-header">
+          <div>
+            <h2>Starter Code</h2>
+            <p>A nice seed for arrays of objects and simple interaction state.</p>
+          </div>
+        </div>
+        <div class="code-panel"><pre>let sentences = [];
 let xspeed = 2;
 let state = -1;
 
-let verbs = ["runs", "jumps","swims"];
+let verbs = ["runs", "jumps", "swims"];
 let nouns = ["saber", "meghna", "anaya"];
 let adverbs = ["fast", "slowly", "quietly"];
 
@@ -31,13 +97,8 @@ function draw() {
     text(s.text, s.x, s.y);
     s.x += xspeed;
   }
-  if(state == -1){
-    xspeed = 0;
-  } 
-  
-  if(state == 1){
-    xspeed = 2;
-  }
+
+  xspeed = state === -1 ? 0 : 2;
 }
 
 function mousePressed() {
@@ -46,18 +107,54 @@ function mousePressed() {
     let phrase = random(nouns) + " " + random(verbs) + " " + random(adverbs);
     sentences.push({ text: phrase, x: 0, y: i * 100 + 50 });
   }
-  
 }
 
-function keyPressed(){
-   state = state * -1;
-  console.log(state)
+function keyPressed() {
+  state = state * -1;
+}</pre></div>
+      </div>
+    </section>
+
+    <footer class="footer">CC Fest Coding Camp · Starter Sketch · Arrays of moving sentences</footer>
+  </div>
+
+  <script>
+let sentences = [];
+let xspeed = 2;
+let state = -1;
+
+let verbs = ["runs", "jumps", "swims"];
+let nouns = ["saber", "meghna", "anaya"];
+let adverbs = ["fast", "slowly", "quietly"];
+
+function setup() {
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
+  textSize(20);
 }
 
-// function mouseReleased(){
-//   noLoop();
-// }
+function draw() {
+  background(255);
+  fill(44, 42, 38);
+  for (let s of sentences) {
+    text(s.text, s.x, s.y);
+    s.x += xspeed;
+  }
 
-</script>
-  </body>
+  xspeed = state === -1 ? 0 : 2;
+}
+
+function mousePressed() {
+  sentences = [];
+  for (let i = 0; i < 3; i++) {
+    let phrase = random(nouns) + " " + random(verbs) + " " + random(adverbs);
+    sentences.push({ text: phrase, x: 0, y: i * 100 + 50 });
+  }
+}
+
+function keyPressed() {
+  state = state * -1;
+}
+  </script>
+</body>
 </html>
