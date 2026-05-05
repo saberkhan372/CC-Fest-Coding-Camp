@@ -811,8 +811,272 @@ function mousePressed() {
           p.redraw();
         };
       }
+    },
+    "nested-loop-array-grid": {
+      title: "Nested Loop Pattern Studio",
+      session: "Session 3",
+      subtitle: "A compact seed for teaching how nested loops and spacing values build repeated grid patterns.",
+      tags: ["nested loops", "patterns", "grid"],
+      liveSeed: "Press Play to render the pattern. Edit `spacing` or swap `rect()` for `circle()` to change the system.",
+      tryText: "Change `spacing` from `50` to `25` and notice how the grid gets denser.",
+      noticeText: "The outer loop steps across one direction of the grid. The inner loop fills the other direction.",
+      remixText: "Replace `rect()` with `circle()`, or make the color depend on `x` and `y`.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Nested loops and pattern grids",
+      code: `let spacing = 50;
+
+function setup() {
+  createCanvas(400, 400);
+  noLoop();
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  for (let x = 0; x < width; x = x + spacing) {
+    for (let y = 0; y < height; y = y + spacing) {
+      if (x % 100 == 0) {
+        fill(random(255));
+      } else {
+        fill(random(255), random(0, 255), random(255));
+      }
+      rect(x, y, spacing);
+    }
+  }
+}`
+    },
+    "array-position-dot-field": {
+      title: "Dot Field Position Sketch",
+      session: "Session 3",
+      subtitle: "A simple array seed that stores many x/y positions, then redraws them as a single related system.",
+      tags: ["arrays", "coordinates", "repetition"],
+      liveSeed: "Press Play, then click inside the canvas to regenerate the stored dot positions.",
+      tryText: "Change the number of points from `100` to `20` or `200`.",
+      noticeText: "The two arrays stay connected by index: `xPositions[i]` belongs with `yPositions[i]`.",
+      remixText: "Change the dots into stars, faces, or different colors based on the position values.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Arrays of positions",
+      code: `let xPositions = [];
+let yPositions = [];
+
+function setup() {
+  createCanvas(400, 400);
+  noStroke();
+  generateDotField();
+}
+
+function draw() {
+  background(220);
+  fill(44, 42, 38);
+
+  for (let i = 0; i < xPositions.length; i++) {
+    ellipse(xPositions[i], yPositions[i], 10, 10);
+  }
+}
+
+function mousePressed() {
+  generateDotField();
+}
+
+function generateDotField() {
+  xPositions = [];
+  yPositions = [];
+
+  for (let i = 0; i < 100; i++) {
+    xPositions.push(random(width));
+    yPositions.push(random(height));
+  }
+}`
+    },
+    "random-poetry-generator": {
+      title: "Random Poetry Generator",
+      session: "Session 4",
+      subtitle: "A tiny language sketch that uses arrays and randomness to build short poetic lines.",
+      tags: ["arrays", "randomness", "text"],
+      liveSeed: "Press Play, then click inside the canvas to redraw a new poem from the same word banks.",
+      tryText: "Add two new adjectives and two new nouns, then play again to see how the poem changes.",
+      noticeText: "The sketch stays short because the arrays do the heavy lifting. New words create new outcomes without changing the structure.",
+      remixText: "Make it spooky, joyful, futuristic, or local to your neighborhood by swapping the word banks.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Generative language",
+      code: `let adjectives = ["baking", "blue", "wet", "lazy", "sunburnt"];
+let nouns = ["tree", "hill", "highway", "sky", "city"];
+let verbs = ["shimmers", "sweats", "melts", "swims", "gorges"];
+
+function setup() {
+  createCanvas(400, 400);
+  noLoop();
+  textFont("Helvetica", 48);
+}
+
+function draw() {
+  background(255, 255, 100);
+  fill(44, 42, 38);
+  text("the", 50, 100);
+  text(random(adjectives), 50, 150);
+  text(random(nouns), 50, 200);
+  text(random(verbs), 50, 250);
+}
+
+function mousePressed() {
+  redraw();
+}`
+    },
+    "random-sentence-generator": {
+      title: "Word Bank Sentence Generator",
+      session: "Session 4",
+      subtitle: "A lightweight sketch seed for generating simple random sentences from three small arrays.",
+      tags: ["language", "arrays", "randomness"],
+      liveSeed: "Press Play to generate the first set of sentences, then click the canvas to remix them.",
+      tryText: "Change the nouns and verbs so the sentences feel like a sports story, game story, or camp story.",
+      noticeText: "The sentence structure stays the same, but the array choices make each result feel different.",
+      remixText: "Add punctuation, a second sentence pattern, or a background illustration tied to the words.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Random sentence generation",
+      code: `let verbs = ["runs", "jumps", "swims"];
+let nouns = ["saber", "meghna", "anaya"];
+let adverbs = ["fast", "slowly", "quietly"];
+
+function setup() {
+  createCanvas(400, 400);
+  generateSentences();
+}
+
+function generateSentences() {
+  background(255);
+  fill(44, 42, 38);
+
+  for (let i = 0; i < 3; i++) {
+    textSize(20);
+    text(
+      random(nouns) + " " + random(verbs) + " " + random(adverbs) + ".",
+      50 * i + 50,
+      50 * i + 50
+    );
+  }
+}
+
+function mousePressed() {
+  generateSentences();
+}`
+    },
+    "arrays-in-motion": {
+      title: "Moving Sentence Machine",
+      session: "Session 4",
+      subtitle: "A starter sketch that turns generated phrases into moving text objects, combining arrays, language, and motion.",
+      tags: ["text", "motion", "arrays"],
+      liveSeed: "Press Play to generate moving phrases. Click to remix them, then press any key in the preview to pause or resume motion.",
+      tryText: "Click to remix the phrases, then press a key to pause or resume the movement.",
+      noticeText: "The sketch stores whole sentence objects with both text and position data, not just single words.",
+      remixText: "Make the sentences fall, bounce, fade, or react to the mouse instead of only sliding sideways.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Arrays of moving sentences",
+      code: `let sentences = [];
+let xspeed = 2;
+let moving = true;
+
+let verbs = ["runs", "jumps", "swims"];
+let nouns = ["saber", "meghna", "anaya"];
+let adverbs = ["fast", "slowly", "quietly"];
+
+function setup() {
+  createCanvas(400, 400);
+  textSize(20);
+  generateSentences();
+}
+
+function draw() {
+  background(255);
+  fill(44, 42, 38);
+  for (let s of sentences) {
+    text(s.text, s.x, s.y);
+
+    if (moving) {
+      s.x += xspeed;
+    }
+
+    if (s.x > width) {
+      s.x = -textWidth(s.text);
+    }
+  }
+}
+
+function generateSentences() {
+  sentences = [];
+  for (let i = 0; i < 3; i++) {
+    let phrase = random(nouns) + " " + random(verbs) + " " + random(adverbs);
+    sentences.push({ text: phrase, x: i * 20, y: i * 100 + 80 });
+  }
+}
+
+function mousePressed() {
+  generateSentences();
+}
+
+function keyPressed() {
+  moving = !moving;
+}`
     }
   };
+
+  function buildRunnerDoc(code) {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #f7f1e7;
+      font-family: sans-serif;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+    canvas {
+      max-width: 100%;
+      height: auto !important;
+      display: block;
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(44,42,38,.08);
+      background: white;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"><\/script>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <script>
+    window.addEventListener("error", function(event) {
+      const pre = document.createElement("pre");
+      pre.textContent = event.message;
+      pre.style.padding = "16px";
+      pre.style.color = "#a33";
+      pre.style.whiteSpace = "pre-wrap";
+      document.body.innerHTML = "";
+      document.body.appendChild(pre);
+    });
+  <\/script>
+  <script>
+${code}
+  <\/script>
+</body>
+</html>`;
+  }
+
+  function stopRunner(frame) {
+    frame.srcdoc = `<!DOCTYPE html><html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100%;background:#f7f1e7;color:#6b6760;font-family:DM Sans, sans-serif;">Preview stopped</body></html>`;
+  }
 
   function renderStarterSeedPage(slug) {
     const seed = seeds[slug];
@@ -840,55 +1104,58 @@ function mousePressed() {
         </header>
 
         <main class="sketch-layout">
-          <section class="card">
+          <section class="card editor-card">
             <div class="card-inner">
-              <div class="card-header">
+              <div class="editor-toolbar">
                 <div>
-                  <h2>Live Seed</h2>
+                  <h2>Starter Editor</h2>
                   <p>${seed.liveSeed}</p>
                 </div>
+                <div class="button-row">
+                  <button class="button primary" id="run-button" type="button">Play</button>
+                  <button class="button ghost" id="stop-button" type="button">Stop</button>
+                  <button class="button ghost" id="reset-button" type="button">Reset</button>
+                </div>
               </div>
-              <div class="canvas-frame">
-                <div id="canvas-container"></div>
+              <div class="editor-layout">
+                <div class="editor-pane">
+                  <div class="pane-label">Code</div>
+                  <textarea id="starter-editor" class="code-editor" spellcheck="false"></textarea>
+                </div>
+                <div class="preview-pane">
+                  <div class="pane-label">Canvas</div>
+                  <div class="preview-stage">
+                    <iframe id="preview-frame" class="preview-frame" title="${seed.title} preview"></iframe>
+                  </div>
+                  <div class="editor-status">Use Play to rerun your code after edits. Stop clears the preview.</div>
+                </div>
               </div>
             </div>
           </section>
-
-          <aside class="card">
-            <div class="card-inner">
-              <div class="card-header">
-                <div>
-                  <h2>Try / Notice / Remix</h2>
-                  <p>Keep the code small, visible, and easy to remix live.</p>
-                </div>
-              </div>
-              <div class="lesson-grid">
-                <div class="lesson-card">
-                  <h3>Try this</h3>
-                  <p>${seed.tryText}</p>
-                </div>
-                <div class="lesson-card">
-                  <h3>Notice this</h3>
-                  <p>${seed.noticeText}</p>
-                </div>
-                <div class="lesson-card">
-                  <h3>Remix this</h3>
-                  <p>${seed.remixText}</p>
-                </div>
-              </div>
-            </div>
-          </aside>
         </main>
 
-        <section class="card" style="margin-top:22px;">
+        <section class="card lessons-card" style="margin-top:22px;">
           <div class="card-inner">
             <div class="card-header">
               <div>
-                <h2>Starter Code</h2>
-                <p>Short enough to live-code, strong enough to extend.</p>
+                <h2>Try / Notice / Remix</h2>
+                <p>Keep the code small, visible, and easy to remix live, just like a p5.js Web Editor sketch.</p>
               </div>
             </div>
-            <div class="code-panel"><pre id="starter-code"></pre></div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>${seed.tryText}</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>${seed.noticeText}</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>${seed.remixText}</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -896,9 +1163,27 @@ function mousePressed() {
       </div>
     `;
 
-    const codeBlock = document.getElementById("starter-code");
-    codeBlock.textContent = seed.code.trim();
-    new p5(seed.sketch);
+    const editor = document.getElementById("starter-editor");
+    const frame = document.getElementById("preview-frame");
+    const runButton = document.getElementById("run-button");
+    const stopButton = document.getElementById("stop-button");
+    const resetButton = document.getElementById("reset-button");
+    const initialCode = seed.code.trim();
+
+    editor.value = initialCode;
+
+    function runCurrentCode() {
+      frame.srcdoc = buildRunnerDoc(editor.value);
+    }
+
+    runButton.addEventListener("click", runCurrentCode);
+    stopButton.addEventListener("click", () => stopRunner(frame));
+    resetButton.addEventListener("click", () => {
+      editor.value = initialCode;
+      runCurrentCode();
+    });
+
+    runCurrentCode();
   }
 
   window.renderStarterSeedPage = renderStarterSeedPage;

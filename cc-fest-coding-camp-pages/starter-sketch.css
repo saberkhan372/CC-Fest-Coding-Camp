@@ -111,9 +111,7 @@ a{color:inherit}
 }
 
 .sketch-layout{
-  display:grid;
-  grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);
-  gap:22px;
+  display:block;
 }
 
 .card{
@@ -144,29 +142,86 @@ a{color:inherit}
   font-size:14px;
 }
 
-.canvas-frame{
+.editor-card .card-inner{padding:18px}
+
+.editor-toolbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  margin-bottom:16px;
+}
+
+.editor-toolbar h2{
+  margin:0 0 6px;
+  font-size:22px;
+}
+
+.editor-toolbar p{
+  margin:0;
+  color:var(--ink-light);
+  font-size:14px;
+  max-width:560px;
+}
+
+.editor-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.06fr) minmax(360px,.94fr);
+  gap:18px;
+}
+
+.editor-pane,
+.preview-pane{
+  min-width:0;
+}
+
+.pane-label{
+  margin-bottom:10px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--accent);
+}
+
+.code-editor{
+  width:100%;
+  min-height:clamp(360px,52vh,620px);
+  resize:vertical;
+  border:none;
+  outline:none;
+  border-radius:18px;
   padding:18px;
+  background:var(--code-bg);
+  color:var(--code-text);
+  font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:13px;
+  line-height:1.6;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+}
+
+.preview-stage{
+  min-height:clamp(360px,52vh,620px);
+  padding:12px;
   background:linear-gradient(180deg,var(--cream),#fff);
   border:1px solid var(--cream-dark);
   border-radius:18px;
 }
 
-#canvas-container{
-  min-height:clamp(340px,48vh,520px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:6px;
+.preview-frame{
+  width:100%;
+  height:100%;
+  min-height:clamp(336px,48vh,596px);
+  border:none;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 8px 24px rgba(44,42,38,.08);
 }
 
-#canvas-container canvas{
-  display:block;
-  max-width:100%;
-  height:auto !important;
-  border:1px solid var(--cream-deep);
-  border-radius:18px;
-  box-shadow:0 8px 24px rgba(44,42,38,.08);
-  background:#fff;
+.editor-status{
+  margin-top:10px;
+  color:var(--ink-light);
+  font-size:13px;
 }
 
 .button-row{
@@ -248,7 +303,7 @@ a{color:inherit}
 }
 
 @media(max-width:960px){
-  .sketch-layout{grid-template-columns:1fr}
+  .editor-layout{grid-template-columns:1fr}
 }
 
 @media(max-width:720px){
@@ -256,4 +311,7 @@ a{color:inherit}
   .sketch-header,.card-inner{padding:20px}
   .card-header,.sketch-topbar{display:block}
   .sketch-topbar a{display:inline-block;margin-top:10px}
+  .editor-toolbar{display:block}
+  .button-row{margin-top:12px}
+  .editor-card .card-inner{padding:16px}
 }
