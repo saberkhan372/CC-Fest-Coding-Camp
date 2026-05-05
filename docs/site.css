@@ -344,31 +344,6 @@ a{color:inherit}
   font-size:13px;
 }
 
-.camp-words{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:14px;
-  flex-wrap:wrap;
-  padding:20px 0 4px;
-  font-family:"Fraunces","DM Sans",system-ui,sans-serif;
-  font-size:clamp(17px,2.4vw,26px);
-  font-weight:800;
-  letter-spacing:-.03em;
-  color:var(--ink-light);
-}
-
-.camp-words .word{
-  display:inline-block;
-}
-
-.camp-words .sep{
-  color:var(--line);
-  font-weight:400;
-  font-family:"DM Sans",sans-serif;
-  font-size:.8em;
-}
-
 .section-label{
   display:inline-flex;
   align-items:center;
@@ -449,6 +424,35 @@ a{color:inherit}
   color:var(--ink-light);
 }
 
+/* ─── CAMP WORDS STRIP ─── */
+
+.camp-words{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  padding:20px 0 4px;
+  font-family:"Fraunces","DM Sans",system-ui,sans-serif;
+  font-size:clamp(17px,2.4vw,26px);
+  font-weight:800;
+  letter-spacing:-.03em;
+  color:var(--ink-light);
+}
+
+.camp-words .word{
+  display:inline-block;
+}
+
+.camp-words .sep{
+  color:var(--line);
+  font-weight:400;
+  font-family:"DM Sans",sans-serif;
+  font-size:.8em;
+}
+
+/* ─── TOOL STATIONS ─── */
+
 .station-list{
   display:flex;
   flex-direction:column;
@@ -460,10 +464,7 @@ a{color:inherit}
   border-top:1px solid var(--line);
 }
 
-.station:first-child{
-  border-top:none;
-  padding-top:0;
-}
+.station:first-child{border-top:none;padding-top:0}
 
 .station-header{
   display:flex;
@@ -494,6 +495,8 @@ a{color:inherit}
   font-size:13px;
   line-height:1.4;
 }
+
+/* ─── GALLERY ─── */
 
 .gallery{
   display:grid;
