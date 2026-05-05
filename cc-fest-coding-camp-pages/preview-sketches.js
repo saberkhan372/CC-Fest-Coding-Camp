@@ -22,15 +22,15 @@
     "webgl-3d-workshop": { family: "cube", label: "3D" },
     "sound-shape-visualizer": { family: "sound", label: "Sound" },
     "image-remix-studio": { family: "image", label: "Remix" },
-    "mouse-trail-drawing-seed": { family: "trail", label: "Trail" },
-    "bouncing-ball-starter": { family: "bounce", label: "Motion" },
-    "click-to-create-shapes": { family: "objects", label: "Clicks" },
+    "mouse-trail-drawing-seed": { family: "trailSeed", label: "Trail" },
+    "bouncing-ball-starter": { family: "bounceSeed", label: "Bounce" },
+    "click-to-create-shapes": { family: "stampSeed", label: "Click" },
     "color-from-position": { family: "shapeColor", label: "Color" },
     "noise-walker": { family: "noiseRandom", label: "Noise" },
-    "function-creature-stamp": { family: "function", label: "Functions" },
-    "keyboard-controlled-character": { family: "keyboard", label: "Keys" },
+    "function-creature-stamp": { family: "functionSeed", label: "Function" },
+    "keyboard-controlled-character": { family: "keyboardSeed", label: "Keys" },
     "simple-collision-game-seed": { family: "collision", label: "Collision" },
-    "data-self-portrait-seed": { family: "dataMap", label: "Data" },
+    "data-self-portrait-seed": { family: "dataPortraitSeed", label: "Data" },
     "image-grid-remix-seed": { family: "image", label: "Image" },
     "sound-pulse-seed": { family: "sound", label: "Sound" },
     "mini-generative-poster-seed": { family: "poster", label: "Poster" },
@@ -272,6 +272,25 @@
         ctx.fill();
         break;
       }
+      case "bounceSeed": {
+        ctx.fillStyle = "#fff";
+        roundedRect(ctx, 16, 14, w - 32, h - 28, 14);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(61,90,128,.18)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(16, 14, w - 32, h - 28);
+        const speed = hover ? 1.65 : 1;
+        const bx = 30 + ((t * 110 * speed) % (w - 60));
+        const by = 24 + ((Math.sin(t * 2.5 * speed) * 0.5 + 0.5) * (h - 48));
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(bx, by, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#3d5a80";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText("if edge, reverse", 22, 28);
+        break;
+      }
       case "transform": {
         drawGrid(ctx, w, h, 22, "rgba(61,90,128,.06)");
         ctx.save();
@@ -372,17 +391,22 @@
         }
         break;
       }
-      case "function": {
+      case "function":
+      case "functionSeed": {
         ctx.save();
-        const centers = [[w * 0.28, h * 0.44], [w * 0.52, h * 0.58], [w * 0.76, h * 0.42]];
+        const centers = family === "functionSeed"
+          ? [[w * 0.24, h * 0.44], [w * 0.5, h * 0.58], [w * 0.76, h * 0.42]]
+          : [[w * 0.28, h * 0.44], [w * 0.52, h * 0.58], [w * 0.76, h * 0.42]];
         centers.forEach(([cx, cy], i) => {
-          for (let petal = 0; petal < 6; petal++) {
-            const angle = petal * (Math.PI / 3) + t * 0.6;
-            const px2 = cx + Math.cos(angle) * 15;
-            const py2 = cy + Math.sin(angle) * 15;
-            ctx.fillStyle = i % 2 === 0 ? "rgba(224,122,95,.58)" : "rgba(61,90,128,.58)";
+          const petalCount = family === "functionSeed" ? 5 : 6;
+          const radius = family === "functionSeed" ? 13 + i * 1.5 : 15;
+          for (let petal = 0; petal < petalCount; petal++) {
+            const angle = petal * ((Math.PI * 2) / petalCount) + t * 0.6;
+            const px2 = cx + Math.cos(angle) * radius;
+            const py2 = cy + Math.sin(angle) * radius;
+            ctx.fillStyle = i % 2 === 0 ? "rgba(224,122,95,.62)" : "rgba(61,90,128,.62)";
             ctx.beginPath();
-            ctx.arc(px2, py2, 9, 0, Math.PI * 2);
+            ctx.arc(px2, py2, family === "functionSeed" ? 8 + i : 9, 0, Math.PI * 2);
             ctx.fill();
           }
           ctx.fillStyle = "#2c2a26";
@@ -390,6 +414,11 @@
           ctx.arc(cx, cy, 7, 0, Math.PI * 2);
           ctx.fill();
         });
+        if (family === "functionSeed") {
+          ctx.fillStyle = "#3d5a80";
+          ctx.font = "700 10px DM Mono, monospace";
+          ctx.fillText("drawCreature(x, y, size)", 18, h - 16);
+        }
         ctx.restore();
         break;
       }
@@ -456,6 +485,30 @@
         });
         break;
       }
+      case "dataPortraitSeed": {
+        const labels = ["sleep", "energy", "focus", "joy"];
+        const values = [0.42, 0.8, 0.56, 0.92];
+        const bubbleMode = hover;
+        values.forEach((v, i) => {
+          const x = 18 + i * ((w - 38) / 4);
+          const bw = 32;
+          const hValue = 20 + v * (h - 52);
+          if (bubbleMode) {
+            ctx.fillStyle = i % 2 ? "rgba(224,122,95,.78)" : "rgba(61,90,128,.72)";
+            ctx.beginPath();
+            ctx.arc(x + 16, h - 26 - v * 44, 7 + v * 16, 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            ctx.fillStyle = i % 2 ? "rgba(224,122,95,.78)" : "rgba(61,90,128,.72)";
+            roundedRect(ctx, x, h - 18 - hValue, bw, hValue, 10);
+            ctx.fill();
+          }
+          ctx.fillStyle = "#6b6760";
+          ctx.font = "600 9px DM Sans, sans-serif";
+          ctx.fillText(labels[i], x - 1, h - 6);
+        });
+        break;
+      }
       case "ripple": {
         const x = 24 + px * (w - 48);
         const y = 20 + py * (h - 40);
@@ -482,6 +535,24 @@
           ctx.arc(x, y, 6 + i * 0.9, 0, Math.PI * 2);
           ctx.fill();
         }
+        break;
+      }
+      case "trailSeed": {
+        const targetX = 24 + px * (w - 48);
+        const targetY = 22 + py * (h - 44);
+        for (let i = 0; i < 11; i++) {
+          const mix = i / 10;
+          const x = 20 + mix * (targetX - 20) + Math.sin(t * 2.6 + i * 0.4) * 2;
+          const y = h - 22 - mix * ((h - 22) - targetY) + Math.cos(t * 2.2 + i * 0.35) * 2;
+          ctx.fillStyle = `rgba(61,90,128,${0.08 + mix * 0.55})`;
+          ctx.beginPath();
+          ctx.arc(x, y, 4 + mix * 9, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(targetX, targetY, 7, 0, Math.PI * 2);
+        ctx.fill();
         break;
       }
       case "collision": {
@@ -518,7 +589,35 @@
         });
         break;
       }
-      case "keyboard": {
+      case "stampSeed": {
+        const stamps = [
+          { x: w * 0.24, y: h * 0.38, kind: "circle", c: "#3d5a80" },
+          { x: w * 0.52, y: h * 0.56, kind: "triangle", c: "#e07a5f" },
+          { x: w * 0.74, y: h * 0.34, kind: "square", c: "#81b29a" }
+        ];
+        const hoverStamp = { x: 26 + px * (w - 52), y: 22 + py * (h - 44), kind: "circle", c: "#e07a5f" };
+        [...stamps, hoverStamp].forEach((stamp, i) => {
+          ctx.fillStyle = stamp.c;
+          if (stamp.kind === "circle") {
+            ctx.beginPath();
+            ctx.arc(stamp.x, stamp.y, i === stamps.length ? 10 : 9 + i, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (stamp.kind === "square") {
+            roundedRect(ctx, stamp.x - 11, stamp.y - 11, 22, 22, 7);
+            ctx.fill();
+          } else {
+            ctx.beginPath();
+            ctx.moveTo(stamp.x, stamp.y - 12);
+            ctx.lineTo(stamp.x + 12, stamp.y + 10);
+            ctx.lineTo(stamp.x - 12, stamp.y + 10);
+            ctx.closePath();
+            ctx.fill();
+          }
+        });
+        break;
+      }
+      case "keyboard":
+      case "keyboardSeed": {
         ctx.fillStyle = "#fff";
         roundedRect(ctx, 18, 18, w - 36, h - 36, 16);
         ctx.fill();
@@ -533,8 +632,16 @@
           ctx.fill();
         });
         ctx.fillStyle = "#e07a5f";
-        roundedRect(ctx, w * 0.5 - 16 + Math.sin(t * 2) * 14, h * 0.72 - 16, 32, 32, 10);
+        const moveAmount = family === "keyboardSeed" ? (hover ? 20 : 10) : 14;
+        roundedRect(ctx, w * 0.5 - 16 + Math.sin(t * 2) * moveAmount, h * 0.72 - 16, 32, 32, 10);
         ctx.fill();
+        if (family === "keyboardSeed") {
+          ctx.fillStyle = "#2c2a26";
+          ctx.beginPath();
+          ctx.arc(w * 0.5 - 6 + Math.sin(t * 2) * moveAmount, h * 0.72 - 3, 3, 0, Math.PI * 2);
+          ctx.arc(w * 0.5 + 6 + Math.sin(t * 2) * moveAmount, h * 0.72 - 3, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
         break;
       }
       case "cube": {
