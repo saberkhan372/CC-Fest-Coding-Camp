@@ -956,6 +956,272 @@ function mousePressed() {
   generateSentences();
 }`
     },
+    "lerp-follow-seed": {
+      title: "lerp() Follow Seed",
+      session: "Things That Move",
+      subtitle: "A smooth-motion seed where a circle follows the mouse using lerp() — the simplest way to feel the difference between snapping and easing.",
+      tags: ["lerp()", "motion", "easing"],
+      liveSeed: "Move the mouse slowly, then quickly. The circle eases toward you instead of jumping.",
+      tryText: "Change 0.08 to 0.3 for a faster follow, or 0.02 for a very dreamy one. Each value gives the motion a personality.",
+      noticeText: "lerp() moves 8% of the remaining distance every frame — so it slows down as it gets closer.",
+      remixText: "Make multiple circles each following at different speeds, or make the follower leave a fading trail.",
+      footer: "CC Fest Coding Camp · Starter Sketch · lerp() and easing",
+      code: `let x = 200;
+let y = 200;
+
+function setup() {
+  createCanvas(400, 400);
+  noStroke();
+}
+
+function draw() {
+  background(250, 246, 240, 30);
+
+  x = lerp(x, mouseX, 0.08);
+  y = lerp(y, mouseY, 0.08);
+
+  // target ring
+  stroke(224, 122, 95, 120);
+  noFill();
+  strokeWeight(1.5);
+  circle(mouseX, mouseY, 28);
+
+  // follower
+  noStroke();
+  fill(61, 90, 128, 220);
+  circle(x, y, 42);
+}`,
+      sketch: (p) => {
+        let x = 200;
+        let y = 200;
+        p.setup = () => {
+          const canvas = p.createCanvas(400, 400);
+          canvas.parent("canvas-container");
+        };
+        p.draw = () => {
+          p.background(250, 246, 240, 30);
+          x = p.lerp(x, p.mouseX, 0.08);
+          y = p.lerp(y, p.mouseY, 0.08);
+          p.stroke(224, 122, 95, 120);
+          p.noFill();
+          p.strokeWeight(1.5);
+          p.circle(p.mouseX, p.mouseY, 28);
+          p.noStroke();
+          p.fill(61, 90, 128, 50);
+          p.circle(x, y, 60);
+          p.fill(61, 90, 128, 220);
+          p.circle(x, y, 42);
+        };
+      }
+    },
+    "dist-proximity-seed": {
+      title: "dist() Proximity Seed",
+      session: "Things That Move",
+      subtitle: "A seed where shapes continuously react to mouse distance — size and opacity shift in real time, making dist() feel physical before it feels like code.",
+      tags: ["dist()", "proximity", "interaction"],
+      liveSeed: "Move the mouse near and far from the circles. The closer you get, the bigger and brighter they grow.",
+      tryText: "Change 300 in the map() call to 150 so the effect only activates when you're closer.",
+      noticeText: "dist() returns a number — the bigger the number, the farther away. map() turns that number into a size.",
+      remixText: "Make circles repel the mouse instead of attracting it, or change color instead of size.",
+      footer: "CC Fest Coding Camp · Starter Sketch · dist() and continuous proximity",
+      code: `let dots = [];
+
+function setup() {
+  createCanvas(400, 400);
+  noStroke();
+  for (let i = 0; i < 9; i++) {
+    dots.push({
+      x: 60 + (i % 3) * 140,
+      y: 120 + floor(i / 3) * 80
+    });
+  }
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  for (let dot of dots) {
+    let d = dist(mouseX, mouseY, dot.x, dot.y);
+    let size = map(d, 0, 300, 80, 16);
+    let alpha = map(d, 0, 300, 255, 70);
+
+    fill(61, 90, 128, alpha);
+    circle(dot.x, dot.y, size);
+  }
+}`,
+      sketch: (p) => {
+        const dots = [];
+        p.setup = () => {
+          const canvas = p.createCanvas(400, 400);
+          canvas.parent("canvas-container");
+          p.noStroke();
+          for (let i = 0; i < 9; i++) {
+            dots.push({ x: 60 + (i % 3) * 140, y: 120 + Math.floor(i / 3) * 80 });
+          }
+        };
+        p.draw = () => {
+          p.background(250, 246, 240);
+          for (const dot of dots) {
+            const d = p.dist(p.mouseX, p.mouseY, dot.x, dot.y);
+            const size = p.map(d, 0, 300, 80, 16);
+            const alpha = p.map(d, 0, 300, 255, 70);
+            p.fill(61, 90, 128, alpha);
+            p.circle(dot.x, dot.y, size);
+          }
+        };
+      }
+    },
+    "hsb-color-seed": {
+      title: "HSB Color Expression Seed",
+      session: "Your Canvas, Your Voice",
+      subtitle: "A seed where mouse Y controls saturation across a row of hues — drag down and every color drains to gray, making HSB click instantly.",
+      tags: ["HSB", "color", "map()"],
+      liveSeed: "Move the mouse up and down. Watch every hue drain to gray as saturation hits zero.",
+      tryText: "Try mapping mouseX to hue rotation instead of mouseY to saturation — you get a completely different effect.",
+      noticeText: "The magic moment: drag to the bottom. All seven circles turn the same gray. Hue stops mattering when saturation is 0.",
+      remixText: "Add a second row where brightness changes, or turn the circles into a gradient stripe background.",
+      footer: "CC Fest Coding Camp · Starter Sketch · HSB color and saturation",
+      code: `function setup() {
+  createCanvas(400, 400);
+  colorMode(HSB, 360, 100, 100);
+  noStroke();
+}
+
+function draw() {
+  background(0, 0, 96);
+
+  let sat = map(mouseY, 0, height, 100, 0);
+
+  for (let i = 0; i < 7; i++) {
+    let hue = map(i, 0, 6, 0, 300);
+    let x = 36 + i * 52;
+
+    fill(hue, sat, 78);
+    circle(x, height / 2, 44);
+
+    fill(0, 0, 30);
+    textSize(11);
+    textAlign(CENTER);
+    text(floor(hue) + "°", x, height / 2 + 34);
+  }
+
+  fill(0, 0, 30);
+  textSize(14);
+  textAlign(LEFT);
+  text("saturation: " + floor(sat) + "%", 18, 30);
+}`,
+      sketch: (p) => {
+        p.setup = () => {
+          const canvas = p.createCanvas(400, 400);
+          canvas.parent("canvas-container");
+          p.colorMode(p.HSB, 360, 100, 100);
+          p.noStroke();
+        };
+        p.draw = () => {
+          p.background(0, 0, 96);
+          const sat = p.map(p.mouseY, 0, p.height, 100, 0, true);
+          for (let i = 0; i < 7; i++) {
+            const hue = p.map(i, 0, 6, 0, 300);
+            const x = 36 + i * 52;
+            p.fill(hue, sat, 78);
+            p.circle(x, p.height / 2, 44);
+            p.fill(0, 0, 30);
+            p.textSize(10);
+            p.textAlign(p.CENTER);
+            p.text(Math.floor(hue) + "°", x, p.height / 2 + 34);
+          }
+          p.fill(0, 0, 30);
+          p.textSize(13);
+          p.textAlign(p.LEFT);
+          p.text("sat: " + Math.floor(sat) + "%", 18, 28);
+        };
+      }
+    },
+    "text-as-visual-seed": {
+      title: "Text as Visual Material",
+      session: "Open Studio",
+      subtitle: "A seed where words become visual objects — each one placed, sized, rotated, and colored independently, treating text like a drawn shape.",
+      tags: ["text", "composition", "randomness"],
+      liveSeed: "Click to regenerate the layout. Change the words and colors to make it feel like you.",
+      tryText: "Change the words array to your own words — your name, a place, a feeling. Watch the composition shift.",
+      noticeText: "Each word is drawn with push()/pop() so translate and rotate apply only to that word, then reset.",
+      remixText: "Make all words the same size but different colors, or have size grow based on word position from center.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Text as visual material",
+      code: `let words = ["make", "code", "remix", "play", "build", "explore", "yes", "now"];
+
+function setup() {
+  createCanvas(400, 400);
+  noLoop();
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  for (let i = 0; i < 14; i++) {
+    let x = random(30, width - 30);
+    let y = random(40, height - 20);
+    let s = random(14, 72);
+    let a = random(-PI / 5, PI / 5);
+    let c = random([
+      color(61, 90, 128, 220),
+      color(224, 122, 95, 210),
+      color(129, 178, 154, 220)
+    ]);
+
+    push();
+    translate(x, y);
+    rotate(a);
+    noStroke();
+    fill(c);
+    textSize(s);
+    textAlign(CENTER, CENTER);
+    text(random(words), 0, 0);
+    pop();
+  }
+}
+
+function mousePressed() {
+  redraw();
+}`,
+      sketch: (p) => {
+        const words = ["make", "code", "remix", "play", "build", "explore"];
+        let items = [];
+        function build() {
+          items = [];
+          for (let i = 0; i < 10; i++) {
+            items.push({
+              x: p.random(20, 380),
+              y: p.random(30, 370),
+              s: p.random(12, 64),
+              a: p.random(-Math.PI / 5, Math.PI / 5),
+              word: p.random(words),
+              c: p.random([p.color(61, 90, 128, 210), p.color(224, 122, 95, 200), p.color(129, 178, 154, 210)])
+            });
+          }
+        }
+        p.setup = () => {
+          const canvas = p.createCanvas(400, 400);
+          canvas.parent("canvas-container");
+          p.noLoop();
+          build();
+        };
+        p.draw = () => {
+          p.background(250, 246, 240);
+          p.noStroke();
+          for (const item of items) {
+            p.push();
+            p.translate(item.x, item.y);
+            p.rotate(item.a);
+            p.fill(item.c);
+            p.textSize(item.s);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.text(item.word, 0, 0);
+            p.pop();
+          }
+        };
+        p.mousePressed = () => { build(); p.redraw(); };
+      }
+    },
     "arrays-in-motion": {
       title: "Moving Sentence Machine",
       session: "Session 4",
