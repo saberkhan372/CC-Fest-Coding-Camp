@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<title>Arrays in Motion — CC Fest Coding Camp</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    <main>
+    </main>
+    <script>
+let sentences = [];
+let xspeed = 2;
+let state = -1;
+
+let verbs = ["runs", "jumps","swims"];
+let nouns = ["saber", "meghna", "anaya"];
+let adverbs = ["fast", "slowly", "quietly"];
+
+function setup() {
+  createCanvas(400, 400);
+  textSize(20);
+}
+
+function draw() {
+  background(255);
+  for (let s of sentences) {
+    text(s.text, s.x, s.y);
+    s.x += xspeed;
+  }
+  if(state == -1){
+    xspeed = 0;
+  } 
+  
+  if(state == 1){
+    xspeed = 2;
+  }
+}
+
+function mousePressed() {
+  sentences = [];
+  for (let i = 0; i < 3; i++) {
+    let phrase = random(nouns) + " " + random(verbs) + " " + random(adverbs);
+    sentences.push({ text: phrase, x: 0, y: i * 100 + 50 });
+  }
+  
+}
+
+function keyPressed(){
+   state = state * -1;
+  console.log(state)
+}
+
+// function mouseReleased(){
+//   noLoop();
+// }
+
+</script>
+  </body>
+</html>

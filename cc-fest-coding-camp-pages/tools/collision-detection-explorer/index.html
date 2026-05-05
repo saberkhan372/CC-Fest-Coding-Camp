@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Collision Detection Explorer — CC Fest Coding Camp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 800px;
+            margin: 20px;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .code-display {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        select, button {
+            margin: 5px;
+            padding: 8px;
+        }
+        .canvas-container {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+        }
+        .explanation {
+            background: #fff8dc;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Collision Detection Explorer</h1>
+
+        <div class="controls">
+            <select id="collisionType" onchange="updateCollisionType()">
+                <option value="circle">Circle to Circle</option>
+                <option value="rect">Rectangle to Rectangle</option>
+                <option value="circle-rect">Circle to Rectangle</option>
+                <option value="point">Point to Shape</option>
+            </select>
+            <button onclick="toggleDraggable()">Toggle Draggable Shapes</button>
+            <button onclick="resetShapes()">Reset Positions</button>
+        </div>
+
+        <div class="explanation" id="explanation">
+            Select a collision type and drag shapes to see how collision detection works.
+        </div>
+
+        <div id="canvas-container" class="canvas-container"></div>
+
+        <div class="code-display" id="codeDisplay"></div>
+    </div>
+
+    <script>
+let shapes = {
+            circle1: { x: 200, y: 200, r: 40 },
+            circle2: { x: 400, y: 200, r: 40 },
+            rect1: { x: 150, y: 150, w: 80, h: 80 },
+            rect2: { x: 350, y: 150, w: 80, h: 80 }
+        };
+
+        let selectedShape = null;
+        let isDraggable = true;
+        let currentType = 'circle';
+
+        new p5((p) => {
+            p.setup = () => {
+                let canvas = p.createCanvas(800, 400);
+                canvas.parent('canvas-container');
+                updateCollisionType();
+            };
+
+            p.draw = () => {
+                p.background(240);
+
+                // Draw grid
+                p.stroke(200);
+                for (let i = 0; i < p.width; i += 20) {
+                    p.line(i, 0, i, p.height);
+                    p.line(0, i, p.width, i);
+                }
+
+                switch (currentType) {
+                    case 'circle':
+                        drawCircleCollision(p);
+                        break;
+                    case 'rect':
+                        drawRectCollision(p);
+                        break;
+                    case 'circle-rect':
+                        drawCircleRectCollision(p);
+                        break;
+                    case 'point':
+                        drawPointCollision(p);
+                        break;
+                }
+            };
+
+            p.mousePressed = () => {
+                if (!isDraggable) return;
+                let mousePoint = { x: p.mouseX, y: p.mouseY };
+
+                if (currentType === 'circle' || currentType === 'circle-rect') {
+                    if (pointInCircle(mousePoint, shapes.circle1)) selectedShape = 'circle1';
+                    else if (pointInCircle(mousePoint, shapes.circle2)) selectedShape = 'circle2';
+                }
+                if (currentType === 'rect' || currentType === 'circle-rect') {
+                    if (pointInRect(mousePoint, shapes.rect1)) selectedShape = 'rect1';
+                    else if (pointInRect(mousePoint, shapes.rect2)) selectedShape = 'rect2';
+                }
+            };
+
+            p.mouseDragged = () => {
+                if (!isDraggable || !selectedShape) return;
+                shapes[selectedShape].x = p.mouseX;
+                shapes[selectedShape].y = p.mouseY;
+                updateCodeDisplay();
+            };
+
+            p.mouseReleased = () => {
+                selectedShape = null;
+            };
+        });
+
+        function drawCircleCollision(p) {
+            let isColliding = circleCircleCollision(shapes.circle1, shapes.circle2);
+
+            p.noStroke();
+            p.fill(isColliding ? '#ff000088' : '#00ff0088');
+            p.circle(shapes.circle1.x, shapes.circle1.y, shapes.circle1.r * 2);
+            p.circle(shapes.circle2.x, shapes.circle2.y, shapes.circle2.r * 2);
+
+            p.fill(0);
+            p.circle(shapes.circle1.x, shapes.circle1.y, 4);
+            p.circle(shapes.circle2.x, shapes.circle2.y, 4);
+
+            p.stroke(100);
+            p.line(shapes.circle1.x, shapes.circle1.y, shapes.circle2.x, shapes.circle2.y);
+
+            updateCodeDisplay();
+        }
+
+        function drawRectCollision(p) {
+            let isColliding = rectRectCollision(shapes.rect1, shapes.rect2);
+
+            p.noStroke();
+            p.fill(isColliding ? '#ff000088' : '#00ff0088');
+            p.rect(shapes.rect1.x, shapes.rect1.y, shapes.rect1.w, shapes.rect1.h);
+            p.rect(shapes.rect2.x, shapes.rect2.y, shapes.rect2.w, shapes.rect2.h);
+
+            updateCodeDisplay();
+        }
+
+        function drawCircleRectCollision(p) {
+            let isColliding = circleRectCollision(shapes.circle1, shapes.rect1);
+
+            p.noStroke();
+            p.fill(isColliding ? '#ff000088' : '#00ff0088');
+            p.circle(shapes.circle1.x, shapes.circle1.y, shapes.circle1.r * 2);
+            p.rect(shapes.rect1.x, shapes.rect1.y, shapes.rect1.w, shapes.rect1.h);
+
+            updateCodeDisplay();
+        }
+
+        function drawPointCollision(p) {
+            let point = { x: p.mouseX, y: p.mouseY };
+            let isColliding = pointInCircle(point, shapes.circle1);
+
+            p.noStroke();
+            p.fill(isColliding ? '#ff000088' : '#00ff0088');
+            p.circle(shapes.circle1.x, shapes.circle1.y, shapes.circle1.r * 2);
+
+            p.fill(0);
+            p.circle(point.x, point.y, 8);
+
+            updateCodeDisplay();
+        }
+
+        function circleCircleCollision(c1, c2) {
+            let d = Math.sqrt((c2.x - c1.x) ** 2 + (c2.y - c1.y) ** 2);
+            return d < (c1.r + c2.r);
+        }
+
+        function rectRectCollision(r1, r2) {
+            return !(r2.x > r1.x + r1.w || 
+                     r2.x + r2.w < r1.x || 
+                     r2.y > r1.y + r1.h || 
+                     r2.y + r2.h < r1.y);
+        }
+
+        function circleRectCollision(c, r) {
+            let testX = c.x;
+            let testY = c.y;
+
+            if (c.x < r.x) testX = r.x;
+            else if (c.x > r.x + r.w) testX = r.x + r.w;
+
+            if (c.y < r.y) testY = r.y;
+            else if (c.y > r.y + r.h) testY = r.y + r.h;
+
+            let d = Math.sqrt((c.x - testX) ** 2 + (c.y - testY) ** 2);
+            return d < c.r;
+        }
+
+        function pointInCircle(p, c) {
+            let d = Math.sqrt((p.x - c.x) ** 2 + (p.y - c.y) ** 2);
+            return d < c.r;
+        }
+
+        function pointInRect(p, r) {
+            return p.x > r.x && p.x < r.x + r.w && p.y > r.y && p.y < r.y + r.h;
+        }
+
+        function updateCollisionType() {
+            currentType = document.getElementById('collisionType').value;
+            resetShapes();
+            updateExplanation();
+        }
+
+        function toggleDraggable() {
+            isDraggable = !isDraggable;
+        }
+
+        function resetShapes() {
+            shapes = {
+                circle1: { x: 200, y: 200, r: 40 },
+                circle2: { x: 400, y: 200, r: 40 },
+                rect1: { x: 150, y: 150, w: 80, h: 80 },
+                rect2: { x: 350, y: 150, w: 80, h: 80 }
+            };
+        }
+
+        function updateCodeDisplay() {
+            let code = '';
+            if (currentType === 'circle') {
+                code = `function circleCircleCollision(c1, c2) {\n  let d = dist(c1.x, c1.y, c2.x, c2.y);\n  return d < (c1.r + c2.r);\n}`;
+            } else if (currentType === 'rect') {
+                code = `function rectRectCollision(r1, r2) {\n  return !(r2.x > r1.x + r1.w || r2.x + r2.w < r1.x || r2.y > r1.y + r1.h || r2.y + r2.h < r1.y);\n}`;
+            } else if (currentType === 'circle-rect') {
+                code = `function circleRectCollision(c, r) {\n  // Implementation shown in UI\n}`;
+            } else if (currentType === 'point') {
+                code = `function pointInCircle(p, c) {\n  let d = dist(p.x, p.y, c.x, c.y);\n  return d < c.r;\n}`;
+            }
+            document.getElementById('codeDisplay').innerText = code;
+        }
+
+        function updateExplanation() {
+            const explanations = {
+                'circle': 'This demonstrates circle-to-circle collision. Drag circles to see how their distance determines collisions.',
+                'rect': 'This demonstrates rectangle-to-rectangle collision using AABB (Axis-Aligned Bounding Box) detection.',
+                'circle-rect': 'This shows circle-to-rectangle collision by finding the closest rectangle edge to the circle.',
+                'point': 'This visualizes point-to-circle collision. Move the mouse to check if it is inside the circle.'
+            };
+            document.getElementById('explanation').innerText = explanations[currentType];
+        }
+</script>
+  </body>
+</html>

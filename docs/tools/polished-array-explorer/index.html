@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Array Explorer: Values Become Visuals — CC Fest Coding Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --surface: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --soft: #e5e7eb;
+      --softer: #f9fafb;
+      --sky: #4a90e2;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --display: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --radius: 18px;
+      --shadow: 0 18px 55px rgba(17, 24, 39, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--display);
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    canvas { display: block; width: 100%; height: auto; background: #fff; border: 2px solid var(--soft); border-radius: 14px; }
+    code, pre { font-family: var(--mono); }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      color: #fff;
+      background: linear-gradient(135deg, #111827, #1f2937 58%, #273449);
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
+      padding: 1.35rem 2rem;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .eyebrow {
+      margin: 0 0 0.35rem 0;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #9ca3af;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 0.45rem 0 0 0;
+      color: #d1d5db;
+      font-size: 0.98rem;
+    }
+
+    .main {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.6rem;
+      border: 1px solid rgba(229, 231, 235, 0.85);
+    }
+
+    .card-header {
+      padding: 0 0 1.2rem 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 4px solid var(--sky);
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      letter-spacing: -0.06em;
+      line-height: 1.05;
+    }
+
+    .card-header p:not(.eyebrow) {
+      margin: 0.65rem 0 0 0;
+      color: var(--muted);
+      max-width: 850px;
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    .layout {
+      display: grid;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (min-width: 1101px) {
+      .layout { grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr); }
+    }
+
+    .canvas-card, .control-panel, .info-box, .code-box {
+      background: var(--softer);
+      border: 1px solid var(--soft);
+      border-radius: 16px;
+      padding: 1rem;
+    }
+
+    .canvas-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .canvas-card h3, .control-panel h3, .info-box h3, .code-box h3 {
+      margin: 0;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #374151;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0.35rem 0.65rem;
+      color: #1e3a8a;
+      background: #dbeafe;
+      font-size: 0.78rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .question-box {
+      padding: 1rem 1.15rem;
+      border-radius: 14px;
+      margin-bottom: 1rem;
+      line-height: 1.55;
+      border-left: 5px solid var(--sky);
+      background: #e9f5ff;
+    }
+
+    .hint, .control-row small {
+      display: block;
+      margin: 0.35rem 0 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .control-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .control-row {
+      display: block;
+    }
+
+    .control-row > span {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.35rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 0.85rem;
+      border: 2px solid var(--soft);
+      border-radius: 12px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+      gap: 0.55rem;
+    }
+
+    .segmented-btn {
+      padding: 0.65rem 0.75rem;
+      background: #fff;
+      color: var(--muted);
+      border: 2px solid var(--soft);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: all 150ms ease;
+    }
+
+    .segmented-btn.active {
+      background: var(--sky);
+      color: #fff;
+      border-color: var(--sky);
+    }
+
+    .segmented-btn:hover { transform: translateY(-1px); }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #4b5563;
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    .data-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .data-button {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      align-items: center;
+      justify-content: center;
+      min-height: 70px;
+      background: #fff;
+      color: #4b5563;
+      border: 2px solid var(--soft);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: all 150ms ease;
+    }
+
+    .data-button.active {
+      color: #fff;
+      background: var(--sky);
+      border-color: var(--sky);
+    }
+
+    .data-button:hover { transform: translateY(-1px); }
+
+    .compare-box {
+      background: #fff;
+      border: 1px solid var(--soft);
+      border-radius: 14px;
+      padding: 0.8rem;
+    }
+
+    .compare-box h4 {
+      margin: 0 0 0.35rem 0;
+      font-size: 0.9rem;
+    }
+
+    .compare-box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+
+    .stats-row span {
+      background: #fff;
+      border: 1px solid var(--soft);
+      border-radius: 999px;
+      padding: 0.42rem 0.68rem;
+      color: #4b5563;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+      gap: 1.25rem;
+      margin-top: 1.25rem;
+    }
+
+    .info-box p {
+      margin: 0.55rem 0 0 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .code-box {
+      min-width: 0;
+    }
+
+    .code-box-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .copy-button {
+      padding: 0.48rem 0.8rem;
+      background: #dbeafe;
+      color: #1e3a8a;
+      border: 2px solid #bfdbfe;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+
+    .copy-button:hover { transform: translateY(-1px); }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 1rem;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      max-height: 320px;
+    }
+
+    .hidden { display: none !important; }
+
+    .footer {
+      text-align: center;
+      padding: 1.8rem 2rem;
+      color: #6b7280;
+    }
+
+    .footer p { margin: 0; }
+
+    @media (max-width: 1100px) {
+      .layout, .bottom-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .header, .main { padding-left: 1rem; padding-right: 1rem; }
+      .card { padding: 1rem; }
+      .data-buttons, .stats-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <p class="eyebrow">CC Fest Coding Camp · Session 3</p>
+    <h1>Array Explorer</h1>
+    <p class="subtitle">Preview arrays and visualization: how the same data can tell different stories</p>
+  </header>
+
+  <main class="main">
+    <div class="card">
+      <div class="card-header">
+        <h2>Array Explorer</h2>
+        <p>Preview Session 4: arrays store meaningful values, and visualization turns those values into something we can read.</p>
+      </div>
+
+      <div class="layout">
+        <article class="canvas-card">
+          <div class="canvas-card-header">
+            <h3>Visualization</h3>
+            <span id="array-summary" class="pill">7 values</span>
+          </div>
+          <div id="array-context" class="question-box"></div>
+          <canvas id="array-canvas" width="680" height="360"></canvas>
+          <div id="array-stats" class="stats-row"></div>
+        </article>
+
+        <aside class="control-panel">
+          <h3>Choose Data</h3>
+          <div class="data-buttons">
+            <button class="data-button active" data-dataset="sleep" type="button">😴 Sleep</button>
+            <button class="data-button" data-dataset="energy" type="button">⚡ Energy</button>
+            <button class="data-button" data-dataset="temp" type="button">🌡️ Temp</button>
+            <button class="data-button" data-dataset="custom" type="button">✏️ Custom</button>
+          </div>
+
+          <label id="custom-values-wrap" class="control-row hidden">
+            <span>Custom values</span>
+            <input id="custom-values" type="text" value="5, 12, 8, 3, 15, 7" />
+            <small>Use comma-separated numbers.</small>
+          </label>
+
+          <div class="segmented">
+            <button class="segmented-btn active" data-array-mode="bars" type="button">Bars</button>
+            <button class="segmented-btn" data-array-mode="circles" type="button">Circles</button>
+            <button class="segmented-btn" data-array-mode="line" type="button">Line</button>
+          </div>
+
+          <label class="checkbox-row">
+            <input id="show-array-indices" type="checkbox" checked />
+            Show indices
+          </label>
+          <label class="checkbox-row">
+            <input id="show-array-values" type="checkbox" checked />
+            Show values
+          </label>
+
+          <div class="compare-box">
+            <h4>Bridge to Session 4</h4>
+            <p>Today, values come from <code>random()</code> or <code>noise()</code>. Next week, values can come from arrays, CSV files, or data your students collect.</p>
+          </div>
+        </aside>
+      </div>
+
+      <div class="bottom-grid">
+        <article class="info-box">
+          <h3>Key idea</h3>
+          <p>Arrays are meaningful containers. The same values can feel different as bars, circles, or a line. Visualization is a design decision.</p>
+        </article>
+        <article class="code-box">
+          <div class="code-box-top">
+            <h3>p5.js array loop</h3>
+            <button class="copy-button" id="copy-array-code">Copy</button>
+          </div>
+          <pre id="array-code"><code></code></pre>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>Three tools, one idea: <strong>nested loops + variation = meaningful patterns.</strong></p>
+  </footer>
+
+  <script>
+    // Utilities
+    function mapRange(value, inMin, inMax, outMin, outMax) {
+      if (inMax === inMin) return outMin;
+      return outMin + ((value - inMin) * (outMax - outMin)) / (inMax - inMin);
+    }
+
+    function formatNumber(value) {
+      return Number.isInteger(value) ? String(value) : Number(value).toFixed(1);
+    }
+
+    // State
+    const state = {
+      dataset: "sleep",
+      mode: "bars",
+      showIndices: true,
+      showValues: true,
+      customValues: "5, 12, 8, 3, 15, 7",
+    };
+
+    const datasets = {
+      sleep: {
+        values: [7, 6, 8, 5, 7, 8, 6],
+        context: "Hours of sleep each night this week",
+        hint: "Which nights look low? Which look healthy?",
+        unit: "hours",
+      },
+      energy: {
+        values: [6, 7, 5, 8, 7, 9, 8],
+        context: "Self-reported energy, 1–10, across a week",
+        hint: "Where does the week rise, dip, or recover?",
+        unit: "energy",
+      },
+      temp: {
+        values: [62, 64, 68, 70, 72, 71, 68],
+        context: "Daily temperature, °F, across a week",
+        hint: "Notice the gradual rise and fall.",
+        unit: "°F",
+      },
+    };
+
+    // Initialize
+    function init() {
+      // Data buttons
+      document.querySelectorAll(".data-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.dataset = button.dataset.dataset;
+          document.querySelectorAll(".data-button").forEach((b) => b.classList.toggle("active", b === button));
+          document.getElementById("custom-values-wrap").classList.toggle("hidden", state.dataset !== "custom");
+          draw();
+          updateCode();
+        });
+      });
+
+      // Visualization mode buttons
+      document.querySelectorAll("[data-array-mode]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.mode = button.dataset.arrayMode;
+          document.querySelectorAll("[data-array-mode]").forEach((b) => b.classList.toggle("active", b === button));
+          draw();
+          updateCode();
+        });
+      });
+
+      // Custom values input
+      document.getElementById("custom-values").addEventListener("input", (e) => {
+        state.customValues = e.target.value;
+        draw();
+        updateCode();
+      });
+
+      // Show indices checkbox
+      document.getElementById("show-array-indices").addEventListener("change", (e) => {
+        state.showIndices = e.target.checked;
+        draw();
+      });
+
+      // Show values checkbox
+      document.getElementById("show-array-values").addEventListener("change", (e) => {
+        state.showValues = e.target.checked;
+        draw();
+      });
+
+      // Copy button
+      document.getElementById("copy-array-code").addEventListener("click", (e) => {
+        const text = document.getElementById("array-code").innerText;
+        navigator.clipboard?.writeText(text).then(() => {
+          const btn = e.target;
+          const orig = btn.textContent;
+          btn.textContent = "Copied";
+          setTimeout(() => (btn.textContent = orig), 1200);
+        }).catch(() => window.prompt("Copy this:", text));
+      });
+
+      draw();
+      updateCode();
+    }
+
+    function getDataset() {
+      if (state.dataset !== "custom") return datasets[state.dataset];
+      const values = state.customValues
+        .split(",")
+        .map((v) => Number(v.trim()))
+        .filter((v) => Number.isFinite(v));
+      return {
+        values: values.length ? values : [0],
+        context: "Your custom values",
+        hint: "Try values from your classroom, body, neighborhood, or week.",
+        unit: "value",
+      };
+    }
+
+    function draw() {
+      const canvas = document.getElementById("array-canvas");
+      const ctx = canvas.getContext("2d");
+      const dataset = getDataset();
+      const values = dataset.values;
+      const w = canvas.width;
+      const h = canvas.height;
+      const pad = { left: 54, right: 28, top: 38, bottom: 58 };
+      const chartW = w - pad.left - pad.right;
+      const chartH = h - pad.top - pad.bottom;
+      const minVal = Math.min(...values);
+      const maxVal = Math.max(...values);
+      const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, w, h);
+
+      // Update info
+      document.getElementById("array-context").innerHTML = `<strong>${dataset.context}</strong><br><span>${dataset.hint}</span>`;
+      document.getElementById("array-summary").textContent = `${values.length} values`;
+      document.getElementById("array-stats").innerHTML = `
+        <span>Min: <strong>${formatNumber(minVal)}</strong></span>
+        <span>Max: <strong>${formatNumber(maxVal)}</strong></span>
+        <span>Avg: <strong>${formatNumber(avg)}</strong></span>
+      `;
+
+      // Draw axes
+      ctx.strokeStyle = "#d1d5db";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top);
+      ctx.lineTo(pad.left, pad.top + chartH);
+      ctx.lineTo(pad.left + chartW, pad.top + chartH);
+      ctx.stroke();
+
+      ctx.fillStyle = "#6b7280";
+      ctx.font = "12px Poppins, sans-serif";
+      ctx.fillText(String(formatNumber(maxVal)), 10, pad.top + 4);
+      ctx.fillText(String(formatNumber(minVal)), 10, pad.top + chartH);
+
+      const denom = maxVal === minVal ? 1 : maxVal - minVal;
+      const xForIndex = (i) => pad.left + (values.length === 1 ? chartW / 2 : (i / (values.length - 1)) * chartW);
+      const yForValue = (v) => pad.top + chartH - ((v - minVal) / denom) * (chartH * 0.88 + 1);
+
+      if (state.mode === "bars") {
+        const slot = chartW / values.length;
+        const barW = Math.max(12, Math.min(54, slot * 0.62));
+        values.forEach((value, i) => {
+          const x = pad.left + slot * i + (slot - barW) / 2;
+          const y = yForValue(value);
+          const barH = pad.top + chartH - y;
+          ctx.fillStyle = "#ff6b6b";
+          ctx.fillRect(x, y, barW, barH);
+          ctx.strokeStyle = "#d94848";
+          ctx.strokeRect(x, y, barW, barH);
+          drawLabels(ctx, value, i, x + barW / 2, y - 8, pad.top + chartH + 20);
+        });
+      } else if (state.mode === "circles") {
+        values.forEach((value, i) => {
+          const x = xForIndex(i);
+          const radius = mapRange(value, minVal, maxVal, 12, 36);
+          ctx.beginPath();
+          ctx.arc(x, pad.top + chartH / 2, radius, 0, Math.PI * 2);
+          ctx.fillStyle = "#4a90e2";
+          ctx.fill();
+          ctx.strokeStyle = "#2d5aa8";
+          ctx.stroke();
+          drawLabels(ctx, value, i, x, pad.top + chartH / 2 - radius - 8, pad.top + chartH + 20);
+        });
+      } else {
+        ctx.strokeStyle = "#3b5bdb";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        values.forEach((value, i) => {
+          const x = xForIndex(i);
+          const y = yForValue(value);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        values.forEach((value, i) => {
+          const x = xForIndex(i);
+          const y = yForValue(value);
+          ctx.beginPath();
+          ctx.arc(x, y, 7, 0, Math.PI * 2);
+          ctx.fillStyle = "#3b5bdb";
+          ctx.fill();
+          ctx.strokeStyle = "#fff";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          drawLabels(ctx, value, i, x, y - 12, pad.top + chartH + 20);
+        });
+      }
+    }
+
+    function drawLabels(ctx, value, index, x, valueY, indexY) {
+      ctx.textAlign = "center";
+      if (state.showValues) {
+        ctx.fillStyle = "#111827";
+        ctx.font = "bold 12px JetBrains Mono, monospace";
+        ctx.fillText(formatNumber(value), x, valueY);
+      }
+      if (state.showIndices) {
+        ctx.fillStyle = "#6b7280";
+        ctx.font = "12px JetBrains Mono, monospace";
+        ctx.fillText(`[${index}]`, x, indexY);
+      }
+      ctx.textAlign = "left";
+    }
+
+    function updateCode() {
+      const values = getDataset().values;
+      const code = `let data = [${values.join(", ")}];
+
+for (let i = 0; i < data.length; i++) {
+  let value = data[i];
+  let x = i * 50 + 30;
+  let h = map(value, min(data), max(data), 10, 160);
+
+  fill(74, 144, 226);
+  rect(x, 200 - h, 36, h);
+}
+
+// Same array. Different visual choices = different stories.`;
+      document.querySelector("#array-code code").textContent = code;
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
+

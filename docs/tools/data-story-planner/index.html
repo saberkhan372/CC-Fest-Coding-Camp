@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Story Planner — CC Fest Coding Camp</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --cream:#FAF6F0;--cream-dark:#F0EBE3;--cream-darker:#E5DFD5;
+  --ink:#2C2A26;--ink-light:#6B6760;--ink-faint:#9E998F;
+  --accent:#3D5A80;--accent-light:#5B7EA1;
+  --highlight:#E07A5F;--highlight-light:#F2CC8F;
+  --success:#81B29A;
+  --grid-bg:#FFFFFF;
+  --code-bg:#2C2A26;--code-text:#F0EBE3;--code-keyword:#81B29A;
+  --code-number:#F2CC8F;--code-comment:#6B6760;
+  --radius:10px;--radius-sm:6px;
+}
+body{background:var(--cream);color:var(--ink);font-family:'DM Sans',-apple-system,sans-serif;line-height:1.5;min-height:100vh;padding:24px}
+.container{max-width:900px;margin:0 auto}
+
+.header{margin-bottom:28px}
+.header .stage-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:rgba(61,90,128,.08);padding:4px 10px;border-radius:4px;margin-bottom:8px}
+.header h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.header .subtitle{font-size:15px;color:var(--ink-light);max-width:600px}
+
+/* Steps */
+.steps{display:flex;flex-direction:column;gap:20px}
+
+.step{background:var(--grid-bg);border-radius:var(--radius);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 0 0 1px rgba(0,0,0,.03);transition:box-shadow .2s}
+.step.active{box-shadow:0 1px 3px rgba(0,0,0,.04),0 0 0 2px var(--accent)}
+
+.step-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--cream-dark);color:var(--ink-faint);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.step.done .step-num{background:var(--success);color:#fff}
+.step.active .step-num{background:var(--accent);color:#fff}
+.step-title{font-size:15px;font-weight:600;color:var(--ink)}
+.step-desc{font-size:13px;color:var(--ink-light);margin-bottom:12px}
+
+/* Inputs */
+.data-textarea{font-family:'DM Mono',monospace;font-size:13px;width:100%;padding:10px 12px;border:1.5px solid var(--cream-darker);border-radius:var(--radius-sm);background:var(--cream);color:var(--ink);outline:none;resize:vertical;min-height:44px;transition:border-color .15s}
+.data-textarea:focus{border-color:var(--accent)}
+.data-textarea::placeholder{color:var(--ink-faint);font-size:12px}
+
+.text-input{font-family:'DM Sans',sans-serif;font-size:14px;width:100%;padding:9px 12px;border:1.5px solid var(--cream-darker);border-radius:var(--radius-sm);background:var(--cream);color:var(--ink);outline:none;transition:border-color .15s}
+.text-input:focus{border-color:var(--accent)}
+.text-input::placeholder{color:var(--ink-faint)}
+
+.hint{font-size:11px;color:var(--ink-faint);margin-top:4px}
+
+/* Preview strip */
+.preview-strip{display:flex;align-items:end;gap:3px;height:48px;margin-top:10px;padding:8px 12px;background:var(--cream);border-radius:var(--radius-sm)}
+.preview-strip .bar{background:var(--accent);border-radius:2px 2px 0 0;flex:1;min-width:8px;transition:height .3s}
+.preview-strip-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink-faint);margin-top:4px}
+
+/* Category chips */
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{font-family:'DM Mono',monospace;font-size:12px;padding:6px 12px;border:1.5px solid var(--cream-darker);border-radius:var(--radius-sm);background:var(--cream);color:var(--ink-light);cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--accent-light);color:var(--accent)}
+.chip.active{border-color:var(--accent);background:var(--accent);color:#fff}
+
+/* Mapping grid */
+.mapping-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+@media(max-width:600px){.mapping-grid{grid-template-columns:repeat(2,1fr)}}
+
+.mapping-card{border:1.5px solid var(--cream-darker);border-radius:var(--radius-sm);padding:8px;cursor:pointer;transition:all .15s;text-align:center}
+.mapping-card:hover{border-color:var(--accent-light)}
+.mapping-card.selected{border-color:var(--accent);background:rgba(61,90,128,.04);box-shadow:0 0 0 1px var(--accent)}
+.mapping-card canvas{display:block;width:100%;height:60px;border-radius:4px;margin-bottom:4px}
+.mapping-card .map-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-light)}
+.mapping-card.selected .map-label{color:var(--accent);font-weight:500}
+
+/* Output section */
+.output-section{margin-top:28px}
+
+.planning-card{background:var(--grid-bg);border-radius:var(--radius);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 0 0 1px rgba(0,0,0,.03);margin-bottom:16px}
+.planning-card h2{font-size:18px;font-weight:700;margin-bottom:14px;color:var(--ink)}
+.card-row{display:flex;gap:8px;margin-bottom:8px;align-items:baseline}
+.card-label{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;min-width:90px;flex-shrink:0}
+.card-value{font-size:14px;color:var(--ink)}
+.card-value.empty{color:var(--ink-faint);font-style:italic}
+
+.card-preview{margin-top:16px;padding-top:16px;border-top:1px solid var(--cream-dark)}
+.card-preview canvas{display:block;width:100%;height:140px;border-radius:var(--radius-sm)}
+
+.code-panel{background:var(--code-bg);border-radius:var(--radius);padding:16px 18px;position:relative;overflow-x:auto}
+.code-panel pre{font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;color:var(--code-text);white-space:pre;margin:0}
+.code-panel .kw{color:var(--code-keyword)}.code-panel .num{color:var(--code-number)}.code-panel .cm{color:var(--code-comment)}.code-panel .fn{color:#81B29A}
+.copy-btn{position:absolute;top:8px;right:8px;font-family:'DM Sans',sans-serif;font-size:11px;padding:3px 9px;border:1px solid rgba(255,255,255,.15);border-radius:4px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s}
+.copy-btn:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.8)}
+
+.footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--cream-dark);font-size:12px;color:var(--ink-faint);text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="stage-tag">Session 4 — Before You Code</div>
+    <h1>Data Story Planner</h1>
+    <p class="subtitle">Five questions that turn a blank canvas into a plan. Answer them, copy your values into Data Mapper, then use the generated starter code when you are ready to build.</p>
+  </header>
+
+  <div class="steps">
+    <!-- Step 1 -->
+    <div class="step active" id="step1">
+      <div class="step-header"><div class="step-num">1</div><div class="step-title">What is your data?</div></div>
+      <div class="step-desc">Give your dataset a title and source, then type or paste 5–10 values. Numbers, or label:value pairs like <code style="font-family:'DM Mono',monospace;font-size:12px;background:var(--cream-dark);padding:1px 4px;border-radius:3px">Mon:6, Tue:8, Wed:5</code></div>
+      <input class="text-input" id="titleInput" placeholder="Dataset title, e.g. My Week of Sleep" style="margin-bottom:8px">
+      <input class="text-input" id="sourceInput" placeholder="Source, e.g. Self-tracked, classroom survey, weather observations" style="margin-bottom:8px">
+      <textarea class="data-textarea" id="dataInput" placeholder="6.5, 7, 5.5, 8, 6, 9, 8.5&#10;or: Mon:6.5, Tue:7, Wed:5.5, Thu:8, Fri:6, Sat:9, Sun:8.5" rows="2"></textarea>
+      <div class="hint">Comma or newline separated. Words like high/medium/low are converted to 3/2/1.</div>
+      <div class="preview-strip" id="previewStrip"></div>
+      <div class="preview-strip-label" id="previewLabel"></div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" id="step2">
+      <div class="step-header"><div class="step-num">2</div><div class="step-title">What does each value represent?</div></div>
+      <div class="step-desc">What are you measuring, counting, or rating?</div>
+      <div class="chip-row" id="categoryChips"></div>
+      <input class="text-input" id="customCategory" placeholder="Or type your own: tabs open, trees counted, attention level...">
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" id="step3">
+      <div class="step-header"><div class="step-num">3</div><div class="step-title">What visual property shows the value?</div></div>
+      <div class="step-desc">Pick one or two. Each one tells a different story with the same numbers.</div>
+      <div class="mapping-grid" id="mappingGrid"></div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step" id="step4">
+      <div class="step-header"><div class="step-num">4</div><div class="step-title">What should the viewer notice?</div></div>
+      <div class="step-desc">A trend, a comparison, a feeling, an outlier, a question.</div>
+      <input class="text-input" id="noticeInput" placeholder="e.g. I sleep less on school nights than weekends">
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step" id="step5">
+      <div class="step-header"><div class="step-num">5</div><div class="step-title">What might this hide?</div></div>
+      <div class="step-desc">Every visualization emphasizes something and leaves something out.</div>
+      <input class="text-input" id="hideInput" placeholder="e.g. It doesn't show sleep quality, only hours">
+    </div>
+  </div>
+
+  <!-- Output -->
+  <div class="output-section" id="outputSection">
+    <div class="planning-card" id="planningCard">
+      <h2>Your Data Story</h2>
+      <div id="cardContent"></div>
+      <div class="card-preview"><canvas id="cardCanvas"></canvas></div>
+    </div>
+
+    <div class="code-panel" style="margin-bottom:16px">
+      <button class="copy-btn" onclick="copyTextFrom('mapperOutput', this)">Copy</button>
+      <pre id="mapperOutput"></pre>
+    </div>
+
+    <div class="code-panel">
+      <button class="copy-btn" onclick="copyTextFrom('codeOutput', this)">Copy</button>
+      <pre id="codeOutput"></pre>
+    </div>
+  </div>
+
+  <footer class="footer">Data Story Planner · CC Fest Coding Camp Spring 2026 · Session 4</footer>
+</div>
+
+<script>
+// --- State ---
+let values = [];
+let labels = [];
+let category = '';
+let selectedMappings = ['height'];
+let noticeText = '';
+let hideText = '';
+
+const WORD_MAP = { high: 3, medium: 2, med: 2, low: 1, yes: 1, no: 0, hot: 3, warm: 2, cool: 1, cold: 0, great: 5, good: 4, ok: 3, okay: 3, bad: 2, terrible: 1 };
+
+const CATEGORIES = [
+  { label: 'hours of sleep', icon: '😴' },
+  { label: 'energy (1–10)', icon: '⚡' },
+  { label: 'mood rating', icon: '🌤️' },
+  { label: 'cups of coffee', icon: '☕' },
+  { label: 'minutes outside', icon: '🌳' },
+  { label: 'screen time (hrs)', icon: '📱' },
+  { label: 'pages read', icon: '📚' },
+  { label: 'steps walked', icon: '🚶' },
+];
+
+const MAPPINGS = [
+  { id: 'height', label: 'Height', draw: drawHeight },
+  { id: 'size', label: 'Size', draw: drawSize },
+  { id: 'color', label: 'Color', draw: drawColor },
+  { id: 'opacity', label: 'Opacity', draw: drawOpacity },
+  { id: 'position', label: 'Y Position', draw: drawPosition },
+  { id: 'weight', label: 'Stroke Weight', draw: drawWeight },
+];
+
+// --- Parse data ---
+function parseData(raw) {
+  raw = raw.trim();
+  if (!raw) { values = []; labels = []; return; }
+
+  const parts = raw.split(/[,\n]+/).map(s => s.trim()).filter(Boolean);
+  const newVals = [], newLabels = [];
+
+  parts.forEach(part => {
+    const cs = part.split(':');
+    if (cs.length === 2) {
+      newLabels.push(cs[0].trim());
+      const v = parseVal(cs[1].trim());
+      newVals.push(v);
+    } else {
+      const v = parseVal(part);
+      newVals.push(v);
+      newLabels.push(`${newVals.length}`);
+    }
+  });
+
+  values = newVals;
+  labels = newLabels;
+}
+
+function parseVal(s) {
+  const n = parseFloat(s);
+  if (!isNaN(n)) return n;
+  const lc = s.toLowerCase();
+  if (WORD_MAP[lc] !== undefined) return WORD_MAP[lc];
+  return 0;
+}
+
+// --- Preview strip ---
+function updatePreview() {
+  const strip = document.getElementById('previewStrip');
+  const label = document.getElementById('previewLabel');
+  strip.innerHTML = '';
+
+  if (values.length === 0) {
+    label.textContent = '';
+    return;
+  }
+
+  const mx = Math.max(...values);
+  values.forEach((v, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.height = (mx > 0 ? (v / mx) * 32 : 2) + 'px';
+    strip.appendChild(bar);
+  });
+
+  label.textContent = `${values.length} values · range ${Math.min(...values)}–${mx}`;
+}
+
+// --- Categories ---
+function buildCategories() {
+  const row = document.getElementById('categoryChips');
+  row.innerHTML = '';
+  CATEGORIES.forEach(c => {
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (category === c.label ? ' active' : '');
+    chip.textContent = `${c.icon} ${c.label}`;
+    chip.onclick = () => {
+      category = category === c.label ? '' : c.label;
+      document.getElementById('customCategory').value = '';
+      buildCategories();
+      updateAll();
+    };
+    row.appendChild(chip);
+  });
+}
+
+// --- Mapping cards ---
+function buildMappingCards() {
+  const grid = document.getElementById('mappingGrid');
+  grid.innerHTML = '';
+  MAPPINGS.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'mapping-card' + (selectedMappings.includes(m.id) ? ' selected' : '');
+    const canvas = document.createElement('canvas');
+    canvas.width = 300; canvas.height = 120;
+    canvas.style.width = '100%'; canvas.style.height = '60px';
+    card.appendChild(canvas);
+    const lab = document.createElement('div');
+    lab.className = 'map-label';
+    lab.textContent = m.label;
+    card.appendChild(lab);
+    card.onclick = () => toggleMapping(m.id);
+    grid.appendChild(card);
+
+    // Draw preview
+    const ctx = canvas.getContext('2d');
+    ctx.scale(2, 2);
+    const previewVals = values.length > 0 ? values : [3, 7, 5, 9, 4, 8, 2];
+    m.draw(ctx, previewVals, 150, 60);
+  });
+}
+
+function toggleMapping(id) {
+  const idx = selectedMappings.indexOf(id);
+  if (idx >= 0) {
+    if (selectedMappings.length > 1) selectedMappings.splice(idx, 1);
+  } else {
+    if (selectedMappings.length < 2) selectedMappings.push(id);
+    else { selectedMappings.shift(); selectedMappings.push(id); }
+  }
+  buildMappingCards();
+  updateAll();
+}
+
+// --- Mini drawing functions for mapping previews ---
+function drawHeight(ctx, vals, w, h) {
+  ctx.clearRect(0, 0, w, h);
+  const mx = Math.max(...vals);
+  const bw = w / vals.length;
+  vals.forEach((v, i) => {
+    const bh = mx > 0 ? (v / mx) * (h - 10) : 2;
+    ctx.fillStyle = '#3D5A80';
+    ctx.fillRect(i * bw + 2, h - bh - 2, bw - 4, bh);
+  });
+}
+
+function drawSize(ctx, vals, w, h) {
+  ctx.clearRect(0, 0, w, h);
+  const mx = Math.max(...vals);
+  const sp = w / vals.length;
+  vals.forEach((v, i) => {
+    const r = mx > 0 ? (v / mx) * (h * 0.4) : 4;
+    ctx.fillStyle = '#3D5A80';
+    ctx.beginPath();
+    ctx.arc(i * sp + sp / 2, h / 2, Math.max(r, 2), 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawColor(ctx, vals, w, h) {
+  ctx.clearRect(0, 0, w, h);
+  const mx = Math.max(...vals), mn = Math.min(...vals);
+  const rng = mx - mn || 1;
+  const cw = w / vals.length;
+  vals.forEach((v, i) => {
+    const t = (v - mn) / rng;
+    const r = Math.round(lerp(240, 44, t));
+    const g = Math.round(lerp(235, 42, t));
+    const b = Math.round(lerp(213, 38, t));
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.fillRect(i * cw, 4, cw, h - 8);
+  });
+}
+
+function drawOpacity(ctx, vals, w, h) {
+  ctx.clearRect(0, 0, w, h);
+  const mx = Math.max(...vals);
+  const sp = w / vals.length;
+  vals.forEach((v, i) => {
+    const a = mx > 0 ? v / mx : 0.1;
+    ctx.fillStyle = `rgba(61,90,128,${a})`;
+    ctx.beginPath();
+    ctx.arc(i * sp + sp / 2, h / 2, h * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawPosition(ctx, vals, w, h) {
+  ctx.clearRect(0, 0, w, h);
+  const mx = Math.max(...vals), mn = Math.min(...vals);
+  const rng = mx - mn || 1;
+  const sp = w / vals.length;
+  vals.forEach((v, i) => {
+    const y = h - 8 - ((v - mn) / rng) * (h - 16);
+    ctx.fillStyle = '#3D5A80';
+    ctx.beginPath();
+    ctx.arc(i * sp + sp / 2, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawWeight(ctx, vals, w, h) {
+  ctx.clearRect(0, 0, w, h);
+  const mx = Math.max(...vals);
+  const sp = w / vals.length;
+  vals.forEach((v, i) => {
+    const sw = mx > 0 ? (v / mx) * 6 + 1 : 1;
+    ctx.strokeStyle = '#3D5A80';
+    ctx.lineWidth = sw;
+    ctx.beginPath();
+    ctx.moveTo(i * sp + sp / 2, 8);
+    ctx.lineTo(i * sp + sp / 2, h - 8);
+    ctx.stroke();
+  });
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function escapeCodeString(s) {
+  return String(s)
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "");
+}
+
+function escapeComment(s) {
+  return String(s).replace(/\n/g, " ").replace(/\r/g, " ").replace(/\*\//g, "* /");
+}
+
+function escapeHtmlForCode(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+// --- Planning card ---
+function updateCard() {
+  const el = document.getElementById('cardContent');
+  const title = document.getElementById('titleInput').value;
+  const source = document.getElementById('sourceInput').value;
+  const cat = category || document.getElementById('customCategory').value || '';
+  const notice = document.getElementById('noticeInput').value;
+  const hide = document.getElementById('hideInput').value;
+  const mappingNames = selectedMappings.map(id => MAPPINGS.find(m => m.id === id).label).join(' + ');
+  const hasLabels = labels.some(l => !/^\d+$/.test(l));
+
+  el.innerHTML = '';
+  const rows = [
+    ['Title', title],
+    ['Source', source],
+    ['Data', values.length > 0 ? `${values.length} values (${Math.min(...values)}–${Math.max(...values)})` : ''],
+    ['Represents', cat],
+    ['Mapping', mappingNames],
+    ['Notice', notice],
+    ['Hides', hide],
+  ];
+
+  rows.forEach(([label, value]) => {
+    const row = document.createElement('div');
+    row.className = 'card-row';
+    row.innerHTML = `<div class="card-label">${label}</div><div class="card-value${value ? '' : ' empty'}">${value || 'not yet answered'}</div>`;
+    el.appendChild(row);
+  });
+
+  // Draw card preview
+  const canvas = document.getElementById('cardCanvas');
+  const w = canvas.parentElement.clientWidth;
+  const h = 140;
+  canvas.width = w * 2; canvas.height = h * 2;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+  ctx.clearRect(0, 0, w, h);
+
+  if (values.length === 0) return;
+
+  const mx = Math.max(...values), mn = Math.min(...values);
+  const rng = mx - mn || 1;
+  const pad = 20;
+  const drawW = w - pad * 2;
+  const drawH = h - (hasLabels ? 50 : 36);
+  const sp = drawW / values.length;
+  const primary = selectedMappings[0];
+
+  for (let i = 0; i < values.length; i++) {
+    const x = pad + i * sp + sp / 2;
+    const t = mx > 0 ? values[i] / mx : 0;
+    const tn = (values[i] - mn) / rng;
+
+    if (primary === 'height') {
+      const bh = t * drawH;
+      const bw = sp - (values.length > 12 ? 2 : 6);
+      let col = '#3D5A80';
+      if (selectedMappings.includes('color')) {
+        const r = Math.round(lerp(200, 61, tn));
+        const g = Math.round(lerp(195, 90, tn));
+        const b = Math.round(lerp(180, 128, tn));
+        col = `rgb(${r},${g},${b})`;
+      }
+      ctx.fillStyle = col;
+      roundRect(ctx, x - bw / 2, pad + drawH - bh, bw, bh, 3);
+      ctx.fill();
+    } else if (primary === 'size') {
+      const r = t * Math.min(sp * 0.4, drawH * 0.38);
+      let col = '#E07A5F';
+      if (selectedMappings.includes('color')) {
+        const rv = Math.round(lerp(240, 61, tn));
+        const gv = Math.round(lerp(200, 90, tn));
+        const bv = Math.round(lerp(180, 128, tn));
+        col = `rgb(${rv},${gv},${bv})`;
+      }
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(x, pad + drawH / 2, Math.max(r, 3), 0, Math.PI * 2);
+      ctx.fill();
+    } else if (primary === 'color') {
+      const cw = sp;
+      const r = Math.round(lerp(240, 44, tn));
+      const g = Math.round(lerp(235, 42, tn));
+      const b = Math.round(lerp(213, 38, tn));
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillRect(pad + i * cw, pad, cw, drawH);
+    } else if (primary === 'opacity') {
+      ctx.fillStyle = `rgba(61,90,128,${t})`;
+      ctx.beginPath();
+      ctx.arc(x, pad + drawH / 2, drawH * 0.28, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (primary === 'position') {
+      const y = pad + drawH - tn * drawH;
+      ctx.fillStyle = '#3D5A80';
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fill();
+      if (i > 0) {
+        const px = pad + (i - 1) * sp + sp / 2;
+        const prevTn = (values[i - 1] - mn) / rng;
+        const py = pad + drawH - prevTn * drawH;
+        ctx.strokeStyle = 'rgba(61,90,128,0.3)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x, y); ctx.stroke();
+      }
+    } else if (primary === 'weight') {
+      const sw = t * 7 + 0.5;
+      ctx.strokeStyle = '#3D5A80';
+      ctx.lineWidth = sw;
+      ctx.beginPath();
+      ctx.moveTo(x, pad + 4);
+      ctx.lineTo(x, pad + drawH - 4);
+      ctx.stroke();
+    }
+
+    if (hasLabels && labels[i]) {
+      ctx.fillStyle = '#9E998F';
+      ctx.font = `${Math.min(11, sp * 0.32)}px "DM Sans", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(labels[i], x, h - 8);
+    }
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h);
+  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// --- Code generation ---
+function updateCode() {
+  const pre = document.getElementById('codeOutput');
+  const mapper = document.getElementById('mapperOutput');
+  if (values.length === 0) {
+    pre.innerHTML = '<span class="cm">// Answer the questions above to generate your starter code</span>';
+    if (mapper) mapper.innerHTML = '<span class="cm">// Copy-for-Data-Mapper output will appear here</span>';
+    return;
+  }
+
+  const title = document.getElementById('titleInput').value;
+  const source = document.getElementById('sourceInput').value;
+  const cat = category || document.getElementById('customCategory').value || '';
+  const notice = document.getElementById('noticeInput').value;
+  const hide = document.getElementById('hideInput').value;
+  const hasLabels = labels.some(l => !/^\d+$/.test(l));
+  const primary = selectedMappings[0];
+
+  if (mapper) {
+    mapper.innerHTML = `<span class="cm">// Copy this line into Data Mapper</span>\n${labels.map((l, i) => `${escapeHtmlForCode(l)}:${values[i]}`).join(', ')}`;
+  }
+
+  let c = '';
+  if (title) c += `<span class="cm">// Title: ${escapeHtmlForCode(escapeComment(title))}</span>\n`;
+  if (source) c += `<span class="cm">// Source: ${escapeHtmlForCode(escapeComment(source))}</span>\n`;
+  if (cat) c += `<span class="cm">// Data: ${escapeHtmlForCode(escapeComment(cat))}</span>\n`;
+  if (notice) c += `<span class="cm">// What to notice: ${escapeHtmlForCode(escapeComment(notice))}</span>\n`;
+  if (hide) c += `<span class="cm">// What this hides: ${escapeHtmlForCode(escapeComment(hide))}</span>\n`;
+  if (title || source || cat || notice || hide) c += '\n';
+
+  c += `<span class="kw">let</span> values = [<span class="num">${values.join(', ')}</span>];\n`;
+  if (hasLabels) {
+    c += `<span class="kw">let</span> labels = [${labels.map(l => `"${escapeCodeString(l)}"`).join(', ')}];\n`;
+  }
+
+  c += `\n<span class="kw">function</span> <span class="fn">setup</span>() {\n`;
+  c += `  <span class="fn">createCanvas</span>(<span class="num">500</span>, <span class="num">300</span>);\n`;
+  c += `  <span class="fn">background</span>(<span class="num">245</span>);\n`;
+  c += `  <span class="fn">noLoop</span>();\n\n`;
+  c += `  <span class="kw">let</span> maxVal = <span class="fn">max</span>(values);\n`;
+
+  if (primary === 'height') {
+    c += `  <span class="kw">let</span> barW = width / values.length;\n\n`;
+    c += `  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < values.length; i++) {\n`;
+    c += `    <span class="kw">let</span> h = <span class="fn">map</span>(values[i], <span class="num">0</span>, maxVal, <span class="num">0</span>, height - <span class="num">60</span>);\n`;
+    if (selectedMappings.includes('color')) {
+      c += `    <span class="kw">let</span> c = <span class="fn">map</span>(values[i], <span class="num">0</span>, maxVal, <span class="num">200</span>, <span class="num">60</span>);\n`;
+      c += `    <span class="fn">fill</span>(c, <span class="num">100</span>, <span class="num">180</span>);\n`;
+    } else {
+      c += `    <span class="fn">fill</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>);\n`;
+    }
+    c += `    <span class="fn">noStroke</span>();\n`;
+    c += `    <span class="fn">rect</span>(i * barW + <span class="num">4</span>, height - h - <span class="num">30</span>, barW - <span class="num">8</span>, h, <span class="num">4</span>, <span class="num">4</span>, <span class="num">0</span>, <span class="num">0</span>);\n`;
+  } else if (primary === 'size') {
+    c += `  <span class="kw">let</span> spacing = width / values.length;\n\n`;
+    c += `  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < values.length; i++) {\n`;
+    c += `    <span class="kw">let</span> d = <span class="fn">map</span>(values[i], <span class="num">0</span>, maxVal, <span class="num">10</span>, <span class="num">80</span>);\n`;
+    if (selectedMappings.includes('color')) {
+      c += `    <span class="fn">fill</span>(<span class="fn">map</span>(values[i], <span class="num">0</span>, maxVal, <span class="num">200</span>, <span class="num">80</span>));\n`;
+    } else {
+      c += `    <span class="fn">fill</span>(<span class="num">224</span>, <span class="num">122</span>, <span class="num">95</span>);\n`;
+    }
+    c += `    <span class="fn">noStroke</span>();\n`;
+    c += `    <span class="fn">ellipse</span>(i * spacing + spacing / <span class="num">2</span>, height / <span class="num">2</span>, d, d);\n`;
+  } else if (primary === 'color') {
+    c += `  <span class="kw">let</span> cellW = width / values.length;\n\n`;
+    c += `  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < values.length; i++) {\n`;
+    c += `    <span class="kw">let</span> c = <span class="fn">map</span>(values[i], <span class="num">0</span>, maxVal, <span class="num">230</span>, <span class="num">30</span>);\n`;
+    c += `    <span class="fn">fill</span>(c);\n    <span class="fn">noStroke</span>();\n`;
+    c += `    <span class="fn">rect</span>(i * cellW, <span class="num">0</span>, cellW, height);\n`;
+  } else if (primary === 'opacity') {
+    c += `  <span class="kw">let</span> spacing = width / values.length;\n\n`;
+    c += `  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < values.length; i++) {\n`;
+    c += `    <span class="kw">let</span> a = <span class="fn">map</span>(values[i], <span class="num">0</span>, maxVal, <span class="num">30</span>, <span class="num">255</span>);\n`;
+    c += `    <span class="fn">fill</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>, a);\n    <span class="fn">noStroke</span>();\n`;
+    c += `    <span class="fn">ellipse</span>(i * spacing + spacing / <span class="num">2</span>, height / <span class="num">2</span>, <span class="num">40</span>, <span class="num">40</span>);\n`;
+  } else if (primary === 'position') {
+    c += `  <span class="kw">let</span> spacing = width / values.length;\n\n`;
+    c += `  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < values.length; i++) {\n`;
+    c += `    <span class="kw">let</span> y = <span class="fn">map</span>(values[i], <span class="num">0</span>, maxVal, height - <span class="num">30</span>, <span class="num">30</span>);\n`;
+    c += `    <span class="fn">fill</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>);\n    <span class="fn">noStroke</span>();\n`;
+    c += `    <span class="fn">ellipse</span>(i * spacing + spacing / <span class="num">2</span>, y, <span class="num">12</span>, <span class="num">12</span>);\n`;
+  } else if (primary === 'weight') {
+    c += `  <span class="kw">let</span> spacing = width / values.length;\n\n`;
+    c += `  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < values.length; i++) {\n`;
+    c += `    <span class="kw">let</span> sw = <span class="fn">map</span>(values[i], <span class="num">0</span>, maxVal, <span class="num">1</span>, <span class="num">10</span>);\n`;
+    c += `    <span class="fn">stroke</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>);\n    <span class="fn">strokeWeight</span>(sw);\n`;
+    c += `    <span class="fn">line</span>(i * spacing + spacing / <span class="num">2</span>, <span class="num">30</span>, i * spacing + spacing / <span class="num">2</span>, height - <span class="num">30</span>);\n`;
+  }
+
+  if (hasLabels) {
+    c += `\n    <span class="fn">fill</span>(<span class="num">80</span>);\n    <span class="fn">noStroke</span>();\n    <span class="fn">textAlign</span>(CENTER);\n    <span class="fn">textSize</span>(<span class="num">11</span>);\n`;
+    if (primary === 'height') c += `    <span class="fn">text</span>(labels[i], i * barW + barW / <span class="num">2</span>, height - <span class="num">10</span>);\n`;
+    else if (primary === 'color') c += `    <span class="fn">text</span>(labels[i], i * cellW + cellW / <span class="num">2</span>, height - <span class="num">10</span>);\n`;
+    else c += `    <span class="fn">text</span>(labels[i], i * spacing + spacing / <span class="num">2</span>, height - <span class="num">10</span>);\n`;
+  }
+
+  c += `  }\n}`;
+  pre.innerHTML = c;
+}
+
+// --- Copy ---
+function copyTextFrom(id, btn) {
+  const text = document.getElementById(id).textContent.replace(/^\/\/ Copy this line into Data Mapper\n/, "");
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  } else {
+    window.prompt('Copy:', text);
+  }
+}
+
+// --- Step tracking ---
+function updateSteps() {
+  const steps = [
+    { el: document.getElementById('step1'), done: values.length > 0 },
+    { el: document.getElementById('step2'), done: !!(category || document.getElementById('customCategory').value) },
+    { el: document.getElementById('step3'), done: selectedMappings.length > 0 },
+    { el: document.getElementById('step4'), done: !!document.getElementById('noticeInput').value },
+    { el: document.getElementById('step5'), done: !!document.getElementById('hideInput').value },
+  ];
+
+  let firstIncomplete = -1;
+  steps.forEach((s, i) => {
+    s.el.classList.remove('active', 'done');
+    if (s.done) s.el.classList.add('done');
+    else if (firstIncomplete === -1) { firstIncomplete = i; s.el.classList.add('active'); }
+  });
+  if (firstIncomplete === -1) steps[steps.length - 1].el.classList.add('done');
+}
+
+// --- Master update ---
+function updateAll() {
+  updatePreview();
+  updateSteps();
+  buildMappingCards();
+  updateCard();
+  updateCode();
+}
+
+// --- Wiring ---
+document.getElementById('dataInput').addEventListener('input', (e) => {
+  parseData(e.target.value);
+  updateAll();
+});
+
+document.getElementById('customCategory').addEventListener('input', (e) => {
+  if (e.target.value) {
+    category = '';
+    buildCategories();
+  }
+  updateAll();
+});
+
+document.getElementById('titleInput').addEventListener('input', updateAll);
+document.getElementById('sourceInput').addEventListener('input', updateAll);
+document.getElementById('noticeInput').addEventListener('input', updateAll);
+document.getElementById('hideInput').addEventListener('input', updateAll);
+
+window.addEventListener('resize', () => { updateCard(); });
+
+// --- Init ---
+document.getElementById('titleInput').value = "My Data Story";
+document.getElementById('sourceInput').value = "Self-tracked";
+document.getElementById('dataInput').value = "Mon:4, Tue:7, Wed:3, Thu:8, Fri:5";
+parseData(document.getElementById('dataInput').value);
+category = "energy (1–10)";
+document.getElementById('noticeInput').value = "Energy dips midweek and rises again by the end of the week.";
+document.getElementById('hideInput').value = "The chart does not explain why my energy changed.";
+buildCategories();
+buildMappingCards();
+updateAll();
+</script>
+</body>
+</html>

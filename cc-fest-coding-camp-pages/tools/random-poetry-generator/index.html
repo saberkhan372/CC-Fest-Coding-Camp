@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<title>Random Poetry Generator — CC Fest Coding Camp</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    
+    
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,900" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+  <body>
+    <script>
+
+
+
+var adjectives = ["baking", "blue","wet","lazy","sunburnt"];
+
+var nouns = ["tree", "hill","highway","sky","city"];
+
+var verbs = ["shimmers", "sweats","melts","swims","gorges"];
+
+
+function setup() { 
+  createCanvas(400, 400);
+  noLoop();
+  textFont('Helvetica',48);
+} 
+
+function draw() { 
+  background(255,255,100);
+  
+  // nb we can use random() to pick one from an array!
+  
+  var rnd_adjective = random(adjectives);
+  var rnd_noun = random(nouns);
+  var rnd_verb = random(verbs);
+  
+  text("the",50,100);
+
+  text(rnd_adjective,50,150);
+  
+  text(rnd_noun,50,200);
+
+  text(rnd_verb,50,250);
+  
+}
+
+function mousePressed(){
+ draw();
+}
+
+
+</script>
+  </body>
+</html>
