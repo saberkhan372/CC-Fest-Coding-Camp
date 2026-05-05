@@ -1,112 +1,168 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>WebGL 3D Workshop — CC Fest Coding Camp</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-        body { margin: 0; display: flex; flex-direction: column; align-items: center; font-family: Arial; }
-        .container { width: 1000px; margin: 20px; display: flex; gap: 20px; }
-        .controls { 
-            width: 300px;
-            padding: 20px; 
-            border: 1px solid #ccc; 
-            border-radius: 5px;
-            background: white;
-        }
-        .main-view { flex-grow: 1; }
-        .code-display { 
-            font-family: monospace; 
-            background: #f0f0f0; 
-            padding: 15px; 
-            border-radius: 5px;
-            margin: 10px 0;
-            white-space: pre;
-            font-size: 12px;
-        }
-        .slider-container {
-            margin: 10px 0;
-        }
-        .slider-label {
-            display: inline-block;
-            width: 100px;
-        }
-        select, button { 
-            margin: 5px 0; 
-            padding: 8px;
-            width: 100%;
-        }
-        .canvas-container { 
-            border: 1px solid #ddd; 
-            margin: 10px 0;
-            background: #f8f8f8;
-        }
-        .material-options, .transform-options {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #eee;
-            border-radius: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebGL 3D Playground — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 </head>
 <body>
-    <h1>WebGL 3D Workshop</h1>
-    <div class="container">
-        <div class="controls">
-            <h3>Shape Controls</h3>
-            <select id="shapeType" onchange="updateShape()">
-                <option value="box">Box</option>
-                <option value="sphere">Sphere</option>
-                <option value="cylinder">Cylinder</option>
-                <option value="cone">Cone</option>
-                <option value="torus">Torus</option>
-                <option value="custom">Custom Shape</option>
-            </select>
-
-            <div class="material-options">
-                <h3>Material & Color</h3>
-                <select id="materialType" onchange="updateMaterial()">
-                    <option value="normal">Normal Material</option>
-                    <option value="basic">Basic Material</option>
-                    <option value="phong">Phong Material</option>
-                </select>
-                <input type="color" id="colorPicker" value="#ff0000" onchange="updateColor(this.value)" style="width: 100%; margin: 5px 0;">
-            </div>
-
-            <div class="transform-options">
-                <h3>Transformations</h3>
-                <div class="slider-container">
-                    <span class="slider-label">Scale:</span>
-                    <input type="range" id="scaleSlider" min="0.1" max="2" step="0.1" value="1" onchange="updateTransforms()">
-                </div>
-                <div class="slider-container">
-                    <span class="slider-label">Rotate X:</span>
-                    <input type="range" id="rotateXSlider" min="0" max="360" value="0" onchange="updateTransforms()">
-                </div>
-                <div class="slider-container">
-                    <span class="slider-label">Rotate Y:</span>
-                    <input type="range" id="rotateYSlider" min="0" max="360" value="0" onchange="updateTransforms()">
-                </div>
-                <div class="slider-container">
-                    <span class="slider-label">Rotate Z:</span>
-                    <input type="range" id="rotateZSlider" min="0" max="360" value="0" onchange="updateTransforms()">
-                </div>
-            </div>
-
-            <div class="animation-options">
-                <h3>Animation</h3>
-                <button onclick="toggleAutoRotate()">Toggle Auto-Rotate</button>
-                <button onclick="resetCamera()">Reset Camera</button>
-            </div>
-
-            <div class="code-display" id="codeDisplay"></div>
-        </div>
-
-        <div class="main-view">
-            <div id="canvas-container" class="canvas-container"></div>
-        </div>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
     </div>
 
-    <script>
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Extension</span>
+        <span class="tool-pill type">Advanced Tool</span>
+      </div>
+      <h1>WebGL 3D Playground</h1>
+      <p class="tool-subtitle">Experiment with 3D shapes, transformations, materials, and camera movement to understand how p5.js changes when you switch to WEBGL mode.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">3D</span>
+        <span class="tool-tag">WEBGL</span>
+        <span class="tool-tag">transforms</span>
+        <span class="tool-tag">materials</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Rotate, recolor, and relight a 3D object while using the mouse to shift the camera depth.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>This generated starter shows how the current WEBGL scene is being built.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="codeDisplay">// 3D starter code will appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Choose a 3D shape, pick a material, and transform it in space.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="control">
+                <label for="shapeType">Shape <span id="shapeValue">Box</span></label>
+                <select id="shapeType" onchange="updateShape()">
+                  <option value="box">Box</option>
+                  <option value="sphere">Sphere</option>
+                  <option value="cylinder">Cylinder</option>
+                  <option value="cone">Cone</option>
+                  <option value="torus">Torus</option>
+                  <option value="custom">Custom Shape</option>
+                </select>
+              </div>
+              <div class="control">
+                <label for="materialType">Material <span id="materialValue">Normal</span></label>
+                <select id="materialType" onchange="updateMaterial()">
+                  <option value="normal">Normal Material</option>
+                  <option value="basic">Basic Material</option>
+                  <option value="phong">Phong Material</option>
+                </select>
+              </div>
+              <div class="control">
+                <label for="colorPicker">Color <span id="colorValue">#ff0000</span></label>
+                <input type="color" id="colorPicker" value="#ff0000" onchange="updateColor(this.value)">
+              </div>
+              <div class="control">
+                <label for="scaleSlider">Scale <span id="scaleValue">1.0</span></label>
+                <input type="range" id="scaleSlider" min="0.1" max="2" step="0.1" value="1" oninput="updateTransforms()">
+              </div>
+              <div class="control">
+                <label for="rotateXSlider">Rotate X <span id="rotateXValue">0</span></label>
+                <input type="range" id="rotateXSlider" min="0" max="360" value="0" oninput="updateTransforms()">
+              </div>
+              <div class="control">
+                <label for="rotateYSlider">Rotate Y <span id="rotateYValue">0</span></label>
+                <input type="range" id="rotateYSlider" min="0" max="360" value="0" oninput="updateTransforms()">
+              </div>
+              <div class="control">
+                <label for="rotateZSlider">Rotate Z <span id="rotateZValue">0</span></label>
+                <input type="range" id="rotateZSlider" min="0" max="360" value="0" oninput="updateTransforms()">
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="toggleAutoRotate()">Toggle Auto-Rotate</button>
+                <button class="button ghost" onclick="resetCamera()">Reset Camera</button>
+                <button class="button ghost" onclick="resetScene()">Reset Scene</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>Track the current 3D scene settings and the camera depth offset.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="state-display"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+                <p>Use the same prompt structure we want across the whole CC Fest library.</p>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Choose <code>Torus</code>, turn on auto-rotate, then drag the mouse up and down to move the camera through the scene.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>In WEBGL mode, rotation, lighting, and camera position all change how the object feels in space.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Build a tiny planet, toy, or sculpture by changing the shape, color, and transform values, then layering more 3D objects later.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · WebGL 3D Playground · 3D shapes, materials, and transformations</footer>
+  </div>
+
+  <script>
 let autoRotate = true;
 let shape = "box";
 let material = "normal";
@@ -114,39 +170,35 @@ let shapeColor = "#ff0000";
 let rotationX = 0;
 let rotationY = 0;
 let rotationZ = 0;
-let scale = 1;
+let sceneScale = 1;
 let cameraZ = 0;
 
 new p5((p) => {
   let time = 0;
 
   p.setup = () => {
-    let canvas = p.createCanvas(600, 600, p.WEBGL);
+    const canvas = p.createCanvas(560, 560, p.WEBGL);
     canvas.parent("canvas-container");
     p.noStroke();
     updateCodeDisplay();
+    updateStateDisplay();
   };
 
   p.draw = () => {
-    p.background(240);
-
-    // Add ambient light
+    p.background(250, 246, 240);
     p.ambientLight(60);
-    p.pointLight(255, 255, 255, 50, 50, 50);
+    p.pointLight(255, 255, 255, 70, 70, 120);
 
-    // Camera control with mouse
     if (p.mouseIsPressed) {
       cameraZ = p.map(p.mouseY, 0, p.height, -500, 500);
     }
     p.camera(0, 0, 300 + cameraZ, 0, 0, 0, 0, 1, 0);
 
-    // Apply transforms
-    p.scale(scale);
+    p.scale(sceneScale);
     p.rotateX(p.radians(rotationX + (autoRotate ? time : 0)));
     p.rotateY(p.radians(rotationY + (autoRotate ? time * 1.5 : 0)));
     p.rotateZ(p.radians(rotationZ));
 
-    // Set material
     switch (material) {
       case "normal":
         p.normalMaterial();
@@ -154,13 +206,12 @@ new p5((p) => {
       case "basic":
         p.fill(shapeColor);
         break;
-      case "phong":
+      default:
         p.specularMaterial(250);
         p.fill(shapeColor);
         break;
     }
 
-    // Draw shape
     switch (shape) {
       case "box":
         p.box(100);
@@ -177,36 +228,34 @@ new p5((p) => {
       case "torus":
         p.torus(50, 20);
         break;
-      case "custom":
+      default:
         drawCustomShape(p);
         break;
     }
 
-    // Draw coordinate system helpers
     drawCoordinateSystem(p);
 
     if (autoRotate) {
       time += 0.5;
     }
+
+    updateStateDisplay();
   };
 }, "canvas-container");
 
 function drawCoordinateSystem(p) {
-  // X axis - red
   p.push();
-  p.stroke(255, 0, 0);
+  p.stroke(224, 122, 95);
   p.line(-100, 0, 0, 100, 0, 0);
   p.pop();
 
-  // Y axis - green
   p.push();
-  p.stroke(0, 255, 0);
+  p.stroke(129, 178, 154);
   p.line(0, -100, 0, 0, 100, 0);
   p.pop();
 
-  // Z axis - blue
   p.push();
-  p.stroke(0, 0, 255);
+  p.stroke(61, 90, 128);
   p.line(0, 0, -100, 0, 0, 100);
   p.pop();
 }
@@ -214,10 +263,10 @@ function drawCoordinateSystem(p) {
 function drawCustomShape(p) {
   p.beginShape();
   for (let i = 0; i < 10; i++) {
-    let angle = p.map(i, 0, 10, 0, p.TWO_PI);
-    let x = p.cos(angle) * 50;
-    let y = p.sin(angle) * 50;
-    let z = p.sin(angle * 2) * 30;
+    const angle = p.map(i, 0, 10, 0, p.TWO_PI);
+    const x = p.cos(angle) * 50;
+    const y = p.sin(angle) * 50;
+    const z = p.sin(angle * 2) * 30;
     p.vertex(x, y, z);
   }
   p.endShape(p.CLOSE);
@@ -225,24 +274,31 @@ function drawCustomShape(p) {
 
 function updateShape() {
   shape = document.getElementById("shapeType").value;
+  document.getElementById("shapeValue").textContent = labelForShape(shape);
   updateCodeDisplay();
 }
 
 function updateMaterial() {
   material = document.getElementById("materialType").value;
+  document.getElementById("materialValue").textContent = labelForMaterial(material);
   updateCodeDisplay();
 }
 
 function updateColor(color) {
   shapeColor = color;
+  document.getElementById("colorValue").textContent = color;
   updateCodeDisplay();
 }
 
 function updateTransforms() {
-  scale = parseFloat(document.getElementById("scaleSlider").value);
+  sceneScale = parseFloat(document.getElementById("scaleSlider").value);
   rotationX = parseFloat(document.getElementById("rotateXSlider").value);
   rotationY = parseFloat(document.getElementById("rotateYSlider").value);
   rotationZ = parseFloat(document.getElementById("rotateZSlider").value);
+  document.getElementById("scaleValue").textContent = sceneScale.toFixed(1);
+  document.getElementById("rotateXValue").textContent = String(rotationX);
+  document.getElementById("rotateYValue").textContent = String(rotationY);
+  document.getElementById("rotateZValue").textContent = String(rotationZ);
   updateCodeDisplay();
 }
 
@@ -253,56 +309,79 @@ function toggleAutoRotate() {
 
 function resetCamera() {
   cameraZ = 0;
+  updateStateDisplay();
+}
+
+function resetScene() {
+  autoRotate = true;
+  shape = "box";
+  material = "normal";
+  shapeColor = "#ff0000";
+  rotationX = 0;
+  rotationY = 0;
+  rotationZ = 0;
+  sceneScale = 1;
+  cameraZ = 0;
+  document.getElementById("shapeType").value = "box";
+  document.getElementById("materialType").value = "normal";
+  document.getElementById("colorPicker").value = "#ff0000";
+  document.getElementById("scaleSlider").value = "1";
+  document.getElementById("rotateXSlider").value = "0";
+  document.getElementById("rotateYSlider").value = "0";
+  document.getElementById("rotateZSlider").value = "0";
+  document.getElementById("shapeValue").textContent = "Box";
+  document.getElementById("materialValue").textContent = "Normal";
+  document.getElementById("colorValue").textContent = "#ff0000";
+  document.getElementById("scaleValue").textContent = "1.0";
+  document.getElementById("rotateXValue").textContent = "0";
+  document.getElementById("rotateYValue").textContent = "0";
+  document.getElementById("rotateZValue").textContent = "0";
   updateCodeDisplay();
 }
 
 function updateCodeDisplay() {
-  let code = `// p5.js 3D Shape Creation
-function setup() {
-  createCanvas(600, 600, WEBGL);
-  noStroke();
+  const code = `function setup() {\n  createCanvas(560, 560, WEBGL);\n  noStroke();\n}\n\nfunction draw() {\n  background(240);\n  ambientLight(60);\n  pointLight(255, 255, 255, 70, 70, 120);\n\n  scale(${sceneScale.toFixed(1)});\n  rotateX(${rotationX});\n  rotateY(${rotationY});\n  rotateZ(${rotationZ});\n\n  ${material === "normal" ? "normalMaterial();" : material === "basic" ? `fill("${shapeColor}");` : `specularMaterial(250);\n  fill("${shapeColor}");`}\n\n  ${shape === "box" ? "box(100);" : shape === "sphere" ? "sphere(50);" : shape === "cylinder" ? "cylinder(30, 100);" : shape === "cone" ? "cone(40, 100);" : shape === "torus" ? "torus(50, 20);" : "// custom WEBGL shape here"}\n}`;
+  document.getElementById("codeDisplay").textContent = code;
 }
 
-function draw() {
-  background(240);
-  
-  // Lighting
-  ambientLight(60);
-  pointLight(255, 255, 255, 50, 50, 50);
-  
-  // Transformations
-  scale(${scale});
-  rotateX(${rotationX});
-  rotateY(${rotationY});
-  rotateZ(${rotationZ});
-  
-  // Material
-  ${
-    material === "normal"
-      ? "normalMaterial();"
-      : material === "basic"
-      ? `fill('${shapeColor}');`
-      : `specularMaterial(250);\nfill('${shapeColor}');`
-  }
-  
-  // Shape
-  ${
-    shape === "box"
-      ? "box(100);"
-      : shape === "sphere"
-      ? "sphere(50);"
-      : shape === "cylinder"
-      ? "cylinder(30, 100);"
-      : shape === "cone"
-      ? "cone(40, 100);"
-      : shape === "torus"
-      ? "torus(50, 20);"
-      : "// Custom shape vertices..."
-  }
-}`;
-  document.getElementById("codeDisplay").innerText = code;
+function updateStateDisplay() {
+  const state = [
+    ["shape", labelForShape(shape)],
+    ["material", labelForMaterial(material)],
+    ["scale", sceneScale.toFixed(1)],
+    ["cameraZ", Math.round(cameraZ)],
+    ["autoRotate", autoRotate]
+  ];
+
+  document.getElementById("state-display").innerHTML = state
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
 }
 
-</script>
-  </body>
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("codeDisplay").textContent);
+}
+
+function labelForShape(value) {
+  const labels = {
+    box: "Box",
+    sphere: "Sphere",
+    cylinder: "Cylinder",
+    cone: "Cone",
+    torus: "Torus",
+    custom: "Custom Shape"
+  };
+  return labels[value] || value;
+}
+
+function labelForMaterial(value) {
+  const labels = {
+    normal: "Normal",
+    basic: "Basic",
+    phong: "Phong"
+  };
+  return labels[value] || value;
+}
+  </script>
+</body>
 </html>

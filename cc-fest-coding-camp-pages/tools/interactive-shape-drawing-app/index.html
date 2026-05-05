@@ -1,359 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Interactive Shape Drawing App — CC Fest Coding Camp</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-        }
-        .sidebar {
-            width: 300px;
-            padding: 20px;
-            background: #ffffff;
-            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-        }
-        #canvas-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #f0f0f0;
-            position: relative;
-        }
-        .code-display {
-            font-family: 'Courier New', monospace;
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 15px;
-            border-radius: 5px;
-            white-space: pre-wrap;
-            font-size: 14px;
-            line-height: 1.5;
-            overflow-x: auto;
-            max-height: 300px;
-        }
-        .object-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 8px;
-            background: #f9f9f9;
-        }
-        .object-item {
-            padding: 10px;
-            margin: 5px 0;
-            background: white;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .object-item:hover {
-            background-color: #e3f2fd;
-            transform: translateX(5px);
-        }
-        .object-item.selected {
-            background: #e3f2fd;
-            border-left: 4px solid #2196F3;
-        }
-        .object-item-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-left: 10px;
-        }
-        button {
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            background: #2196F3;
-            color: white;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-right: 10px;
-        }
-        button:hover {
-            background: #1976D2;
-        }
-        button.delete {
-            background: #ff4d4d;
-        }
-        button.delete:hover {
-            background: #d32f2f;
-        }
-        select, input {
-            padding: 10px;
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Object Shape Studio — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Shape Drawing App</h2>
-        <div>
-            <h3>Create New Object</h3>
-            <div class="control-group">
-                <label for="objectType">Shape Type</label>
-                <select id="objectType" onchange="updatePropertiesForm()">
-                    <option value="Circle">Circle</option>
-                    <option value="Rectangle">Rectangle</option>
-                    <option value="Triangle">Triangle</option>
-                </select>
-            </div>
-            <div id="propertiesForm"></div>
-            <div>
-                <button onclick="createObject()">Create Object</button>
-                <button onclick="deleteSelectedObject()" class="delete">Delete Selected Object</button>
-            </div>
-        </div>
-        <div>
-            <h3>Objects</h3>
-            <div class="object-list" id="objectList"></div>
-        </div>
-        <div>
-            <h3>Shape Class Definition</h3>
-            <div class="code-display" id="classCode"></div>
-        </div>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
     </div>
-    <div class="canvas-container" id="canvas-container"></div>
-    <script>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Objects / OOP</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Object Shape Studio</h1>
+      <p class="tool-subtitle">Create reusable shape objects, place them on the canvas, and inspect the shared class logic that makes object-based sketches possible.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">objects</span>
+        <span class="tool-tag">classes</span>
+        <span class="tool-tag">reuse</span>
+        <span class="tool-tag">movement</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Create object instances, then watch them move and bounce while the selected one stays highlighted.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Shape Class Definition</h2>
+                <p>This class code shows the shared blueprint behind every object you create.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="classCode">// Shape class code will appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Create New Object</h2>
+                <p>Choose a shape type and properties, then add a new instance to the scene.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="control">
+                <label for="objectType">Shape Type <span id="objectTypeValue">Circle</span></label>
+                <select id="objectType" onchange="updateObjectTypeLabel()">
+                  <option value="Circle">Circle</option>
+                  <option value="Rectangle">Rectangle</option>
+                  <option value="Triangle">Triangle</option>
+                </select>
+              </div>
+              <div class="control">
+                <label for="x">X Coordinate <span id="xValue">300</span></label>
+                <input id="x" type="range" min="0" max="600" value="300" oninput="syncRangeValue('x')">
+              </div>
+              <div class="control">
+                <label for="y">Y Coordinate <span id="yValue">200</span></label>
+                <input id="y" type="range" min="0" max="400" value="200" oninput="syncRangeValue('y')">
+              </div>
+              <div class="control">
+                <label for="size">Size <span id="sizeValue">50</span></label>
+                <input id="size" type="range" min="10" max="200" value="50" oninput="syncRangeValue('size')">
+              </div>
+              <div class="control">
+                <label for="color">Color <span id="colorValue">#ff0000</span></label>
+                <input id="color" type="color" value="#ff0000" oninput="document.getElementById('colorValue').textContent = this.value">
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="createObject()">Create Object</button>
+                <button class="button ghost" onclick="deleteSelectedObject()">Delete Selected</button>
+                <button class="button ghost" onclick="initializeApp()">Reset App</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Objects</h2>
+                <p>Select an object instance to inspect it or delete it from the scene.</p>
+              </div>
+            </div>
+            <div class="code-panel">
+              <pre id="objectList">// No objects yet.</pre>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>Track how many objects exist and which one is currently selected.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="state-display"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+                <p>Use the same prompt structure we want across the whole CC Fest library.</p>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Create one circle, one rectangle, and one triangle with different colors, then click each one to see which object is selected.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>Each object has its own position and size, but they all share the same class logic for movement and containment.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Add a score, speed control, or a new subclass like <code>Star</code> or <code>Bubble</code> to grow the object system.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Object Shape Studio · Objects, classes, instances, and reuse</footer>
+  </div>
+
+  <script>
 const ShapeApp = {
-            objects: [],
-            selectedObject: null,
-            p5Instance: null,
-            reset() {
-                this.objects = [];
-                this.selectedObject = null;
-                if (this.p5Instance) {
-                    this.p5Instance.remove();
-                    this.p5Instance = null;
-                }
-                document.getElementById('canvas-container').innerHTML = '';
-                document.getElementById('objectList').innerHTML = '';
-            }
-        };
-
-        class Shape {
-            constructor(x, y, size, color) {
-                this.x = x;
-                this.y = y;
-                this.size = size;
-                this.color = color;
-                this.speed = 2;
-                this.direction = Math.random() * Math.PI * 2;
-            }
-
-            move() {
-                if (this === ShapeApp.selectedObject) return;
-                this.x += Math.cos(this.direction) * this.speed;
-                this.y += Math.sin(this.direction) * this.speed;
-
-                if (this.x < 0 || this.x > 600) {
-                    this.direction = Math.PI - this.direction;
-                    this.x = Math.max(0, Math.min(600, this.x));
-                }
-                if (this.y < 0 || this.y > 400) {
-                    this.direction = -this.direction;
-                    this.y = Math.max(0, Math.min(400, this.y));
-                }
-            }
-
-            contains(px, py) {
-                return Math.hypot(px - this.x, py - this.y) < this.size / 2;
-            }
-        }
-
-        class Circle extends Shape {
-            draw(p) {
-                p.fill(this.color);
-                p.noStroke();
-                p.circle(this.x, this.y, this.size);
-            }
-        }
-
-        class Rectangle extends Shape {
-            draw(p) {
-                p.fill(this.color);
-                p.noStroke();
-                p.rectMode(p.CENTER);
-                p.rect(this.x, this.y, this.size, this.size);
-            }
-        }
-
-        class Triangle extends Shape {
-            draw(p) {
-                p.fill(this.color);
-                p.noStroke();
-                p.triangle(
-                    this.x, this.y - this.size / 2,
-                    this.x - this.size / 2, this.y + this.size / 2,
-                    this.x + this.size / 2, this.y + this.size / 2
-                );
-            }
-        }
-
-        function initializeApp() {
-            ShapeApp.reset();
-
-            ShapeApp.p5Instance = new p5((p) => {
-                p.setup = () => {
-                    const canvas = p.createCanvas(600, 400);
-                    canvas.parent('canvas-container');
-                };
-
-                p.draw = () => {
-                    p.background(240);
-                    ShapeApp.objects.forEach(obj => {
-                        p.noStroke();
-                        if (obj === ShapeApp.selectedObject) {
-                            p.stroke(0);
-                            p.strokeWeight(2);
-                        }
-                        obj.move();
-                        obj.draw(p);
-                    });
-                };
-
-                p.mousePressed = () => {
-                    if (p.mouseX < 0 || p.mouseX > p.width || p.mouseY < 0 || p.mouseY > p.height) return;
-                    ShapeApp.selectedObject = ShapeApp.objects.find(obj => obj.contains(p.mouseX, p.mouseY));
-                    updateObjectList();
-                };
-            });
-
-            updateClassCode();
-            updatePropertiesForm();
-        }
-
-        function createObject() {
-            const type = document.getElementById('objectType').value;
-            const x = parseInt(document.getElementById('x').value);
-            const y = parseInt(document.getElementById('y').value);
-            const size = parseInt(document.getElementById('size').value);
-            const color = document.getElementById('color').value;
-
-            let obj;
-            switch (type) {
-                case 'Circle':
-                    obj = new Circle(x, y, size, color);
-                    break;
-                case 'Rectangle':
-                    obj = new Rectangle(x, y, size, color);
-                    break;
-                case 'Triangle':
-                    obj = new Triangle(x, y, size, color);
-                    break;
-            }
-
-            ShapeApp.objects.push(obj);
-            updateObjectList();
-            updateClassCode();
-        }
-
-        function deleteSelectedObject() {
-            if (ShapeApp.selectedObject) {
-                const index = ShapeApp.objects.indexOf(ShapeApp.selectedObject);
-                if (index !== -1) {
-                    ShapeApp.objects.splice(index, 1);
-                    ShapeApp.selectedObject = null;
-                    updateObjectList();
-                    updateClassCode();
-                }
-            } else {
-                alert("No object selected to delete.");
-            }
-        }
-
-        function updatePropertiesForm() {
-            const form = document.getElementById('propertiesForm');
-            form.innerHTML = `
-                <div class="control-group">
-                    <label for="x">X Coordinate</label>
-                    <input type="number" id="x" value="300" min="0" max="600">
-                </div>
-                <div class="control-group">
-                    <label for="y">Y Coordinate</label>
-                    <input type="number" id="y" value="200" min="0" max="400">
-                </div>
-                <div class="control-group">
-                    <label for="size">Size</label>
-                    <input type="number" id="size" value="50" min="10" max="200">
-                </div>
-                <div class="control-group">
-                    <label for="color">Color</label>
-                    <input type="color" id="color" value="#ff0000">
-                </div>
-            `;
-        }
-
-        function updateObjectList() {
-            const list = document.getElementById('objectList');
-            list.innerHTML = ShapeApp.objects.map((obj, i) => `
-                <div class="object-item ${obj === ShapeApp.selectedObject ? 'selected' : ''}" 
-                     onclick="selectObject(${i})">
-                    <span>${obj.constructor.name} at (${Math.round(obj.x)}, ${Math.round(obj.y)})</span>
-                    <div class="object-item-color" style="background-color: ${obj.color};"></div>
-                </div>
-            `).join('');
-        }
-
-        function selectObject(index) {
-            ShapeApp.selectedObject = ShapeApp.objects[index];
-            updateObjectList();
-        }
-
-        function updateClassCode() {
-            const code = `class Shape {
-    constructor(x, y, size, color) {
-        this.x = x;
-        this.y = y;
-        this.size = size;
-        this.color = color;
-        this.speed = 2;
-        this.direction = Math.random() * Math.PI * 2;
+  objects: [],
+  selectedObject: null,
+  p5Instance: null,
+  reset() {
+    this.objects = [];
+    this.selectedObject = null;
+    if (this.p5Instance) {
+      this.p5Instance.remove();
+      this.p5Instance = null;
     }
+    document.getElementById("canvas-container").innerHTML = "";
+    document.getElementById("objectList").textContent = "// No objects yet.";
+  }
+};
 
-    move() {
-        if (this === selectedObject) return;
-        this.x += Math.cos(this.direction) * this.speed;
-        this.y += Math.sin(this.direction) * this.speed;
-        if (this.x < 0 || this.x > 600) this.direction = Math.PI - this.direction;
-        if (this.y < 0 || this.y > 400) this.direction = -this.direction;
-    }
+class Shape {
+  constructor(x, y, size, color) {
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.color = color;
+    this.speed = 2;
+    this.direction = Math.random() * Math.PI * 2;
+  }
 
-    contains(px, py) {
-        return Math.hypot(px - this.x, py - this.y) < this.size / 2;
+  move() {
+    if (this === ShapeApp.selectedObject) return;
+    this.x += Math.cos(this.direction) * this.speed;
+    this.y += Math.sin(this.direction) * this.speed;
+
+    if (this.x < 0 || this.x > 600) {
+      this.direction = Math.PI - this.direction;
+      this.x = Math.max(0, Math.min(600, this.x));
     }
-}`;
-            document.getElementById('classCode').innerHTML = code;
+    if (this.y < 0 || this.y > 400) {
+      this.direction = -this.direction;
+      this.y = Math.max(0, Math.min(400, this.y));
+    }
+  }
+
+  contains(px, py) {
+    return Math.hypot(px - this.x, py - this.y) < this.size / 2;
+  }
+}
+
+class Circle extends Shape {
+  draw(p) {
+    p.fill(this.color);
+    p.noStroke();
+    p.circle(this.x, this.y, this.size);
+  }
+}
+
+class Rectangle extends Shape {
+  draw(p) {
+    p.fill(this.color);
+    p.noStroke();
+    p.rectMode(p.CENTER);
+    p.rect(this.x, this.y, this.size, this.size, 12);
+  }
+}
+
+class Triangle extends Shape {
+  draw(p) {
+    p.fill(this.color);
+    p.noStroke();
+    p.triangle(
+      this.x,
+      this.y - this.size / 2,
+      this.x - this.size / 2,
+      this.y + this.size / 2,
+      this.x + this.size / 2,
+      this.y + this.size / 2
+    );
+  }
+}
+
+function initializeApp() {
+  ShapeApp.reset();
+
+  ShapeApp.p5Instance = new p5((p) => {
+    p.setup = () => {
+      const canvas = p.createCanvas(620, 400);
+      canvas.parent("canvas-container");
+    };
+
+    p.draw = () => {
+      p.background(250, 246, 240);
+      ShapeApp.objects.forEach((obj) => {
+        p.noStroke();
+        if (obj === ShapeApp.selectedObject) {
+          p.stroke(44, 42, 38);
+          p.strokeWeight(3);
         }
+        obj.move();
+        obj.draw(p);
+      });
+      updateStateDisplay();
+    };
 
-        document.addEventListener('DOMContentLoaded', initializeApp);
-</script>
-  </body>
+    p.mousePressed = () => {
+      if (p.mouseX < 0 || p.mouseX > p.width || p.mouseY < 0 || p.mouseY > p.height) return;
+      ShapeApp.selectedObject = ShapeApp.objects.find((obj) => obj.contains(p.mouseX, p.mouseY)) || null;
+      updateObjectList();
+      updateStateDisplay();
+    };
+  });
+
+  updateClassCode();
+  updateObjectTypeLabel();
+  syncRangeValue("x");
+  syncRangeValue("y");
+  syncRangeValue("size");
+  updateStateDisplay();
+}
+
+function createObject() {
+  const type = document.getElementById("objectType").value;
+  const x = parseInt(document.getElementById("x").value, 10);
+  const y = parseInt(document.getElementById("y").value, 10);
+  const size = parseInt(document.getElementById("size").value, 10);
+  const color = document.getElementById("color").value;
+
+  let obj;
+  if (type === "Circle") obj = new Circle(x, y, size, color);
+  else if (type === "Rectangle") obj = new Rectangle(x, y, size, color);
+  else obj = new Triangle(x, y, size, color);
+
+  ShapeApp.objects.push(obj);
+  updateObjectList();
+  updateStateDisplay();
+}
+
+function deleteSelectedObject() {
+  if (!ShapeApp.selectedObject) return;
+  const index = ShapeApp.objects.indexOf(ShapeApp.selectedObject);
+  if (index !== -1) {
+    ShapeApp.objects.splice(index, 1);
+    ShapeApp.selectedObject = null;
+    updateObjectList();
+    updateStateDisplay();
+  }
+}
+
+function updateObjectTypeLabel() {
+  document.getElementById("objectTypeValue").textContent = document.getElementById("objectType").value;
+}
+
+function syncRangeValue(id) {
+  document.getElementById(`${id}Value`).textContent = document.getElementById(id).value;
+}
+
+function updateObjectList() {
+  if (ShapeApp.objects.length === 0) {
+    document.getElementById("objectList").textContent = "// No objects yet.";
+    return;
+  }
+
+  document.getElementById("objectList").textContent = ShapeApp.objects
+    .map((obj, index) => {
+      const selected = obj === ShapeApp.selectedObject ? " ← selected" : "";
+      return `${index + 1}. ${obj.constructor.name} at (${Math.round(obj.x)}, ${Math.round(obj.y)}) color ${obj.color}${selected}`;
+    })
+    .join("\n");
+}
+
+function updateClassCode() {
+  const code = `class Shape {\n  constructor(x, y, size, color) {\n    this.x = x;\n    this.y = y;\n    this.size = size;\n    this.color = color;\n    this.speed = 2;\n    this.direction = Math.random() * Math.PI * 2;\n  }\n\n  move() {\n    if (this === selectedObject) return;\n    this.x += Math.cos(this.direction) * this.speed;\n    this.y += Math.sin(this.direction) * this.speed;\n  }\n\n  contains(px, py) {\n    return Math.hypot(px - this.x, py - this.y) < this.size / 2;\n  }\n}`;
+  document.getElementById("classCode").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("classCode").textContent);
+}
+
+function updateStateDisplay() {
+  const state = [
+    ["objects", ShapeApp.objects.length],
+    ["selected", ShapeApp.selectedObject ? ShapeApp.selectedObject.constructor.name : "none"],
+    ["selectedX", ShapeApp.selectedObject ? Math.round(ShapeApp.selectedObject.x) : "-"],
+    ["selectedY", ShapeApp.selectedObject ? Math.round(ShapeApp.selectedObject.y) : "-"]
+  ];
+
+  document.getElementById("state-display").innerHTML = state
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
+}
+
+document.addEventListener("DOMContentLoaded", initializeApp);
+  </script>
+</body>
 </html>
