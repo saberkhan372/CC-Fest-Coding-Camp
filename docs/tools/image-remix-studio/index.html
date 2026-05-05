@@ -315,12 +315,30 @@
     font-size: 12px;
     color: var(--ink-faint);
   }
+
+  .page-topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0 18px;
+    font-size:13px;
+    font-family:'DM Sans',system-ui,sans-serif;
+  }
+  .page-topbar a{
+    text-decoration:none;
+    color:#5c5650;
+  }
+  .page-topbar a:hover{color:#c8391d}
 </style>
 </head>
 <body>
+  <div class="page-topbar">
+    <a href="../../index.html">← Back to tool library</a>
+    <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+  </div>
   <div class="container">
     <header class="header">
-      <div class="stage-tag">Missing Tool 8 — Images + Media Remix</div>
+      <div class="stage-tag">Session 5 · Images + Media</div>
       <h1>Image Remix Studio</h1>
       <p class="subtitle">Use an image as creative coding material. Load a picture, then remix it with tint, transparency, pixel sampling, repeated grids, mouse reveal, and glitch-like slicing.</p>
       <div class="tag-row" aria-label="Concept tags">

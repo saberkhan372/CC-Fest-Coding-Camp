@@ -347,4 +347,5 @@ pre[contenteditable="true"]{
   .tool-header,.card-inner{padding:20px}
   .card-header,.tool-topbar{display:block}
   .tool-topbar a{display:inline-block;margin-top:10px}
+  #canvas-container{min-height:unset;height:auto}
 }
