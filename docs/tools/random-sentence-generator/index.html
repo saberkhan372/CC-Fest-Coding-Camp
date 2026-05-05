@@ -84,10 +84,13 @@ let adverbs = ["fast", "slowly", "quietly"];
 
 function setup() {
   createCanvas(400, 400);
+  generateSentences();
 }
 
-function mousePressed() {
+function generateSentences() {
   background(255);
+  fill(44, 42, 38);
+
   for (let i = 0; i < 3; i++) {
     textSize(20);
     text(
@@ -96,6 +99,10 @@ function mousePressed() {
       50 * i + 50
     );
   }
+}
+
+function mousePressed() {
+  generateSentences();
 }</pre></div>
       </div>
     </section>
@@ -111,12 +118,13 @@ let adverbs = ["fast", "slowly", "quietly"];
 function setup() {
   const canvas = createCanvas(400, 400);
   canvas.parent("canvas-container");
-  background(255);
+  generateSentences();
 }
 
-function mousePressed() {
+function generateSentences() {
   background(255);
   fill(44, 42, 38);
+
   for (let i = 0; i < 3; i++) {
     textSize(20);
     text(
@@ -125,6 +133,10 @@ function mousePressed() {
       50 * i + 50
     );
   }
+}
+
+function mousePressed() {
+  generateSentences();
 }
   </script>
 </body>

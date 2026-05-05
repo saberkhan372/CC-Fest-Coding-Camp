@@ -84,11 +84,7 @@ let yPositions = [];
 function setup() {
   createCanvas(400, 400);
   noStroke();
-  
-  for (let i = 0; i < 100; i++) {
-    xPositions.push(random(400));
-    yPositions.push(random(400));
-  }
+  generateDotField();
 }
 
 function draw() {
@@ -97,6 +93,20 @@ function draw() {
   
   for (let i = 0; i < xPositions.length; i++) {
     ellipse(xPositions[i], yPositions[i], 10, 10);
+  }
+}
+
+function mousePressed() {
+  generateDotField();
+}
+
+function generateDotField() {
+  xPositions = [];
+  yPositions = [];
+
+  for (let i = 0; i < 100; i++) {
+    xPositions.push(random(width));
+    yPositions.push(random(height));
   }
 }</pre></div>
       </div>
@@ -113,11 +123,7 @@ function setup() {
   const canvas = createCanvas(400, 400);
   canvas.parent("canvas-container");
   noStroke();
-
-  for (let i = 0; i < 100; i++) {
-    xPositions.push(random(400));
-    yPositions.push(random(400));
-  }
+  generateDotField();
 }
 
 function draw() {
@@ -126,6 +132,20 @@ function draw() {
 
   for (let i = 0; i < xPositions.length; i++) {
     ellipse(xPositions[i], yPositions[i], 10, 10);
+  }
+}
+
+function mousePressed() {
+  generateDotField();
+}
+
+function generateDotField() {
+  xPositions = [];
+  yPositions = [];
+
+  for (let i = 0; i < 100; i++) {
+    xPositions.push(random(width));
+    yPositions.push(random(height));
   }
 }
   </script>

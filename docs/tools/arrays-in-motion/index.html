@@ -55,7 +55,7 @@
           <div class="lesson-grid">
             <div class="lesson-card">
               <h3>Try this</h3>
-              <p>Click once to generate phrases, then press a key to freeze them and press again to restart them.</p>
+              <p>Click to remix the phrases, then press a key to pause or resume the movement.</p>
             </div>
             <div class="lesson-card">
               <h3>Notice this</h3>
@@ -80,7 +80,7 @@
         </div>
         <div class="code-panel"><pre>let sentences = [];
 let xspeed = 2;
-let state = -1;
+let moving = true;
 
 let verbs = ["runs", "jumps", "swims"];
 let nouns = ["saber", "meghna", "anaya"];
@@ -89,28 +89,38 @@ let adverbs = ["fast", "slowly", "quietly"];
 function setup() {
   createCanvas(400, 400);
   textSize(20);
+  generateSentences();
 }
 
 function draw() {
   background(255);
   for (let s of sentences) {
     text(s.text, s.x, s.y);
-    s.x += xspeed;
-  }
 
-  xspeed = state === -1 ? 0 : 2;
+    if (moving) {
+      s.x += xspeed;
+    }
+
+    if (s.x > width) {
+      s.x = -textWidth(s.text);
+    }
+  }
 }
 
-function mousePressed() {
+function generateSentences() {
   sentences = [];
   for (let i = 0; i < 3; i++) {
     let phrase = random(nouns) + " " + random(verbs) + " " + random(adverbs);
-    sentences.push({ text: phrase, x: 0, y: i * 100 + 50 });
+    sentences.push({ text: phrase, x: i * 20, y: i * 100 + 80 });
   }
 }
 
+function mousePressed() {
+  generateSentences();
+}
+
 function keyPressed() {
-  state = state * -1;
+  moving = !moving;
 }</pre></div>
       </div>
     </section>
@@ -121,7 +131,7 @@ function keyPressed() {
   <script>
 let sentences = [];
 let xspeed = 2;
-let state = -1;
+let moving = true;
 
 let verbs = ["runs", "jumps", "swims"];
 let nouns = ["saber", "meghna", "anaya"];
@@ -131,6 +141,7 @@ function setup() {
   const canvas = createCanvas(400, 400);
   canvas.parent("canvas-container");
   textSize(20);
+  generateSentences();
 }
 
 function draw() {
@@ -138,22 +149,31 @@ function draw() {
   fill(44, 42, 38);
   for (let s of sentences) {
     text(s.text, s.x, s.y);
-    s.x += xspeed;
-  }
 
-  xspeed = state === -1 ? 0 : 2;
+    if (moving) {
+      s.x += xspeed;
+    }
+
+    if (s.x > width) {
+      s.x = -textWidth(s.text);
+    }
+  }
 }
 
-function mousePressed() {
+function generateSentences() {
   sentences = [];
   for (let i = 0; i < 3; i++) {
     let phrase = random(nouns) + " " + random(verbs) + " " + random(adverbs);
-    sentences.push({ text: phrase, x: 0, y: i * 100 + 50 });
+    sentences.push({ text: phrase, x: i * 20, y: i * 100 + 80 });
   }
 }
 
+function mousePressed() {
+  generateSentences();
+}
+
 function keyPressed() {
-  state = state * -1;
+  moving = !moving;
 }
   </script>
 </body>
