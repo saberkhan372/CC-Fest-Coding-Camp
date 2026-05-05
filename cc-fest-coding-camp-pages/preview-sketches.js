@@ -22,6 +22,18 @@
     "webgl-3d-workshop": { family: "cube", label: "3D" },
     "sound-shape-visualizer": { family: "sound", label: "Sound" },
     "image-remix-studio": { family: "image", label: "Remix" },
+    "mouse-trail-drawing-seed": { family: "trail", label: "Trail" },
+    "bouncing-ball-starter": { family: "bounce", label: "Motion" },
+    "click-to-create-shapes": { family: "objects", label: "Clicks" },
+    "color-from-position": { family: "shapeColor", label: "Color" },
+    "noise-walker": { family: "noiseRandom", label: "Noise" },
+    "function-creature-stamp": { family: "function", label: "Functions" },
+    "keyboard-controlled-character": { family: "keyboard", label: "Keys" },
+    "simple-collision-game-seed": { family: "collision", label: "Collision" },
+    "data-self-portrait-seed": { family: "dataMap", label: "Data" },
+    "image-grid-remix-seed": { family: "image", label: "Image" },
+    "sound-pulse-seed": { family: "sound", label: "Sound" },
+    "mini-generative-poster-seed": { family: "poster", label: "Poster" },
     "nested-loop-array-grid": { family: "gridSeed", label: "Seed" },
     "array-position-dot-field": { family: "dots", label: "Positions" },
     "random-poetry-generator": { family: "poetry", label: "Poetry" },
@@ -460,6 +472,18 @@
         ctx.fill();
         break;
       }
+      case "trail": {
+        for (let i = 0; i < 9; i++) {
+          const alpha = 0.1 + i * 0.08;
+          const x = 26 + i * ((w - 52) / 8) + Math.sin(t * 2 + i * 0.4) * 4;
+          const y = h * 0.48 + Math.cos(t * 2.1 + i * 0.45) * 18;
+          ctx.fillStyle = `rgba(61,90,128,${alpha})`;
+          ctx.beginPath();
+          ctx.arc(x, y, 6 + i * 0.9, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        break;
+      }
       case "collision": {
         const aX = w * 0.38 + Math.sin(t * 1.7) * 18;
         const bX = w * 0.62 - Math.sin(t * 1.7) * 18;
@@ -492,6 +516,25 @@
           roundedRect(ctx, node.x - 18 + dx, node.y - 14 + dy, 36, 28, 10);
           ctx.fill();
         });
+        break;
+      }
+      case "keyboard": {
+        ctx.fillStyle = "#fff";
+        roundedRect(ctx, 18, 18, w - 36, h - 36, 16);
+        ctx.fill();
+        ctx.fillStyle = "rgba(61,90,128,.18)";
+        [
+          [w * 0.5, h * 0.3],
+          [w * 0.38, h * 0.5],
+          [w * 0.5, h * 0.5],
+          [w * 0.62, h * 0.5]
+        ].forEach(([x, y]) => {
+          roundedRect(ctx, x - 18, y - 14, 36, 28, 10);
+          ctx.fill();
+        });
+        ctx.fillStyle = "#e07a5f";
+        roundedRect(ctx, w * 0.5 - 16 + Math.sin(t * 2) * 14, h * 0.72 - 16, 32, 32, 10);
+        ctx.fill();
         break;
       }
       case "cube": {
@@ -551,6 +594,24 @@
         ctx.fillStyle = "rgba(255,255,255,.68)";
         ctx.fillRect(w * 0.68, 30, 8, h - 60);
         ctx.fillRect(w * 0.76, 30, 5, h - 60);
+        break;
+      }
+      case "poster": {
+        ctx.fillStyle = "rgba(61,90,128,.14)";
+        roundedRect(ctx, 18, 16, w - 36, h - 32, 14);
+        ctx.fill();
+        ctx.fillStyle = "#e07a5f";
+        ctx.fillRect(32, 32, 56, 18);
+        ctx.fillStyle = "#3d5a80";
+        ctx.fillRect(w - 98, 32, 46, 64);
+        ctx.fillStyle = "rgba(129,178,154,.92)";
+        ctx.beginPath();
+        ctx.arc(86 + Math.sin(t * 1.5) * 8, h - 42, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 13px DM Sans, sans-serif";
+        ctx.fillText("code", 32, 86);
+        ctx.fillText("poster", 32, 104);
         break;
       }
       case "dots": {
