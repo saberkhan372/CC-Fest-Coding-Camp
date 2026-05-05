@@ -202,6 +202,25 @@ a{color:inherit}
   accent-color:var(--accent);
 }
 
+.control select,
+.control input[type="color"]{
+  width:100%;
+  border:1px solid var(--cream-deep);
+  border-radius:12px;
+  background:#fff;
+  color:var(--ink);
+  font:inherit;
+}
+
+.control select{
+  padding:10px 12px;
+}
+
+.control input[type="color"]{
+  min-height:42px;
+  padding:4px;
+}
+
 .button-row{
   display:flex;
   flex-wrap:wrap;

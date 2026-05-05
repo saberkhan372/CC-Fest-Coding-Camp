@@ -1,219 +1,343 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Rows and Columns Tool — CC Fest Coding Camp</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
-        .controls {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            background: #f9f9f9;
-            border-radius: 10px;
-            width: 400px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .controls label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-        .controls input,
-        .controls select {
-            width: 100%;
-        }
-        .controls button {
-            grid-column: span 2;
-            padding: 10px;
-            border: none;
-            background-color: #007bff;
-            color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .controls button:hover {
-            background-color: #0056b3;
-        }
-        .code-preview {
-            font-family: monospace;
-            background: #282c34;
-            color: #61dafb;
-            padding: 10px;
-            margin-top: 20px;
-            border-radius: 8px;
-            width: 400px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rows + Columns Pattern Maker — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 </head>
 <body>
-    <div class="controls">
-        <div>
-            <label>Rows:</label>
-            <input type="range" min="1" max="20" value="5" oninput="updateRows(this.value)">
-        </div>
-        <div>
-            <label>Columns:</label>
-            <input type="range" min="1" max="20" value="5" oninput="updateCols(this.value)">
-        </div>
-        <div>
-            <label>Size:</label>
-            <input type="range" min="10" max="50" value="30" oninput="updateSize(this.value)">
-        </div>
-        <div>
-            <label>Color Mode:</label>
-            <select onchange="updateColorMode(this.value)">
-                <option value="rainbow">Rainbow</option>
-                <option value="gradient">Gradient</option>
-                <option value="random">Random</option>
-            </select>
-        </div>
-        <div>
-            <label>Shape:</label>
-            <select onchange="updateShape(this.value)">
-                <option value="rect">Rectangle</option>
-                <option value="circle">Circle</option>
-                <option value="triangle">Triangle</option>
-            </select>
-        </div>
-        <div>
-            <label>Rotation:</label>
-            <input type="checkbox" onchange="toggleRotation(this.checked)">
-        </div>
-        <button onclick="copyCode()">Copy Code</button>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
     </div>
-    <div id="canvas-container"></div>
-    <div class="code-preview" id="code-preview">// Code preview will appear here</div>
-    <script>
- let rows = 5;
-        let cols = 5;
-        let size = 30;
-        let colorMode = 'rainbow';
-        let shape = 'rect';
-        let rotateShapes = false;
-        let angle = 0;
 
-        function setup() {
-            let canvas = createCanvas(400, 400);
-            canvas.parent('canvas-container');
-            angleMode(DEGREES);
-            updateCodePreview();
-        }
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 3</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Rows + Columns Pattern Maker</h1>
+      <p class="tool-subtitle">Use nested loops to build repeated visual systems by changing rows, columns, size, color logic, and rotation.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">loops</span>
+        <span class="tool-tag">patterns</span>
+        <span class="tool-tag">grid</span>
+        <span class="tool-tag">nested loops</span>
+      </div>
+    </header>
 
-        function draw() {
-            background(220);
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Change the pattern controls and watch rows and columns turn into repeated systems.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
 
-            let spacingX = width / (cols + 1);
-            let spacingY = height / (rows + 1);
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>The preview maps your controls back to a nested-loop structure you can remix later.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Pattern starter code will appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
 
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < cols; j++) {
-                    let x = (j + 1) * spacingX;
-                    let y = (i + 1) * spacingY;
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Adjust the loop counts, shape settings, and color system for the pattern.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="control">
+                <label for="rows">Rows <span id="rowsValue">5</span></label>
+                <input id="rows" type="range" min="1" max="20" value="5" oninput="updateRows(this.value)">
+              </div>
+              <div class="control">
+                <label for="cols">Columns <span id="colsValue">5</span></label>
+                <input id="cols" type="range" min="1" max="20" value="5" oninput="updateCols(this.value)">
+              </div>
+              <div class="control">
+                <label for="size">Shape Size <span id="sizeValue">30</span></label>
+                <input id="size" type="range" min="10" max="50" value="30" oninput="updateSize(this.value)">
+              </div>
+              <div class="control">
+                <label for="colorMode">Color Mode <span id="colorModeValue">Rainbow</span></label>
+                <select id="colorMode" onchange="updateColorMode(this.value)">
+                  <option value="rainbow">Rainbow</option>
+                  <option value="gradient">Gradient</option>
+                  <option value="random">Random</option>
+                </select>
+              </div>
+              <div class="control">
+                <label for="shapeType">Shape <span id="shapeValue">Rectangle</span></label>
+                <select id="shapeType" onchange="updateShape(this.value)">
+                  <option value="rect">Rectangle</option>
+                  <option value="circle">Circle</option>
+                  <option value="triangle">Triangle</option>
+                </select>
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="toggleRotation(!rotateShapes)">Toggle Rotation</button>
+                <button class="button ghost" onclick="randomizePattern()">Randomize</button>
+                <button class="button ghost" onclick="resetPattern()">Reset</button>
+              </div>
+            </div>
+          </div>
+        </article>
 
-                    if (colorMode === 'rainbow') {
-                        fill(map(i * cols + j, 0, rows * cols, 0, 360), 80, 80);
-                    } else if (colorMode === 'gradient') {
-                        fill(map(x, 0, width, 0, 360), map(y, 0, height, 0, 100), 80);
-                    } else if (colorMode === 'random') {
-                        fill(random(360), 80, 80);
-                    }
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>Track the current pattern settings and the total number of shapes being drawn.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="state-display"></div>
+          </div>
+        </article>
 
-                    push();
-                    translate(x, y);
-                    if (rotateShapes) {
-                        rotate(angle);
-                    }
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+                <p>Use the same prompt structure we want across the whole CC Fest library.</p>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Set the grid to <code>8</code> rows and <code>12</code> columns, then compare what happens in <code>Rainbow</code> and <code>Gradient</code> mode.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>The outer loop controls how many rows appear. The inner loop controls how many shapes land across each row.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Change the shape color based on row number, column number, or mouse position to create your own pattern system.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
 
-                    if (shape === 'rect') {
-                        rectMode(CENTER);
-                        rect(0, 0, size, size);
-                    } else if (shape === 'circle') {
-                        circle(0, 0, size);
-                    } else if (shape === 'triangle') {
-                        triangle(-size / 2, size / 2, 0, -size / 2, size / 2, size / 2);
-                    }
+    <footer class="tool-footer">CC Fest Coding Camp · Rows + Columns Pattern Maker · Nested loops, repetition, and pattern systems</footer>
+  </div>
 
-                    pop();
-                }
-            }
+  <script>
+let rows = 5;
+let cols = 5;
+let size = 30;
+let paletteMode = "rainbow";
+let shape = "rect";
+let rotateShapes = false;
+let angle = 0;
 
-            if (rotateShapes) {
-                angle += 0.5;
-            }
-        }
+function setup() {
+  const canvas = createCanvas(500, 400);
+  canvas.parent("canvas-container");
+  angleMode(DEGREES);
+  paletteMode = "rainbow";
+  updateCodePreview();
+  updateStateDisplay();
+  syncControls();
+}
 
-        function updateRows(value) {
-            rows = Number(value);
-            updateCodePreview();
-        }
+function draw() {
+  background(250, 246, 240);
+  colorMode(HSB, 360, 100, 100, 100);
 
-        function updateCols(value) {
-            cols = Number(value);
-            updateCodePreview();
-        }
+  const spacingX = width / (cols + 1);
+  const spacingY = height / (rows + 1);
 
-        function updateSize(value) {
-            size = Number(value);
-            updateCodePreview();
-        }
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      const x = (j + 1) * spacingX;
+      const y = (i + 1) * spacingY;
 
-        function updateColorMode(value) {
-            colorMode = value;
-            updateCodePreview();
-        }
+      if (paletteMode === "rainbow") {
+        fill(map(i * cols + j, 0, max(1, rows * cols), 0, 360), 55, 88);
+      } else if (paletteMode === "gradient") {
+        fill(map(x, 0, width, 10, 220), map(y, 0, height, 40, 80), 88);
+      } else {
+        fill((i * 41 + j * 23 + frameCount) % 360, 55, 88);
+      }
 
-        function updateShape(value) {
-            shape = value;
-            updateCodePreview();
-        }
+      noStroke();
+      push();
+      translate(x, y);
+      if (rotateShapes) {
+        rotate(angle + i * 8 + j * 8);
+      }
 
-        function toggleRotation(value) {
-            rotateShapes = value;
-        }
+      if (shape === "rect") {
+        rectMode(CENTER);
+        rect(0, 0, size, size);
+      } else if (shape === "circle") {
+        circle(0, 0, size);
+      } else {
+        triangle(-size / 2, size / 2, 0, -size / 2, size / 2, size / 2);
+      }
 
-        function updateCodePreview() {
-            const code = `// Pattern configuration
-let rows = ${rows};
+      pop();
+    }
+  }
+
+  if (rotateShapes) {
+    angle += 0.5;
+  }
+
+  updateStateDisplay();
+}
+
+function updateRows(value) {
+  rows = Number(value);
+  document.getElementById("rowsValue").textContent = String(rows);
+  updateCodePreview();
+}
+
+function updateCols(value) {
+  cols = Number(value);
+  document.getElementById("colsValue").textContent = String(cols);
+  updateCodePreview();
+}
+
+function updateSize(value) {
+  size = Number(value);
+  document.getElementById("sizeValue").textContent = String(size);
+  updateCodePreview();
+}
+
+function updateColorMode(value) {
+  paletteMode = value;
+  document.getElementById("colorModeValue").textContent = labelForColorMode(value);
+  updateCodePreview();
+}
+
+function updateShape(value) {
+  shape = value;
+  document.getElementById("shapeValue").textContent = labelForShape(value);
+  updateCodePreview();
+}
+
+function toggleRotation(value) {
+  rotateShapes = value;
+  updateCodePreview();
+}
+
+function randomizePattern() {
+  rows = floor(random(3, 12));
+  cols = floor(random(3, 12));
+  size = floor(random(16, 42));
+  paletteMode = random(["rainbow", "gradient", "random"]);
+  shape = random(["rect", "circle", "triangle"]);
+  rotateShapes = random([true, false]);
+  syncControls();
+  updateCodePreview();
+}
+
+function resetPattern() {
+  rows = 5;
+  cols = 5;
+  size = 30;
+  paletteMode = "rainbow";
+  shape = "rect";
+  rotateShapes = false;
+  angle = 0;
+  syncControls();
+  updateCodePreview();
+}
+
+function syncControls() {
+  document.getElementById("rows").value = rows;
+  document.getElementById("cols").value = cols;
+  document.getElementById("size").value = size;
+  document.getElementById("colorMode").value = paletteMode;
+  document.getElementById("shapeType").value = shape;
+  document.getElementById("rowsValue").textContent = String(rows);
+  document.getElementById("colsValue").textContent = String(cols);
+  document.getElementById("sizeValue").textContent = String(size);
+  document.getElementById("colorModeValue").textContent = labelForColorMode(paletteMode);
+  document.getElementById("shapeValue").textContent = labelForShape(shape);
+}
+
+function updateCodePreview() {
+  const code = `let rows = ${rows};
 let cols = ${cols};
 let size = ${size};
-let colorMode = '${colorMode}';
-let shape = '${shape}';
+let colorMode = "${paletteMode}";
+let shape = "${shape}";
 let rotateShapes = ${rotateShapes};
 
-// Main loop
-for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-        let x = (j + 1) * width / (cols + 1);
-        let y = (i + 1) * height / (rows + 1);
+for (let row = 0; row < rows; row++) {
+  for (let col = 0; col < cols; col++) {
+    let x = (col + 1) * width / (cols + 1);
+    let y = (row + 1) * height / (rows + 1);
 
-        if (rotateShapes) {
-            rotate(angle);
-        }
-
-        // Draw ${shape} at position (x, y)
-    }
+    // choose fill based on ${paletteMode}
+    // draw ${labelForShape(shape).toLowerCase()} at x, y
+  }
 }`;
-            document.getElementById('code-preview').innerText = code;
-        }
 
-        function copyCode() {
-            const code = document.getElementById('code-preview').innerText;
-            navigator.clipboard.writeText(code).then(() => {
-                alert('Code copied to clipboard!');
-            });
-        }
-</script>
-  </body>
+  document.getElementById("code-preview").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+
+function updateStateDisplay() {
+  const state = [
+    ["rows", rows],
+    ["cols", cols],
+    ["shapeCount", rows * cols],
+    ["size", size],
+    ["shape", labelForShape(shape)],
+    ["colorMode", labelForColorMode(paletteMode)],
+    ["rotating", rotateShapes]
+  ];
+
+  document.getElementById("state-display").innerHTML = state
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
+}
+
+function labelForShape(value) {
+  const labels = { rect: "Rectangle", circle: "Circle", triangle: "Triangle" };
+  return labels[value] || value;
+}
+
+function labelForColorMode(value) {
+  const labels = { rainbow: "Rainbow", gradient: "Gradient", random: "Random" };
+  return labels[value] || value;
+}
+  </script>
+</body>
 </html>

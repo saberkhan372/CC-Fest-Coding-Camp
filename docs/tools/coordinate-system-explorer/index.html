@@ -1,86 +1,175 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Coordinate System Explorer — CC Fest Coding Camp</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .controls {
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-        }
-        #code-display {
-            font-family: monospace;
-            margin: 10px;
-            padding: 10px;
-            background: #282c34;
-            color: #61dafb;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-            overflow-x: auto;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coordinate System Explorer — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 </head>
 <body>
-    <div class="controls">
-        <h2>Coordinate System Explorer</h2>
-        <button onclick="toggleGrid()">Toggle Grid</button>
-        <button onclick="toggleCoordinates()">Toggle Coordinates</button>
-        <label>
-            Grid Spacing:
-            <input type="range" min="10" max="50" value="20" oninput="changeGridSpacing(this.value)">
-        </label>
-        <label>Drawing Mode: 
-            <select onchange="changeMode(this.value)">
-                <option value="draw">Free Draw</option>
-                <option value="rect">Rectangle</option>
-                <option value="circle">Circle</option>
-                <option value="line">Line</option>
-                <option value="erase">Erase</option>
-            </select>
-        </label>
-        <label>
-            Stroke Color: <input type="color" value="#000000" onchange="updateStrokeColor(this.value)">
-        </label>
-        <label>
-            Fill Color: <input type="color" value="#ffffff" onchange="updateFillColor(this.value)">
-        </label>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
     </div>
-    <div id="code-display">// Code will appear here when you draw</div>
-    <script>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 1</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Coordinate System Explorer</h1>
+      <p class="tool-subtitle">Learn how coordinates, shapes, and drawing modes work together by sketching directly on a gridded p5.js canvas.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">coordinates</span>
+        <span class="tool-tag">shapes</span>
+        <span class="tool-tag">drawing</span>
+        <span class="tool-tag">grid</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Switch tools, draw on the canvas, and watch the coordinate logic update in real time.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>The most recent drawing action is translated into p5.js shape code here.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-display">// Draw a shape to see the code appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Turn the grid on or off, choose a drawing mode, and adjust the colors you sketch with.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="button-row">
+                <button class="button primary" onclick="toggleGrid()">Toggle Grid</button>
+                <button class="button ghost" onclick="toggleCoordinates()">Toggle Coordinates</button>
+                <button class="button ghost" onclick="clearShapes()">Clear Canvas</button>
+              </div>
+              <div class="control">
+                <label for="gridSpacing">Grid Spacing <span id="gridSpacingValue">20</span></label>
+                <input id="gridSpacing" type="range" min="10" max="50" value="20" oninput="changeGridSpacing(this.value)">
+              </div>
+              <div class="control">
+                <label for="drawingMode">Drawing Mode <span id="modeValue">Free Draw</span></label>
+                <select id="drawingMode" onchange="changeMode(this.value)">
+                  <option value="draw">Free Draw</option>
+                  <option value="rect">Rectangle</option>
+                  <option value="circle">Circle</option>
+                  <option value="line">Line</option>
+                  <option value="erase">Erase</option>
+                </select>
+              </div>
+              <div class="control">
+                <label for="strokeColor">Stroke Color <span id="strokeValue">#000000</span></label>
+                <input id="strokeColor" type="color" value="#000000" onchange="updateStrokeColor(this.value)">
+              </div>
+              <div class="control">
+                <label for="fillColor">Fill Color <span id="fillValue">#ffffff</span></label>
+                <input id="fillColor" type="color" value="#ffffff" onchange="updateFillColor(this.value)">
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>These values track the current tool, grid behavior, and how much has been drawn.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="state-display"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+                <p>Use the prompts to turn the drawing canvas into a mini-lesson.</p>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Turn the grid on, choose <code>Rectangle</code>, and draw three different shapes while reading the coordinate labels.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>The numbers in each shape function describe position and size. The same grid helps you predict where each shape will land.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Switch to <code>Line</code> mode and try drawing a letter, a map, or a tiny scene using only coordinates and shapes.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Coordinate System Explorer · Coordinates, shapes, and drawing logic</footer>
+  </div>
+
+  <script>
 let showGrid = true;
 let showCoordinates = true;
 let mode = "draw";
-let startX, startY;
+let startX;
+let startY;
 let isDrawing = false;
 let shapes = [];
 let gridSpacing = 20;
 let strokeColor = "#000000";
 let fillColor = "#ffffff";
+let freehandPoints = [];
+let lastCode = "// Draw a shape to see the code appear here.";
 
 function setup() {
-  createCanvas(600, 600);
+  const canvas = createCanvas(500, 500);
+  canvas.parent("canvas-container");
+  updateStateDisplay();
 }
 
 function draw() {
-  background(255);
+  background(250, 246, 240);
 
-  // Draw grid
   if (showGrid) {
-    stroke(200);
+    stroke(228, 220, 207);
     strokeWeight(1);
     for (let i = 0; i <= width; i += gridSpacing) {
       line(i, 0, i, height);
@@ -88,69 +177,84 @@ function draw() {
     }
   }
 
-  // Draw coordinates at mouse position
   if (showCoordinates) {
-    let x = constrain(mouseX, 0, width);
-    let y = constrain(mouseY, 0, height);
-    fill(0);
+    const x = constrain(mouseX, 0, width);
+    const y = constrain(mouseY, 0, height);
+    fill(44, 42, 38);
     noStroke();
     textSize(12);
     text(`(${Math.round(x)}, ${Math.round(y)})`, x + 10, y - 10);
   }
 
-  // Draw all saved shapes
   shapes.forEach((shape) => shape.draw());
 
-  // Preview shape being drawn
   if (isDrawing) {
     stroke(strokeColor);
     strokeWeight(2);
     fill(fillColor);
+
     if (mode === "rect") {
       noFill();
       rect(startX, startY, mouseX - startX, mouseY - startY);
-      updateCode(
-        `rect(${Math.round(startX)}, ${Math.round(startY)}, ${Math.round(
-          mouseX - startX
-        )}, ${Math.round(mouseY - startY)})`
-      );
+      updateCode(`rect(${Math.round(startX)}, ${Math.round(startY)}, ${Math.round(mouseX - startX)}, ${Math.round(mouseY - startY)});`);
     } else if (mode === "circle") {
       noFill();
-      let diameter = dist(startX, startY, mouseX, mouseY) * 2;
+      const diameter = dist(startX, startY, mouseX, mouseY) * 2;
       circle(startX, startY, diameter);
-      updateCode(
-        `circle(${Math.round(startX)}, ${Math.round(startY)}, ${Math.round(
-          diameter
-        )})`
-      );
+      updateCode(`circle(${Math.round(startX)}, ${Math.round(startY)}, ${Math.round(diameter)});`);
     } else if (mode === "line") {
       line(startX, startY, mouseX, mouseY);
-      updateCode(
-        `line(${Math.round(startX)}, ${Math.round(startY)}, ${Math.round(
-          mouseX
-        )}, ${Math.round(mouseY)})`
-      );
+      updateCode(`line(${Math.round(startX)}, ${Math.round(startY)}, ${Math.round(mouseX)}, ${Math.round(mouseY)});`);
+    } else if (mode === "draw" && freehandPoints.length > 1) {
+      noFill();
+      beginShape();
+      freehandPoints.forEach((point) => vertex(point.x, point.y));
+      endShape();
+      updateCode(`beginShape();\n${freehandPoints.map((point) => `vertex(${Math.round(point.x)}, ${Math.round(point.y)});`).join("\n")}\nendShape();`);
     }
   }
+
+  updateStateDisplay();
 }
 
 function mousePressed() {
+  if (!insideCanvas()) return;
+
   isDrawing = true;
   startX = mouseX;
   startY = mouseY;
 
   if (mode === "erase") {
     shapes = shapes.filter((shape) => !shape.contains(mouseX, mouseY));
+    updateCode("// Erased a shape from the canvas.");
+    updateStateDisplay();
+  } else if (mode === "draw") {
+    freehandPoints = [{ x: mouseX, y: mouseY }];
+  }
+}
+
+function mouseDragged() {
+  if (isDrawing && mode === "draw" && insideCanvas()) {
+    freehandPoints.push({ x: mouseX, y: mouseY });
   }
 }
 
 function mouseReleased() {
-  if (isDrawing && (mode === "rect" || mode === "circle" || mode === "line")) {
-    shapes.push(
-      new Shape(mode, startX, startY, mouseX, mouseY, strokeColor, fillColor)
-    );
+  if (!isDrawing) return;
+
+  if (mode === "rect" || mode === "circle" || mode === "line") {
+    shapes.push(new Shape(mode, startX, startY, mouseX, mouseY, strokeColor, fillColor));
+  } else if (mode === "draw" && freehandPoints.length > 1) {
+    shapes.push(new FreehandShape(freehandPoints.slice(), strokeColor));
   }
+
+  freehandPoints = [];
   isDrawing = false;
+  updateStateDisplay();
+}
+
+function insideCanvas() {
+  return mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height;
 }
 
 function toggleGrid() {
@@ -161,44 +265,88 @@ function toggleCoordinates() {
   showCoordinates = !showCoordinates;
 }
 
+function clearShapes() {
+  shapes = [];
+  freehandPoints = [];
+  updateCode("// Canvas cleared.");
+}
+
 function changeMode(newMode) {
   mode = newMode;
+  document.getElementById("modeValue").textContent = modeLabel(newMode);
+  updateStateDisplay();
 }
 
 function changeGridSpacing(value) {
   gridSpacing = parseInt(value, 10);
+  document.getElementById("gridSpacingValue").textContent = String(gridSpacing);
 }
 
 function updateStrokeColor(color) {
   strokeColor = color;
+  document.getElementById("strokeValue").textContent = color;
 }
 
 function updateFillColor(color) {
   fillColor = color;
+  document.getElementById("fillValue").textContent = color;
 }
 
 function updateCode(code) {
-  document.getElementById("code-display").innerText = code;
+  lastCode = code;
+  document.getElementById("code-display").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(lastCode);
+}
+
+function updateStateDisplay() {
+  const state = [
+    ["mode", modeLabel(mode)],
+    ["gridOn", showGrid],
+    ["coordsOn", showCoordinates],
+    ["gridSpacing", gridSpacing],
+    ["shapes", shapes.length],
+    ["stroke", strokeColor],
+    ["fill", fillColor]
+  ];
+
+  document.getElementById("state-display").innerHTML = state
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
+}
+
+function modeLabel(value) {
+  const labels = {
+    draw: "Free Draw",
+    rect: "Rectangle",
+    circle: "Circle",
+    line: "Line",
+    erase: "Erase"
+  };
+  return labels[value] || value;
 }
 
 class Shape {
-  constructor(type, x1, y1, x2, y2, strokeColor, fillColor) {
+  constructor(type, x1, y1, x2, y2, strokeHex, fillHex) {
     this.type = type;
     this.x1 = x1;
     this.y1 = y1;
     this.x2 = x2;
     this.y2 = y2;
-    this.strokeColor = strokeColor;
-    this.fillColor = fillColor;
+    this.strokeHex = strokeHex;
+    this.fillHex = fillHex;
   }
 
   draw() {
-    stroke(this.strokeColor);
-    fill(this.fillColor);
+    stroke(this.strokeHex);
+    fill(this.fillHex);
+
     if (this.type === "rect") {
       rect(this.x1, this.y1, this.x2 - this.x1, this.y2 - this.y1);
     } else if (this.type === "circle") {
-      let diameter = dist(this.x1, this.y1, this.x2, this.y2) * 2;
+      const diameter = dist(this.x1, this.y1, this.x2, this.y2) * 2;
       circle(this.x1, this.y1, diameter);
     } else if (this.type === "line") {
       line(this.x1, this.y1, this.x2, this.y2);
@@ -207,16 +355,40 @@ class Shape {
 
   contains(px, py) {
     if (this.type === "rect") {
-      return px > this.x1 && px < this.x2 && py > this.y1 && py < this.y2;
-    } else if (this.type === "circle") {
-      let radius = dist(this.x1, this.y1, this.x2, this.y2);
+      const left = min(this.x1, this.x2);
+      const right = max(this.x1, this.x2);
+      const top = min(this.y1, this.y2);
+      const bottom = max(this.y1, this.y2);
+      return px > left && px < right && py > top && py < bottom;
+    }
+
+    if (this.type === "circle") {
+      const radius = dist(this.x1, this.y1, this.x2, this.y2);
       return dist(px, py, this.x1, this.y1) <= radius;
     }
+
     return false;
   }
 }
 
-</script>
-      </script>
+class FreehandShape {
+  constructor(points, strokeHex) {
+    this.points = points;
+    this.strokeHex = strokeHex;
+  }
+
+  draw() {
+    noFill();
+    stroke(this.strokeHex);
+    beginShape();
+    this.points.forEach((point) => vertex(point.x, point.y));
+    endShape();
+  }
+
+  contains(px, py) {
+    return this.points.some((point) => dist(px, py, point.x, point.y) < 10);
+  }
+}
+  </script>
 </body>
 </html>

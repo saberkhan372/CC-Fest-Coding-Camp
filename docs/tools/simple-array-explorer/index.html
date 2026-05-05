@@ -1,196 +1,249 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Simple Array Explorer — CC Fest Coding Camp</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
-        .controls {
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            background: #f9f9f9;
-            border-radius: 10px;
-            width: 400px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .controls button {
-            margin: 5px;
-            padding: 8px 12px;
-            border: none;
-            background-color: #007bff;
-            color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .controls button:hover {
-            background-color: #0056b3;
-        }
-        .controls label {
-            font-weight: bold;
-            display: block;
-            margin-top: 10px;
-        }
-        .controls select {
-            width: 100%;
-        }
-        .array-display {
-            font-family: monospace;
-            background: #282c34;
-            color: #61dafb;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 8px;
-            width: 400px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Array Explorer — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 </head>
 <body>
-    <div class="controls">
-        <h2>Array Explorer</h2>
-        <button onclick="addValue()">Add Value</button>
-        <button onclick="removeValue()">Remove Value</button>
-        <button onclick="sortArray()">Sort Array</button>
-        <button onclick="shuffleArray()">Shuffle</button>
-        <label>Max Array Size:
-            <input type="range" min="2" max="15" value="10" oninput="updateMaxArraySize(this.value)">
-        </label>
-        <label>Visualization:
-            <select onchange="changeVisualization(this.value)">
-                <option value="bars">Bars</option>
-                <option value="circles">Circles</option>
-                <option value="line">Line Graph</option>
-            </select>
-        </label>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
     </div>
-    <div class="array-display" id="array-display">// Array operations will appear here</div>
-    <script>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 3</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Array Explorer</h1>
+      <p class="tool-subtitle">Learn what arrays do by adding, removing, sorting, and reshaping the same set of values into different visual forms.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">arrays</span>
+        <span class="tool-tag">sorting</span>
+        <span class="tool-tag">data</span>
+        <span class="tool-tag">visualization</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>See the same array as bars, circles, or a line graph while you change the values.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>The live readout shows the current array and highlights the item under the mouse when one is selected.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="array-display">// Array operations will appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Modify the array, change the display mode, and keep experimenting with the same set of values.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="button-row">
+                <button class="button primary" onclick="addValue()">Add Value</button>
+                <button class="button ghost" onclick="removeValue()">Remove Value</button>
+                <button class="button ghost" onclick="sortArray()">Sort</button>
+                <button class="button ghost" onclick="shuffleArray()">Shuffle</button>
+                <button class="button ghost" onclick="resetArray()">Reset</button>
+              </div>
+              <div class="control">
+                <label for="maxArraySize">Max Array Size <span id="maxArraySizeValue">10</span></label>
+                <input id="maxArraySize" type="range" min="2" max="15" value="10" oninput="updateMaxArraySize(this.value)">
+              </div>
+              <div class="control">
+                <label for="visualizationType">Visualization <span id="visualizationValue">Bars</span></label>
+                <select id="visualizationType" onchange="changeVisualization(this.value)">
+                  <option value="bars">Bars</option>
+                  <option value="circles">Circles</option>
+                  <option value="line">Line Graph</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>Track the array length, selected value, and current display mode.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="state-display"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+                <p>Use the same prompt structure we want across the whole CC Fest library.</p>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Add values until the array is full, then switch between <code>Bars</code>, <code>Circles</code>, and <code>Line Graph</code>.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>The array data stays the same even when the visual form changes. The numbers are the source; the drawing is just one interpretation.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Change the random values into a mood tracker, weather tracker, or game score history and build a custom visualization.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Array Explorer · Arrays, values, sorting, and visualization</footer>
+  </div>
+
+  <script>
 let numbers = [5, 8, 3, 2, 9];
 let visualizationType = "bars";
 let highlighted = -1;
 let maxArraySize = 10;
 
 function setup() {
-  createCanvas(400, 400);
+  const canvas = createCanvas(500, 400);
+  canvas.parent("canvas-container");
+  updateArrayDisplay();
+  updateStateDisplay();
 }
 
 function draw() {
-  background(220);
+  background(250, 246, 240);
+  highlighted = -1;
 
-  // Draw array visualization
   if (visualizationType === "bars") {
     drawBars();
   } else if (visualizationType === "circles") {
     drawCircles();
-  } else if (visualizationType === "line") {
+  } else {
     drawLine();
   }
 
-  // Update array display
   updateArrayDisplay();
+  updateStateDisplay();
 }
 
 function drawBars() {
-  let barWidth = width / numbers.length;
+  const barWidth = width / numbers.length;
+
   for (let i = 0; i < numbers.length; i++) {
-    let x = i * barWidth;
-    let h = map(numbers[i], 0, 10, 0, height - 50);
+    const x = i * barWidth;
+    const h = map(numbers[i], 0, 10, 0, height - 70);
 
     if (mouseX > x && mouseX < x + barWidth) {
-      fill(100, 200, 255);
+      fill(129, 178, 154);
       highlighted = i;
     } else {
-      fill(100, 150, 200);
+      fill(61, 90, 128);
     }
 
-    rect(x, height - h, barWidth - 2, h);
+    noStroke();
+    rect(x + 4, height - h - 24, barWidth - 8, h, 12);
 
-    fill(0);
+    fill(44, 42, 38);
     textAlign(CENTER);
-    text(numbers[i], x + barWidth / 2, height - h - 10);
+    text(numbers[i], x + barWidth / 2, height - h - 32);
   }
 }
 
 function drawCircles() {
-  let angle = TWO_PI / numbers.length;
-  let radius = min(width, height) * 0.4;
+  const angle = TWO_PI / numbers.length;
+  const radius = min(width, height) * 0.3;
 
   for (let i = 0; i < numbers.length; i++) {
-    let a = angle * i - PI / 2;
-    let x = width / 2 + cos(a) * radius;
-    let y = height / 2 + sin(a) * radius;
-    let size = map(numbers[i], 0, 10, 10, 50);
+    const a = angle * i - PI / 2;
+    const x = width / 2 + cos(a) * radius;
+    const y = height / 2 + sin(a) * radius;
+    const circleSize = map(numbers[i], 0, 10, 16, 70);
 
-    let d = dist(mouseX, mouseY, x, y);
-    if (d < size / 2) {
-      fill(100, 200, 255);
+    if (dist(mouseX, mouseY, x, y) < circleSize / 2) {
+      fill(129, 178, 154);
       highlighted = i;
     } else {
-      fill(100, 150, 200);
+      fill(61, 90, 128);
     }
 
-    circle(x, y, size);
-
-    fill(0);
-    textAlign(CENTER);
+    noStroke();
+    circle(x, y, circleSize);
+    fill(250, 246, 240);
+    textAlign(CENTER, CENTER);
     text(numbers[i], x, y);
   }
 }
 
 function drawLine() {
-  stroke(100, 150, 200);
-  strokeWeight(2);
+  stroke(61, 90, 128);
+  strokeWeight(2.5);
 
   for (let i = 0; i < numbers.length - 1; i++) {
-    let x1 = map(i, 0, numbers.length - 1, 50, width - 50);
-    let y1 = map(numbers[i], 0, 10, height - 50, 50);
-    let x2 = map(i + 1, 0, numbers.length - 1, 50, width - 50);
-    let y2 = map(numbers[i + 1], 0, 10, height - 50, 50);
+    const x1 = map(i, 0, numbers.length - 1, 50, width - 50);
+    const y1 = map(numbers[i], 0, 10, height - 60, 50);
+    const x2 = map(i + 1, 0, numbers.length - 1, 50, width - 50);
+    const y2 = map(numbers[i + 1], 0, 10, height - 60, 50);
 
     line(x1, y1, x2, y2);
+  }
 
-    // Draw points
-    fill(100, 150, 200);
-    ellipse(x1, y1, 10);
+  for (let i = 0; i < numbers.length; i++) {
+    const x = map(i, 0, numbers.length - 1, 50, width - 50);
+    const y = map(numbers[i], 0, 10, height - 60, 50);
 
-    // Highlight points under mouse
-    if (dist(mouseX, mouseY, x1, y1) < 10) {
-      fill(100, 200, 255);
-      ellipse(x1, y1, 10);
+    if (dist(mouseX, mouseY, x, y) < 12) {
+      fill(129, 178, 154);
       highlighted = i;
+    } else {
+      fill(61, 90, 128);
     }
 
-    fill(0);
     noStroke();
+    circle(x, y, 14);
+    fill(44, 42, 38);
     textAlign(CENTER);
-    text(numbers[i], x1, y1 - 10);
-    stroke(100, 150, 200);
+    text(numbers[i], x, y - 16);
   }
-
-  // Draw last point
-  let xLast = map(numbers.length - 1, 0, numbers.length - 1, 50, width - 50);
-  let yLast = map(numbers[numbers.length - 1], 0, 10, height - 50, 50);
-
-  fill(100, 150, 200);
-  ellipse(xLast, yLast, 10);
-
-  if (dist(mouseX, mouseY, xLast, yLast) < 10) {
-    fill(100, 200, 255);
-    ellipse(xLast, yLast, 10);
-    highlighted = numbers.length - 1;
-  }
-
-  fill(0);
-  noStroke();
-  text(numbers[numbers.length - 1], xLast, yLast - 10);
 }
 
 function addValue() {
@@ -211,30 +264,66 @@ function sortArray() {
 
 function shuffleArray() {
   for (let i = numbers.length - 1; i > 0; i--) {
-    let j = floor(random(i + 1));
+    const j = floor(random(i + 1));
     [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
   }
 }
 
+function resetArray() {
+  numbers = [5, 8, 3, 2, 9];
+  maxArraySize = 10;
+  visualizationType = "bars";
+  document.getElementById("maxArraySize").value = "10";
+  document.getElementById("visualizationType").value = "bars";
+  document.getElementById("maxArraySizeValue").textContent = "10";
+  document.getElementById("visualizationValue").textContent = "Bars";
+}
+
 function changeVisualization(type) {
   visualizationType = type;
+  document.getElementById("visualizationValue").textContent = labelForVisualization(type);
 }
 
 function updateMaxArraySize(value) {
   maxArraySize = Number(value);
+  document.getElementById("maxArraySizeValue").textContent = String(maxArraySize);
   while (numbers.length > maxArraySize) {
     numbers.pop();
   }
 }
 
 function updateArrayDisplay() {
-  let code = `// Array operations\nlet numbers = [${numbers.join(", ")}];`;
+  let code = `let numbers = [${numbers.join(", ")}];\nlet visualizationType = "${visualizationType}";`;
   if (highlighted >= 0) {
-    code += `\nnumbers[${highlighted}] = ${numbers[highlighted]}; // Selected element`;
+    code += `\n\n// highlighted element\nnumbers[${highlighted}] = ${numbers[highlighted]};`;
   }
-  document.getElementById("array-display").innerText = code;
+  document.getElementById("array-display").textContent = code;
 }
 
-</script>
-  </body>
+function updateStateDisplay() {
+  const selected = highlighted >= 0 ? `${highlighted}: ${numbers[highlighted]}` : "none";
+  const state = [
+    ["length", numbers.length],
+    ["maxSize", maxArraySize],
+    ["display", labelForVisualization(visualizationType)],
+    ["selected", selected],
+    ["min", min(numbers)],
+    ["max", max(numbers)]
+  ];
+
+  document.getElementById("state-display").innerHTML = state
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
+}
+
+function labelForVisualization(value) {
+  const labels = { bars: "Bars", circles: "Circles", line: "Line Graph" };
+  return labels[value] || value;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("array-display").textContent);
+}
+  </script>
+</body>
 </html>
