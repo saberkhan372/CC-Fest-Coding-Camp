@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Coordinate System Explorer — CC Fest Coding Camp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .controls {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+        #code-display {
+            font-family: monospace;
+            margin: 10px;
+            padding: 10px;
+            background: #282c34;
+            color: #61dafb;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            overflow-x: auto;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>Coordinate System Explorer</h2>
+        <button onclick="toggleGrid()">Toggle Grid</button>
+        <button onclick="toggleCoordinates()">Toggle Coordinates</button>
+        <label>
+            Grid Spacing:
+            <input type="range" min="10" max="50" value="20" oninput="changeGridSpacing(this.value)">
+        </label>
+        <label>Drawing Mode: 
+            <select onchange="changeMode(this.value)">
+                <option value="draw">Free Draw</option>
+                <option value="rect">Rectangle</option>
+                <option value="circle">Circle</option>
+                <option value="line">Line</option>
+                <option value="erase">Erase</option>
+            </select>
+        </label>
+        <label>
+            Stroke Color: <input type="color" value="#000000" onchange="updateStrokeColor(this.value)">
+        </label>
+        <label>
+            Fill Color: <input type="color" value="#ffffff" onchange="updateFillColor(this.value)">
+        </label>
+    </div>
+    <div id="code-display">// Code will appear here when you draw</div>
+    <script>
+let showGrid = true;
+let showCoordinates = true;
+let mode = "draw";
+let startX, startY;
+let isDrawing = false;
+let shapes = [];
+let gridSpacing = 20;
+let strokeColor = "#000000";
+let fillColor = "#ffffff";
+
+function setup() {
+  createCanvas(600, 600);
+}
+
+function draw() {
+  background(255);
+
+  // Draw grid
+  if (showGrid) {
+    stroke(200);
+    strokeWeight(1);
+    for (let i = 0; i <= width; i += gridSpacing) {
+      line(i, 0, i, height);
+      line(0, i, width, i);
+    }
+  }
+
+  // Draw coordinates at mouse position
+  if (showCoordinates) {
+    let x = constrain(mouseX, 0, width);
+    let y = constrain(mouseY, 0, height);
+    fill(0);
+    noStroke();
+    textSize(12);
+    text(`(${Math.round(x)}, ${Math.round(y)})`, x + 10, y - 10);
+  }
+
+  // Draw all saved shapes
+  shapes.forEach((shape) => shape.draw());
+
+  // Preview shape being drawn
+  if (isDrawing) {
+    stroke(strokeColor);
+    strokeWeight(2);
+    fill(fillColor);
+    if (mode === "rect") {
+      noFill();
+      rect(startX, startY, mouseX - startX, mouseY - startY);
+      updateCode(
+        `rect(${Math.round(startX)}, ${Math.round(startY)}, ${Math.round(
+          mouseX - startX
+        )}, ${Math.round(mouseY - startY)})`
+      );
+    } else if (mode === "circle") {
+      noFill();
+      let diameter = dist(startX, startY, mouseX, mouseY) * 2;
+      circle(startX, startY, diameter);
+      updateCode(
+        `circle(${Math.round(startX)}, ${Math.round(startY)}, ${Math.round(
+          diameter
+        )})`
+      );
+    } else if (mode === "line") {
+      line(startX, startY, mouseX, mouseY);
+      updateCode(
+        `line(${Math.round(startX)}, ${Math.round(startY)}, ${Math.round(
+          mouseX
+        )}, ${Math.round(mouseY)})`
+      );
+    }
+  }
+}
+
+function mousePressed() {
+  isDrawing = true;
+  startX = mouseX;
+  startY = mouseY;
+
+  if (mode === "erase") {
+    shapes = shapes.filter((shape) => !shape.contains(mouseX, mouseY));
+  }
+}
+
+function mouseReleased() {
+  if (isDrawing && (mode === "rect" || mode === "circle" || mode === "line")) {
+    shapes.push(
+      new Shape(mode, startX, startY, mouseX, mouseY, strokeColor, fillColor)
+    );
+  }
+  isDrawing = false;
+}
+
+function toggleGrid() {
+  showGrid = !showGrid;
+}
+
+function toggleCoordinates() {
+  showCoordinates = !showCoordinates;
+}
+
+function changeMode(newMode) {
+  mode = newMode;
+}
+
+function changeGridSpacing(value) {
+  gridSpacing = parseInt(value, 10);
+}
+
+function updateStrokeColor(color) {
+  strokeColor = color;
+}
+
+function updateFillColor(color) {
+  fillColor = color;
+}
+
+function updateCode(code) {
+  document.getElementById("code-display").innerText = code;
+}
+
+class Shape {
+  constructor(type, x1, y1, x2, y2, strokeColor, fillColor) {
+    this.type = type;
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.strokeColor = strokeColor;
+    this.fillColor = fillColor;
+  }
+
+  draw() {
+    stroke(this.strokeColor);
+    fill(this.fillColor);
+    if (this.type === "rect") {
+      rect(this.x1, this.y1, this.x2 - this.x1, this.y2 - this.y1);
+    } else if (this.type === "circle") {
+      let diameter = dist(this.x1, this.y1, this.x2, this.y2) * 2;
+      circle(this.x1, this.y1, diameter);
+    } else if (this.type === "line") {
+      line(this.x1, this.y1, this.x2, this.y2);
+    }
+  }
+
+  contains(px, py) {
+    if (this.type === "rect") {
+      return px > this.x1 && px < this.x2 && py > this.y1 && py < this.y2;
+    } else if (this.type === "circle") {
+      let radius = dist(this.x1, this.y1, this.x2, this.y2);
+      return dist(px, py, this.x1, this.y1) <= radius;
+    }
+    return false;
+  }
+}
+
+</script>
+      </script>
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Interactive Event Handler Studio — CC Fest Coding Camp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .container {
+            width: 95%;
+            margin: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .panel {
+            flex: 1;
+            min-width: 400px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .event-log {
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+        .code-display {
+            font-family: monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            white-space: pre;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .event-item {
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 4px solid;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.2s ease;
+        }
+        .event-item:hover {
+            transform: translateX(5px);
+            background: rgba(255,255,255,0.1);
+        }
+        .event-item.mouse { border-left-color: #2196F3; }
+        .event-item.keyboard { border-left-color: #9C27B0; }
+        .event-item.touch { border-left-color: #4CAF50; }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            background: #2196F3;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        button.active {
+            background: #1976D2;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .shape-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        .shape-control {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: #f8f8f8;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .interactive-area {
+            position: relative;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 200px;
+        }
+        .event-counter {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .keyboard-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interactive Event Handler Studio</h1>
+
+    <div class="container">
+        <div class="panel">
+            <h2>Event Playground</h2>
+            <div class="interactive-area">
+                <div id="canvas-container"></div>
+                <div class="event-counter" id="eventCounter">Events: 0</div>
+                <div class="keyboard-indicator" id="keyboardIndicator"></div>
+                <div class="tooltip" id="tooltip" style="display: none;"></div>
+            </div>
+            
+            <div class="shape-controls">
+                <div class="shape-control">
+                    <h3>Add Shapes</h3>
+                    <button onclick="addNewShape('circle')">Circle</button>
+                    <button onclick="addNewShape('rect')">Rectangle</button>
+                </div>
+                <div class="shape-control">
+                    <h3>Clear</h3>
+                    <button onclick="clearShapes()">Clear All</button>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button onclick="clearEventLog()">Clear Log</button>
+                <button onclick="togglePause()" id="pauseButton">Pause</button>
+                <button onclick="filterEventLog('mouse')" id="mouseFilter">Mouse Events</button>
+                <button onclick="filterEventLog('keyboard')" id="keyboardFilter">Keyboard Events</button>
+                <button onclick="filterEventLog('touch')" id="touchFilter">Touch Events</button>
+                <button onclick="toggleGrid()">Toggle Grid</button>
+            </div>
+
+            <div class="event-log" id="eventLog"></div>
+        </div>
+
+        <div class="panel">
+            <h2>Event Handler Code</h2>
+            <div class="code-display" id="codeDisplay"></div>
+            <div id="eventDescription"></div>
+        </div>
+    <script>
+let events = [];
+        let shapes = [];
+        let isPaused = false;
+        let eventFilter = null;
+        let draggedShape = null;
+        let showGrid = true;
+        let totalEvents = 0;
+        let currentKeyPressed = '';
+        let sketch = new p5((p) => {
+            p.setup = () => {
+                p.createCanvas(600, 400).parent('canvas-container');
+                addInitialShapes(p);
+            };
+
+            p.draw = () => {
+                p.background(240);
+                if (showGrid) drawGrid(p);
+                shapes.forEach(shape => drawShape(p, shape));
+                updateEventCounter();
+                updateKeyboardIndicator();
+            };
+
+            function drawGrid(p) {
+                p.push();
+                p.stroke(220);
+                p.strokeWeight(1);
+                for (let i = 0; i < p.width; i += 20) {
+                    p.line(i, 0, i, p.height);
+                    p.line(0, i, p.width, i);
+                }
+                p.pop();
+            }
+
+            function drawShape(p, shape) {
+                p.push();
+                const isHovered = p.dist(p.mouseX, p.mouseY, shape.x, shape.y) < shape.size/2;
+                const isDragged = shape === draggedShape;
+
+                // Shadow
+                if (isHovered || isDragged) {
+                    p.noStroke();
+                    p.fill(0, 30);
+                    p.circle(shape.x + 2, shape.y + 2, shape.size + 4);
+                }
+
+                // Shape
+                p.fill(shape.color);
+                p.stroke(isHovered ? 255 : 200);
+                p.strokeWeight(isDragged ? 3 : 1);
+                
+                if (shape.type === 'circle') {
+                    p.circle(shape.x, shape.y, shape.size);
+                } else {
+                    p.rectMode(p.CENTER);
+                    p.rect(shape.x, shape.y, shape.size, shape.size);
+                }
+
+                // Label
+                p.noStroke();
+                p.fill(0);
+                p.textAlign(p.CENTER, p.CENTER);
+                p.textSize(12);
+                p.text(shape.label, shape.x, shape.y);
+                p.pop();
+            }
+
+            // Enhanced event handlers
+            p.mousePressed = () => {
+                const mousePos = { x: p.mouseX, y: p.mouseY };
+                shapes.forEach(shape => {
+                    if (p.dist(mousePos.x, mousePos.y, shape.x, shape.y) < shape.size/2) {
+                        draggedShape = shape;
+                        logEvent('mouse', 'mousePressed', {
+                            x: mousePos.x,
+                            y: mousePos.y,
+                            target: shape.label
+                        });
+                    }
+                });
+                updateCodeDisplay('mousePressed');
+            };
+
+            p.mouseDragged = () => {
+                if (draggedShape) {
+                    draggedShape.x = p.mouseX;
+                    draggedShape.y = p.mouseY;
+                    logEvent('mouse', 'mouseDragged', {
+                        x: p.mouseX,
+                        y: p.mouseY,
+                        target: draggedShape.label
+                    });
+                }
+            };
+
+            p.mouseReleased = () => {
+                if (draggedShape) {
+                    logEvent('mouse', 'mouseReleased', {
+                        x: p.mouseX,
+                        y: p.mouseY,
+                        target: draggedShape.label
+                    });
+                    draggedShape = null;
+                }
+            };
+
+            p.keyPressed = () => {
+                currentKeyPressed = p.key;
+                logEvent('keyboard', 'keyPressed', {
+                    key: p.key,
+                    keyCode: p.keyCode,
+                    modifiers: {
+                        shift: p.keyIsDown(p.SHIFT),
+                        ctrl: p.keyIsDown(p.CONTROL),
+                        alt: p.keyIsDown(p.ALT)
+                    }
+                });
+                updateCodeDisplay('keyPressed');
+            };
+
+            p.keyReleased = () => {
+                currentKeyPressed = '';
+                logEvent('keyboard', 'keyReleased', {
+                    key: p.key,
+                    keyCode: p.keyCode
+                });
+            };
+        });
+
+        // Helper functions
+        function addInitialShapes(p) {
+            shapes = [
+                createShape(p, 'circle', 100, 100, 'Draggable'),
+                createShape(p, 'rect', 200, 200, 'Clickable'),
+                createShape(p, 'circle', 300, 150, 'Hoverable')
+            ];
+        }
+
+        function createShape(p, type, x, y, label) {
+            return {
+                type,
+                x,
+                y,
+                size: 50,
+                label,
+                color: p.color(
+                    Math.random() * 255,
+                    Math.random() * 255,
+                    Math.random() * 255
+                )
+            };
+        }
+
+        function addNewShape(type) {
+            const p = sketch;
+            shapes.push(createShape(
+                p,
+                type,
+                Math.random() * (p.width - 100) + 50,
+                Math.random() * (p.height - 100) + 50,
+                type.charAt(0).toUpperCase() + type.slice(1)
+            ));
+        }
+
+        function clearShapes() {
+            shapes = [];
+        }
+
+        function logEvent(category, name, data) {
+            if (isPaused) return;
+            
+            events.unshift({
+                category,
+                name,
+                data,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            if (events.length > 50) events.pop();
+            totalEvents++;
+            
+            updateEventLog();
+            updateEventDescription(name);
+        }
+
+        function updateEventLog() {
+            const logElement = document.getElementById('eventLog');
+            const filteredEvents = eventFilter 
+                ? events.filter(e => e.category === eventFilter)
+                : events;
+
+            logElement.innerHTML = filteredEvents.map(e => `
+                <div class="event-item ${e.category}">
+                    <strong>${e.timestamp}:</strong> ${e.name}
+                    <pre>${JSON.stringify(e.data, null, 2)}</pre>
+                </div>
+            `).join('');
+        }
+
+        function updateCodeDisplay(eventType) {
+            const codeSnippets = {
+                mousePressed: `function mousePressed() {
+    // Get mouse position
+    let mousePos = { x: mouseX, y: mouseY };
+    
+    // Check for shape collision
+    shapes.forEach(shape => {
+        if (dist(mousePos.x, mousePos.y, 
+                shape.x, shape.y) < shape.size/2) {
+            // Handle interaction
+            draggedShape = shape;
+        }
+    });
+}`,
+                keyPressed: `function keyPressed() {
+    // Key information
+    console.log({
+        key: key,
+        keyCode: keyCode,
+        modifiers: {
+            shift: keyIsDown(SHIFT),
+            ctrl: keyIsDown(CONTROL),
+            alt: keyIsDown(ALT)
+        }
+    });
+}`
+            };
+
+            document.getElementById('codeDisplay').innerText = 
+                codeSnippets[eventType] || '// Select an event to see its code';
+        }
+
+        function updateEventDescription(eventName) {
+            const descriptions = {
+                mousePressed: "Triggered when a mouse button is pressed",
+                mouseDragged: "Triggered when the mouse is moved while a button is pressed",
+                mouseReleased: "Triggered when a mouse button is released",
+                keyPressed: "Triggered when any keyboard key is pressed",
+                keyReleased: "Triggered when any keyboard key is released"
+            };
+
+            document.getElementById('eventDescription').innerHTML = `
+                <h3>${eventName}</h3>
+                <p>${descriptions[eventName] || ''}</p>
+            `;
+        }
+
+        function updateEventCounter() {
+            document.getElementById('eventCounter').innerText = `Events: ${totalEvents}`;
+        }
+
+        function updateKeyboardIndicator() {
+            const indicator = document.getElementById('keyboardIndicator');
+            indicator.innerText = currentKeyPressed 
+                ? `Key Pressed: ${currentKeyPressed}` 
+                : '';
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            const pauseButton = document.getElementById('pauseButton');
+            pauseButton.innerText = isPaused ? 'Resume' : 'Pause';
+            pauseButton.classList.toggle('active', isPaused);
+        }
+
+        function toggleGrid() {
+            showGrid = !showGrid;
+        }
+
+        function filterEventLog(category) {
+            if (eventFilter === category) {
+                eventFilter = null; // Clear filter
+            } else {
+                eventFilter = category;
+            }
+
+            // Update button states
+            document.querySelectorAll('.filter-buttons button').forEach((btn) => {
+                btn.classList.remove('active');
+            });
+
+            const activeFilterButton = document.getElementById(
+                `${category}Filter`
+            );
+            if (activeFilterButton) activeFilterButton.classList.add('active');
+
+            updateEventLog();
+        }
+
+        function clearEventLog() {
+            events = [];
+            totalEvents = 0;
+            updateEventLog();
+            updateEventCounter();
+        }
+</script>
+  </body>
+</html>

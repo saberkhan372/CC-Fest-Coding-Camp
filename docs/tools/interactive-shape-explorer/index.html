@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Interactive Shape Explorer — CC Fest Coding Camp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f9f9f9;
+        }
+        .controls {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+        .canvas-container {
+            border: 1px solid #ddd;
+            margin: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .code-display {
+            margin-top: 20px;
+            padding: 10px;
+            background: #282c34;
+            color: #61dafb;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 200px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: #282c34;
+            color: #61dafb;
+            font-family: 'Courier New', Courier, monospace;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            resize: none;
+            box-sizing: border-box;
+            font-size: 1.1em;
+        }
+        button {
+            margin: 5px;
+            padding: 8px 12px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>Interactive Shape Explorer</h2>
+        <div>
+            <button onclick="changeShape('circle')">Circle</button>
+            <button onclick="changeShape('square')">Square</button>
+            <button onclick="changeShape('triangle')">Triangle</button>
+            <button onclick="changeShape('line')">Line</button>
+            <button onclick="changeShape('arc')">Arc</button>
+            <button onclick="changeShape('quad')">Quad</button>
+        </div>
+        <label>Size: <input type="range" min="10" max="200" value="50" oninput="updateSize(this.value)"></label>
+        <label>Stroke Weight: <input type="range" min="1" max="10" value="2" oninput="updateStrokeWeight(this.value)"></label>
+        <label>Stroke Color: <input type="color" value="#000000" oninput="updateStrokeColor(this.value)"></label>
+        <label>Fill Color: <input type="color" value="#ff0000" oninput="updateFillColor(this.value)"></label>
+        <textarea id="codeDisplay"></textarea>
+        <button onclick="applyCode()">Apply Code</button>
+    </div>
+    <script>
+let currentShape = "circle";
+let size = 50;
+let strokeWeightValue = 2;
+let strokeColor = "#000000";
+let fillColor = "#ff0000";
+
+function setup() {
+  const canvas = createCanvas(windowWidth * 0.8, windowHeight * 0.6);
+  canvas.parent("canvas-container");
+  updateCodeDisplay();
+}
+
+function draw() {
+  renderShape();
+  noLoop(); // Stop continuous rendering
+}
+
+function renderShape() {
+  background(220);
+  stroke(strokeColor);
+  strokeWeight(strokeWeightValue);
+  fill(fillColor);
+
+  translate(width / 2, height / 2);
+
+  if (currentShape === "circle") {
+    circle(0, 0, size);
+  } else if (currentShape === "square") {
+    rectMode(CENTER);
+    rect(0, 0, size, size);
+  } else if (currentShape === "triangle") {
+    triangle(-size / 2, size / 2, 0, -size / 2, size / 2, size / 2);
+  } else if (currentShape === "line") {
+    line(-size / 2, 0, size / 2, 0);
+  } else if (currentShape === "arc") {
+    arc(0, 0, size, size, 0, HALF_PI);
+  } else if (currentShape === "quad") {
+    quad(
+      -size / 2,
+      size / 2,
+      size / 2,
+      size / 2,
+      size / 2,
+      -size / 2,
+      -size / 2,
+      -size / 2
+    );
+  }
+}
+
+function changeShape(shape) {
+  currentShape = shape;
+  updateCodeDisplay();
+  redraw(); // Trigger canvas update
+}
+
+function updateSize(newSize) {
+  size = Number(newSize);
+  updateCodeDisplay();
+  redraw();
+}
+
+function updateStrokeWeight(newStrokeWeight) {
+  strokeWeightValue = Number(newStrokeWeight);
+  updateCodeDisplay();
+  redraw();
+}
+
+function updateStrokeColor(newStrokeColor) {
+  strokeColor = newStrokeColor;
+  updateCodeDisplay();
+  redraw();
+}
+
+function updateFillColor(newFillColor) {
+  fillColor = newFillColor;
+  updateCodeDisplay();
+  redraw();
+}
+
+function updateCodeDisplay() {
+  const codeDisplay = document.getElementById("codeDisplay");
+  codeDisplay.value = generateShapeCode();
+}
+
+function generateShapeCode() {
+  const fillHex = fillColor.toUpperCase();
+  const strokeHex = strokeColor.toUpperCase();
+  const roundedSize = size.toFixed(1);
+  const roundedStrokeWeight = strokeWeightValue.toFixed(1);
+
+  if (currentShape === "circle") {
+    return `
+fill('${fillHex}');
+stroke('${strokeHex}');
+strokeWeight(${roundedStrokeWeight});
+circle(0, 0, ${roundedSize});
+                `.trim();
+  } else if (currentShape === "square") {
+    return `
+fill('${fillHex}');
+stroke('${strokeHex}');
+strokeWeight(${roundedStrokeWeight});
+rectMode(CENTER);
+rect(0, 0, ${roundedSize}, ${roundedSize});
+                `.trim();
+  } else if (currentShape === "triangle") {
+    return `
+fill('${fillHex}');
+stroke('${strokeHex}');
+strokeWeight(${roundedStrokeWeight});
+triangle(${(-size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, 
+         0, ${(-size / 2).toFixed(1)}, 
+         ${(size / 2).toFixed(1)}, ${(size / 2).toFixed(1)});
+                `.trim();
+  } else if (currentShape === "line") {
+    return `
+stroke('${strokeHex}');
+strokeWeight(${roundedStrokeWeight});
+line(${(-size / 2).toFixed(1)}, 0, ${(size / 2).toFixed(1)}, 0);
+                `.trim();
+  } else if (currentShape === "arc") {
+    return `
+fill('${fillHex}');
+stroke('${strokeHex}');
+strokeWeight(${roundedStrokeWeight});
+arc(0, 0, ${roundedSize}, ${roundedSize}, 0, HALF_PI);
+                `.trim();
+  } else if (currentShape === "quad") {
+    return `
+fill('${fillHex}');
+stroke('${strokeHex}');
+strokeWeight(${roundedStrokeWeight});
+quad(${(-size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, 
+     ${(size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, 
+     ${(size / 2).toFixed(1)}, ${(-size / 2).toFixed(1)}, 
+     ${(-size / 2).toFixed(1)}, ${(-size / 2).toFixed(1)});
+                `.trim();
+  }
+}
+
+function applyCode() {
+  try {
+    background(220); // Clear the canvas
+    resetMatrix(); // Reset any transformations
+    translate(width / 2, height / 2); // Center the drawing
+    eval(document.getElementById("codeDisplay").value);
+  } catch (e) {
+    alert("Error in code: " + e.message);
+  }
+}
+
+</script>
+    <div id="canvas-container"></div>
+</body>
+</html>
