@@ -1,19 +1,33 @@
 # CC Fest Coding Camp Tools
 
-A static GitHub Pages library of p5.js teaching tools for CC Fest Coding Camp.
+A static GitHub Pages library of p5.js teaching tools and starter sketches for CC Fest Coding Camp.
 
 ## Live site
 
-Once GitHub Pages is enabled for this repository, the site will be available at:
+The live site is published from the repository `main` branch using the `/docs` folder:
 
 https://saberkhan372.github.io/CC-Fest-Coding-Camp/
 
 ## Structure
 
-- `index.html` — main tool gallery
-- `site.css` — shared gallery styling
-- `tools/` — one folder per tool or sketch seed
+- `index.html` — homepage gallery and learning pathway
+- `site.css` — shared homepage styling and design tokens
+- `tool-page.css` — shared layout shell for the main interactive tools
+- `starter-sketch.css` — lighter shell for sketch seeds and remix prompts
+- `tools/` — one folder per tool or starter sketch
+
+## Library organization
+
+- `Interactive Tools` are the workshop-ready experiences with a shared teaching layout:
+  workspace, controls, code preview, sketch state, and Try / Notice / Remix prompts.
+- `Starter Sketches` are lighter remix seeds for live coding, demos, and extensions.
+
+## Publishing notes
+
+- GitHub Pages serves this `docs/` directory.
+- The repo also contains a duplicate source copy in `cc-fest-coding-camp-pages/` for the original site files.
+- When making content or design changes, update `docs/` first so the published site stays correct.
 
 ## Notes
 
-The uploaded p5.js library files were not committed because most tools already load p5.js from a CDN. This keeps the repository small and easier to maintain. If you want fully offline-downloadable tool folders later, add a shared `libraries/` folder and update each tool to use a local p5 file.
+Most tools still load `p5.js` from a CDN. If you want fully offline-downloadable tool folders later, add a shared `assets/` or `libraries/` folder and update each tool to use a local p5 file.
