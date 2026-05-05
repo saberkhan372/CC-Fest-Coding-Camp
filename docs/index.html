@@ -4,140 +4,204 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CC Fest Coding Camp Tools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="site.css">
 </head>
 <body>
-  <header class="hero">
-    <p class="eyebrow">CC Fest Coding Camp · Spring 2026</p>
-    <h1>Creative Coding Tool Library</h1>
-    <p class="lede">A growing collection of p5.js tools and sketch seeds for teaching shapes, coordinates, animation, loops, arrays, interaction, data stories, objects, and 3D creative coding.</p>
-    <div class="hero-actions">
-      <a class="button primary" href="#tools">Browse tools</a>
-      <a class="button" href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">View source on GitHub</a>
+  <div class="shell">
+    <div class="site-topbar">
+      <div class="brand-mark">CC Fest Coding Camp</div>
+      <a class="topbar-link" href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">View source on GitHub</a>
     </div>
-  </header>
 
-  <main>
-    <section class="overview" aria-label="Suggested learning sequence">
-      <h2>Suggested sequence</h2>
-      <div class="sequence">
-        <div><strong>1. Shapes</strong><span>Coordinates, parameters, color</span></div>
-        <div><strong>2. Motion</strong><span>Variables, animation, events</span></div>
-        <div><strong>3. Systems</strong><span>Loops, arrays, patterns</span></div>
-        <div><strong>4. Stories</strong><span>Text generation, data, visualization</span></div>
-        <div><strong>5. Extensions</strong><span>Collisions, objects, WEBGL</span></div>
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Spring 2026 · Creative Coding Pathway</p>
+          <h1>Creative coding tools that feel like one workshop, not seventeen separate files.</h1>
+          <p class="lede">A CC Fest library for learning shapes, motion, loops, arrays, interaction, stories, objects, and 3D through playful p5.js experiments. Start with polished teaching tools, then branch into starter sketches for live coding and remixing.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#interactive-tools">Browse Interactive Tools</a>
+            <a class="button secondary" href="#starter-sketches">Open Starter Sketches</a>
+          </div>
+        </div>
+        <aside class="hero-aside">
+          <h2>What learners should feel here</h2>
+          <ul>
+            <li>I know what this tool teaches.</li>
+            <li>I can change something safely.</li>
+            <li>I can connect the controls to the code.</li>
+            <li>I can remix the idea into my own sketch.</li>
+          </ul>
+        </aside>
       </div>
-    </section>
+    </header>
 
-    <section id="tools" class="tools" aria-label="Tool list">
-      <article class="tool-card" data-session="Session 1">
-  <div class="tool-meta"><span>Session 1</span><span>Interactive tool</span></div>
-  <h2>Coordinate System Explorer</h2>
-  <p>Explore how x/y coordinates and shape functions place drawings on the p5.js canvas.</p>
-  <p class="concepts">Coordinates, canvas placement, shape syntax</p>
-  <a class="button" href="tools/coordinate-system-explorer/">Open tool</a>
-</article><article class="tool-card" data-session="Session 1">
-  <div class="tool-meta"><span>Session 1</span><span>Interactive tool</span></div>
-  <h2>Interactive Shape Explorer</h2>
-  <p>Adjust shape properties and see how visual choices connect to p5.js code.</p>
-  <p class="concepts">Shape parameters, fill, stroke, generated code</p>
-  <a class="button" href="tools/interactive-shape-explorer/">Open tool</a>
-</article><article class="tool-card" data-session="Session 1">
-  <div class="tool-meta"><span>Session 1</span><span>Interactive tool</span></div>
-  <h2>Shape + Color Explorer</h2>
-  <p>Experiment with shape and color controls while generating editable starter code.</p>
-  <p class="concepts">Shape choice, color, stroke weight, code editing</p>
-  <a class="button" href="tools/shape-and-color-explorer/">Open tool</a>
-</article><article class="tool-card" data-session="Session 2">
-  <div class="tool-meta"><span>Session 2</span><span>Interactive tool</span></div>
-  <h2>Animation Explorer</h2>
-  <p>Use changing variables to understand motion, speed, and edge-bouncing behavior.</p>
-  <p class="concepts">Variables, speed, bouncing, path tracing</p>
-  <a class="button" href="tools/animation-explorer/">Open tool</a>
-</article><article class="tool-card" data-session="Session 3">
-  <div class="tool-meta"><span>Session 3</span><span>Interactive tool</span></div>
-  <h2>Rows and Columns Tool</h2>
-  <p>Build repeated visual systems by changing rows, columns, spacing, and pattern choices.</p>
-  <p class="concepts">Nested loops, grid systems, repeated patterns</p>
-  <a class="button" href="tools/rows-and-columns/">Open tool</a>
-</article><article class="tool-card" data-session="Session 3">
-  <div class="tool-meta"><span>Session 3</span><span>Interactive tool</span></div>
-  <h2>Simple Array Explorer</h2>
-  <p>Add, remove, sort, and shuffle array values while visualizing the same data in multiple forms.</p>
-  <p class="concepts">Arrays, values, sorting, shuffling, visualization modes</p>
-  <a class="button" href="tools/simple-array-explorer/">Open tool</a>
-</article><article class="tool-card" data-session="Session 3">
-  <div class="tool-meta"><span>Session 3</span><span>Polished tool</span></div>
-  <h2>Array Explorer: Values Become Visuals</h2>
-  <p>A more polished array/data visualization tool with built-in datasets, stats, and code preview.</p>
-  <p class="concepts">Arrays, data visualization, statistics, code preview</p>
-  <a class="button" href="tools/polished-array-explorer/">Open tool</a>
-</article><article class="tool-card" data-session="Session 3">
-  <div class="tool-meta"><span>Session 3</span><span>Sketch seed</span></div>
-  <h2>Nested Loop + Arrays Sketch</h2>
-  <p>A compact sketch seed showing how nested loops and arrays can generate a colorful grid.</p>
-  <p class="concepts">Nested loops, grids, arrays, random variation</p>
-  <a class="button" href="tools/nested-loop-array-grid/">Open tool</a>
-</article><article class="tool-card" data-session="Session 3">
-  <div class="tool-meta"><span>Session 3</span><span>Sketch seed</span></div>
-  <h2>Array of Positions / Dot Field Sketch</h2>
-  <p>Use arrays to store positions and draw many related shapes from stored data.</p>
-  <p class="concepts">Arrays of x/y positions, repeated drawing</p>
-  <a class="button" href="tools/array-position-dot-field/">Open tool</a>
-</article><article class="tool-card" data-session="Session 4">
-  <div class="tool-meta"><span>Session 4</span><span>Sketch seed</span></div>
-  <h2>Random Poetry Generator</h2>
-  <p>Generate small poetic phrases by recombining words stored in arrays.</p>
-  <p class="concepts">Arrays, randomness, generative text</p>
-  <a class="button" href="tools/random-poetry-generator/">Open tool</a>
-</article><article class="tool-card" data-session="Session 4">
-  <div class="tool-meta"><span>Session 4</span><span>Sketch seed</span></div>
-  <h2>Random Sentence Generator</h2>
-  <p>Create random sentences from arrays of nouns, verbs, and modifiers.</p>
-  <p class="concepts">Word arrays, randomness, generative language</p>
-  <a class="button" href="tools/random-sentence-generator/">Open tool</a>
-</article><article class="tool-card" data-session="Session 4">
-  <div class="tool-meta"><span>Session 4</span><span>Sketch seed</span></div>
-  <h2>Arrays in Motion</h2>
-  <p>Animate generated sentences as objects that move, respond, and reset.</p>
-  <p class="concepts">Arrays of objects, text, motion, interaction</p>
-  <a class="button" href="tools/arrays-in-motion/">Open tool</a>
-</article><article class="tool-card" data-session="Session 4">
-  <div class="tool-meta"><span>Session 4</span><span>Planning tool</span></div>
-  <h2>Data Story Planner</h2>
-  <p>Plan a data visualization before coding by choosing data, meaning, mapping, notice, and limitation.</p>
-  <p class="concepts">Data, visual mapping, story, limitation</p>
-  <a class="button" href="tools/data-story-planner/">Open tool</a>
-</article><article class="tool-card" data-session="Interaction">
-  <div class="tool-meta"><span>Interaction</span><span>Interactive tool</span></div>
-  <h2>Interactive Event Handler Studio</h2>
-  <p>Explore how mouse and keyboard input become interactive behavior in a sketch.</p>
-  <p class="concepts">Mouse events, keyboard events, event logs</p>
-  <a class="button" href="tools/event-handler-studio/">Open tool</a>
-</article><article class="tool-card" data-session="Game-making">
-  <div class="tool-meta"><span>Game-making</span><span>Interactive tool</span></div>
-  <h2>Collision Detection Explorer</h2>
-  <p>Make invisible collision rules visible through interactive shapes and collision states.</p>
-  <p class="concepts">Circle, rectangle, and point collision logic</p>
-  <a class="button" href="tools/collision-detection-explorer/">Open tool</a>
-</article><article class="tool-card" data-session="Objects / OOP">
-  <div class="tool-meta"><span>Objects / OOP</span><span>Interactive tool</span></div>
-  <h2>Interactive Shape Drawing App</h2>
-  <p>Create and manipulate shape objects while exploring reusable code structures.</p>
-  <p class="concepts">Objects, classes, inheritance, shape instances</p>
-  <a class="button" href="tools/interactive-shape-drawing-app/">Open tool</a>
-</article><article class="tool-card" data-session="Extension">
-  <div class="tool-meta"><span>Extension</span><span>Advanced tool</span></div>
-  <h2>WebGL 3D Workshop</h2>
-  <p>Experiment with 3D shapes, materials, and transformations in p5.js WEBGL mode.</p>
-  <p class="concepts">WEBGL, 3D primitives, rotation, materials</p>
-  <a class="button" href="tools/webgl-3d-workshop/">Open tool</a>
-</article>
-    </section>
-  </main>
+    <main>
+      <section class="overview panel" aria-label="Suggested learning sequence">
+        <div class="section-label">Start Here</div>
+        <h2>The CC Fest arc</h2>
+        <p>Move from drawing single shapes to building systems, telling stories with data, and making interactive worlds. The homepage now mirrors that learning journey so teachers and participants can choose tools intentionally.</p>
+        <div class="sequence">
+          <div class="sequence-card"><strong>1. Shapes</strong><span>Coordinates, parameters, color</span></div>
+          <div class="sequence-card"><strong>2. Motion</strong><span>Variables, animation, events</span></div>
+          <div class="sequence-card"><strong>3. Systems</strong><span>Loops, arrays, patterns</span></div>
+          <div class="sequence-card"><strong>4. Stories</strong><span>Text generation, data, visualization</span></div>
+          <div class="sequence-card"><strong>5. Extensions</strong><span>Collisions, objects, WEBGL</span></div>
+        </div>
+      </section>
 
-  <footer>
-    <p>Built for CC Fest Coding Camp. Each tool is a static HTML/CSS/JavaScript page and can be remixed for teaching.</p>
-  </footer>
+      <div class="gallery">
+        <section id="interactive-tools" class="gallery-section panel" aria-label="Interactive tools">
+          <div class="gallery-header">
+            <div class="gallery-header-copy">
+              <div class="section-label">Interactive Tools</div>
+              <h2>Polished tools for guided exploration</h2>
+              <p>These are the main workshop-ready experiences: clear concept focus, stronger scaffolds, and enough control to support demos, stations, and remix prompts.</p>
+            </div>
+            <div class="gallery-count">11 tools</div>
+          </div>
+          <div class="tool-grid">
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 1</span><span class="pill type">Interactive Tool</span></div>
+              <h3>Coordinate System Explorer</h3>
+              <p class="tool-description">Explore how x/y coordinates and shape functions place drawings on the p5.js canvas.</p>
+              <div class="tag-row"><span class="tag">coordinates</span><span class="tag">canvas</span><span class="tag">shapes</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/coordinate-system-explorer/">Launch Tool</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 1</span><span class="pill type">Interactive Tool</span></div>
+              <h3>Interactive Shape Explorer</h3>
+              <p class="tool-description">Adjust shape properties and see how visual choices connect to p5.js code.</p>
+              <div class="tag-row"><span class="tag">shapes</span><span class="tag">fill</span><span class="tag">stroke</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/interactive-shape-explorer/">Launch Tool</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 1</span><span class="pill type">Interactive Tool</span></div>
+              <h3>Shape + Color Explorer</h3>
+              <p class="tool-description">Experiment with shape and color controls while generating editable starter code.</p>
+              <div class="tag-row"><span class="tag">color</span><span class="tag">shapes</span><span class="tag">starter code</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/shape-and-color-explorer/">Launch Tool</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 2</span><span class="pill type">Interactive Tool</span></div>
+              <h3>Animation Explorer</h3>
+              <p class="tool-description">Use changing variables to understand motion, speed, and edge-bouncing behavior.</p>
+              <div class="tag-row"><span class="tag">variables</span><span class="tag">motion</span><span class="tag">conditionals</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/animation-explorer/">Launch Tool</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 3</span><span class="pill type">Interactive Tool</span></div>
+              <h3>Rows + Columns Pattern Maker</h3>
+              <p class="tool-description">Build repeated visual systems by changing rows, columns, spacing, shape, and pattern choices.</p>
+              <div class="tag-row"><span class="tag">loops</span><span class="tag">patterns</span><span class="tag">grid</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/rows-and-columns/">Launch Tool</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 3</span><span class="pill type">Interactive Tool</span></div>
+              <h3>Array Explorer</h3>
+              <p class="tool-description">Add, remove, sort, and shuffle array values while visualizing the same data in multiple forms.</p>
+              <div class="tag-row"><span class="tag">arrays</span><span class="tag">sorting</span><span class="tag">visualization</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/simple-array-explorer/">Launch Tool</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 3</span><span class="pill type">Polished Tool</span></div>
+              <h3>Array Explorer: Values Become Visuals</h3>
+              <p class="tool-description">A fuller array and data visualization tool with built-in datasets, summary stats, and code preview.</p>
+              <div class="tag-row"><span class="tag">arrays</span><span class="tag">data</span><span class="tag">statistics</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/polished-array-explorer/">Launch Tool</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 4</span><span class="pill type">Planning Tool</span></div>
+              <h3>Data Story Planner</h3>
+              <p class="tool-description">Plan a data visualization before coding by choosing the data, mapping, takeaway, and limitation.</p>
+              <div class="tag-row"><span class="tag">data</span><span class="tag">storytelling</span><span class="tag">planning</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/data-story-planner/">Launch Tool</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Interaction</span><span class="pill type">Interactive Tool</span></div>
+              <h3>Event Handler Studio</h3>
+              <p class="tool-description">Explore how mouse and keyboard input become interactive behavior in a sketch.</p>
+              <div class="tag-row"><span class="tag">events</span><span class="tag">interaction</span><span class="tag">input</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/event-handler-studio/">Launch Tool</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Game-making</span><span class="pill type">Interactive Tool</span></div>
+              <h3>Collision Detection Explorer</h3>
+              <p class="tool-description">Make invisible collision rules visible through interactive shapes and live collision states.</p>
+              <div class="tag-row"><span class="tag">collisions</span><span class="tag">conditionals</span><span class="tag">games</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/collision-detection-explorer/">Launch Tool</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Objects / OOP</span><span class="pill type">Interactive Tool</span></div>
+              <h3>Object Shape Studio</h3>
+              <p class="tool-description">Create and manipulate shape objects while exploring reusable code structures.</p>
+              <div class="tag-row"><span class="tag">objects</span><span class="tag">classes</span><span class="tag">reuse</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/interactive-shape-drawing-app/">Launch Tool</a></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="starter-sketches" class="gallery-section panel" aria-label="Starter sketches">
+          <div class="gallery-header">
+            <div class="gallery-header-copy">
+              <div class="section-label">Starter Sketches</div>
+              <h2>Smaller seeds for live coding and remix prompts</h2>
+              <p>These are intentionally lighter-weight sketch seeds. They are useful for modeling ideas live, extending in pairs, or turning into challenge prompts during camp.</p>
+            </div>
+            <div class="gallery-count">6 sketches</div>
+          </div>
+          <div class="tool-grid">
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 3</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Nested Loop Pattern Studio</h3>
+              <p class="tool-description">A compact sketch seed showing how nested loops and arrays can generate a colorful grid.</p>
+              <div class="tag-row"><span class="tag">nested loops</span><span class="tag">arrays</span><span class="tag">patterns</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/nested-loop-array-grid/">Open Sketch</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 3</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Dot Field Position Sketch</h3>
+              <p class="tool-description">Use arrays to store positions and draw many related shapes from stored x/y values.</p>
+              <div class="tag-row"><span class="tag">arrays</span><span class="tag">coordinates</span><span class="tag">repetition</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/array-position-dot-field/">Open Sketch</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 4</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Random Poetry Generator</h3>
+              <p class="tool-description">Generate small poetic phrases by recombining words stored in arrays.</p>
+              <div class="tag-row"><span class="tag">arrays</span><span class="tag">randomness</span><span class="tag">text</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/random-poetry-generator/">Open Sketch</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 4</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Word Bank Sentence Generator</h3>
+              <p class="tool-description">Create random sentences from arrays of nouns, verbs, and modifiers.</p>
+              <div class="tag-row"><span class="tag">language</span><span class="tag">arrays</span><span class="tag">randomness</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/random-sentence-generator/">Open Sketch</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Session 4</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Moving Sentence Machine</h3>
+              <p class="tool-description">Animate generated sentences as objects that move, respond, and reset.</p>
+              <div class="tag-row"><span class="tag">text</span><span class="tag">motion</span><span class="tag">arrays</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/arrays-in-motion/">Open Sketch</a></div>
+            </article>
+            <article class="tool-card">
+              <div class="tool-meta"><span class="pill session">Extension</span><span class="pill type">Advanced Tool</span></div>
+              <h3>3D WebGL Playground</h3>
+              <p class="tool-description">Experiment with 3D shapes, materials, and transformations in p5.js WEBGL mode.</p>
+              <div class="tag-row"><span class="tag">3D</span><span class="tag">WEBGL</span><span class="tag">transforms</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/webgl-3d-workshop/">Launch Tool</a></div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      Built for CC Fest Coding Camp. Each page is a remixable p5.js teaching tool or starter sketch with a warmer shared visual identity.
+    </footer>
+  </div>
 </body>
 </html>

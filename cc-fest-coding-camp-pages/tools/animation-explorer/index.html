@@ -1,69 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Animation Explorer — CC Fest Coding Camp</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .controls {
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            background: #f9f9f9;
-            border-radius: 10px;
-            width: 400px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .variable-display {
-            font-family: monospace;
-            background: #282c34;
-            color: #61dafb;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 8px;
-            width: 400px;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-        button {
-            margin: 5px;
-            padding: 8px 12px;
-            border: none;
-            background-color: #007bff;
-            color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animation Explorer — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 </head>
 <body>
-    <div class="controls">
-        <h2>Animation Explorer</h2>
-        <div>
-            <label>Speed X: <input type="range" min="-5" max="5" value="1" step="0.1" oninput="updateSpeedX(this.value)"></label>
-            <label>Speed Y: <input type="range" min="-5" max="5" value="1" step="0.1" oninput="updateSpeedY(this.value)"></label>
-            <label>Ball Size: <input type="range" min="10" max="100" value="20" step="1" oninput="updateBallSize(this.value)"></label>
-        </div>
-        <div>
-            <button onclick="togglePath()">Toggle Path</button>
-            <button onclick="togglePause()">Pause/Resume</button>
-            <button onclick="resetAnimation()">Reset</button>
-        </div>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
     </div>
-    <div class="variable-display" id="variables">// Variables will appear here</div>
-    <script>
-// Tool 5 animation explorer
 
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 2</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Animation Explorer</h1>
+      <p class="tool-subtitle">Learn how variables create motion by changing speed, size, and path behavior, then watch the code readout update as the sketch runs.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">variables</span>
+        <span class="tool-tag">motion</span>
+        <span class="tool-tag">conditionals</span>
+        <span class="tool-tag">coordinates</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Change the controls, then study how the moving circle responds inside the canvas.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>This live readout shows the values and logic currently driving the sketch.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Live starter code will appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>What can I change? Adjust speed, scale, and trail behavior.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="control">
+                <label for="speedX">Speed X <span id="speedXValue">1.0</span></label>
+                <input id="speedX" type="range" min="-5" max="5" value="1" step="0.1" oninput="updateSpeedX(this.value)">
+              </div>
+              <div class="control">
+                <label for="speedY">Speed Y <span id="speedYValue">1.0</span></label>
+                <input id="speedY" type="range" min="-5" max="5" value="1" step="0.1" oninput="updateSpeedY(this.value)">
+              </div>
+              <div class="control">
+                <label for="ballSize">Ball Size <span id="ballSizeValue">20</span></label>
+                <input id="ballSize" type="range" min="10" max="100" value="20" step="1" oninput="updateBallSize(this.value)">
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="togglePath()">Toggle Path</button>
+                <button class="button ghost" onclick="togglePause()">Pause / Resume</button>
+                <button class="button ghost" onclick="resetAnimation()">Reset</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>Where is the code? These are the variables changing live in the sketch.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+                <p>Use the same prompt structure we want across the whole CC Fest library.</p>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Set <code>Speed X</code> to <code>3.5</code>, <code>Speed Y</code> to <code>-1.5</code>, then turn the path on and watch the travel pattern change.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>When the circle reaches an edge, the speed flips sign. That single change in a variable creates the bounce.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Change the circle color based on speed, or make the ball grow a little each time it hits a wall.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Animation Explorer · Variables, motion, and bounce logic</footer>
+  </div>
+
+  <script>
 let x, y;
 let speedX = 1;
 let speedY = 1;
@@ -74,81 +146,84 @@ let paused = false;
 let edgeCollisions = 0;
 
 function setup() {
-  createCanvas(400, 400);
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
   resetAnimation();
 }
 
 function draw() {
   if (paused) return;
 
-  // Clear background
   if (!showPath) {
-    background(220);
+    background(244, 239, 230);
   } else {
-    background(220, 10); // Create a fading effect
+    background(244, 239, 230, 16);
   }
 
-  // Update position
   x += speedX;
   y += speedY;
 
-  // Bounce off edges
   if (x < 0 || x > width) {
     speedX *= -1;
     edgeCollisions++;
   }
+
   if (y < 0 || y > height) {
     speedY *= -1;
     edgeCollisions++;
   }
 
-  // Keep within bounds
   x = constrain(x, 0, width);
   y = constrain(y, 0, height);
 
-  // Draw the ball
-  fill(255, 0, 0);
+  fill(224, 122, 95);
   noStroke();
   circle(x, y, ballSize);
 
-  // Store and draw path
   if (showPath) {
     path.push({ x, y });
     if (path.length > 100) path.shift();
 
     noFill();
-    stroke(255, 0, 0, 150);
     beginShape();
     for (let i = 0; i < path.length; i++) {
-      stroke(255, 0, 0, map(i, 0, path.length, 50, 255)); // Gradient fading
+      stroke(61, 90, 128, map(i, 0, path.length, 40, 220));
       vertex(path[i].x, path[i].y);
     }
     endShape();
   }
 
-  // Update variable display
   updateVariableDisplay();
+  updateCodePreview();
 }
 
 function updateSpeedX(value) {
   speedX = Number(value);
+  document.getElementById("speedXValue").textContent = speedX.toFixed(1);
+  updateCodePreview();
 }
 
 function updateSpeedY(value) {
   speedY = Number(value);
+  document.getElementById("speedYValue").textContent = speedY.toFixed(1);
+  updateCodePreview();
 }
 
 function updateBallSize(value) {
   ballSize = Number(value);
+  document.getElementById("ballSizeValue").textContent = String(ballSize);
+  updateCodePreview();
 }
 
 function togglePath() {
   showPath = !showPath;
   if (!showPath) path = [];
+  updateCodePreview();
 }
 
 function togglePause() {
   paused = !paused;
+  updateCodePreview();
 }
 
 function resetAnimation() {
@@ -157,23 +232,66 @@ function resetAnimation() {
   path = [];
   edgeCollisions = 0;
   paused = false;
+  document.getElementById("speedX").value = speedX;
+  document.getElementById("speedY").value = speedY;
+  document.getElementById("ballSize").value = ballSize;
+  document.getElementById("speedXValue").textContent = speedX.toFixed(1);
+  document.getElementById("speedYValue").textContent = speedY.toFixed(1);
+  document.getElementById("ballSizeValue").textContent = String(ballSize);
+  updateVariableDisplay();
+  updateCodePreview();
 }
 
 function updateVariableDisplay() {
-  const variables = {
-    x: Math.round(x),
-    y: Math.round(y),
-    speedX: speedX.toFixed(1),
-    speedY: speedY.toFixed(1),
-    ballSize: ballSize,
-    edgeCollisions: edgeCollisions,
-  };
-  document.getElementById("variables").innerText = Object.entries(variables)
-    .map(([key, value]) => `${key} = ${value}`)
-    .join("\n");
+  const variables = [
+    ["x", Math.round(x)],
+    ["y", Math.round(y)],
+    ["speedX", speedX.toFixed(1)],
+    ["speedY", speedY.toFixed(1)],
+    ["ballSize", ballSize],
+    ["edgeCollisions", edgeCollisions],
+    ["pathOn", showPath],
+    ["paused", paused]
+  ];
+
+  document.getElementById("variables").innerHTML = variables
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
 }
 
-</script>
-    </script>
+function updateCodePreview() {
+  const code = `let x = width / 2;
+let y = height / 2;
+let speedX = ${speedX.toFixed(1)};
+let speedY = ${speedY.toFixed(1)};
+let ballSize = ${ballSize};
+let showPath = ${showPath};
+let paused = ${paused};
+
+function draw() {
+  if (paused) return;
+
+  x += speedX;
+  y += speedY;
+
+  if (x < 0 || x > width) {
+    speedX *= -1;
+  }
+
+  if (y < 0 || y > height) {
+    speedY *= -1;
+  }
+
+  circle(x, y, ballSize);
+}`;
+
+  document.getElementById("code-preview").textContent = code;
+}
+
+function copyCode() {
+  const code = document.getElementById("code-preview").textContent;
+  navigator.clipboard.writeText(code);
+}
+  </script>
 </body>
 </html>
