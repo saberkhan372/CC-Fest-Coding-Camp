@@ -1,232 +1,297 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Shape + Color Explorer — CC Fest Coding Camp</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f9f9f9;
-        }
-        .controls {
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 500px;
-        }
-        .canvas-container {
-            border: 1px solid #ddd;
-            margin: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .code-display {
-            margin-top: 20px;
-            padding: 10px;
-            background: #282c34;
-            color: #61dafb;
-            border-radius: 8px;
-            font-family: 'Courier New', Courier, monospace;
-            white-space: pre-wrap;
-            overflow-x: auto;
-            max-height: 200px;
-        }
-        textarea {
-            width: 100%;
-            height: 150px;
-            background: #282c34;
-            color: #61dafb;
-            font-family: 'Courier New', Courier, monospace;
-            border: none;
-            border-radius: 8px;
-            padding: 10px;
-            resize: none;
-            box-sizing: border-box;
-            font-size: 1.1em;
-        }
-        button {
-            margin: 5px;
-            padding: 8px 12px;
-            border: none;
-            background-color: #007bff;
-            color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shape + Color Explorer — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 </head>
 <body>
-    <div class="controls">
-        <h2>Interactive Shape Explorer</h2>
-        <div>
-            <button onclick="changeShape('circle')">Circle</button>
-            <button onclick="changeShape('square')">Square</button>
-            <button onclick="changeShape('triangle')">Triangle</button>
-            <button onclick="changeShape('line')">Line</button>
-            <button onclick="changeShape('arc')">Arc</button>
-            <button onclick="changeShape('quad')">Quad</button>
-        </div>
-        <label>Size: <input type="range" min="10" max="200" value="50" oninput="updateSize(this.value)"></label>
-        <label>Stroke Weight: <input type="range" min="1" max="10" value="2" oninput="updateStrokeWeight(this.value)"></label>
-        <label>Stroke Color: <input type="color" value="#000000" oninput="updateStrokeColor(this.value)"></label>
-        <label>Fill Color: <input type="color" value="#ff0000" oninput="updateFillColor(this.value)"></label>
-        <textarea id="codeDisplay"></textarea>
-        <button onclick="applyCode()">Apply Code</button>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
     </div>
-    <script>
-  let currentShape = 'circle';
-        let size = 50;
-        let strokeWeightValue = 2;
-        let strokeColor = '#000000';
-        let fillColor = '#ff0000';
 
-        function setup() {
-            const canvas = createCanvas(windowWidth * 0.8, windowHeight * 0.6);
-            canvas.parent('canvas-container');
-            updateCodeDisplay();
-        }
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 1</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Shape + Color Explorer</h1>
+      <p class="tool-subtitle">Experiment with shape choice, scale, stroke, and fill color while generating starter code you can copy into your own sketch.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">shapes</span>
+        <span class="tool-tag">color</span>
+        <span class="tool-tag">stroke</span>
+        <span class="tool-tag">starter code</span>
+      </div>
+    </header>
 
-        function draw() {
-            renderShape();
-            noLoop(); // Stop continuous rendering
-        }
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Choose a shape, tune its visual settings, and see how each decision changes the result on the canvas.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
 
-        function renderShape() {
-            background(220);
-            stroke(strokeColor);
-            strokeWeight(strokeWeightValue);
-            fill(fillColor);
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>This code block updates as you design. You can edit it directly and apply your custom version too.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Shape starter code will appear here.</pre>
+            </div>
+          </div>
+        </article>
 
-            translate(width / 2, height / 2);
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Editable Code</h2>
+                <p>Paste or tweak the generated code, then apply it to test your own variation.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="applyCode()">Apply Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-editor" contenteditable="true">// Edit the generated code here and click Apply Code.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
 
-            if (currentShape === 'circle') {
-                circle(0, 0, size);
-            } else if (currentShape === 'square') {
-                rectMode(CENTER);
-                rect(0, 0, size, size);
-            } else if (currentShape === 'triangle') {
-                triangle(-size / 2, size / 2, 0, -size / 2, size / 2, size / 2);
-            } else if (currentShape === 'line') {
-                line(-size / 2, 0, size / 2, 0);
-            } else if (currentShape === 'arc') {
-                arc(0, 0, size, size, 0, HALF_PI);
-            } else if (currentShape === 'quad') {
-                quad(-size / 2, size / 2, size / 2, size / 2, size / 2, -size / 2, -size / 2, -size / 2);
-            }
-        }
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Choose a shape and tune the visual properties that make it yours.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="button-row">
+                <button class="button primary" onclick="changeShape('circle')">Circle</button>
+                <button class="button ghost" onclick="changeShape('square')">Square</button>
+                <button class="button ghost" onclick="changeShape('triangle')">Triangle</button>
+                <button class="button ghost" onclick="changeShape('line')">Line</button>
+                <button class="button ghost" onclick="changeShape('arc')">Arc</button>
+                <button class="button ghost" onclick="changeShape('quad')">Quad</button>
+              </div>
+              <div class="control">
+                <label for="size">Size <span id="sizeValue">50</span></label>
+                <input id="size" type="range" min="10" max="200" value="50" oninput="updateSize(this.value)">
+              </div>
+              <div class="control">
+                <label for="strokeWeight">Stroke Weight <span id="strokeWeightValue">2</span></label>
+                <input id="strokeWeight" type="range" min="1" max="10" value="2" oninput="updateStrokeWeight(this.value)">
+              </div>
+              <div class="control">
+                <label for="strokeColor">Stroke Color <span id="strokeColorValue">#000000</span></label>
+                <input id="strokeColor" type="color" value="#000000" oninput="updateStrokeColor(this.value)">
+              </div>
+              <div class="control">
+                <label for="fillColor">Fill Color <span id="fillColorValue">#ff0000</span></label>
+                <input id="fillColor" type="color" value="#ff0000" oninput="updateFillColor(this.value)">
+              </div>
+            </div>
+          </div>
+        </article>
 
-        function changeShape(shape) {
-            currentShape = shape;
-            updateCodeDisplay();
-            redraw(); // Trigger canvas update
-        }
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>Track the current visual settings so you can connect each slider to the generated code.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="state-display"></div>
+          </div>
+        </article>
 
-        function updateSize(newSize) {
-            size = Number(newSize);
-            updateCodeDisplay();
-            redraw();
-        }
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+                <p>Use the same prompt structure we want across the whole CC Fest library.</p>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Choose <code>Triangle</code>, set the fill to a warm color, and increase the stroke weight to make the outline stand out.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>The same shape can feel very different depending on fill, stroke, and size. Those design choices all map cleanly to p5.js functions.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Turn the shape into a character, badge, logo, or abstract icon by editing the code and adding more drawing commands.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
 
-        function updateStrokeWeight(newStrokeWeight) {
-            strokeWeightValue = Number(newStrokeWeight);
-            updateCodeDisplay();
-            redraw();
-        }
+    <footer class="tool-footer">CC Fest Coding Camp · Shape + Color Explorer · Shape choice, color, and starter code</footer>
+  </div>
 
-        function updateStrokeColor(newStrokeColor) {
-            strokeColor = newStrokeColor;
-            updateCodeDisplay();
-            redraw();
-        }
+  <script>
+let currentShape = "circle";
+let size = 50;
+let strokeWeightValue = 2;
+let strokeColor = "#000000";
+let fillColor = "#ff0000";
 
-        function updateFillColor(newFillColor) {
-            fillColor = newFillColor;
-            updateCodeDisplay();
-            redraw();
-        }
+function setup() {
+  const canvas = createCanvas(500, 360);
+  canvas.parent("canvas-container");
+  updateCodeDisplay();
+}
 
-        function updateCodeDisplay() {
-            const codeDisplay = document.getElementById('codeDisplay');
-            codeDisplay.value = generateShapeCode();
-        }
+function draw() {
+  renderShape();
+  noLoop();
+}
 
-        function generateShapeCode() {
-            const fillHex = fillColor.toUpperCase();
-            const strokeHex = strokeColor.toUpperCase();
-            const roundedSize = size.toFixed(1);
-            const roundedStrokeWeight = strokeWeightValue.toFixed(1);
+function renderShape() {
+  background(250, 246, 240);
+  stroke(strokeColor);
+  strokeWeight(strokeWeightValue);
+  fill(fillColor);
 
-            if (currentShape === 'circle') {
-                return `
-fill('${fillHex}');
-stroke('${strokeHex}');
-strokeWeight(${roundedStrokeWeight});
-circle(0, 0, ${roundedSize});
-                `.trim();
-            } else if (currentShape === 'square') {
-                return `
-fill('${fillHex}');
-stroke('${strokeHex}');
-strokeWeight(${roundedStrokeWeight});
-rectMode(CENTER);
-rect(0, 0, ${roundedSize}, ${roundedSize});
-                `.trim();
-            } else if (currentShape === 'triangle') {
-                return `
-fill('${fillHex}');
-stroke('${strokeHex}');
-strokeWeight(${roundedStrokeWeight});
-triangle(${(-size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, 
-         0, ${(-size / 2).toFixed(1)}, 
-         ${(size / 2).toFixed(1)}, ${(size / 2).toFixed(1)});
-                `.trim();
-            } else if (currentShape === 'line') {
-                return `
-stroke('${strokeHex}');
-strokeWeight(${roundedStrokeWeight});
-line(${(-size / 2).toFixed(1)}, 0, ${(size / 2).toFixed(1)}, 0);
-                `.trim();
-            } else if (currentShape === 'arc') {
-                return `
-fill('${fillHex}');
-stroke('${strokeHex}');
-strokeWeight(${roundedStrokeWeight});
-arc(0, 0, ${roundedSize}, ${roundedSize}, 0, HALF_PI);
-                `.trim();
-            } else if (currentShape === 'quad') {
-                return `
-fill('${fillHex}');
-stroke('${strokeHex}');
-strokeWeight(${roundedStrokeWeight});
-quad(${(-size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, 
-     ${(size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, 
-     ${(size / 2).toFixed(1)}, ${(-size / 2).toFixed(1)}, 
-     ${(-size / 2).toFixed(1)}, ${(-size / 2).toFixed(1)});
-                `.trim();
-            }
-        }
+  push();
+  translate(width / 2, height / 2);
 
-        function applyCode() {
-            try {
-                background(220); // Clear the canvas
-                resetMatrix(); // Reset any transformations
-                translate(width / 2, height / 2); // Center the drawing
-                eval(document.getElementById('codeDisplay').value);
-            } catch (e) {
-                alert('Error in code: ' + e.message);
-            }
-        }
-</script>
-    <div id="canvas-container"></div>
+  if (currentShape === "circle") {
+    circle(0, 0, size);
+  } else if (currentShape === "square") {
+    rectMode(CENTER);
+    rect(0, 0, size, size);
+  } else if (currentShape === "triangle") {
+    triangle(-size / 2, size / 2, 0, -size / 2, size / 2, size / 2);
+  } else if (currentShape === "line") {
+    line(-size / 2, 0, size / 2, 0);
+  } else if (currentShape === "arc") {
+    arc(0, 0, size, size, 0, HALF_PI);
+  } else if (currentShape === "quad") {
+    quad(-size / 2, size / 2, size / 2, size / 2, size / 2, -size / 2, -size / 2, -size / 2);
+  }
+  pop();
+
+  updateStateDisplay();
+}
+
+function changeShape(shape) {
+  currentShape = shape;
+  updateCodeDisplay();
+  redraw();
+}
+
+function updateSize(newSize) {
+  size = Number(newSize);
+  document.getElementById("sizeValue").textContent = String(size);
+  updateCodeDisplay();
+  redraw();
+}
+
+function updateStrokeWeight(newStrokeWeight) {
+  strokeWeightValue = Number(newStrokeWeight);
+  document.getElementById("strokeWeightValue").textContent = String(strokeWeightValue);
+  updateCodeDisplay();
+  redraw();
+}
+
+function updateStrokeColor(newStrokeColor) {
+  strokeColor = newStrokeColor;
+  document.getElementById("strokeColorValue").textContent = newStrokeColor;
+  updateCodeDisplay();
+  redraw();
+}
+
+function updateFillColor(newFillColor) {
+  fillColor = newFillColor;
+  document.getElementById("fillColorValue").textContent = newFillColor;
+  updateCodeDisplay();
+  redraw();
+}
+
+function updateCodeDisplay() {
+  const code = generateShapeCode();
+  document.getElementById("code-preview").textContent = code;
+  document.getElementById("code-editor").textContent = code;
+}
+
+function generateShapeCode() {
+  const fillHex = fillColor.toUpperCase();
+  const strokeHex = strokeColor.toUpperCase();
+  const roundedSize = size.toFixed(1);
+  const roundedStrokeWeight = strokeWeightValue.toFixed(1);
+
+  if (currentShape === "circle") {
+    return `fill("${fillHex}");\nstroke("${strokeHex}");\nstrokeWeight(${roundedStrokeWeight});\ncircle(0, 0, ${roundedSize});`;
+  } else if (currentShape === "square") {
+    return `fill("${fillHex}");\nstroke("${strokeHex}");\nstrokeWeight(${roundedStrokeWeight});\nrectMode(CENTER);\nrect(0, 0, ${roundedSize}, ${roundedSize});`;
+  } else if (currentShape === "triangle") {
+    return `fill("${fillHex}");\nstroke("${strokeHex}");\nstrokeWeight(${roundedStrokeWeight});\ntriangle(${(-size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, 0, ${(-size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, ${(size / 2).toFixed(1)});`;
+  } else if (currentShape === "line") {
+    return `stroke("${strokeHex}");\nstrokeWeight(${roundedStrokeWeight});\nline(${(-size / 2).toFixed(1)}, 0, ${(size / 2).toFixed(1)}, 0);`;
+  } else if (currentShape === "arc") {
+    return `fill("${fillHex}");\nstroke("${strokeHex}");\nstrokeWeight(${roundedStrokeWeight});\narc(0, 0, ${roundedSize}, ${roundedSize}, 0, HALF_PI);`;
+  }
+  return `fill("${fillHex}");\nstroke("${strokeHex}");\nstrokeWeight(${roundedStrokeWeight});\nquad(${(-size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, ${(size / 2).toFixed(1)}, ${(-size / 2).toFixed(1)}, ${(-size / 2).toFixed(1)}, ${(-size / 2).toFixed(1)});`;
+}
+
+function applyCode() {
+  try {
+    background(250, 246, 240);
+    push();
+    translate(width / 2, height / 2);
+    eval(document.getElementById("code-editor").textContent);
+    pop();
+  } catch (error) {
+    alert(`Error in code: ${error.message}`);
+  }
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+
+function updateStateDisplay() {
+  const state = [
+    ["shape", currentShape],
+    ["size", size],
+    ["strokeWeight", strokeWeightValue],
+    ["stroke", strokeColor],
+    ["fill", fillColor]
+  ];
+
+  document.getElementById("state-display").innerHTML = state
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
+}
+  </script>
 </body>
 </html>
