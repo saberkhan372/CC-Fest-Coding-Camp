@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Noise vs Random Explorer — CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #FAF6F0;
+    --cream-dark: #F0EBE3;
+    --cream-darker: #E5DFD5;
+    --ink: #2C2A26;
+    --ink-light: #6B6760;
+    --ink-faint: #9E998F;
+    --accent: #3D5A80;
+    --accent-light: #5B7EA1;
+    --highlight: #E07A5F;
+    --highlight-light: #F2CC8F;
+    --success: #81B29A;
+    --grid-bg: #FFFFFF;
+    --code-bg: #2C2A26;
+    --code-text: #F0EBE3;
+    --code-keyword: #81B29A;
+    --code-number: #F2CC8F;
+    --code-comment: #8F8A81;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04);
+    --shadow-strong: 0 6px 24px rgba(44,42,38,.09), 0 0 0 1px rgba(0,0,0,.04);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; }
+  .header { margin-bottom: 24px; }
+
+  .stage-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(61,90,128,.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    max-width: 830px;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    background: var(--cream-dark);
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(340px, .85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 950px) { .workspace { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .panel-desc { font-size: 13px; color: var(--ink-light); }
+
+  .canvas-panel { padding: 14px; }
+
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 1.2 / 1;
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  #canvas-container canvas { display: block; }
+
+  .readout-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 680px) { .readout-row { grid-template-columns: repeat(2, 1fr); } }
+
+  .readout-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+  }
+
+  .readout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .readout-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .controls { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .control-group {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .control-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+
+  .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .button-row.two { grid-template-columns: repeat(2, 1fr); }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  }
+
+  button:hover { transform: translateY(-1px); }
+  .primary-btn { background: var(--accent); color: #fff; }
+  .secondary-btn { background: #fff; color: var(--accent); border: 1px solid var(--cream-darker); }
+  .toggle-btn { background: #fff; color: var(--ink-light); border: 1px solid var(--cream-darker); }
+  .toggle-btn.active { background: rgba(61,90,128,.08); color: var(--accent); border-color: rgba(61,90,128,.3); }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 58px;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+  }
+
+  .slider-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+  .value-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    text-align: center;
+    padding: 3px 6px;
+  }
+
+  .mini-note { font-size: 12px; color: var(--ink-light); margin-top: 8px; }
+
+  .comparison-card {
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    margin-top: 8px;
+  }
+
+  .comparison-card strong { color: var(--accent); }
+
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 850px) { .lesson-grid { grid-template-columns: 1fr; } }
+
+  .lesson-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+
+  .lesson-card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .lesson-card p { font-size: 14px; color: var(--ink-light); }
+
+  .code-panel {
+    margin-top: 18px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+  }
+
+  .code-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .code-toolbar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(240,235,227,.68);
+  }
+
+  .copy-btn {
+    background: rgba(255,255,255,.06);
+    color: rgba(240,235,227,.75);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .copy-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  pre {
+    margin: 0;
+    padding: 15px 18px 18px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre;
+  }
+
+  .kw { color: var(--code-keyword); }
+  .num { color: var(--code-number); }
+  .cm { color: var(--code-comment); }
+  .fn { color: #A7C7E7; }
+  .str { color: #F2CC8F; }
+  .hi { background: rgba(224,122,95,.22); border-radius: 4px; padding: 1px 2px; margin: -1px -2px; }
+
+  .footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cream-dark);
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="stage-tag">Missing Tool 5 — Generative Motion + Nature</div>
+      <h1>Noise vs Random Explorer</h1>
+      <p class="subtitle">Compare <strong>random()</strong>, which jumps between unrelated values, with <strong>noise()</strong>, which creates smooth, related values over time or space. This is one of the key ideas behind organic motion, clouds, waves, terrain, and generative textures.</p>
+      <div class="tag-row" aria-label="Concept tags">
+        <span class="tag">random()</span>
+        <span class="tag">noise()</span>
+        <span class="tag">generative art</span>
+        <span class="tag">motion</span>
+        <span class="tag">organic systems</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Side-by-Side Comparison</div>
+          <div class="panel-desc">Left side uses random jumps. Right side uses noise for smoother, connected movement.</div>
+        </div>
+        <div class="canvas-panel">
+          <div id="canvas-container" aria-label="p5.js canvas comparing random and noise motion"></div>
+          <div class="readout-row">
+            <div class="readout-card">
+              <div class="readout-label">random</div>
+              <div class="readout-value" id="randomReadout">jumping</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">noise</div>
+              <div class="readout-value" id="noiseReadout">flowing</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">mode</div>
+              <div class="readout-value" id="modeReadout">movers</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">scale</div>
+              <div class="readout-value" id="scaleReadout">0.010</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Explore the Difference</div>
+          <div class="panel-desc">Change the visualization, speed, smoothness, and number of moving points.</div>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <div class="control-group-title">Visual Mode</div>
+            <div class="button-grid" id="modeButtons"></div>
+            <p class="mini-note">Each mode shows the same idea differently: sudden unrelated values versus smooth related values.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Motion Controls</div>
+            <div class="slider-row">
+              <label for="speedSlider">speed</label>
+              <input id="speedSlider" type="range" min="1" max="60" value="18" />
+              <span class="value-pill" id="speedValue">18</span>
+            </div>
+            <div class="slider-row">
+              <label for="scaleSlider">scale</label>
+              <input id="scaleSlider" type="range" min="1" max="80" value="10" />
+              <span class="value-pill" id="scaleValue">0.010</span>
+            </div>
+            <div class="slider-row">
+              <label for="countSlider">count</label>
+              <input id="countSlider" type="range" min="1" max="40" value="14" />
+              <span class="value-pill" id="countValue">14</span>
+            </div>
+            <div class="slider-row">
+              <label for="trailSlider">trails</label>
+              <input id="trailSlider" type="range" min="0" max="95" value="45" />
+              <span class="value-pill" id="trailValue">45</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">View + Actions</div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="labelsBtn" type="button">Labels On</button>
+              <button class="toggle-btn active" id="guidesBtn" type="button">Divider On</button>
+            </div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="playBtn" type="button">Playing</button>
+              <button class="toggle-btn" id="syncBtn" type="button">Unsynced</button>
+            </div>
+            <div class="button-row">
+              <button class="secondary-btn" id="resetBtn" type="button">Reset</button>
+              <button class="secondary-btn" id="newSeedBtn" type="button">New Seed</button>
+              <button class="primary-btn" id="copyTopBtn" type="button">Copy Code</button>
+            </div>
+            <div class="comparison-card">
+              <p><strong>random()</strong> gives a new unrelated value each time. <strong>noise()</strong> gives values that change gradually when its input changes gradually.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="lesson-grid" aria-label="Learning prompts">
+      <div class="lesson-card">
+        <h2>Try this</h2>
+        <p>Increase the speed and watch how random motion becomes chaotic while noise motion still feels connected.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Notice this</h2>
+        <p><code>random()</code> gives unrelated values. <code>noise()</code> gives related values when you move through time or space.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Remix this</h2>
+        <p>Use noise to create clouds, terrain, drifting particles, breathing shapes, water, wind, or organic movement.</p>
+      </div>
+    </section>
+
+    <section class="code-panel" aria-label="Generated code preview">
+      <div class="code-toolbar">
+        <div class="code-toolbar-title">Starter Code Preview</div>
+        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
+      </div>
+      <pre id="codeOutput"></pre>
+    </section>
+
+    <footer class="footer">Noise vs Random Explorer · CC Fest Coding Camp · p5.js learning tool</footer>
+  </div>
+
+<script>
+  const modes = [
+    { id: 'movers', label: 'Movers' },
+    { id: 'waves', label: 'Waves' },
+    { id: 'terrain', label: 'Terrain' },
+    { id: 'field', label: 'Color Field' }
+  ];
+
+  const defaults = {
+    mode: 'movers',
+    speed: 18,
+    scale: 10,
+    count: 14,
+    trails: 45,
+    labels: true,
+    guides: true,
+    playing: true,
+    synced: false
+  };
+
+  const state = { ...defaults };
+  let t = 0;
+  let randomPoints = [];
+  let noiseOffsets = [];
+  let currentRandomValue = 0;
+  let currentNoiseValue = 0;
+  let seedValue = 1000;
+
+  function setup() {
+    const holder = document.getElementById('canvas-container');
+    const canvas = createCanvas(holder.clientWidth, holder.clientHeight);
+    canvas.parent('canvas-container');
+    pixelDensity(2);
+    textFont('DM Mono');
+    resetSystem();
+  }
+
+  function windowResized() {
+    const holder = document.getElementById('canvas-container');
+    resizeCanvas(holder.clientWidth, holder.clientHeight);
+    resetSystem(false);
+  }
+
+  function draw() {
+    const fade = map(state.trails, 0, 95, 255, 15);
+    background(250, 246, 240, fade);
+
+    if (state.playing) t += state.speed * 0.0015;
+
+    if (state.guides) drawDivider();
+    if (state.mode === 'movers') drawMovers();
+    if (state.mode === 'waves') drawWaves();
+    if (state.mode === 'terrain') drawTerrain();
+    if (state.mode === 'field') drawColorField();
+
+    if (state.labels) drawLabels();
+    updateReadouts();
+    updateCode();
+  }
+
+  function resetSystem(reseed = true) {
+    if (reseed) seedValue = Math.floor(Math.random() * 100000);
+    randomSeed(seedValue);
+    noiseSeed(seedValue);
+    randomPoints = [];
+    noiseOffsets = [];
+    for (let i = 0; i < 40; i++) {
+      randomPoints.push({
+        x: random(0.08, 0.42),
+        y: random(0.12, 0.86),
+        size: random(9, 25),
+        vx: random(-1, 1),
+        vy: random(-1, 1)
+      });
+      noiseOffsets.push({ x: random(1000), y: random(1000), s: random(1000) });
+    }
+    t = 0;
+  }
+
+  function drawDivider() {
+    stroke(61, 90, 128, 90);
+    strokeWeight(1.5);
+    drawingContext.setLineDash([8, 8]);
+    line(width / 2, 0, width / 2, height);
+    drawingContext.setLineDash([]);
+  }
+
+  function drawLabels() {
+    noStroke();
+    textFont('DM Sans');
+    textSize(16);
+    textAlign(CENTER, TOP);
+    fill(224, 122, 95);
+    text('random()', width * 0.25, 12);
+    fill(61, 90, 128);
+    text('noise()', width * 0.75, 12);
+
+    textFont('DM Mono');
+    textSize(11);
+    fill(44, 42, 38, 180);
+    text('jumpy / unrelated', width * 0.25, 34);
+    text('smooth / related', width * 0.75, 34);
+  }
+
+  function drawMovers() {
+    noStroke();
+    for (let i = 0; i < state.count; i++) {
+      const rp = randomPoints[i];
+      const no = noiseOffsets[i];
+
+      let rx;
+      let ry;
+      if (state.playing) {
+        rx = random(width * 0.07, width * 0.43);
+        ry = random(height * 0.16, height * 0.88);
+        currentRandomValue = rx;
+      } else {
+        rx = rp.x * width;
+        ry = rp.y * height;
+      }
+
+      const noiseScale = state.scale * 0.001;
+      const nx = map(noise(no.x + t * state.speed * noiseScale), 0, 1, width * 0.57, width * 0.93);
+      const ny = map(noise(no.y + t * state.speed * noiseScale), 0, 1, height * 0.16, height * 0.88);
+      const ns = map(noise(no.s + t * state.speed * noiseScale), 0, 1, 8, 26);
+      currentNoiseValue = nx;
+
+      fill(224, 122, 95, 205);
+      circle(rx, ry, rp.size);
+      fill(61, 90, 128, 205);
+      circle(nx, ny, ns);
+    }
+  }
+
+  function drawWaves() {
+    noFill();
+    strokeWeight(2.2);
+
+    stroke(224, 122, 95, 205);
+    beginShape();
+    for (let x = width * 0.06; x <= width * 0.44; x += 8) {
+      const y = random(height * 0.24, height * 0.78);
+      vertex(x, y);
+      currentRandomValue = y;
+    }
+    endShape();
+
+    stroke(61, 90, 128, 220);
+    beginShape();
+    const noiseScale = state.scale * 0.003;
+    for (let x = width * 0.56; x <= width * 0.94; x += 8) {
+      const n = noise(x * noiseScale + t * state.speed * 0.02);
+      const y = map(n, 0, 1, height * 0.24, height * 0.78);
+      vertex(x, y);
+      currentNoiseValue = y;
+    }
+    endShape();
+  }
+
+  function drawTerrain() {
+    noStroke();
+    fill(224, 122, 95, 90);
+    beginShape();
+    vertex(width * 0.05, height * 0.88);
+    for (let x = width * 0.05; x <= width * 0.45; x += 15) {
+      const y = random(height * 0.32, height * 0.82);
+      vertex(x, y);
+      currentRandomValue = y;
+    }
+    vertex(width * 0.45, height * 0.88);
+    endShape(CLOSE);
+
+    fill(61, 90, 128, 105);
+    beginShape();
+    vertex(width * 0.55, height * 0.88);
+    const noiseScale = state.scale * 0.004;
+    for (let x = width * 0.55; x <= width * 0.95; x += 12) {
+      const n = noise(x * noiseScale + t * state.speed * 0.01);
+      const y = map(n, 0, 1, height * 0.32, height * 0.82);
+      vertex(x, y);
+      currentNoiseValue = y;
+    }
+    vertex(width * 0.95, height * 0.88);
+    endShape(CLOSE);
+  }
+
+  function drawColorField() {
+    const cols = 12;
+    const rows = 8;
+    const leftW = width * 0.4;
+    const cellW = leftW / cols;
+    const cellH = (height * 0.68) / rows;
+    const top = height * 0.18;
+
+    noStroke();
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const rv = random(40, 240);
+        fill(224, rv * 0.55, 95, 190);
+        rect(width * 0.05 + col * cellW, top + row * cellH, cellW + 1, cellH + 1);
+        currentRandomValue = rv;
+
+        const noiseScale = state.scale * 0.02;
+        const nv = noise(col * noiseScale, row * noiseScale, t * state.speed * 0.015);
+        const b = map(nv, 0, 1, 45, 230);
+        fill(61, 90 + b * 0.4, 128 + b * 0.35, 190);
+        rect(width * 0.55 + col * cellW, top + row * cellH, cellW + 1, cellH + 1);
+        currentNoiseValue = b;
+      }
+    }
+  }
+
+  function updateReadouts() {
+    document.getElementById('randomReadout').textContent = `value ${Math.round(currentRandomValue)}`;
+    document.getElementById('noiseReadout').textContent = `value ${Math.round(currentNoiseValue)}`;
+    document.getElementById('modeReadout').textContent = state.mode;
+    document.getElementById('scaleReadout').textContent = (state.scale * 0.001).toFixed(3);
+  }
+
+  function buildModeButtons() {
+    const wrap = document.getElementById('modeButtons');
+    wrap.innerHTML = '';
+    modes.forEach(mode => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toggle-btn' + (state.mode === mode.id ? ' active' : '');
+      btn.textContent = mode.label;
+      btn.addEventListener('click', () => {
+        state.mode = mode.id;
+        buildModeButtons();
+        updateCode();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  function syncSliders() {
+    document.getElementById('speedSlider').value = state.speed;
+    document.getElementById('speedValue').textContent = state.speed;
+    document.getElementById('scaleSlider').value = state.scale;
+    document.getElementById('scaleValue').textContent = (state.scale * 0.001).toFixed(3);
+    document.getElementById('countSlider').value = state.count;
+    document.getElementById('countValue').textContent = state.count;
+    document.getElementById('trailSlider').value = state.trails;
+    document.getElementById('trailValue').textContent = state.trails;
+  }
+
+  function updateButtons() {
+    const labelsBtn = document.getElementById('labelsBtn');
+    labelsBtn.textContent = state.labels ? 'Labels On' : 'Labels Off';
+    labelsBtn.classList.toggle('active', state.labels);
+
+    const guidesBtn = document.getElementById('guidesBtn');
+    guidesBtn.textContent = state.guides ? 'Divider On' : 'Divider Off';
+    guidesBtn.classList.toggle('active', state.guides);
+
+    const playBtn = document.getElementById('playBtn');
+    playBtn.textContent = state.playing ? 'Playing' : 'Paused';
+    playBtn.classList.toggle('active', state.playing);
+
+    const syncBtn = document.getElementById('syncBtn');
+    syncBtn.textContent = state.synced ? 'Synced Seed' : 'Unsynced';
+    syncBtn.classList.toggle('active', state.synced);
+  }
+
+  function updateCode() {
+    const lines = [];
+    lines.push(`<span class="cm">// Noise vs Random Explorer starter code</span>`);
+    lines.push(`<span class="kw">let</span> t = <span class="num">0</span>;`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">setup</span>() {`);
+    lines.push(`  <span class="fn">createCanvas</span>(<span class="num">400</span>, <span class="num">300</span>);`);
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">draw</span>() {`);
+    lines.push(`  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>, <span class="num">${Math.round(map(state.trails, 0, 95, 255, 15))}</span>);`);
+    lines.push(`  t += <span class="num">${(state.speed * 0.0015).toFixed(4)}</span>;`);
+    lines.push('');
+
+    if (state.mode === 'movers') {
+      lines.push(`  <span class="cm">// random(): unrelated jumps</span>`);
+      lines.push(`  <span class="kw">let</span> randomX = <span class="fn">random</span>(<span class="num">20</span>, width / <span class="num">2</span> - <span class="num">20</span>);`);
+      lines.push(`  <span class="kw">let</span> randomY = <span class="fn">random</span>(<span class="num">40</span>, height - <span class="num">30</span>);`);
+      lines.push(`  <span class="fn">circle</span>(randomX, randomY, <span class="num">18</span>);`);
+      lines.push('');
+      lines.push(`  <span class="cm">// noise(): smooth related values</span>`);
+      lines.push(`  <span class="kw">let</span> noiseX = <span class="fn">map</span>(<span class="hi"><span class="fn">noise</span>(t)</span>, <span class="num">0</span>, <span class="num">1</span>, width / <span class="num">2</span> + <span class="num">20</span>, width - <span class="num">20</span>);`);
+      lines.push(`  <span class="kw">let</span> noiseY = <span class="fn">map</span>(<span class="fn">noise</span>(t + <span class="num">100</span>), <span class="num">0</span>, <span class="num">1</span>, <span class="num">40</span>, height - <span class="num">30</span>);`);
+      lines.push(`  <span class="fn">circle</span>(noiseX, noiseY, <span class="num">18</span>);`);
+    } else if (state.mode === 'waves') {
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> x = <span class="num">0</span>; x < width; x += <span class="num">8</span>) {`);
+      lines.push(`    <span class="kw">let</span> randomY = <span class="fn">random</span>(<span class="num">80</span>, <span class="num">230</span>);`);
+      lines.push(`    <span class="kw">let</span> noiseY = <span class="fn">map</span>(<span class="hi"><span class="fn">noise</span>(x * <span class="num">${(state.scale * 0.003).toFixed(3)}</span> + t)</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">80</span>, <span class="num">230</span>);`);
+      lines.push(`  }`);
+    } else if (state.mode === 'terrain') {
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> x = <span class="num">0</span>; x < width; x += <span class="num">12</span>) {`);
+      lines.push(`    <span class="kw">let</span> randomHeight = <span class="fn">random</span>(<span class="num">80</span>, <span class="num">250</span>);`);
+      lines.push(`    <span class="kw">let</span> noiseHeight = <span class="fn">map</span>(<span class="hi"><span class="fn">noise</span>(x * <span class="num">${(state.scale * 0.004).toFixed(3)}</span> + t)</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">80</span>, <span class="num">250</span>);`);
+      lines.push(`  }`);
+    } else {
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> row = <span class="num">0</span>; row < <span class="num">8</span>; row++) {`);
+      lines.push(`    <span class="kw">for</span> (<span class="kw">let</span> col = <span class="num">0</span>; col < <span class="num">12</span>; col++) {`);
+      lines.push(`      <span class="kw">let</span> randomBrightness = <span class="fn">random</span>(<span class="num">40</span>, <span class="num">240</span>);`);
+      lines.push(`      <span class="kw">let</span> noiseBrightness = <span class="fn">map</span>(<span class="hi"><span class="fn">noise</span>(col * <span class="num">0.2</span>, row * <span class="num">0.2</span>, t)</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">40</span>, <span class="num">240</span>);`);
+      lines.push(`    }`);
+      lines.push(`  }`);
+    }
+
+    lines.push(`}`);
+    document.getElementById('codeOutput').innerHTML = lines.join('\n');
+  }
+
+  function plainCode() {
+    if (state.mode === 'movers') {
+      return `// Noise vs Random Explorer starter code\nlet t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  background(250, 246, 240, ${Math.round(map(state.trails, 0, 95, 255, 15))});\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  // random(): unrelated jumps\n  let randomX = random(20, width / 2 - 20);\n  let randomY = random(40, height - 30);\n  circle(randomX, randomY, 18);\n\n  // noise(): smooth related values\n  let noiseX = map(noise(t), 0, 1, width / 2 + 20, width - 20);\n  let noiseY = map(noise(t + 100), 0, 1, 40, height - 30);\n  circle(noiseX, noiseY, 18);\n}`;
+    }
+
+    if (state.mode === 'waves') {
+      return `// Noise vs Random Explorer starter code\nlet t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  background(250, 246, 240);\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  for (let x = 0; x < width; x += 8) {\n    let randomY = random(80, 230);\n    let noiseY = map(noise(x * ${(state.scale * 0.003).toFixed(3)} + t), 0, 1, 80, 230);\n  }\n}`;
+    }
+
+    if (state.mode === 'terrain') {
+      return `// Noise vs Random Explorer starter code\nlet t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  background(250, 246, 240);\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  for (let x = 0; x < width; x += 12) {\n    let randomHeight = random(80, 250);\n    let noiseHeight = map(noise(x * ${(state.scale * 0.004).toFixed(3)} + t), 0, 1, 80, 250);\n  }\n}`;
+    }
+
+    return `// Noise vs Random Explorer starter code\nlet t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  background(250, 246, 240);\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  for (let row = 0; row < 8; row++) {\n    for (let col = 0; col < 12; col++) {\n      let randomBrightness = random(40, 240);\n      let noiseBrightness = map(noise(col * 0.2, row * 0.2, t), 0, 1, 40, 240);\n    }\n  }\n}`;
+  }
+
+  function copyCode(button) {
+    navigator.clipboard.writeText(plainCode()).then(() => {
+      const old = button.textContent;
+      button.textContent = 'Copied!';
+      setTimeout(() => { button.textContent = old; }, 1400);
+    }).catch(() => window.prompt('Copy this code:', plainCode()));
+  }
+
+  function wireControls() {
+    document.getElementById('speedSlider').addEventListener('input', e => {
+      state.speed = Number(e.target.value);
+      document.getElementById('speedValue').textContent = state.speed;
+    });
+
+    document.getElementById('scaleSlider').addEventListener('input', e => {
+      state.scale = Number(e.target.value);
+      document.getElementById('scaleValue').textContent = (state.scale * 0.001).toFixed(3);
+    });
+
+    document.getElementById('countSlider').addEventListener('input', e => {
+      state.count = Number(e.target.value);
+      document.getElementById('countValue').textContent = state.count;
+    });
+
+    document.getElementById('trailSlider').addEventListener('input', e => {
+      state.trails = Number(e.target.value);
+      document.getElementById('trailValue').textContent = state.trails;
+    });
+
+    document.getElementById('labelsBtn').addEventListener('click', () => {
+      state.labels = !state.labels;
+      updateButtons();
+    });
+
+    document.getElementById('guidesBtn').addEventListener('click', () => {
+      state.guides = !state.guides;
+      updateButtons();
+    });
+
+    document.getElementById('playBtn').addEventListener('click', () => {
+      state.playing = !state.playing;
+      updateButtons();
+    });
+
+    document.getElementById('syncBtn').addEventListener('click', () => {
+      state.synced = !state.synced;
+      if (state.synced) {
+        randomSeed(seedValue);
+        noiseSeed(seedValue);
+      }
+      updateButtons();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      Object.assign(state, defaults);
+      syncSliders();
+      updateButtons();
+      buildModeButtons();
+      resetSystem(false);
+    });
+
+    document.getElementById('newSeedBtn').addEventListener('click', () => resetSystem(true));
+    document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
+    document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
+  }
+
+  buildModeButtons();
+  syncSliders();
+  updateButtons();
+  wireControls();
+  updateCode();
+</script>
+</body>
+</html>

@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Data Mapper — CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #FAF6F0;
+    --cream-dark: #F0EBE3;
+    --cream-darker: #E5DFD5;
+    --ink: #2C2A26;
+    --ink-light: #6B6760;
+    --ink-faint: #9E998F;
+    --accent: #3D5A80;
+    --accent-light: #5B7EA1;
+    --highlight: #E07A5F;
+    --highlight-light: #F2CC8F;
+    --success: #81B29A;
+    --grid-bg: #FFFFFF;
+    --code-bg: #2C2A26;
+    --code-text: #F0EBE3;
+    --code-keyword: #81B29A;
+    --code-number: #F2CC8F;
+    --code-comment: #8F8A81;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04);
+    --shadow-strong: 0 6px 24px rgba(44,42,38,.09), 0 0 0 1px rgba(0,0,0,.04);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; }
+  .header { margin-bottom: 24px; }
+
+  .stage-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(61,90,128,.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    max-width: 860px;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    background: var(--cream-dark);
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(340px, .85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 950px) { .workspace { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .panel-desc { font-size: 13px; color: var(--ink-light); }
+
+  .canvas-panel { padding: 14px; }
+
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 1.2 / 1;
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  #canvas-container canvas { display: block; }
+
+  .readout-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 680px) { .readout-row { grid-template-columns: repeat(2, 1fr); } }
+
+  .readout-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+  }
+
+  .readout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .readout-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .controls { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .control-group {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .control-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 104px;
+    resize: vertical;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink);
+    background: #fff;
+    outline: none;
+  }
+
+  textarea:focus { border-color: rgba(61,90,128,.45); box-shadow: 0 0 0 3px rgba(61,90,128,.08); }
+
+  .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .button-row.two { grid-template-columns: repeat(2, 1fr); }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  }
+
+  button:hover { transform: translateY(-1px); }
+  .primary-btn { background: var(--accent); color: #fff; }
+  .secondary-btn { background: #fff; color: var(--accent); border: 1px solid var(--cream-darker); }
+  .toggle-btn { background: #fff; color: var(--ink-light); border: 1px solid var(--cream-darker); }
+  .toggle-btn.active { background: rgba(61,90,128,.08); color: var(--accent); border-color: rgba(61,90,128,.3); }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 98px 1fr 58px;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+  }
+
+  .slider-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+  .value-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    text-align: center;
+    padding: 3px 6px;
+  }
+
+  .mini-note { font-size: 12px; color: var(--ink-light); margin-top: 8px; }
+
+  .concept-card {
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    margin-top: 8px;
+  }
+
+  .concept-card strong { color: var(--accent); }
+
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 850px) { .lesson-grid { grid-template-columns: 1fr; } }
+
+  .lesson-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+
+  .lesson-card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .lesson-card p { font-size: 14px; color: var(--ink-light); }
+
+  .code-panel {
+    margin-top: 18px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+  }
+
+  .code-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .code-toolbar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(240,235,227,.68);
+  }
+
+  .copy-btn {
+    background: rgba(255,255,255,.06);
+    color: rgba(240,235,227,.75);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .copy-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  pre {
+    margin: 0;
+    padding: 15px 18px 18px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre;
+  }
+
+  .kw { color: var(--code-keyword); }
+  .num { color: var(--code-number); }
+  .cm { color: var(--code-comment); }
+  .fn { color: #A7C7E7; }
+  .str { color: #F2CC8F; }
+  .hi { background: rgba(224,122,95,.22); border-radius: 4px; padding: 1px 2px; margin: -1px -2px; }
+
+  .footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cream-dark);
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="stage-tag">Missing Tool 10 — Data + Visual Mapping</div>
+      <h1>Data Mapper</h1>
+      <p class="subtitle">Paste a small dataset and choose what the values control. The same numbers can become height, size, color, opacity, position, rotation, or motion — and each mapping tells a different story.</p>
+      <div class="tag-row" aria-label="Concept tags">
+        <span class="tag">arrays</span>
+        <span class="tag">data visualization</span>
+        <span class="tag">map()</span>
+        <span class="tag">labels + values</span>
+        <span class="tag">visual storytelling</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Data Visualization Canvas</div>
+          <div class="panel-desc">The values are stored in arrays, then mapped to a visual property.</div>
+        </div>
+        <div class="canvas-panel">
+          <div id="canvas-container" aria-label="p5.js canvas showing mapped data visualization"></div>
+          <div class="readout-row">
+            <div class="readout-card">
+              <div class="readout-label">items</div>
+              <div class="readout-value" id="itemsReadout">5</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">range</div>
+              <div class="readout-value" id="rangeReadout">3–9</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">visual</div>
+              <div class="readout-value" id="visualReadout">bars</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">mapping</div>
+              <div class="readout-value" id="mappingReadout">height</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Map Your Data</div>
+          <div class="panel-desc">Enter data as <code>label:value</code> pairs or one pair per line.</div>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <div class="control-group-title">Dataset</div>
+            <textarea id="dataInput" spellcheck="false">Mon:4, Tue:7, Wed:3, Thu:9, Fri:6</textarea>
+            <div class="button-grid" id="sampleButtons" style="margin-top:8px"></div>
+            <p class="mini-note">Try: <code>sleep:6, focus:8, energy:5</code> or one item per line.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Visualization Type</div>
+            <div class="button-grid" id="visualButtons"></div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">What Values Control</div>
+            <div class="button-grid" id="mappingButtons"></div>
+            <p class="mini-note">Same data, different mapping: that is a design decision, not just a coding decision.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Scale + Style</div>
+            <div class="slider-row">
+              <label for="minOutSlider">out min</label>
+              <input id="minOutSlider" type="range" min="0" max="160" value="20" />
+              <span class="value-pill" id="minOutValue">20</span>
+            </div>
+            <div class="slider-row">
+              <label for="maxOutSlider">out max</label>
+              <input id="maxOutSlider" type="range" min="20" max="280" value="170" />
+              <span class="value-pill" id="maxOutValue">170</span>
+            </div>
+            <div class="slider-row">
+              <label for="spacingSlider">spacing</label>
+              <input id="spacingSlider" type="range" min="8" max="60" value="24" />
+              <span class="value-pill" id="spacingValue">24</span>
+            </div>
+            <div class="slider-row">
+              <label for="speedSlider">motion</label>
+              <input id="speedSlider" type="range" min="0" max="60" value="12" />
+              <span class="value-pill" id="speedValue">12</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">View + Actions</div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="labelsBtn" type="button">Labels On</button>
+              <button class="toggle-btn active" id="gridBtn" type="button">Grid On</button>
+            </div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="valuesBtn" type="button">Values On</button>
+              <button class="toggle-btn" id="animateBtn" type="button">Motion Off</button>
+            </div>
+            <div class="button-row">
+              <button class="secondary-btn" id="resetBtn" type="button">Reset</button>
+              <button class="secondary-btn" id="randomBtn" type="button">Randomize</button>
+              <button class="primary-btn" id="copyTopBtn" type="button">Copy Code</button>
+            </div>
+            <div class="concept-card">
+              <p><strong>Key idea:</strong> data values become visual variables. <code>map(value, minVal, maxVal, outMin, outMax)</code> translates data into drawing instructions.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="lesson-grid" aria-label="Learning prompts">
+      <div class="lesson-card">
+        <h2>Try this</h2>
+        <p>Show the same data three ways: height, color, and size. Which one makes the pattern easiest to see?</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Notice this</h2>
+        <p>The numbers do not explain themselves. Your visual mapping decides what the viewer notices first.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Remix this</h2>
+        <p>Make a data self-portrait using values from your day, week, classroom, neighborhood, or environment.</p>
+      </div>
+    </section>
+
+    <section class="code-panel" aria-label="Generated code preview">
+      <div class="code-toolbar">
+        <div class="code-toolbar-title">Starter Code Preview</div>
+        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
+      </div>
+      <pre id="codeOutput"></pre>
+    </section>
+
+    <footer class="footer">Data Mapper · CC Fest Coding Camp · p5.js learning tool</footer>
+  </div>
+
+<script>
+  const visualTypes = [
+    { id: 'bars', label: 'Bars' },
+    { id: 'circles', label: 'Circles' },
+    { id: 'radial', label: 'Radial' },
+    { id: 'line', label: 'Line' },
+    { id: 'cards', label: 'Cards' },
+    { id: 'orbit', label: 'Orbit' }
+  ];
+
+  const mappingTypes = [
+    { id: 'height', label: 'Height' },
+    { id: 'size', label: 'Size' },
+    { id: 'color', label: 'Color' },
+    { id: 'opacity', label: 'Opacity' },
+    { id: 'position', label: 'Position' },
+    { id: 'rotation', label: 'Rotation' }
+  ];
+
+  const samples = [
+    { label: 'Week', data: 'Mon:4, Tue:7, Wed:3, Thu:9, Fri:6' },
+    { label: 'Mood', data: 'calm:8, focus:6, joy:9, stress:3, energy:7' },
+    { label: 'Weather', data: 'sun:10, fog:4, rain:2, wind:6, clouds:7' },
+    { label: 'Class', data: 'ideas:9, questions:6, bugs:8, fixes:7, remixes:10' }
+  ];
+
+  const defaults = {
+    visual: 'bars',
+    mapping: 'height',
+    minOut: 20,
+    maxOut: 170,
+    spacing: 24,
+    speed: 12,
+    showLabels: true,
+    showGrid: true,
+    showValues: true,
+    animate: false
+  };
+
+  const state = { ...defaults };
+  let parsedData = [];
+
+  function setup() {
+    const holder = document.getElementById('canvas-container');
+    const canvas = createCanvas(holder.clientWidth, holder.clientHeight);
+    canvas.parent('canvas-container');
+    pixelDensity(2);
+    textFont('DM Mono');
+    parseAndUpdate();
+  }
+
+  function windowResized() {
+    const holder = document.getElementById('canvas-container');
+    resizeCanvas(holder.clientWidth, holder.clientHeight);
+  }
+
+  function draw() {
+    background(250, 246, 240);
+    if (state.showGrid) drawGrid();
+    if (parsedData.length === 0) {
+      drawEmptyState();
+      return;
+    }
+
+    if (state.visual === 'bars') drawBars();
+    if (state.visual === 'circles') drawCircles();
+    if (state.visual === 'radial') drawRadial();
+    if (state.visual === 'line') drawLineChart();
+    if (state.visual === 'cards') drawCards();
+    if (state.visual === 'orbit') drawOrbit();
+
+    updateReadouts();
+    updateCode();
+  }
+
+  function parseData(text) {
+    const normalized = text.replace(/\n/g, ',');
+    return normalized.split(',')
+      .map(item => item.trim())
+      .filter(Boolean)
+      .map((item, index) => {
+        const parts = item.split(':');
+        if (parts.length >= 2) {
+          const label = parts[0].trim() || `item ${index + 1}`;
+          const value = Number(parts.slice(1).join(':').trim());
+          return Number.isFinite(value) ? { label, value } : null;
+        }
+        const value = Number(item.trim());
+        return Number.isFinite(value) ? { label: `item ${index + 1}`, value } : null;
+      })
+      .filter(Boolean);
+  }
+
+  function parseAndUpdate() {
+    parsedData = parseData(document.getElementById('dataInput').value);
+    updateCode();
+  }
+
+  function dataStats() {
+    const values = parsedData.map(d => d.value);
+    return {
+      min: Math.min(...values),
+      max: Math.max(...values),
+      sum: values.reduce((a, b) => a + b, 0),
+      avg: values.reduce((a, b) => a + b, 0) / values.length
+    };
+  }
+
+  function mapped(value) {
+    const stats = dataStats();
+    if (stats.min === stats.max) return (state.minOut + state.maxOut) / 2;
+    return map(value, stats.min, stats.max, state.minOut, state.maxOut);
+  }
+
+  function drawGrid() {
+    stroke(229, 223, 213);
+    strokeWeight(1);
+    for (let x = 0; x <= width; x += 40) line(x, 0, x, height);
+    for (let y = 0; y <= height; y += 40) line(0, y, width, y);
+    stroke(61, 90, 128, 110);
+    strokeWeight(1.5);
+    line(0, height - 38, width, height - 38);
+  }
+
+  function drawEmptyState() {
+    noStroke();
+    fill(44, 42, 38);
+    textAlign(CENTER, CENTER);
+    textSize(15);
+    text('Enter data as label:value pairs.', width / 2, height / 2);
+  }
+
+  function colorFor(value, alpha = 220) {
+    const stats = dataStats();
+    const amt = stats.min === stats.max ? 0.5 : map(value, stats.min, stats.max, 0, 1);
+    const r = lerp(61, 224, amt);
+    const g = lerp(90, 122, amt);
+    const b = lerp(128, 95, amt);
+    return color(r, g, b, alpha);
+  }
+
+  function applyMappedStyle(d, baseAlpha = 220) {
+    const m = mapped(d.value);
+    if (state.mapping === 'color') fill(colorFor(d.value, baseAlpha));
+    else if (state.mapping === 'opacity') fill(61, 90, 128, constrain(m, 20, 255));
+    else fill(61, 90, 128, baseAlpha);
+    stroke(44, 42, 38, 45);
+    strokeWeight(1);
+  }
+
+  function drawBars() {
+    const margin = 42;
+    const bottom = height - 38;
+    const available = width - margin * 2;
+    const barW = max(12, (available - state.spacing * (parsedData.length - 1)) / parsedData.length);
+
+    parsedData.forEach((d, i) => {
+      const x = margin + i * (barW + state.spacing);
+      const mappedValue = mapped(d.value);
+      const h = state.mapping === 'height' ? mappedValue : map(d.value, dataStats().min, dataStats().max, 30, height - 88);
+      const yOffset = state.mapping === 'position' ? map(mappedValue, state.minOut, state.maxOut, 40, -40) : 0;
+      const rotation = state.mapping === 'rotation' ? radians(map(mappedValue, state.minOut, state.maxOut, -35, 35)) : 0;
+
+      push();
+      translate(x + barW / 2, bottom + yOffset);
+      rotate(rotation);
+      applyMappedStyle(d);
+      rectMode(CENTER);
+      rect(0, -h / 2, barW, h, 8, 8, 2, 2);
+      pop();
+
+      drawLabelAndValue(d, x + barW / 2, bottom + 16, x + barW / 2, bottom - h - 12);
+    });
+  }
+
+  function drawCircles() {
+    const margin = 50;
+    const available = width - margin * 2;
+    const step = parsedData.length <= 1 ? 0 : available / (parsedData.length - 1);
+    const baseY = height * 0.5;
+
+    parsedData.forEach((d, i) => {
+      const m = mapped(d.value);
+      const size = state.mapping === 'size' ? m : 62;
+      const y = state.mapping === 'position' ? map(m, state.minOut, state.maxOut, height - 70, 70) : baseY;
+      const rot = state.mapping === 'rotation' ? radians(m) : 0;
+      const x = parsedData.length === 1 ? width / 2 : margin + i * step;
+
+      push();
+      translate(x, y);
+      rotate(rot + (state.animate ? frameCount * 0.01 : 0));
+      applyMappedStyle(d);
+      circle(0, 0, size);
+      noStroke();
+      fill(242, 204, 143, 180);
+      circle(size * 0.16, 0, size * 0.28);
+      pop();
+
+      drawLabelAndValue(d, x, height - 22, x, y - size / 2 - 12);
+    });
+  }
+
+  function drawRadial() {
+    const cx = width / 2;
+    const cy = height / 2;
+    const baseRadius = min(width, height) * 0.22;
+
+    noFill();
+    stroke(229, 223, 213);
+    circle(cx, cy, baseRadius * 2);
+
+    parsedData.forEach((d, i) => {
+      const angle = TWO_PI / parsedData.length * i - HALF_PI + (state.animate ? frameCount * 0.004 : 0);
+      const m = mapped(d.value);
+      const radius = state.mapping === 'position' || state.mapping === 'height' ? baseRadius + m * 0.45 : baseRadius;
+      const size = state.mapping === 'size' ? m : 38;
+      const x = cx + cos(angle) * radius;
+      const y = cy + sin(angle) * radius;
+
+      stroke(44, 42, 38, 45);
+      line(cx, cy, x, y);
+      applyMappedStyle(d);
+      circle(x, y, size);
+
+      if (state.mapping === 'rotation') {
+        push();
+        translate(x, y);
+        rotate(radians(m));
+        stroke(224, 122, 95);
+        strokeWeight(3);
+        line(-18, 0, 18, 0);
+        pop();
+      }
+
+      drawLabelAndValue(d, x, y + size / 2 + 13, x, y - size / 2 - 12);
+    });
+  }
+
+  function drawLineChart() {
+    const margin = 46;
+    const top = 50;
+    const bottom = height - 52;
+    const available = width - margin * 2;
+    const stats = dataStats();
+    const points = parsedData.map((d, i) => {
+      const x = parsedData.length === 1 ? width / 2 : margin + i * available / (parsedData.length - 1);
+      const y = map(d.value, stats.min, stats.max, bottom, top);
+      return { ...d, x, y };
+    });
+
+    noFill();
+    stroke(61, 90, 128);
+    strokeWeight(3);
+    beginShape();
+    points.forEach(p => vertex(p.x, p.y));
+    endShape();
+
+    points.forEach(p => {
+      const m = mapped(p.value);
+      const size = state.mapping === 'size' ? m : 24;
+      const y = state.mapping === 'position' ? map(m, state.minOut, state.maxOut, bottom, top) : p.y;
+      applyMappedStyle(p);
+      circle(p.x, y, size);
+      drawLabelAndValue(p, p.x, height - 22, p.x, y - size / 2 - 12);
+    });
+  }
+
+  function drawCards() {
+    const cols = ceil(sqrt(parsedData.length));
+    const rows = ceil(parsedData.length / cols);
+    const gap = state.spacing * 0.55;
+    const cardW = (width - 60 - gap * (cols - 1)) / cols;
+    const cardH = (height - 70 - gap * (rows - 1)) / rows;
+
+    parsedData.forEach((d, i) => {
+      const col = i % cols;
+      const row = floor(i / cols);
+      const x = 30 + col * (cardW + gap);
+      const y = 35 + row * (cardH + gap);
+      const m = mapped(d.value);
+      const pad = state.mapping === 'size' ? map(m, state.minOut, state.maxOut, 0, 18) : 0;
+
+      push();
+      translate(x + cardW / 2, y + cardH / 2);
+      if (state.mapping === 'rotation') rotate(radians(map(m, state.minOut, state.maxOut, -12, 12)));
+      applyMappedStyle(d, state.mapping === 'opacity' ? constrain(m, 30, 255) : 210);
+      rectMode(CENTER);
+      rect(0, 0, cardW - pad, cardH - pad, 14);
+      noStroke();
+      fill(250, 246, 240);
+      textAlign(CENTER, CENTER);
+      textSize(13);
+      text(d.label, 0, -8);
+      textSize(18);
+      text(d.value, 0, 18);
+      pop();
+    });
+  }
+
+  function drawOrbit() {
+    const cx = width / 2;
+    const cy = height / 2;
+    noStroke();
+    fill(242, 204, 143, 200);
+    circle(cx, cy, 52);
+
+    parsedData.forEach((d, i) => {
+      const m = mapped(d.value);
+      const radius = state.mapping === 'position' ? map(m, state.minOut, state.maxOut, 55, 150) : 105;
+      const angle = TWO_PI / parsedData.length * i + (state.animate ? frameCount * 0.008 * (1 + i * 0.08) : 0);
+      const x = cx + cos(angle) * radius;
+      const y = cy + sin(angle) * radius;
+      const size = state.mapping === 'size' ? m : 30;
+      stroke(44, 42, 38, 38);
+      line(cx, cy, x, y);
+      applyMappedStyle(d);
+      circle(x, y, size);
+      drawLabelAndValue(d, x, y + size / 2 + 12, x, y - size / 2 - 12);
+    });
+  }
+
+  function drawLabelAndValue(d, labelX, labelY, valueX, valueY) {
+    textFont('DM Mono');
+    textAlign(CENTER, CENTER);
+    noStroke();
+    if (state.showLabels) {
+      fill(44, 42, 38);
+      textSize(11);
+      text(d.label, labelX, labelY);
+    }
+    if (state.showValues) {
+      fill(224, 122, 95);
+      textSize(11);
+      text(d.value, valueX, valueY);
+    }
+  }
+
+  function updateReadouts() {
+    if (parsedData.length === 0) return;
+    const stats = dataStats();
+    document.getElementById('itemsReadout').textContent = parsedData.length;
+    document.getElementById('rangeReadout').textContent = `${stats.min}–${stats.max}`;
+    document.getElementById('visualReadout').textContent = state.visual;
+    document.getElementById('mappingReadout').textContent = state.mapping;
+  }
+
+  function buildButtons() {
+    const visualWrap = document.getElementById('visualButtons');
+    visualWrap.innerHTML = '';
+    visualTypes.forEach(type => {
+      const btn = document.createElement('button');
+      btn.className = 'toggle-btn' + (state.visual === type.id ? ' active' : '');
+      btn.type = 'button';
+      btn.textContent = type.label;
+      btn.addEventListener('click', () => {
+        state.visual = type.id;
+        buildButtons();
+        updateCode();
+      });
+      visualWrap.appendChild(btn);
+    });
+
+    const mappingWrap = document.getElementById('mappingButtons');
+    mappingWrap.innerHTML = '';
+    mappingTypes.forEach(type => {
+      const btn = document.createElement('button');
+      btn.className = 'toggle-btn' + (state.mapping === type.id ? ' active' : '');
+      btn.type = 'button';
+      btn.textContent = type.label;
+      btn.addEventListener('click', () => {
+        state.mapping = type.id;
+        buildButtons();
+        updateCode();
+      });
+      mappingWrap.appendChild(btn);
+    });
+
+    const sampleWrap = document.getElementById('sampleButtons');
+    sampleWrap.innerHTML = '';
+    samples.forEach(sample => {
+      const btn = document.createElement('button');
+      btn.className = 'secondary-btn';
+      btn.type = 'button';
+      btn.textContent = sample.label;
+      btn.addEventListener('click', () => {
+        document.getElementById('dataInput').value = sample.data;
+        parseAndUpdate();
+      });
+      sampleWrap.appendChild(btn);
+    });
+  }
+
+  function syncSliders() {
+    const values = {
+      minOut: state.minOut,
+      maxOut: state.maxOut,
+      spacing: state.spacing,
+      speed: state.speed
+    };
+    Object.entries(values).forEach(([key, value]) => {
+      document.getElementById(`${key}Slider`).value = value;
+      document.getElementById(`${key}Value`).textContent = value;
+    });
+  }
+
+  function updateButtons() {
+    const labelsBtn = document.getElementById('labelsBtn');
+    labelsBtn.textContent = state.showLabels ? 'Labels On' : 'Labels Off';
+    labelsBtn.classList.toggle('active', state.showLabels);
+
+    const gridBtn = document.getElementById('gridBtn');
+    gridBtn.textContent = state.showGrid ? 'Grid On' : 'Grid Off';
+    gridBtn.classList.toggle('active', state.showGrid);
+
+    const valuesBtn = document.getElementById('valuesBtn');
+    valuesBtn.textContent = state.showValues ? 'Values On' : 'Values Off';
+    valuesBtn.classList.toggle('active', state.showValues);
+
+    const animateBtn = document.getElementById('animateBtn');
+    animateBtn.textContent = state.animate ? 'Motion On' : 'Motion Off';
+    animateBtn.classList.toggle('active', state.animate);
+  }
+
+  function dataArrayCode() {
+    return parsedData.map(d => `{ label: "${d.label.replace(/"/g, '\\"')}", value: ${d.value} }`).join(',\n  ');
+  }
+
+  function updateCode() {
+    const stats = parsedData.length ? dataStats() : { min: 0, max: 1 };
+    const lines = [];
+    lines.push(`<span class="cm">// Data Mapper starter code</span>`);
+    lines.push(`<span class="kw">let</span> data = [`);
+    lines.push(`  ${dataArrayCode()}`);
+    lines.push(`];`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">setup</span>() {`);
+    lines.push(`  <span class="fn">createCanvas</span>(<span class="num">400</span>, <span class="num">300</span>);`);
+    lines.push(`  textAlign(CENTER, CENTER);`);
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">draw</span>() {`);
+    lines.push(`  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>);`);
+    lines.push(`  <span class="kw">let</span> minVal = <span class="num">${stats.min}</span>;`);
+    lines.push(`  <span class="kw">let</span> maxVal = <span class="num">${stats.max}</span>;`);
+    lines.push('');
+
+    if (state.visual === 'bars') {
+      lines.push(`  <span class="kw">let</span> barWidth = width / data.length;`);
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < data.length; i++) {`);
+      lines.push(`    <span class="kw">let</span> value = data[i].value;`);
+      lines.push(`    <span class="kw">let</span> h = <span class="hi"><span class="fn">map</span>(value, minVal, maxVal, <span class="num">${state.minOut}</span>, <span class="num">${state.maxOut}</span>)</span>;`);
+      lines.push(`    <span class="fn">fill</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>);`);
+      lines.push(`    <span class="fn">rect</span>(i * barWidth + <span class="num">10</span>, height - h - <span class="num">30</span>, barWidth - <span class="num">20</span>, h);`);
+      lines.push(`    <span class="fn">text</span>(data[i].label, i * barWidth + barWidth / <span class="num">2</span>, height - <span class="num">12</span>);`);
+      lines.push(`  }`);
+    } else if (state.visual === 'circles') {
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < data.length; i++) {`);
+      lines.push(`    <span class="kw">let</span> x = <span class="fn">map</span>(i, <span class="num">0</span>, data.length - <span class="num">1</span>, <span class="num">50</span>, width - <span class="num">50</span>);`);
+      lines.push(`    <span class="kw">let</span> size = <span class="hi"><span class="fn">map</span>(data[i].value, minVal, maxVal, <span class="num">${state.minOut}</span>, <span class="num">${state.maxOut}</span>)</span>;`);
+      lines.push(`    <span class="fn">circle</span>(x, height / <span class="num">2</span>, size);`);
+      lines.push(`  }`);
+    } else if (state.visual === 'radial') {
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < data.length; i++) {`);
+      lines.push(`    <span class="kw">let</span> angle = TWO_PI / data.length * i - HALF_PI;`);
+      lines.push(`    <span class="kw">let</span> radius = <span class="hi"><span class="fn">map</span>(data[i].value, minVal, maxVal, <span class="num">${state.minOut}</span>, <span class="num">${state.maxOut}</span>)</span>;`);
+      lines.push(`    <span class="kw">let</span> x = width / <span class="num">2</span> + <span class="fn">cos</span>(angle) * radius;`);
+      lines.push(`    <span class="kw">let</span> y = height / <span class="num">2</span> + <span class="fn">sin</span>(angle) * radius;`);
+      lines.push(`    <span class="fn">circle</span>(x, y, <span class="num">28</span>);`);
+      lines.push(`  }`);
+    } else {
+      lines.push(`  <span class="cm">// Try changing this drawing code for your own data story.</span>`);
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < data.length; i++) {`);
+      lines.push(`    <span class="kw">let</span> mappedValue = <span class="hi"><span class="fn">map</span>(data[i].value, minVal, maxVal, <span class="num">${state.minOut}</span>, <span class="num">${state.maxOut}</span>)</span>;`);
+      lines.push(`    <span class="fn">circle</span>(<span class="num">60</span> + i * <span class="num">60</span>, height / <span class="num">2</span>, mappedValue);`);
+      lines.push(`  }`);
+    }
+
+    lines.push(`}`);
+    document.getElementById('codeOutput').innerHTML = lines.join('\n');
+  }
+
+  function plainCode() {
+    const stats = parsedData.length ? dataStats() : { min: 0, max: 1 };
+    const lines = [];
+    lines.push('// Data Mapper starter code');
+    lines.push('let data = [');
+    lines.push('  ' + dataArrayCode());
+    lines.push('];');
+    lines.push('');
+    lines.push('function setup() {');
+    lines.push('  createCanvas(400, 300);');
+    lines.push('  textAlign(CENTER, CENTER);');
+    lines.push('}');
+    lines.push('');
+    lines.push('function draw() {');
+    lines.push('  background(250, 246, 240);');
+    lines.push(`  let minVal = ${stats.min};`);
+    lines.push(`  let maxVal = ${stats.max};`);
+    lines.push('');
+
+    if (state.visual === 'bars') {
+      lines.push('  let barWidth = width / data.length;');
+      lines.push('  for (let i = 0; i < data.length; i++) {');
+      lines.push('    let value = data[i].value;');
+      lines.push(`    let h = map(value, minVal, maxVal, ${state.minOut}, ${state.maxOut});`);
+      lines.push('    fill(61, 90, 128);');
+      lines.push('    rect(i * barWidth + 10, height - h - 30, barWidth - 20, h);');
+      lines.push('    text(data[i].label, i * barWidth + barWidth / 2, height - 12);');
+      lines.push('  }');
+    } else if (state.visual === 'circles') {
+      lines.push('  for (let i = 0; i < data.length; i++) {');
+      lines.push('    let x = map(i, 0, data.length - 1, 50, width - 50);');
+      lines.push(`    let size = map(data[i].value, minVal, maxVal, ${state.minOut}, ${state.maxOut});`);
+      lines.push('    circle(x, height / 2, size);');
+      lines.push('  }');
+    } else if (state.visual === 'radial') {
+      lines.push('  for (let i = 0; i < data.length; i++) {');
+      lines.push('    let angle = TWO_PI / data.length * i - HALF_PI;');
+      lines.push(`    let radius = map(data[i].value, minVal, maxVal, ${state.minOut}, ${state.maxOut});`);
+      lines.push('    let x = width / 2 + cos(angle) * radius;');
+      lines.push('    let y = height / 2 + sin(angle) * radius;');
+      lines.push('    circle(x, y, 28);');
+      lines.push('  }');
+    } else {
+      lines.push('  // Try changing this drawing code for your own data story.');
+      lines.push('  for (let i = 0; i < data.length; i++) {');
+      lines.push(`    let mappedValue = map(data[i].value, minVal, maxVal, ${state.minOut}, ${state.maxOut});`);
+      lines.push('    circle(60 + i * 60, height / 2, mappedValue);');
+      lines.push('  }');
+    }
+    lines.push('}');
+    return lines.join('\n');
+  }
+
+  function copyCode(button) {
+    navigator.clipboard.writeText(plainCode()).then(() => {
+      const old = button.textContent;
+      button.textContent = 'Copied!';
+      setTimeout(() => { button.textContent = old; }, 1400);
+    }).catch(() => window.prompt('Copy this code:', plainCode()));
+  }
+
+  function randomizeData() {
+    const labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+    const count = Math.floor(Math.random() * 4) + 4;
+    const values = labels.slice(0, count).map(label => `${label}:${Math.floor(Math.random() * 10) + 1}`);
+    document.getElementById('dataInput').value = values.join(', ');
+    parseAndUpdate();
+  }
+
+  function wireControls() {
+    document.getElementById('dataInput').addEventListener('input', parseAndUpdate);
+
+    const sliderMap = {
+      minOutSlider: 'minOut',
+      maxOutSlider: 'maxOut',
+      spacingSlider: 'spacing',
+      speedSlider: 'speed'
+    };
+
+    Object.entries(sliderMap).forEach(([id, key]) => {
+      document.getElementById(id).addEventListener('input', e => {
+        state[key] = Number(e.target.value);
+        syncSliders();
+        updateCode();
+      });
+    });
+
+    document.getElementById('labelsBtn').addEventListener('click', () => {
+      state.showLabels = !state.showLabels;
+      updateButtons();
+    });
+
+    document.getElementById('gridBtn').addEventListener('click', () => {
+      state.showGrid = !state.showGrid;
+      updateButtons();
+    });
+
+    document.getElementById('valuesBtn').addEventListener('click', () => {
+      state.showValues = !state.showValues;
+      updateButtons();
+    });
+
+    document.getElementById('animateBtn').addEventListener('click', () => {
+      state.animate = !state.animate;
+      updateButtons();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      Object.assign(state, defaults);
+      document.getElementById('dataInput').value = samples[0].data;
+      syncSliders();
+      buildButtons();
+      updateButtons();
+      parseAndUpdate();
+    });
+
+    document.getElementById('randomBtn').addEventListener('click', randomizeData);
+    document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
+    document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
+  }
+
+  buildButtons();
+  syncSliders();
+  updateButtons();
+  wireControls();
+</script>
+</body>
+</html>

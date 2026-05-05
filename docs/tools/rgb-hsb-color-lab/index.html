@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RGB / HSB Color Lab — CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #FAF6F0;
+    --cream-dark: #F0EBE3;
+    --cream-darker: #E5DFD5;
+    --ink: #2C2A26;
+    --ink-light: #6B6760;
+    --ink-faint: #9E998F;
+    --accent: #3D5A80;
+    --accent-light: #5B7EA1;
+    --highlight: #E07A5F;
+    --highlight-light: #F2CC8F;
+    --success: #81B29A;
+    --grid-bg: #FFFFFF;
+    --code-bg: #2C2A26;
+    --code-text: #F0EBE3;
+    --code-keyword: #81B29A;
+    --code-number: #F2CC8F;
+    --code-comment: #8F8A81;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04);
+    --shadow-strong: 0 6px 24px rgba(44,42,38,.09), 0 0 0 1px rgba(0,0,0,.04);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; }
+  .header { margin-bottom: 24px; }
+
+  .stage-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(61,90,128,.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    max-width: 830px;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    background: var(--cream-dark);
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(340px, .85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 950px) { .workspace { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .panel-desc { font-size: 13px; color: var(--ink-light); }
+
+  .canvas-panel { padding: 14px; }
+
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 1.2 / 1;
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  #canvas-container canvas { display: block; }
+
+  .readout-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 680px) { .readout-row { grid-template-columns: repeat(2, 1fr); } }
+
+  .readout-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+  }
+
+  .readout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .readout-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .controls { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .control-group {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .control-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+
+  .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .button-row.two { grid-template-columns: repeat(2, 1fr); }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  }
+
+  button:hover { transform: translateY(-1px); }
+  .primary-btn { background: var(--accent); color: #fff; }
+  .secondary-btn { background: #fff; color: var(--accent); border: 1px solid var(--cream-darker); }
+  .toggle-btn { background: #fff; color: var(--ink-light); border: 1px solid var(--cream-darker); }
+  .toggle-btn.active { background: rgba(61,90,128,.08); color: var(--accent); border-color: rgba(61,90,128,.3); }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 92px 1fr 58px;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+  }
+
+  .slider-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+  .value-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    text-align: center;
+    padding: 3px 6px;
+  }
+
+  .swatch-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 7px;
+    margin-top: 8px;
+  }
+
+  .swatch {
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid rgba(44,42,38,.12);
+  }
+
+  .mini-note { font-size: 12px; color: var(--ink-light); margin-top: 8px; }
+
+  .concept-card {
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    margin-top: 8px;
+  }
+
+  .concept-card strong { color: var(--accent); }
+
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 850px) { .lesson-grid { grid-template-columns: 1fr; } }
+
+  .lesson-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+
+  .lesson-card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .lesson-card p { font-size: 14px; color: var(--ink-light); }
+
+  .code-panel {
+    margin-top: 18px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+  }
+
+  .code-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .code-toolbar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(240,235,227,.68);
+  }
+
+  .copy-btn {
+    background: rgba(255,255,255,.06);
+    color: rgba(240,235,227,.75);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .copy-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  pre {
+    margin: 0;
+    padding: 15px 18px 18px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre;
+  }
+
+  .kw { color: var(--code-keyword); }
+  .num { color: var(--code-number); }
+  .cm { color: var(--code-comment); }
+  .fn { color: #A7C7E7; }
+  .str { color: #F2CC8F; }
+  .hi { background: rgba(224,122,95,.22); border-radius: 4px; padding: 1px 2px; margin: -1px -2px; }
+
+  .footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cream-dark);
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="stage-tag">Missing Tool 7 — Color Systems</div>
+      <h1>RGB / HSB Color Lab</h1>
+      <p class="subtitle">Compare two ways of thinking about color in p5.js. <strong>RGB</strong> mixes red, green, and blue light. <strong>HSB</strong> lets you work with hue, saturation, and brightness — often a more intuitive system for palettes, moods, gradients, and generative art.</p>
+      <div class="tag-row" aria-label="Concept tags">
+        <span class="tag">RGB</span>
+        <span class="tag">HSB</span>
+        <span class="tag">colorMode()</span>
+        <span class="tag">fill()</span>
+        <span class="tag">palettes</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Color Preview</div>
+          <div class="panel-desc">Use the sliders to build colors, compare RGB and HSB thinking, and generate p5.js color code.</div>
+        </div>
+        <div class="canvas-panel">
+          <div id="canvas-container" aria-label="p5.js canvas showing RGB and HSB color preview"></div>
+          <div class="readout-row">
+            <div class="readout-card">
+              <div class="readout-label">mode</div>
+              <div class="readout-value" id="modeReadout">HSB</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">RGB</div>
+              <div class="readout-value" id="rgbReadout">224, 122, 95</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">HSB</div>
+              <div class="readout-value" id="hsbReadout">12, 58, 88</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">hex</div>
+              <div class="readout-value" id="hexReadout">#E07A5F</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Color Controls</div>
+          <div class="panel-desc">Switch modes or sync them to see equivalent values.</div>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <div class="control-group-title">Mode</div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn" id="rgbModeBtn" type="button">RGB Mode</button>
+              <button class="toggle-btn active" id="hsbModeBtn" type="button">HSB Mode</button>
+            </div>
+            <div class="button-row two">
+              <button class="toggle-btn active" id="syncBtn" type="button">Sync Modes</button>
+              <button class="toggle-btn active" id="paletteBtn" type="button">Palette On</button>
+            </div>
+            <p class="mini-note">Sync keeps the RGB and HSB sliders describing the same current color.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">RGB: Red + Green + Blue</div>
+            <div class="slider-row">
+              <label for="redSlider">red</label>
+              <input id="redSlider" type="range" min="0" max="255" value="224" />
+              <span class="value-pill" id="redValue">224</span>
+            </div>
+            <div class="slider-row">
+              <label for="greenSlider">green</label>
+              <input id="greenSlider" type="range" min="0" max="255" value="122" />
+              <span class="value-pill" id="greenValue">122</span>
+            </div>
+            <div class="slider-row">
+              <label for="blueSlider">blue</label>
+              <input id="blueSlider" type="range" min="0" max="255" value="95" />
+              <span class="value-pill" id="blueValue">95</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">HSB: Hue + Saturation + Brightness</div>
+            <div class="slider-row">
+              <label for="hueSlider">hue</label>
+              <input id="hueSlider" type="range" min="0" max="360" value="12" />
+              <span class="value-pill" id="hueValue">12</span>
+            </div>
+            <div class="slider-row">
+              <label for="satSlider">saturation</label>
+              <input id="satSlider" type="range" min="0" max="100" value="58" />
+              <span class="value-pill" id="satValue">58</span>
+            </div>
+            <div class="slider-row">
+              <label for="brightSlider">brightness</label>
+              <input id="brightSlider" type="range" min="0" max="100" value="88" />
+              <span class="value-pill" id="brightValue">88</span>
+            </div>
+            <div class="slider-row">
+              <label for="alphaSlider">alpha</label>
+              <input id="alphaSlider" type="range" min="0" max="255" value="230" />
+              <span class="value-pill" id="alphaValue">230</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Palette + Actions</div>
+            <div class="button-grid" id="presetButtons" style="margin-bottom:8px"></div>
+            <div class="swatch-row" id="swatchRow" aria-label="Generated palette swatches"></div>
+            <div class="button-row" style="margin-top:10px">
+              <button class="secondary-btn" id="resetBtn" type="button">Reset</button>
+              <button class="secondary-btn" id="randomBtn" type="button">Randomize</button>
+              <button class="primary-btn" id="copyTopBtn" type="button">Copy Code</button>
+            </div>
+            <div class="concept-card">
+              <p><strong>RGB</strong> asks: how much red, green, and blue light? <strong>HSB</strong> asks: what color family, how intense, and how bright?</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="lesson-grid" aria-label="Learning prompts">
+      <div class="lesson-card">
+        <h2>Try this</h2>
+        <p>Make a bright red in RGB, then switch to HSB and change only the hue to create a full color family.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Notice this</h2>
+        <p>In HSB, changing hue can keep a similar brightness and saturation. That makes palettes easier to design.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Remix this</h2>
+        <p>Create a palette for a mood: calm, electric, underwater, sunset, forest, glitch, candy, or storm.</p>
+      </div>
+    </section>
+
+    <section class="code-panel" aria-label="Generated code preview">
+      <div class="code-toolbar">
+        <div class="code-toolbar-title">Starter Code Preview</div>
+        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
+      </div>
+      <pre id="codeOutput"></pre>
+    </section>
+
+    <footer class="footer">RGB / HSB Color Lab · CC Fest Coding Camp · p5.js learning tool</footer>
+  </div>
+
+<script>
+  const defaults = {
+    mode: 'HSB',
+    sync: true,
+    showPalette: true,
+    r: 224,
+    g: 122,
+    b: 95,
+    h: 12,
+    s: 58,
+    br: 88,
+    a: 230
+  };
+
+  const state = { ...defaults };
+
+  const presets = [
+    { name: 'Sunset', h: 12, s: 58, br: 88 },
+    { name: 'Ocean', h: 205, s: 62, br: 78 },
+    { name: 'Forest', h: 135, s: 48, br: 58 },
+    { name: 'Neon', h: 292, s: 86, br: 96 }
+  ];
+
+  function setup() {
+    const holder = document.getElementById('canvas-container');
+    const canvas = createCanvas(holder.clientWidth, holder.clientHeight);
+    canvas.parent('canvas-container');
+    pixelDensity(2);
+    textFont('DM Mono');
+    noLoop();
+  }
+
+  function windowResized() {
+    const holder = document.getElementById('canvas-container');
+    resizeCanvas(holder.clientWidth, holder.clientHeight);
+    redraw();
+  }
+
+  function draw() {
+    background(250, 246, 240);
+    drawPreview();
+    updateReadouts();
+    updateSwatches();
+    updateCode();
+  }
+
+  function drawPreview() {
+    const rgbColor = color(state.r, state.g, state.b, state.a);
+    const fullColor = color(state.r, state.g, state.b);
+
+    noStroke();
+    fill(255);
+    rect(16, 16, width - 32, height - 32, 14);
+
+    const mainX = width * 0.3;
+    const mainY = height * 0.42;
+    const mainD = min(width, height) * 0.36;
+
+    noStroke();
+    fill(rgbColor);
+    circle(mainX, mainY, mainD);
+
+    fill(44, 42, 38);
+    textSize(12);
+    textAlign(CENTER, CENTER);
+    text('current color', mainX, mainY + mainD * 0.62);
+
+    drawHueStrip(width * 0.55, height * 0.18, width * 0.34, 22);
+    drawSaturationStrip(width * 0.55, height * 0.34, width * 0.34, 22);
+    drawBrightnessStrip(width * 0.55, height * 0.50, width * 0.34, 22);
+
+    if (state.showPalette) drawPalettePreview(width * 0.55, height * 0.68, width * 0.34, 36);
+
+    fill(44, 42, 38);
+    textAlign(LEFT, CENTER);
+    textSize(11);
+    text('hue', width * 0.55, height * 0.18 - 12);
+    text('saturation', width * 0.55, height * 0.34 - 12);
+    text('brightness', width * 0.55, height * 0.50 - 12);
+    if (state.showPalette) text('palette from hue shifts', width * 0.55, height * 0.68 - 12);
+
+    const hx = map(state.h, 0, 360, width * 0.55, width * 0.89);
+    const sx = map(state.s, 0, 100, width * 0.55, width * 0.89);
+    const bx = map(state.br, 0, 100, width * 0.55, width * 0.89);
+    drawMarker(hx, height * 0.18 + 11);
+    drawMarker(sx, height * 0.34 + 11);
+    drawMarker(bx, height * 0.50 + 11);
+  }
+
+  function drawHueStrip(x, y, w, h) {
+    colorMode(HSB, 360, 100, 100, 255);
+    for (let i = 0; i < w; i++) {
+      const hue = map(i, 0, w, 0, 360);
+      stroke(hue, state.s, state.br);
+      line(x + i, y, x + i, y + h);
+    }
+    colorMode(RGB, 255);
+    noFill();
+    stroke(44, 42, 38, 55);
+    rect(x, y, w, h, 6);
+  }
+
+  function drawSaturationStrip(x, y, w, h) {
+    colorMode(HSB, 360, 100, 100, 255);
+    for (let i = 0; i < w; i++) {
+      const sat = map(i, 0, w, 0, 100);
+      stroke(state.h, sat, state.br);
+      line(x + i, y, x + i, y + h);
+    }
+    colorMode(RGB, 255);
+    noFill();
+    stroke(44, 42, 38, 55);
+    rect(x, y, w, h, 6);
+  }
+
+  function drawBrightnessStrip(x, y, w, h) {
+    colorMode(HSB, 360, 100, 100, 255);
+    for (let i = 0; i < w; i++) {
+      const bright = map(i, 0, w, 0, 100);
+      stroke(state.h, state.s, bright);
+      line(x + i, y, x + i, y + h);
+    }
+    colorMode(RGB, 255);
+    noFill();
+    stroke(44, 42, 38, 55);
+    rect(x, y, w, h, 6);
+  }
+
+  function drawPalettePreview(x, y, w, h) {
+    const sw = w / 5;
+    colorMode(HSB, 360, 100, 100, 255);
+    for (let i = 0; i < 5; i++) {
+      const hue = (state.h + i * 28 - 56 + 360) % 360;
+      noStroke();
+      fill(hue, state.s, state.br, state.a);
+      rect(x + i * sw, y, sw + 1, h, i === 0 ? 8 : 0, i === 4 ? 8 : 0, i === 4 ? 8 : 0, i === 0 ? 8 : 0);
+    }
+    colorMode(RGB, 255);
+  }
+
+  function drawMarker(x, y) {
+    noStroke();
+    fill(44, 42, 38);
+    circle(x, y, 9);
+    fill(255);
+    circle(x, y, 4);
+  }
+
+  function hsbToRgb(h, s, br) {
+    colorMode(HSB, 360, 100, 100, 255);
+    const c = color(h, s, br);
+    const rgb = { r: Math.round(red(c)), g: Math.round(green(c)), b: Math.round(blue(c)) };
+    colorMode(RGB, 255);
+    return rgb;
+  }
+
+  function rgbToHsb(r, g, b) {
+    colorMode(RGB, 255);
+    const c = color(r, g, b);
+    colorMode(HSB, 360, 100, 100, 255);
+    const hsb = { h: Math.round(hue(c)), s: Math.round(saturation(c)), br: Math.round(brightness(c)) };
+    colorMode(RGB, 255);
+    return hsb;
+  }
+
+  function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0').toUpperCase()).join('');
+  }
+
+  function syncFromHSB() {
+    const rgb = hsbToRgb(state.h, state.s, state.br);
+    state.r = rgb.r;
+    state.g = rgb.g;
+    state.b = rgb.b;
+  }
+
+  function syncFromRGB() {
+    const hsb = rgbToHsb(state.r, state.g, state.b);
+    state.h = hsb.h;
+    state.s = hsb.s;
+    state.br = hsb.br;
+  }
+
+  function updateReadouts() {
+    document.getElementById('modeReadout').textContent = state.mode;
+    document.getElementById('rgbReadout').textContent = `${state.r}, ${state.g}, ${state.b}`;
+    document.getElementById('hsbReadout').textContent = `${state.h}, ${state.s}, ${state.br}`;
+    document.getElementById('hexReadout').textContent = rgbToHex(state.r, state.g, state.b);
+  }
+
+  function updateSwatches() {
+    const row = document.getElementById('swatchRow');
+    row.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+      const hueVal = (state.h + i * 28 - 56 + 360) % 360;
+      const rgb = hsbToRgb(hueVal, state.s, state.br);
+      const swatch = document.createElement('div');
+      swatch.className = 'swatch';
+      swatch.style.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${state.a / 255})`;
+      swatch.title = `HSB(${hueVal}, ${state.s}, ${state.br})`;
+      row.appendChild(swatch);
+    }
+  }
+
+  function syncSliders() {
+    const values = {
+      red: state.r,
+      green: state.g,
+      blue: state.b,
+      hue: state.h,
+      sat: state.s,
+      bright: state.br,
+      alpha: state.a
+    };
+    Object.entries(values).forEach(([key, value]) => {
+      const slider = document.getElementById(`${key}Slider`);
+      const label = document.getElementById(`${key}Value`);
+      if (slider) slider.value = value;
+      if (label) label.textContent = value;
+    });
+  }
+
+  function updateButtons() {
+    document.getElementById('rgbModeBtn').classList.toggle('active', state.mode === 'RGB');
+    document.getElementById('hsbModeBtn').classList.toggle('active', state.mode === 'HSB');
+
+    const syncBtn = document.getElementById('syncBtn');
+    syncBtn.textContent = state.sync ? 'Sync Modes' : 'Unsynced';
+    syncBtn.classList.toggle('active', state.sync);
+
+    const paletteBtn = document.getElementById('paletteBtn');
+    paletteBtn.textContent = state.showPalette ? 'Palette On' : 'Palette Off';
+    paletteBtn.classList.toggle('active', state.showPalette);
+  }
+
+  function buildPresetButtons() {
+    const wrap = document.getElementById('presetButtons');
+    wrap.innerHTML = '';
+    presets.forEach(preset => {
+      const btn = document.createElement('button');
+      btn.className = 'toggle-btn';
+      btn.type = 'button';
+      btn.textContent = preset.name;
+      btn.addEventListener('click', () => {
+        state.mode = 'HSB';
+        state.h = preset.h;
+        state.s = preset.s;
+        state.br = preset.br;
+        syncFromHSB();
+        syncSliders();
+        updateButtons();
+        redraw();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  function updateCode() {
+    const lines = [];
+    lines.push(`<span class="cm">// RGB / HSB Color Lab starter code</span>`);
+    lines.push(`<span class="kw">function</span> <span class="fn">setup</span>() {`);
+    lines.push(`  <span class="fn">createCanvas</span>(<span class="num">400</span>, <span class="num">300</span>);`);
+    if (state.mode === 'HSB') lines.push(`  <span class="hi"><span class="fn">colorMode</span>(HSB, <span class="num">360</span>, <span class="num">100</span>, <span class="num">100</span>, <span class="num">255</span>);</span>`);
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">draw</span>() {`);
+    lines.push(`  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>);`);
+    lines.push(`  <span class="fn">noStroke</span>();`);
+    if (state.mode === 'RGB') {
+      lines.push(`  <span class="cm">// RGB means red, green, blue, alpha.</span>`);
+      lines.push(`  <span class="hi"><span class="fn">fill</span>(<span class="num">${state.r}</span>, <span class="num">${state.g}</span>, <span class="num">${state.b}</span>, <span class="num">${state.a}</span>);</span>`);
+    } else {
+      lines.push(`  <span class="cm">// HSB means hue, saturation, brightness, alpha.</span>`);
+      lines.push(`  <span class="hi"><span class="fn">fill</span>(<span class="num">${state.h}</span>, <span class="num">${state.s}</span>, <span class="num">${state.br}</span>, <span class="num">${state.a}</span>);</span>`);
+    }
+    lines.push(`  <span class="fn">circle</span>(width / <span class="num">2</span>, height / <span class="num">2</span>, <span class="num">140</span>);`);
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="cm">// Equivalent RGB: fill(${state.r}, ${state.g}, ${state.b}, ${state.a})</span>`);
+    lines.push(`<span class="cm">// Equivalent HSB: fill(${state.h}, ${state.s}, ${state.br}, ${state.a})</span>`);
+    document.getElementById('codeOutput').innerHTML = lines.join('\n');
+  }
+
+  function plainCode() {
+    const lines = [];
+    lines.push('// RGB / HSB Color Lab starter code');
+    lines.push('function setup() {');
+    lines.push('  createCanvas(400, 300);');
+    if (state.mode === 'HSB') lines.push('  colorMode(HSB, 360, 100, 100, 255);');
+    lines.push('}');
+    lines.push('');
+    lines.push('function draw() {');
+    lines.push('  background(250, 246, 240);');
+    lines.push('  noStroke();');
+    if (state.mode === 'RGB') {
+      lines.push('  // RGB means red, green, blue, alpha.');
+      lines.push(`  fill(${state.r}, ${state.g}, ${state.b}, ${state.a});`);
+    } else {
+      lines.push('  // HSB means hue, saturation, brightness, alpha.');
+      lines.push(`  fill(${state.h}, ${state.s}, ${state.br}, ${state.a});`);
+    }
+    lines.push('  circle(width / 2, height / 2, 140);');
+    lines.push('}');
+    lines.push('');
+    lines.push(`// Equivalent RGB: fill(${state.r}, ${state.g}, ${state.b}, ${state.a})`);
+    lines.push(`// Equivalent HSB: fill(${state.h}, ${state.s}, ${state.br}, ${state.a})`);
+    return lines.join('\n');
+  }
+
+  function copyCode(button) {
+    navigator.clipboard.writeText(plainCode()).then(() => {
+      const old = button.textContent;
+      button.textContent = 'Copied!';
+      setTimeout(() => { button.textContent = old; }, 1400);
+    }).catch(() => window.prompt('Copy this code:', plainCode()));
+  }
+
+  function setMode(mode) {
+    state.mode = mode;
+    updateButtons();
+    updateCode();
+    redraw();
+  }
+
+  function wireControls() {
+    document.getElementById('rgbModeBtn').addEventListener('click', () => setMode('RGB'));
+    document.getElementById('hsbModeBtn').addEventListener('click', () => setMode('HSB'));
+
+    document.getElementById('syncBtn').addEventListener('click', () => {
+      state.sync = !state.sync;
+      updateButtons();
+    });
+
+    document.getElementById('paletteBtn').addEventListener('click', () => {
+      state.showPalette = !state.showPalette;
+      updateButtons();
+      redraw();
+    });
+
+    ['red', 'green', 'blue'].forEach(key => {
+      document.getElementById(`${key}Slider`).addEventListener('input', e => {
+        const mapKey = key === 'red' ? 'r' : key === 'green' ? 'g' : 'b';
+        state[mapKey] = Number(e.target.value);
+        state.mode = 'RGB';
+        if (state.sync) syncFromRGB();
+        syncSliders();
+        updateButtons();
+        redraw();
+      });
+    });
+
+    const hsbMap = { hue: 'h', sat: 's', bright: 'br' };
+    Object.entries(hsbMap).forEach(([sliderKey, stateKey]) => {
+      document.getElementById(`${sliderKey}Slider`).addEventListener('input', e => {
+        state[stateKey] = Number(e.target.value);
+        state.mode = 'HSB';
+        if (state.sync) syncFromHSB();
+        syncSliders();
+        updateButtons();
+        redraw();
+      });
+    });
+
+    document.getElementById('alphaSlider').addEventListener('input', e => {
+      state.a = Number(e.target.value);
+      syncSliders();
+      redraw();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      Object.assign(state, defaults);
+      syncSliders();
+      updateButtons();
+      redraw();
+    });
+
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      state.mode = 'HSB';
+      state.h = Math.floor(Math.random() * 361);
+      state.s = Math.floor(Math.random() * 61) + 35;
+      state.br = Math.floor(Math.random() * 46) + 50;
+      state.a = Math.floor(Math.random() * 106) + 150;
+      syncFromHSB();
+      syncSliders();
+      updateButtons();
+      redraw();
+    });
+
+    document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
+    document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
+  }
+
+  buildPresetButtons();
+  syncSliders();
+  updateButtons();
+  wireControls();
+  updateCode();
+</script>
+</body>
+</html>

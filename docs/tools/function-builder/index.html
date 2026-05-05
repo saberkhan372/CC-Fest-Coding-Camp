@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Function Builder — CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #FAF6F0;
+    --cream-dark: #F0EBE3;
+    --cream-darker: #E5DFD5;
+    --ink: #2C2A26;
+    --ink-light: #6B6760;
+    --ink-faint: #9E998F;
+    --accent: #3D5A80;
+    --accent-light: #5B7EA1;
+    --highlight: #E07A5F;
+    --highlight-light: #F2CC8F;
+    --success: #81B29A;
+    --grid-bg: #FFFFFF;
+    --code-bg: #2C2A26;
+    --code-text: #F0EBE3;
+    --code-keyword: #81B29A;
+    --code-number: #F2CC8F;
+    --code-comment: #8F8A81;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04);
+    --shadow-strong: 0 6px 24px rgba(44,42,38,.09), 0 0 0 1px rgba(0,0,0,.04);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; }
+  .header { margin-bottom: 24px; }
+
+  .stage-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(61,90,128,.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    max-width: 790px;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    background: var(--cream-dark);
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(340px, .85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 950px) { .workspace { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .panel-desc { font-size: 13px; color: var(--ink-light); }
+
+  .canvas-panel { padding: 14px; }
+
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 1.2 / 1;
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  #canvas-container canvas { display: block; }
+
+  .readout-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 680px) { .readout-row { grid-template-columns: repeat(2, 1fr); } }
+
+  .readout-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+  }
+
+  .readout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .readout-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .controls { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .control-group {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .control-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+
+  .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .button-row.two { grid-template-columns: repeat(2, 1fr); }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  }
+
+  button:hover { transform: translateY(-1px); }
+
+  .primary-btn { background: var(--accent); color: #fff; }
+  .secondary-btn { background: #fff; color: var(--accent); border: 1px solid var(--cream-darker); }
+  .toggle-btn { background: #fff; color: var(--ink-light); border: 1px solid var(--cream-darker); }
+  .toggle-btn.active { background: rgba(61,90,128,.08); color: var(--accent); border-color: rgba(61,90,128,.3); }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 92px 1fr 54px;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+  }
+
+  .slider-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+  .value-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    text-align: center;
+    padding: 3px 6px;
+  }
+
+  .mini-note { font-size: 12px; color: var(--ink-light); margin-top: 8px; }
+
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 850px) { .lesson-grid { grid-template-columns: 1fr; } }
+
+  .lesson-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+
+  .lesson-card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .lesson-card p { font-size: 14px; color: var(--ink-light); }
+
+  .code-panel {
+    margin-top: 18px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+  }
+
+  .code-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .code-toolbar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(240,235,227,.68);
+  }
+
+  .copy-btn {
+    background: rgba(255,255,255,.06);
+    color: rgba(240,235,227,.75);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .copy-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  pre {
+    margin: 0;
+    padding: 15px 18px 18px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre;
+  }
+
+  .kw { color: var(--code-keyword); }
+  .num { color: var(--code-number); }
+  .cm { color: var(--code-comment); }
+  .fn { color: #A7C7E7; }
+  .str { color: #F2CC8F; }
+  .hi { background: rgba(224,122,95,.22); border-radius: 4px; padding: 1px 2px; margin: -1px -2px; }
+
+  .footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cream-dark);
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="stage-tag">Missing Tool 3 — Abstraction + Reuse</div>
+      <h1>Function Builder</h1>
+      <p class="subtitle">Turn repeated drawing code into a reusable recipe. A function definition describes what to draw; each function call decides where, how big, and how different each copy should be.</p>
+      <div class="tag-row" aria-label="Concept tags">
+        <span class="tag">functions</span>
+        <span class="tag">parameters</span>
+        <span class="tag">arguments</span>
+        <span class="tag">reuse</span>
+        <span class="tag">abstraction</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Reusable Drawing Recipe</div>
+          <div class="panel-desc">Choose a recipe, then call it multiple times with different arguments.</div>
+        </div>
+        <div class="canvas-panel">
+          <div id="canvas-container" aria-label="p5.js canvas showing repeated drawings created by function calls"></div>
+          <div class="readout-row">
+            <div class="readout-card">
+              <div class="readout-label">function</div>
+              <div class="readout-value" id="functionReadout">drawFlower</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">calls</div>
+              <div class="readout-value" id="callsReadout">5</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">parameters</div>
+              <div class="readout-value" id="paramsReadout">x, y, size</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">pattern</div>
+              <div class="readout-value" id="patternReadout">row</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Build the Function</div>
+          <div class="panel-desc">Change the recipe and the calls. Watch the code update.</div>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <div class="control-group-title">Drawing Recipe</div>
+            <div class="button-grid" id="recipeButtons"></div>
+            <p class="mini-note">The recipe is the function definition: what happens when the function is called.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Function Calls</div>
+            <div class="button-grid" id="patternButtons"></div>
+            <p class="mini-note">A call uses the recipe with specific argument values like <code>drawFlower(100, 150, 60)</code>.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Parameters + Arguments</div>
+            <div class="slider-row">
+              <label for="xSlider">x</label>
+              <input id="xSlider" type="range" min="40" max="360" value="200" />
+              <span class="value-pill" id="xValue">200</span>
+            </div>
+            <div class="slider-row">
+              <label for="ySlider">y</label>
+              <input id="ySlider" type="range" min="40" max="260" value="150" />
+              <span class="value-pill" id="yValue">150</span>
+            </div>
+            <div class="slider-row">
+              <label for="sizeSlider">size</label>
+              <input id="sizeSlider" type="range" min="20" max="110" value="62" />
+              <span class="value-pill" id="sizeValue">62</span>
+            </div>
+            <div class="slider-row">
+              <label for="countSlider">count</label>
+              <input id="countSlider" type="range" min="1" max="12" value="5" />
+              <span class="value-pill" id="countValue">5</span>
+            </div>
+            <div class="slider-row">
+              <label for="spacingSlider">spacing</label>
+              <input id="spacingSlider" type="range" min="25" max="110" value="72" />
+              <span class="value-pill" id="spacingValue">72</span>
+            </div>
+            <div class="slider-row">
+              <label for="variationSlider">variation</label>
+              <input id="variationSlider" type="range" min="0" max="50" value="18" />
+              <span class="value-pill" id="variationValue">18</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">View + Actions</div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="labelsBtn" type="button">Labels On</button>
+              <button class="toggle-btn active" id="guidesBtn" type="button">Guides On</button>
+            </div>
+            <div class="button-row">
+              <button class="secondary-btn" id="resetBtn" type="button">Reset</button>
+              <button class="secondary-btn" id="randomBtn" type="button">Randomize</button>
+              <button class="primary-btn" id="copyTopBtn" type="button">Copy Code</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="lesson-grid" aria-label="Learning prompts">
+      <div class="lesson-card">
+        <h2>Try this</h2>
+        <p>Switch from one call to a row of calls. Change only <strong>size</strong> and watch every function call use that value differently.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Notice this</h2>
+        <p>The function definition is the recipe. The function calls are where you use the recipe with specific arguments.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Remix this</h2>
+        <p>Make your own creature, icon, plant, or symbol as a function, then call it in a pattern, grid, or random field.</p>
+      </div>
+    </section>
+
+    <section class="code-panel" aria-label="Generated code preview">
+      <div class="code-toolbar">
+        <div class="code-toolbar-title">Starter Code Preview</div>
+        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
+      </div>
+      <pre id="codeOutput"></pre>
+    </section>
+
+    <footer class="footer">Function Builder · CC Fest Coding Camp · p5.js learning tool</footer>
+  </div>
+
+<script>
+  const recipes = [
+    { id: 'flower', label: 'Flower', fn: 'drawFlower', params: 'x, y, size' },
+    { id: 'creature', label: 'Creature', fn: 'drawCreature', params: 'x, y, size' },
+    { id: 'target', label: 'Target', fn: 'drawTarget', params: 'x, y, size' },
+    { id: 'spark', label: 'Spark', fn: 'drawSpark', params: 'x, y, size' }
+  ];
+
+  const patterns = [
+    { id: 'single', label: 'Single Call' },
+    { id: 'row', label: 'Row of Calls' },
+    { id: 'grid', label: 'Grid Calls' },
+    { id: 'random', label: 'Random Field' }
+  ];
+
+  const defaults = {
+    recipe: 'flower',
+    pattern: 'row',
+    x: 200,
+    y: 150,
+    size: 62,
+    count: 5,
+    spacing: 72,
+    variation: 18,
+    showLabels: true,
+    showGuides: true
+  };
+
+  const state = { ...defaults };
+  let randomCalls = [];
+  let activeLine = 'call';
+
+  function setup() {
+    const holder = document.getElementById('canvas-container');
+    const canvas = createCanvas(holder.clientWidth, holder.clientHeight);
+    canvas.parent('canvas-container');
+    pixelDensity(2);
+    textFont('DM Mono');
+    buildRandomCalls();
+    noLoop();
+  }
+
+  function windowResized() {
+    const holder = document.getElementById('canvas-container');
+    resizeCanvas(holder.clientWidth, holder.clientHeight);
+    redraw();
+  }
+
+  function draw() {
+    background(250, 246, 240);
+    drawGrid();
+    const calls = getCalls();
+
+    if (state.showGuides) drawCallGuides(calls);
+
+    calls.forEach((call, index) => {
+      drawRecipe(call.x, call.y, call.size, index);
+      if (state.showLabels) drawCallLabel(call, index);
+    });
+
+    updateReadouts(calls.length);
+  }
+
+  function drawGrid() {
+    stroke(229, 223, 213);
+    strokeWeight(1);
+    for (let x = 0; x <= width; x += 40) line(x, 0, x, height);
+    for (let y = 0; y <= height; y += 40) line(0, y, width, y);
+    stroke(61, 90, 128, 110);
+    strokeWeight(1.5);
+    line(0, 0, width, 0);
+    line(0, 0, 0, height);
+  }
+
+  function getScaleX() { return width / 400; }
+  function getScaleY() { return height / 300; }
+  function sx(v) { return v * getScaleX(); }
+  function sy(v) { return v * getScaleY(); }
+  function ss(v) { return v * Math.min(getScaleX(), getScaleY()); }
+
+  function getCalls() {
+    const calls = [];
+    if (state.pattern === 'single') {
+      calls.push({ x: sx(state.x), y: sy(state.y), size: ss(state.size), codeX: state.x, codeY: state.y, codeSize: state.size });
+    }
+
+    if (state.pattern === 'row') {
+      const n = state.count;
+      const start = state.x - ((n - 1) * state.spacing) / 2;
+      for (let i = 0; i < n; i++) {
+        const codeX = Math.round(start + i * state.spacing);
+        const codeY = state.y;
+        const codeSize = Math.round(state.size + ((i % 2 === 0 ? 1 : -1) * state.variation));
+        calls.push({ x: sx(codeX), y: sy(codeY), size: ss(codeSize), codeX, codeY, codeSize });
+      }
+    }
+
+    if (state.pattern === 'grid') {
+      const cols = Math.ceil(Math.sqrt(state.count));
+      const rows = Math.ceil(state.count / cols);
+      const startX = state.x - ((cols - 1) * state.spacing) / 2;
+      const startY = state.y - ((rows - 1) * state.spacing) / 2;
+      for (let i = 0; i < state.count; i++) {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const codeX = Math.round(startX + col * state.spacing);
+        const codeY = Math.round(startY + row * state.spacing);
+        const codeSize = Math.round(state.size + ((row + col) % 2 === 0 ? state.variation : -state.variation));
+        calls.push({ x: sx(codeX), y: sy(codeY), size: ss(codeSize), codeX, codeY, codeSize });
+      }
+    }
+
+    if (state.pattern === 'random') {
+      calls.push(...randomCalls.slice(0, state.count).map(call => ({
+        x: sx(call.x), y: sy(call.y), size: ss(call.size), codeX: call.x, codeY: call.y, codeSize: call.size
+      })));
+    }
+
+    return calls;
+  }
+
+  function buildRandomCalls() {
+    randomCalls = [];
+    for (let i = 0; i < 12; i++) {
+      randomCalls.push({
+        x: Math.floor(Math.random() * 320) + 40,
+        y: Math.floor(Math.random() * 220) + 40,
+        size: Math.floor(Math.random() * Math.max(10, state.variation * 2 + 20)) + Math.max(18, state.size - state.variation)
+      });
+    }
+  }
+
+  function drawRecipe(x, y, size, index) {
+    if (state.recipe === 'flower') drawFlowerVisual(x, y, size, index);
+    if (state.recipe === 'creature') drawCreatureVisual(x, y, size, index);
+    if (state.recipe === 'target') drawTargetVisual(x, y, size, index);
+    if (state.recipe === 'spark') drawSparkVisual(x, y, size, index);
+  }
+
+  function drawFlowerVisual(x, y, size, index) {
+    push();
+    translate(x, y);
+    rotate(index * 0.2);
+    noStroke();
+    fill(242, 204, 143, 230);
+    for (let i = 0; i < 8; i++) {
+      rotate(TWO_PI / 8);
+      ellipse(size * 0.25, 0, size * 0.5, size * 0.22);
+    }
+    fill(224, 122, 95);
+    circle(0, 0, size * 0.38);
+    pop();
+  }
+
+  function drawCreatureVisual(x, y, size, index) {
+    push();
+    translate(x, y);
+    noStroke();
+    fill(129, 178, 154);
+    ellipse(0, 0, size, size * 0.75);
+    fill(250, 246, 240);
+    circle(-size * 0.18, -size * 0.1, size * 0.18);
+    circle(size * 0.18, -size * 0.1, size * 0.18);
+    fill(44, 42, 38);
+    circle(-size * 0.18, -size * 0.1, size * 0.07);
+    circle(size * 0.18, -size * 0.1, size * 0.07);
+    stroke(61, 90, 128);
+    strokeWeight(Math.max(1, size * 0.04));
+    noFill();
+    arc(0, size * 0.06, size * 0.3, size * 0.22, 0, PI);
+    pop();
+  }
+
+  function drawTargetVisual(x, y, size, index) {
+    push();
+    translate(x, y);
+    noStroke();
+    fill(61, 90, 128);
+    circle(0, 0, size);
+    fill(250, 246, 240);
+    circle(0, 0, size * 0.68);
+    fill(224, 122, 95);
+    circle(0, 0, size * 0.4);
+    fill(242, 204, 143);
+    circle(0, 0, size * 0.16);
+    pop();
+  }
+
+  function drawSparkVisual(x, y, size, index) {
+    push();
+    translate(x, y);
+    rotate(index * 0.35);
+    stroke(224, 122, 95);
+    strokeWeight(Math.max(2, size * 0.05));
+    for (let i = 0; i < 10; i++) {
+      rotate(TWO_PI / 10);
+      line(0, 0, size * 0.48, 0);
+    }
+    noStroke();
+    fill(242, 204, 143);
+    circle(0, 0, size * 0.25);
+    pop();
+  }
+
+  function drawCallGuides(calls) {
+    stroke(61, 90, 128, 85);
+    strokeWeight(1.25);
+    drawingContext.setLineDash([5, 6]);
+    calls.forEach(call => {
+      line(call.x, 0, call.x, height);
+      line(0, call.y, width, call.y);
+    });
+    drawingContext.setLineDash([]);
+  }
+
+  function drawCallLabel(call, index) {
+    const recipe = recipes.find(r => r.id === state.recipe);
+    const label = `${recipe.fn}(${call.codeX}, ${call.codeY}, ${call.codeSize})`;
+    textFont('DM Mono');
+    textSize(10.5);
+    textAlign(CENTER, CENTER);
+    const tw = textWidth(label);
+    noStroke();
+    fill(44, 42, 38, 220);
+    rect(call.x - tw / 2 - 5, call.y + call.size / 2 + 8, tw + 10, 20, 5);
+    fill(250, 246, 240);
+    text(label, call.x, call.y + call.size / 2 + 18);
+  }
+
+  function updateReadouts(callCount) {
+    const recipe = recipes.find(r => r.id === state.recipe);
+    document.getElementById('functionReadout').textContent = recipe.fn;
+    document.getElementById('callsReadout').textContent = callCount;
+    document.getElementById('paramsReadout').textContent = recipe.params;
+    document.getElementById('patternReadout').textContent = state.pattern;
+  }
+
+  function buildButtons() {
+    const recipeWrap = document.getElementById('recipeButtons');
+    recipeWrap.innerHTML = '';
+    recipes.forEach(recipe => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toggle-btn' + (state.recipe === recipe.id ? ' active' : '');
+      btn.textContent = recipe.label;
+      btn.addEventListener('click', () => {
+        state.recipe = recipe.id;
+        activeLine = 'definition';
+        buildButtons();
+        updateCode();
+        redraw();
+      });
+      recipeWrap.appendChild(btn);
+    });
+
+    const patternWrap = document.getElementById('patternButtons');
+    patternWrap.innerHTML = '';
+    patterns.forEach(pattern => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toggle-btn' + (state.pattern === pattern.id ? ' active' : '');
+      btn.textContent = pattern.label;
+      btn.addEventListener('click', () => {
+        state.pattern = pattern.id;
+        activeLine = 'call';
+        if (pattern.id === 'random') buildRandomCalls();
+        buildButtons();
+        updateCode();
+        redraw();
+      });
+      patternWrap.appendChild(btn);
+    });
+  }
+
+  function syncSliders() {
+    ['x', 'y', 'size', 'count', 'spacing', 'variation'].forEach(key => {
+      document.getElementById(`${key}Slider`).value = state[key];
+      document.getElementById(`${key}Value`).textContent = state[key];
+    });
+  }
+
+  function updateButtons() {
+    const labelsBtn = document.getElementById('labelsBtn');
+    labelsBtn.textContent = state.showLabels ? 'Labels On' : 'Labels Off';
+    labelsBtn.classList.toggle('active', state.showLabels);
+
+    const guidesBtn = document.getElementById('guidesBtn');
+    guidesBtn.textContent = state.showGuides ? 'Guides On' : 'Guides Off';
+    guidesBtn.classList.toggle('active', state.showGuides);
+  }
+
+  function highlighted(key, html) {
+    return activeLine === key ? `<span class="hi">${html}</span>` : html;
+  }
+
+  function functionDefinitionHtml() {
+    if (state.recipe === 'flower') {
+      return [
+        highlighted('definition', `<span class="kw">function</span> <span class="fn">drawFlower</span>(x, y, size) {`),
+        `  <span class="fn">push</span>();`,
+        `  <span class="fn">translate</span>(x, y);`,
+        `  <span class="fn">noStroke</span>();`,
+        `  <span class="fn">fill</span>(<span class="num">242</span>, <span class="num">204</span>, <span class="num">143</span>);`,
+        `  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < <span class="num">8</span>; i++) {`,
+        `    <span class="fn">rotate</span>(TWO_PI / <span class="num">8</span>);`,
+        `    <span class="fn">ellipse</span>(size * <span class="num">0.25</span>, <span class="num">0</span>, size * <span class="num">0.5</span>, size * <span class="num">0.22</span>);`,
+        `  }`,
+        `  <span class="fn">fill</span>(<span class="num">224</span>, <span class="num">122</span>, <span class="num">95</span>);`,
+        `  <span class="fn">circle</span>(<span class="num">0</span>, <span class="num">0</span>, size * <span class="num">0.38</span>);`,
+        `  <span class="fn">pop</span>();`,
+        `}`
+      ].join('\n');
+    }
+
+    if (state.recipe === 'creature') {
+      return [
+        highlighted('definition', `<span class="kw">function</span> <span class="fn">drawCreature</span>(x, y, size) {`),
+        `  <span class="fn">push</span>();`,
+        `  <span class="fn">translate</span>(x, y);`,
+        `  <span class="fn">noStroke</span>();`,
+        `  <span class="fn">fill</span>(<span class="num">129</span>, <span class="num">178</span>, <span class="num">154</span>);`,
+        `  <span class="fn">ellipse</span>(<span class="num">0</span>, <span class="num">0</span>, size, size * <span class="num">0.75</span>);`,
+        `  <span class="fn">fill</span>(<span class="num">250</span>);`,
+        `  <span class="fn">circle</span>(-size * <span class="num">0.18</span>, -size * <span class="num">0.1</span>, size * <span class="num">0.18</span>);`,
+        `  <span class="fn">circle</span>( size * <span class="num">0.18</span>, -size * <span class="num">0.1</span>, size * <span class="num">0.18</span>);`,
+        `  <span class="fn">pop</span>();`,
+        `}`
+      ].join('\n');
+    }
+
+    if (state.recipe === 'target') {
+      return [
+        highlighted('definition', `<span class="kw">function</span> <span class="fn">drawTarget</span>(x, y, size) {`),
+        `  <span class="fn">noStroke</span>();`,
+        `  <span class="fn">fill</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>);`,
+        `  <span class="fn">circle</span>(x, y, size);`,
+        `  <span class="fn">fill</span>(<span class="num">250</span>);`,
+        `  <span class="fn">circle</span>(x, y, size * <span class="num">0.68</span>);`,
+        `  <span class="fn">fill</span>(<span class="num">224</span>, <span class="num">122</span>, <span class="num">95</span>);`,
+        `  <span class="fn">circle</span>(x, y, size * <span class="num">0.4</span>);`,
+        `}`
+      ].join('\n');
+    }
+
+    return [
+      highlighted('definition', `<span class="kw">function</span> <span class="fn">drawSpark</span>(x, y, size) {`),
+      `  <span class="fn">push</span>();`,
+      `  <span class="fn">translate</span>(x, y);`,
+      `  <span class="fn">stroke</span>(<span class="num">224</span>, <span class="num">122</span>, <span class="num">95</span>);`,
+      `  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < <span class="num">10</span>; i++) {`,
+      `    <span class="fn">rotate</span>(TWO_PI / <span class="num">10</span>);`,
+      `    <span class="fn">line</span>(<span class="num">0</span>, <span class="num">0</span>, size * <span class="num">0.48</span>, <span class="num">0</span>);`,
+      `  }`,
+      `  <span class="fn">pop</span>();`,
+      `}`
+    ].join('\n');
+  }
+
+  function functionDefinitionPlain() {
+    const recipe = recipes.find(r => r.id === state.recipe);
+    if (recipe.id === 'flower') return `function drawFlower(x, y, size) {\n  push();\n  translate(x, y);\n  noStroke();\n  fill(242, 204, 143);\n  for (let i = 0; i < 8; i++) {\n    rotate(TWO_PI / 8);\n    ellipse(size * 0.25, 0, size * 0.5, size * 0.22);\n  }\n  fill(224, 122, 95);\n  circle(0, 0, size * 0.38);\n  pop();\n}`;
+    if (recipe.id === 'creature') return `function drawCreature(x, y, size) {\n  push();\n  translate(x, y);\n  noStroke();\n  fill(129, 178, 154);\n  ellipse(0, 0, size, size * 0.75);\n  fill(250);\n  circle(-size * 0.18, -size * 0.1, size * 0.18);\n  circle( size * 0.18, -size * 0.1, size * 0.18);\n  pop();\n}`;
+    if (recipe.id === 'target') return `function drawTarget(x, y, size) {\n  noStroke();\n  fill(61, 90, 128);\n  circle(x, y, size);\n  fill(250);\n  circle(x, y, size * 0.68);\n  fill(224, 122, 95);\n  circle(x, y, size * 0.4);\n}`;
+    return `function drawSpark(x, y, size) {\n  push();\n  translate(x, y);\n  stroke(224, 122, 95);\n  for (let i = 0; i < 10; i++) {\n    rotate(TWO_PI / 10);\n    line(0, 0, size * 0.48, 0);\n  }\n  pop();\n}`;
+  }
+
+  function callLinesHtml() {
+    const recipe = recipes.find(r => r.id === state.recipe);
+    return getCalls().map(call => highlighted('call', `  <span class="fn">${recipe.fn}</span>(<span class="num">${call.codeX}</span>, <span class="num">${call.codeY}</span>, <span class="num">${call.codeSize}</span>);`)).join('\n');
+  }
+
+  function callLinesPlain() {
+    const recipe = recipes.find(r => r.id === state.recipe);
+    return getCalls().map(call => `  ${recipe.fn}(${call.codeX}, ${call.codeY}, ${call.codeSize});`).join('\n');
+  }
+
+  function updateCode() {
+    const lines = [];
+    lines.push(`<span class="cm">// Function Builder starter code</span>`);
+    lines.push(`<span class="kw">function</span> <span class="fn">setup</span>() {`);
+    lines.push(`  <span class="fn">createCanvas</span>(<span class="num">400</span>, <span class="num">300</span>);`);
+    lines.push(`  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>);`);
+    lines.push('');
+    lines.push(callLinesHtml());
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="cm">// This is the reusable drawing recipe.</span>`);
+    lines.push(functionDefinitionHtml());
+    document.getElementById('codeOutput').innerHTML = lines.join('\n');
+  }
+
+  function plainCode() {
+    return [
+      '// Function Builder starter code',
+      'function setup() {',
+      '  createCanvas(400, 300);',
+      '  background(250, 246, 240);',
+      '',
+      callLinesPlain(),
+      '}',
+      '',
+      '// This is the reusable drawing recipe.',
+      functionDefinitionPlain()
+    ].join('\n');
+  }
+
+  function copyCode(button) {
+    navigator.clipboard.writeText(plainCode()).then(() => {
+      const old = button.textContent;
+      button.textContent = 'Copied!';
+      setTimeout(() => { button.textContent = old; }, 1400);
+    }).catch(() => window.prompt('Copy this code:', plainCode()));
+  }
+
+  function updateAll() {
+    syncSliders();
+    updateButtons();
+    buildButtons();
+    updateCode();
+    redraw();
+  }
+
+  function wireControls() {
+    ['x', 'y', 'size', 'count', 'spacing', 'variation'].forEach(key => {
+      const slider = document.getElementById(`${key}Slider`);
+      slider.addEventListener('input', () => {
+        state[key] = Number(slider.value);
+        document.getElementById(`${key}Value`).textContent = state[key];
+        activeLine = key === 'count' || key === 'spacing' ? 'call' : 'call';
+        if (state.pattern === 'random') buildRandomCalls();
+        updateCode();
+        redraw();
+      });
+    });
+
+    document.getElementById('labelsBtn').addEventListener('click', () => {
+      state.showLabels = !state.showLabels;
+      updateButtons();
+      redraw();
+    });
+
+    document.getElementById('guidesBtn').addEventListener('click', () => {
+      state.showGuides = !state.showGuides;
+      updateButtons();
+      redraw();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      Object.assign(state, defaults);
+      buildRandomCalls();
+      activeLine = 'call';
+      updateAll();
+    });
+
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      state.x = Math.floor(Math.random() * 240) + 80;
+      state.y = Math.floor(Math.random() * 160) + 70;
+      state.size = Math.floor(Math.random() * 65) + 35;
+      state.count = Math.floor(Math.random() * 8) + 3;
+      state.spacing = Math.floor(Math.random() * 50) + 45;
+      state.variation = Math.floor(Math.random() * 38) + 8;
+      state.pattern = patterns[Math.floor(Math.random() * patterns.length)].id;
+      state.recipe = recipes[Math.floor(Math.random() * recipes.length)].id;
+      buildRandomCalls();
+      activeLine = 'call';
+      updateAll();
+    });
+
+    document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
+    document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
+  }
+
+  buildButtons();
+  wireControls();
+  syncSliders();
+  updateButtons();
+  updateCode();
+</script>
+</body>
+</html>

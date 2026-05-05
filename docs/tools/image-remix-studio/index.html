@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Image Remix Studio — CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #FAF6F0;
+    --cream-dark: #F0EBE3;
+    --cream-darker: #E5DFD5;
+    --ink: #2C2A26;
+    --ink-light: #6B6760;
+    --ink-faint: #9E998F;
+    --accent: #3D5A80;
+    --accent-light: #5B7EA1;
+    --highlight: #E07A5F;
+    --highlight-light: #F2CC8F;
+    --success: #81B29A;
+    --grid-bg: #FFFFFF;
+    --code-bg: #2C2A26;
+    --code-text: #F0EBE3;
+    --code-keyword: #81B29A;
+    --code-number: #F2CC8F;
+    --code-comment: #8F8A81;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04);
+    --shadow-strong: 0 6px 24px rgba(44,42,38,.09), 0 0 0 1px rgba(0,0,0,.04);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; }
+  .header { margin-bottom: 24px; }
+
+  .stage-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(61,90,128,.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    max-width: 840px;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    background: var(--cream-dark);
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(340px, .85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 950px) { .workspace { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .panel-desc { font-size: 13px; color: var(--ink-light); }
+
+  .canvas-panel { padding: 14px; }
+
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 1.2 / 1;
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  #canvas-container canvas { display: block; }
+
+  .readout-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 680px) { .readout-row { grid-template-columns: repeat(2, 1fr); } }
+
+  .readout-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+  }
+
+  .readout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .readout-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .controls { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .control-group {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .control-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+
+  .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .button-row.two { grid-template-columns: repeat(2, 1fr); }
+
+  button, .file-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+    text-align: center;
+  }
+
+  button:hover, .file-label:hover { transform: translateY(-1px); }
+  .primary-btn, .file-label { background: var(--accent); color: #fff; }
+  .secondary-btn { background: #fff; color: var(--accent); border: 1px solid var(--cream-darker); }
+  .toggle-btn { background: #fff; color: var(--ink-light); border: 1px solid var(--cream-darker); }
+  .toggle-btn.active { background: rgba(61,90,128,.08); color: var(--accent); border-color: rgba(61,90,128,.3); }
+
+  input[type="file"] { display: none; }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 94px 1fr 58px;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+  }
+
+  .slider-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+  .value-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    text-align: center;
+    padding: 3px 6px;
+  }
+
+  .mini-note { font-size: 12px; color: var(--ink-light); margin-top: 8px; }
+
+  .concept-card {
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    margin-top: 8px;
+  }
+
+  .concept-card strong { color: var(--accent); }
+
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 850px) { .lesson-grid { grid-template-columns: 1fr; } }
+
+  .lesson-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+
+  .lesson-card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .lesson-card p { font-size: 14px; color: var(--ink-light); }
+
+  .code-panel {
+    margin-top: 18px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+  }
+
+  .code-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .code-toolbar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(240,235,227,.68);
+  }
+
+  .copy-btn {
+    background: rgba(255,255,255,.06);
+    color: rgba(240,235,227,.75);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .copy-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  pre {
+    margin: 0;
+    padding: 15px 18px 18px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre;
+  }
+
+  .kw { color: var(--code-keyword); }
+  .num { color: var(--code-number); }
+  .cm { color: var(--code-comment); }
+  .fn { color: #A7C7E7; }
+  .str { color: #F2CC8F; }
+  .hi { background: rgba(224,122,95,.22); border-radius: 4px; padding: 1px 2px; margin: -1px -2px; }
+
+  .footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cream-dark);
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="stage-tag">Missing Tool 8 — Images + Media Remix</div>
+      <h1>Image Remix Studio</h1>
+      <p class="subtitle">Use an image as creative coding material. Load a picture, then remix it with tint, transparency, pixel sampling, repeated grids, mouse reveal, and glitch-like slicing.</p>
+      <div class="tag-row" aria-label="Concept tags">
+        <span class="tag">loadImage()</span>
+        <span class="tag">image()</span>
+        <span class="tag">tint()</span>
+        <span class="tag">pixels</span>
+        <span class="tag">media art</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Image Remix Canvas</div>
+          <div class="panel-desc">Upload an image or use the built-in sample. Move your mouse over the canvas in reveal mode.</div>
+        </div>
+        <div class="canvas-panel">
+          <div id="canvas-container" aria-label="p5.js canvas showing image remix effects"></div>
+          <div class="readout-row">
+            <div class="readout-card">
+              <div class="readout-label">mode</div>
+              <div class="readout-value" id="modeReadout">tint</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">image</div>
+              <div class="readout-value" id="imageReadout">sample</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">alpha</div>
+              <div class="readout-value" id="alphaReadout">220</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">effect</div>
+              <div class="readout-value" id="effectReadout">tint color</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Remix Controls</div>
+          <div class="panel-desc">Choose a remix mode and adjust how the image is drawn.</div>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <div class="control-group-title">Image Source</div>
+            <div class="button-row two">
+              <label class="file-label" for="imageUpload">Upload Image</label>
+              <button class="secondary-btn" id="sampleBtn" type="button">Use Sample</button>
+            </div>
+            <input id="imageUpload" type="file" accept="image/*" />
+            <p class="mini-note">Images stay in your browser. For a published sketch, place an image file in the project folder and use <code>loadImage()</code>.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Remix Mode</div>
+            <div class="button-grid" id="modeButtons"></div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Color + Transparency</div>
+            <div class="slider-row">
+              <label for="redSlider">red</label>
+              <input id="redSlider" type="range" min="0" max="255" value="120" />
+              <span class="value-pill" id="redValue">120</span>
+            </div>
+            <div class="slider-row">
+              <label for="greenSlider">green</label>
+              <input id="greenSlider" type="range" min="0" max="255" value="160" />
+              <span class="value-pill" id="greenValue">160</span>
+            </div>
+            <div class="slider-row">
+              <label for="blueSlider">blue</label>
+              <input id="blueSlider" type="range" min="0" max="255" value="220" />
+              <span class="value-pill" id="blueValue">220</span>
+            </div>
+            <div class="slider-row">
+              <label for="alphaSlider">alpha</label>
+              <input id="alphaSlider" type="range" min="10" max="255" value="220" />
+              <span class="value-pill" id="alphaValue">220</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Effect Settings</div>
+            <div class="slider-row">
+              <label for="pixelSlider">pixel size</label>
+              <input id="pixelSlider" type="range" min="4" max="42" value="16" />
+              <span class="value-pill" id="pixelValue">16</span>
+            </div>
+            <div class="slider-row">
+              <label for="revealSlider">reveal</label>
+              <input id="revealSlider" type="range" min="20" max="220" value="90" />
+              <span class="value-pill" id="revealValue">90</span>
+            </div>
+            <div class="slider-row">
+              <label for="repeatSlider">repeat</label>
+              <input id="repeatSlider" type="range" min="2" max="10" value="4" />
+              <span class="value-pill" id="repeatValue">4</span>
+            </div>
+            <div class="slider-row">
+              <label for="glitchSlider">glitch</label>
+              <input id="glitchSlider" type="range" min="0" max="60" value="18" />
+              <span class="value-pill" id="glitchValue">18</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">View + Actions</div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="fitBtn" type="button">Fit Image</button>
+              <button class="toggle-btn active" id="labelsBtn" type="button">Labels On</button>
+            </div>
+            <div class="button-row">
+              <button class="secondary-btn" id="resetBtn" type="button">Reset</button>
+              <button class="secondary-btn" id="randomBtn" type="button">Randomize</button>
+              <button class="primary-btn" id="copyTopBtn" type="button">Copy Code</button>
+            </div>
+            <div class="concept-card">
+              <p><strong>Key idea:</strong> in p5.js, an image is not only a picture. It can be drawn, repeated, tinted, cropped, sampled, masked, or treated as data.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="lesson-grid" aria-label="Learning prompts">
+      <div class="lesson-card">
+        <h2>Try this</h2>
+        <p>Upload a photo, switch to pixel sample mode, and change the pixel size until the image becomes abstract but still recognizable.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Notice this</h2>
+        <p><code>image()</code> draws the whole image. <code>get()</code> samples color from one point. Both are useful for remixing images with code.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Remix this</h2>
+        <p>Turn a photo into a poster, glitch portrait, tiled pattern, mouse reveal, pixel mosaic, or interactive visual poem.</p>
+      </div>
+    </section>
+
+    <section class="code-panel" aria-label="Generated code preview">
+      <div class="code-toolbar">
+        <div class="code-toolbar-title">Starter Code Preview</div>
+        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
+      </div>
+      <pre id="codeOutput"></pre>
+    </section>
+
+    <footer class="footer">Image Remix Studio · CC Fest Coding Camp · p5.js learning tool</footer>
+  </div>
+
+<script>
+  const modes = [
+    { id: 'tint', label: 'Tint' },
+    { id: 'pixel', label: 'Pixel Sample' },
+    { id: 'reveal', label: 'Mouse Reveal' },
+    { id: 'repeat', label: 'Repeat Grid' },
+    { id: 'glitch', label: 'Glitch Slices' },
+    { id: 'poster', label: 'Poster Duotone' }
+  ];
+
+  const defaults = {
+    mode: 'tint',
+    r: 120,
+    g: 160,
+    b: 220,
+    a: 220,
+    pixelSize: 16,
+    revealRadius: 90,
+    repeatCount: 4,
+    glitchAmount: 18,
+    fitImage: true,
+    showLabels: true,
+    usingSample: true
+  };
+
+  const state = { ...defaults };
+  let img;
+  let sampleGraphic;
+  let uploadedName = '';
+
+  function setup() {
+    const holder = document.getElementById('canvas-container');
+    const canvas = createCanvas(holder.clientWidth, holder.clientHeight);
+    canvas.parent('canvas-container');
+    pixelDensity(2);
+    textFont('DM Mono');
+    createSampleImage();
+    img = sampleGraphic;
+  }
+
+  function windowResized() {
+    const holder = document.getElementById('canvas-container');
+    resizeCanvas(holder.clientWidth, holder.clientHeight);
+  }
+
+  function draw() {
+    background(250, 246, 240);
+    if (!img) return;
+
+    if (state.mode === 'tint') drawTintMode();
+    if (state.mode === 'pixel') drawPixelMode();
+    if (state.mode === 'reveal') drawRevealMode();
+    if (state.mode === 'repeat') drawRepeatMode();
+    if (state.mode === 'glitch') drawGlitchMode();
+    if (state.mode === 'poster') drawPosterMode();
+
+    if (state.showLabels) drawOverlayLabels();
+    updateReadouts();
+    updateCode();
+  }
+
+  function createSampleImage() {
+    sampleGraphic = createGraphics(640, 420);
+    sampleGraphic.background(250, 246, 240);
+    sampleGraphic.noStroke();
+
+    for (let y = 0; y < sampleGraphic.height; y++) {
+      const amt = y / sampleGraphic.height;
+      sampleGraphic.fill(lerp(242, 61, amt), lerp(204, 90, amt), lerp(143, 128, amt));
+      sampleGraphic.rect(0, y, sampleGraphic.width, 1);
+    }
+
+    sampleGraphic.fill(61, 90, 128, 220);
+    sampleGraphic.circle(170, 170, 170);
+    sampleGraphic.fill(224, 122, 95, 230);
+    sampleGraphic.circle(310, 220, 230);
+    sampleGraphic.fill(129, 178, 154, 220);
+    sampleGraphic.rect(380, 95, 160, 210, 26);
+
+    sampleGraphic.stroke(44, 42, 38, 180);
+    sampleGraphic.strokeWeight(8);
+    sampleGraphic.noFill();
+    for (let i = 0; i < 8; i++) {
+      sampleGraphic.arc(315, 225, 250 + i * 22, 250 + i * 22, PI * 1.02, PI * 1.54);
+    }
+
+    sampleGraphic.noStroke();
+    sampleGraphic.fill(250, 246, 240, 210);
+    sampleGraphic.textFont('DM Sans');
+    sampleGraphic.textSize(42);
+    sampleGraphic.textStyle(BOLD);
+    sampleGraphic.text('CC Fest', 58, 358);
+    sampleGraphic.textSize(18);
+    sampleGraphic.textStyle(NORMAL);
+    sampleGraphic.text('sample image for remixing', 62, 385);
+  }
+
+  function imageRect() {
+    const iw = img.width;
+    const ih = img.height;
+    const cw = width;
+    const ch = height;
+    if (!state.fitImage) return { x: 0, y: 0, w: cw, h: ch };
+    const s = min(cw / iw, ch / ih);
+    const w = iw * s;
+    const h = ih * s;
+    return { x: (cw - w) / 2, y: (ch - h) / 2, w, h };
+  }
+
+  function drawBaseImage(alpha = state.a) {
+    const r = imageRect();
+    push();
+    tint(state.r, state.g, state.b, alpha);
+    image(img, r.x, r.y, r.w, r.h);
+    pop();
+  }
+
+  function drawTintMode() {
+    drawBaseImage(state.a);
+  }
+
+  function drawPixelMode() {
+    const r = imageRect();
+    noStroke();
+    const step = state.pixelSize;
+    for (let y = 0; y < height; y += step) {
+      for (let x = 0; x < width; x += step) {
+        const ix = constrain(floor(map(x, r.x, r.x + r.w, 0, img.width)), 0, img.width - 1);
+        const iy = constrain(floor(map(y, r.y, r.y + r.h, 0, img.height)), 0, img.height - 1);
+        const c = img.get(ix, iy);
+        fill(c[0], c[1], c[2], state.a);
+        rect(x, y, step + 1, step + 1);
+      }
+    }
+  }
+
+  function drawRevealMode() {
+    background(44, 42, 38);
+    const r = imageRect();
+    image(img, r.x, r.y, r.w, r.h);
+    push();
+    fill(44, 42, 38, 210);
+    rect(0, 0, width, height);
+    erase();
+    circle(mouseX, mouseY, state.revealRadius * 2);
+    noErase();
+    pop();
+
+    noFill();
+    stroke(242, 204, 143);
+    strokeWeight(2);
+    circle(mouseX, mouseY, state.revealRadius * 2);
+  }
+
+  function drawRepeatMode() {
+    const n = state.repeatCount;
+    const cellW = width / n;
+    const cellH = height / n;
+    for (let row = 0; row < n; row++) {
+      for (let col = 0; col < n; col++) {
+        push();
+        const alpha = map(row + col, 0, n * 2 - 2, 90, state.a);
+        tint(state.r, state.g, state.b, alpha);
+        image(img, col * cellW, row * cellH, cellW, cellH);
+        pop();
+      }
+    }
+  }
+
+  function drawGlitchMode() {
+    const r = imageRect();
+    image(img, r.x, r.y, r.w, r.h);
+    const sliceH = max(4, state.pixelSize * 0.75);
+    const amount = state.glitchAmount;
+    for (let y = 0; y < height; y += sliceH) {
+      const offset = sin(frameCount * 0.07 + y * 0.08) * amount + random(-amount * 0.25, amount * 0.25);
+      copy(0, y, width, sliceH, offset, y, width, sliceH);
+    }
+    push();
+    tint(state.r, state.g, state.b, 70);
+    image(img, r.x + amount * 0.35, r.y, r.w, r.h);
+    pop();
+  }
+
+  function drawPosterMode() {
+    const r = imageRect();
+    const step = state.pixelSize;
+    noStroke();
+    for (let y = 0; y < height; y += step) {
+      for (let x = 0; x < width; x += step) {
+        const ix = constrain(floor(map(x, r.x, r.x + r.w, 0, img.width)), 0, img.width - 1);
+        const iy = constrain(floor(map(y, r.y, r.y + r.h, 0, img.height)), 0, img.height - 1);
+        const c = img.get(ix, iy);
+        const bright = (c[0] + c[1] + c[2]) / 3;
+        if (bright > 150) fill(242, 204, 143, state.a);
+        else if (bright > 80) fill(state.r, state.g, state.b, state.a);
+        else fill(44, 42, 38, state.a);
+        rect(x, y, step + 1, step + 1);
+      }
+    }
+  }
+
+  function drawOverlayLabels() {
+    noStroke();
+    fill(44, 42, 38, 220);
+    rect(12, 12, 214, 54, 8);
+    fill(250, 246, 240);
+    textFont('DM Mono');
+    textSize(11);
+    textAlign(LEFT, TOP);
+    text(`mode: ${state.mode}`, 24, 22);
+    text(`tint(${state.r}, ${state.g}, ${state.b}, ${state.a})`, 24, 42);
+  }
+
+  function updateReadouts() {
+    document.getElementById('modeReadout').textContent = state.mode;
+    document.getElementById('imageReadout').textContent = state.usingSample ? 'sample' : uploadedName || 'uploaded';
+    document.getElementById('alphaReadout').textContent = state.a;
+    const effect = {
+      tint: 'tint color',
+      pixel: `${state.pixelSize}px mosaic`,
+      reveal: `${state.revealRadius}px reveal`,
+      repeat: `${state.repeatCount} × ${state.repeatCount}`,
+      glitch: `${state.glitchAmount}px offset`,
+      poster: 'duotone sample'
+    }[state.mode];
+    document.getElementById('effectReadout').textContent = effect;
+  }
+
+  function buildModeButtons() {
+    const wrap = document.getElementById('modeButtons');
+    wrap.innerHTML = '';
+    modes.forEach(mode => {
+      const btn = document.createElement('button');
+      btn.className = 'toggle-btn' + (state.mode === mode.id ? ' active' : '');
+      btn.type = 'button';
+      btn.textContent = mode.label;
+      btn.addEventListener('click', () => {
+        state.mode = mode.id;
+        buildModeButtons();
+        updateCode();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  function syncSliders() {
+    const pairs = {
+      red: state.r,
+      green: state.g,
+      blue: state.b,
+      alpha: state.a,
+      pixel: state.pixelSize,
+      reveal: state.revealRadius,
+      repeat: state.repeatCount,
+      glitch: state.glitchAmount
+    };
+    Object.entries(pairs).forEach(([key, value]) => {
+      const slider = document.getElementById(`${key}Slider`);
+      const label = document.getElementById(`${key}Value`);
+      if (slider) slider.value = value;
+      if (label) label.textContent = value;
+    });
+  }
+
+  function updateButtons() {
+    const fitBtn = document.getElementById('fitBtn');
+    fitBtn.textContent = state.fitImage ? 'Fit Image' : 'Stretch Image';
+    fitBtn.classList.toggle('active', state.fitImage);
+
+    const labelsBtn = document.getElementById('labelsBtn');
+    labelsBtn.textContent = state.showLabels ? 'Labels On' : 'Labels Off';
+    labelsBtn.classList.toggle('active', state.showLabels);
+  }
+
+  function updateCode() {
+    const lines = [];
+    lines.push(`<span class="cm">// Image Remix Studio starter code</span>`);
+    lines.push(`<span class="kw">let</span> img;`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">preload</span>() {`);
+    lines.push(`  img = <span class="fn">loadImage</span>(<span class="str">"your-image.jpg"</span>);`);
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">setup</span>() {`);
+    lines.push(`  <span class="fn">createCanvas</span>(<span class="num">400</span>, <span class="num">300</span>);`);
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">draw</span>() {`);
+    lines.push(`  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>);`);
+
+    if (state.mode === 'tint') {
+      lines.push(`  <span class="hi"><span class="fn">tint</span>(<span class="num">${state.r}</span>, <span class="num">${state.g}</span>, <span class="num">${state.b}</span>, <span class="num">${state.a}</span>);</span>`);
+      lines.push(`  <span class="fn">image</span>(img, <span class="num">0</span>, <span class="num">0</span>, width, height);`);
+    } else if (state.mode === 'pixel') {
+      lines.push(`  <span class="kw">let</span> step = <span class="num">${state.pixelSize}</span>;`);
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> y = <span class="num">0</span>; y < height; y += step) {`);
+      lines.push(`    <span class="kw">for</span> (<span class="kw">let</span> x = <span class="num">0</span>; x < width; x += step) {`);
+      lines.push(`      <span class="kw">let</span> c = <span class="hi">img.<span class="fn">get</span>(x, y)</span>;`);
+      lines.push(`      <span class="fn">fill</span>(c[<span class="num">0</span>], c[<span class="num">1</span>], c[<span class="num">2</span>], <span class="num">${state.a}</span>);`);
+      lines.push(`      <span class="fn">rect</span>(x, y, step, step);`);
+      lines.push(`    }`);
+      lines.push(`  }`);
+    } else if (state.mode === 'reveal') {
+      lines.push(`  <span class="fn">image</span>(img, <span class="num">0</span>, <span class="num">0</span>, width, height);`);
+      lines.push(`  <span class="fn">fill</span>(<span class="num">44</span>, <span class="num">42</span>, <span class="num">38</span>, <span class="num">210</span>);`);
+      lines.push(`  <span class="fn">rect</span>(<span class="num">0</span>, <span class="num">0</span>, width, height);`);
+      lines.push(`  <span class="cm">// Use erase() to reveal a circular window.</span>`);
+      lines.push(`  <span class="fn">erase</span>();`);
+      lines.push(`  <span class="hi"><span class="fn">circle</span>(mouseX, mouseY, <span class="num">${state.revealRadius * 2}</span>);</span>`);
+      lines.push(`  <span class="fn">noErase</span>();`);
+    } else if (state.mode === 'repeat') {
+      lines.push(`  <span class="kw">let</span> n = <span class="num">${state.repeatCount}</span>;`);
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> row = <span class="num">0</span>; row < n; row++) {`);
+      lines.push(`    <span class="kw">for</span> (<span class="kw">let</span> col = <span class="num">0</span>; col < n; col++) {`);
+      lines.push(`      <span class="fn">image</span>(img, col * width / n, row * height / n, width / n, height / n);`);
+      lines.push(`    }`);
+      lines.push(`  }`);
+    } else if (state.mode === 'glitch') {
+      lines.push(`  <span class="fn">image</span>(img, <span class="num">0</span>, <span class="num">0</span>, width, height);`);
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> y = <span class="num">0</span>; y < height; y += <span class="num">${state.pixelSize}</span>) {`);
+      lines.push(`    <span class="kw">let</span> offset = <span class="fn">random</span>(-<span class="num">${state.glitchAmount}</span>, <span class="num">${state.glitchAmount}</span>);`);
+      lines.push(`    <span class="hi"><span class="fn">copy</span>(<span class="num">0</span>, y, width, <span class="num">${state.pixelSize}</span>, offset, y, width, <span class="num">${state.pixelSize}</span>);</span>`);
+      lines.push(`  }`);
+    } else {
+      lines.push(`  <span class="kw">let</span> step = <span class="num">${state.pixelSize}</span>;`);
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> y = <span class="num">0</span>; y < height; y += step) {`);
+      lines.push(`    <span class="kw">for</span> (<span class="kw">let</span> x = <span class="num">0</span>; x < width; x += step) {`);
+      lines.push(`      <span class="kw">let</span> c = img.<span class="fn">get</span>(x, y);`);
+      lines.push(`      <span class="kw">let</span> bright = (c[<span class="num">0</span>] + c[<span class="num">1</span>] + c[<span class="num">2</span>]) / <span class="num">3</span>;`);
+      lines.push(`      <span class="kw">if</span> (bright > <span class="num">150</span>) <span class="fn">fill</span>(<span class="num">242</span>, <span class="num">204</span>, <span class="num">143</span>);`);
+      lines.push(`      <span class="kw">else</span> <span class="fn">fill</span>(<span class="num">${state.r}</span>, <span class="num">${state.g}</span>, <span class="num">${state.b}</span>);`);
+      lines.push(`      <span class="fn">rect</span>(x, y, step, step);`);
+      lines.push(`    }`);
+      lines.push(`  }`);
+    }
+
+    lines.push(`}`);
+    document.getElementById('codeOutput').innerHTML = lines.join('\n');
+  }
+
+  function plainCode() {
+    const lines = [];
+    lines.push('// Image Remix Studio starter code');
+    lines.push('let img;');
+    lines.push('');
+    lines.push('function preload() {');
+    lines.push('  img = loadImage("your-image.jpg");');
+    lines.push('}');
+    lines.push('');
+    lines.push('function setup() {');
+    lines.push('  createCanvas(400, 300);');
+    lines.push('}');
+    lines.push('');
+    lines.push('function draw() {');
+    lines.push('  background(250, 246, 240);');
+
+    if (state.mode === 'tint') {
+      lines.push(`  tint(${state.r}, ${state.g}, ${state.b}, ${state.a});`);
+      lines.push('  image(img, 0, 0, width, height);');
+    } else if (state.mode === 'pixel') {
+      lines.push(`  let step = ${state.pixelSize};`);
+      lines.push('  for (let y = 0; y < height; y += step) {');
+      lines.push('    for (let x = 0; x < width; x += step) {');
+      lines.push('      let c = img.get(x, y);');
+      lines.push(`      fill(c[0], c[1], c[2], ${state.a});`);
+      lines.push('      rect(x, y, step, step);');
+      lines.push('    }');
+      lines.push('  }');
+    } else if (state.mode === 'reveal') {
+      lines.push('  image(img, 0, 0, width, height);');
+      lines.push('  fill(44, 42, 38, 210);');
+      lines.push('  rect(0, 0, width, height);');
+      lines.push('  // Use erase() to reveal a circular window.');
+      lines.push('  erase();');
+      lines.push(`  circle(mouseX, mouseY, ${state.revealRadius * 2});`);
+      lines.push('  noErase();');
+    } else if (state.mode === 'repeat') {
+      lines.push(`  let n = ${state.repeatCount};`);
+      lines.push('  for (let row = 0; row < n; row++) {');
+      lines.push('    for (let col = 0; col < n; col++) {');
+      lines.push('      image(img, col * width / n, row * height / n, width / n, height / n);');
+      lines.push('    }');
+      lines.push('  }');
+    } else if (state.mode === 'glitch') {
+      lines.push('  image(img, 0, 0, width, height);');
+      lines.push(`  for (let y = 0; y < height; y += ${state.pixelSize}) {`);
+      lines.push(`    let offset = random(-${state.glitchAmount}, ${state.glitchAmount});`);
+      lines.push(`    copy(0, y, width, ${state.pixelSize}, offset, y, width, ${state.pixelSize});`);
+      lines.push('  }');
+    } else {
+      lines.push(`  let step = ${state.pixelSize};`);
+      lines.push('  for (let y = 0; y < height; y += step) {');
+      lines.push('    for (let x = 0; x < width; x += step) {');
+      lines.push('      let c = img.get(x, y);');
+      lines.push('      let bright = (c[0] + c[1] + c[2]) / 3;');
+      lines.push('      if (bright > 150) fill(242, 204, 143);');
+      lines.push(`      else fill(${state.r}, ${state.g}, ${state.b});`);
+      lines.push('      rect(x, y, step, step);');
+      lines.push('    }');
+      lines.push('  }');
+    }
+
+    lines.push('}');
+    return lines.join('\n');
+  }
+
+  function copyCode(button) {
+    navigator.clipboard.writeText(plainCode()).then(() => {
+      const old = button.textContent;
+      button.textContent = 'Copied!';
+      setTimeout(() => { button.textContent = old; }, 1400);
+    }).catch(() => window.prompt('Copy this code:', plainCode()));
+  }
+
+  function setState(values) {
+    Object.assign(state, values);
+    syncSliders();
+    updateButtons();
+    buildModeButtons();
+    updateCode();
+  }
+
+  function wireControls() {
+    document.getElementById('imageUpload').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      uploadedName = file.name.length > 14 ? file.name.slice(0, 12) + '…' : file.name;
+      const url = URL.createObjectURL(file);
+      loadImage(url, loaded => {
+        img = loaded;
+        state.usingSample = false;
+        URL.revokeObjectURL(url);
+      });
+    });
+
+    document.getElementById('sampleBtn').addEventListener('click', () => {
+      img = sampleGraphic;
+      state.usingSample = true;
+      uploadedName = '';
+    });
+
+    const sliderMap = {
+      redSlider: 'r',
+      greenSlider: 'g',
+      blueSlider: 'b',
+      alphaSlider: 'a',
+      pixelSlider: 'pixelSize',
+      revealSlider: 'revealRadius',
+      repeatSlider: 'repeatCount',
+      glitchSlider: 'glitchAmount'
+    };
+
+    Object.entries(sliderMap).forEach(([id, key]) => {
+      document.getElementById(id).addEventListener('input', e => {
+        state[key] = Number(e.target.value);
+        syncSliders();
+        updateCode();
+      });
+    });
+
+    document.getElementById('fitBtn').addEventListener('click', () => {
+      state.fitImage = !state.fitImage;
+      updateButtons();
+    });
+
+    document.getElementById('labelsBtn').addEventListener('click', () => {
+      state.showLabels = !state.showLabels;
+      updateButtons();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => setState({ ...defaults, usingSample: state.usingSample }));
+
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      const randomMode = modes[Math.floor(Math.random() * modes.length)].id;
+      setState({
+        mode: randomMode,
+        r: Math.floor(Math.random() * 256),
+        g: Math.floor(Math.random() * 256),
+        b: Math.floor(Math.random() * 256),
+        a: Math.floor(Math.random() * 126) + 120,
+        pixelSize: Math.floor(Math.random() * 26) + 8,
+        revealRadius: Math.floor(Math.random() * 120) + 50,
+        repeatCount: Math.floor(Math.random() * 6) + 3,
+        glitchAmount: Math.floor(Math.random() * 45) + 5
+      });
+    });
+
+    document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
+    document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
+  }
+
+  buildModeButtons();
+  syncSliders();
+  updateButtons();
+  wireControls();
+  updateCode();
+</script>
+</body>

@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Transformations Explorer — CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #FAF6F0;
+    --cream-dark: #F0EBE3;
+    --cream-darker: #E5DFD5;
+    --ink: #2C2A26;
+    --ink-light: #6B6760;
+    --ink-faint: #9E998F;
+    --accent: #3D5A80;
+    --accent-light: #5B7EA1;
+    --highlight: #E07A5F;
+    --highlight-light: #F2CC8F;
+    --success: #81B29A;
+    --grid-bg: #FFFFFF;
+    --code-bg: #2C2A26;
+    --code-text: #F0EBE3;
+    --code-keyword: #81B29A;
+    --code-number: #F2CC8F;
+    --code-comment: #8F8A81;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04);
+    --shadow-strong: 0 6px 24px rgba(44,42,38,.09), 0 0 0 1px rgba(0,0,0,.04);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; }
+  .header { margin-bottom: 24px; }
+
+  .stage-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(61,90,128,.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    max-width: 840px;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    background: var(--cream-dark);
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(340px, .85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 950px) { .workspace { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .panel-desc { font-size: 13px; color: var(--ink-light); }
+
+  .canvas-panel { padding: 14px; }
+
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 1.2 / 1;
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  #canvas-container canvas { display: block; }
+
+  .readout-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 680px) { .readout-row { grid-template-columns: repeat(2, 1fr); } }
+
+  .readout-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+  }
+
+  .readout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .readout-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .controls { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .control-group {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .control-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+
+  .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .button-row.two { grid-template-columns: repeat(2, 1fr); }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  }
+
+  button:hover { transform: translateY(-1px); }
+  .primary-btn { background: var(--accent); color: #fff; }
+  .secondary-btn { background: #fff; color: var(--accent); border: 1px solid var(--cream-darker); }
+  .toggle-btn { background: #fff; color: var(--ink-light); border: 1px solid var(--cream-darker); }
+  .toggle-btn.active { background: rgba(61,90,128,.08); color: var(--accent); border-color: rgba(61,90,128,.3); }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 102px 1fr 58px;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+  }
+
+  .slider-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+  .value-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    text-align: center;
+    padding: 3px 6px;
+  }
+
+  .mini-note { font-size: 12px; color: var(--ink-light); margin-top: 8px; }
+
+  .concept-card {
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    margin-top: 8px;
+  }
+
+  .concept-card strong { color: var(--accent); }
+
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 850px) { .lesson-grid { grid-template-columns: 1fr; } }
+
+  .lesson-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+
+  .lesson-card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .lesson-card p { font-size: 14px; color: var(--ink-light); }
+
+  .code-panel {
+    margin-top: 18px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+  }
+
+  .code-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .code-toolbar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(240,235,227,.68);
+  }
+
+  .copy-btn {
+    background: rgba(255,255,255,.06);
+    color: rgba(240,235,227,.75);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .copy-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  pre {
+    margin: 0;
+    padding: 15px 18px 18px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre;
+  }
+
+  .kw { color: var(--code-keyword); }
+  .num { color: var(--code-number); }
+  .cm { color: var(--code-comment); }
+  .fn { color: #A7C7E7; }
+  .str { color: #F2CC8F; }
+  .hi { background: rgba(224,122,95,.22); border-radius: 4px; padding: 1px 2px; margin: -1px -2px; }
+
+  .footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cream-dark);
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="stage-tag">Missing Tool 6 — Transformations + Coordinate Systems</div>
+      <h1>Transformations Explorer</h1>
+      <p class="subtitle">Explore <strong>translate()</strong>, <strong>rotate()</strong>, and <strong>scale()</strong>. Transformations do not just move a shape; they move, turn, and resize the coordinate system that the shape is drawn inside.</p>
+      <div class="tag-row" aria-label="Concept tags">
+        <span class="tag">translate()</span>
+        <span class="tag">rotate()</span>
+        <span class="tag">scale()</span>
+        <span class="tag">push()</span>
+        <span class="tag">pop()</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Local Coordinate System</div>
+          <div class="panel-desc">The blue and orange axes show the transformed coordinate system. The shape is drawn around local point <code>(0, 0)</code>.</div>
+        </div>
+        <div class="canvas-panel">
+          <div id="canvas-container" aria-label="p5.js canvas showing translate rotate and scale transformations"></div>
+          <div class="readout-row">
+            <div class="readout-card">
+              <div class="readout-label">translate</div>
+              <div class="readout-value" id="translateReadout">200, 150</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">rotate</div>
+              <div class="readout-value" id="rotateReadout">30°</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">scale</div>
+              <div class="readout-value" id="scaleReadout">1.00</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">drawn at</div>
+              <div class="readout-value" id="localReadout">0, 0</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Transform the Drawing Space</div>
+          <div class="panel-desc">Change the coordinate system first, then draw a shape inside it.</div>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <div class="control-group-title">Shape</div>
+            <div class="button-grid" id="shapeButtons"></div>
+            <p class="mini-note">The shape is drawn using local coordinates after the transformations happen.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Transformations</div>
+            <div class="slider-row">
+              <label for="translateXSlider">translate x</label>
+              <input id="translateXSlider" type="range" min="0" max="400" value="200" />
+              <span class="value-pill" id="translateXValue">200</span>
+            </div>
+            <div class="slider-row">
+              <label for="translateYSlider">translate y</label>
+              <input id="translateYSlider" type="range" min="0" max="300" value="150" />
+              <span class="value-pill" id="translateYValue">150</span>
+            </div>
+            <div class="slider-row">
+              <label for="rotationSlider">rotation</label>
+              <input id="rotationSlider" type="range" min="-180" max="180" value="30" />
+              <span class="value-pill" id="rotationValue">30°</span>
+            </div>
+            <div class="slider-row">
+              <label for="scaleSlider">scale</label>
+              <input id="scaleSlider" type="range" min="25" max="220" value="100" />
+              <span class="value-pill" id="scaleValue">1.00</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Pattern Options</div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn" id="radialBtn" type="button">Single Shape</button>
+              <button class="toggle-btn" id="animateBtn" type="button">Animation Off</button>
+            </div>
+            <div class="slider-row">
+              <label for="copiesSlider">copies</label>
+              <input id="copiesSlider" type="range" min="3" max="24" value="10" />
+              <span class="value-pill" id="copiesValue">10</span>
+            </div>
+            <p class="mini-note">Radial mode repeats the same transformed drawing around a center point.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">View + Actions</div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="gridBtn" type="button">Global Grid On</button>
+              <button class="toggle-btn active" id="axesBtn" type="button">Local Axes On</button>
+            </div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="labelsBtn" type="button">Labels On</button>
+              <button class="toggle-btn active" id="pushPopBtn" type="button">Use push/pop</button>
+            </div>
+            <div class="button-row">
+              <button class="secondary-btn" id="resetBtn" type="button">Reset</button>
+              <button class="secondary-btn" id="presetBtn" type="button">Preset</button>
+              <button class="primary-btn" id="copyTopBtn" type="button">Copy Code</button>
+            </div>
+            <div class="concept-card">
+              <p><strong>Key idea:</strong> after <code>translate(200, 150)</code>, drawing at <code>(0, 0)</code> means drawing at the new origin, not the top-left corner.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="lesson-grid" aria-label="Learning prompts">
+      <div class="lesson-card">
+        <h2>Try this</h2>
+        <p>Set translate to the center, then rotate the shape. Notice that it spins around its own local origin.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Notice this</h2>
+        <p><code>translate()</code>, <code>rotate()</code>, and <code>scale()</code> transform the coordinate system before the shape is drawn.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Remix this</h2>
+        <p>Make a spinning flower, clock hand, orbiting planet, radial mandala, or repeating geometric badge.</p>
+      </div>
+    </section>
+
+    <section class="code-panel" aria-label="Generated code preview">
+      <div class="code-toolbar">
+        <div class="code-toolbar-title">Starter Code Preview</div>
+        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
+      </div>
+      <pre id="codeOutput"></pre>
+    </section>
+
+    <footer class="footer">Transformations Explorer · CC Fest Coding Camp · p5.js learning tool</footer>
+  </div>
+
+<script>
+  const shapes = [
+    { id: 'rect', label: 'Rectangle' },
+    { id: 'triangle', label: 'Triangle' },
+    { id: 'flower', label: 'Flower' },
+    { id: 'orbit', label: 'Orbit' }
+  ];
+
+  const defaults = {
+    shape: 'rect',
+    tx: 200,
+    ty: 150,
+    rotation: 30,
+    scaleAmount: 100,
+    copies: 10,
+    radial: false,
+    animate: false,
+    showGrid: true,
+    showAxes: true,
+    showLabels: true,
+    usePushPop: true
+  };
+
+  const state = { ...defaults };
+  let spin = 0;
+  let presetIndex = 0;
+
+  function setup() {
+    const holder = document.getElementById('canvas-container');
+    const canvas = createCanvas(holder.clientWidth, holder.clientHeight);
+    canvas.parent('canvas-container');
+    pixelDensity(2);
+    textFont('DM Mono');
+  }
+
+  function windowResized() {
+    const holder = document.getElementById('canvas-container');
+    resizeCanvas(holder.clientWidth, holder.clientHeight);
+  }
+
+  function draw() {
+    background(250, 246, 240);
+    if (state.showGrid) drawGlobalGrid();
+    if (state.animate) spin += 0.8;
+
+    if (state.radial) drawRadialPattern();
+    else drawSingleTransform();
+
+    updateReadouts();
+    updateCode();
+  }
+
+  function sx(v) { return v * width / 400; }
+  function sy(v) { return v * height / 300; }
+  function ss(v) { return v * Math.min(width / 400, height / 300); }
+
+  function drawGlobalGrid() {
+    stroke(229, 223, 213);
+    strokeWeight(1);
+    for (let x = 0; x <= width; x += 40) line(x, 0, x, height);
+    for (let y = 0; y <= height; y += 40) line(0, y, width, y);
+
+    stroke(61, 90, 128, 120);
+    strokeWeight(1.5);
+    line(0, 0, width, 0);
+    line(0, 0, 0, height);
+
+    if (state.showLabels) {
+      noStroke();
+      fill(61, 90, 128);
+      textSize(11);
+      textAlign(LEFT, TOP);
+      text('global origin (0, 0)', 8, 8);
+    }
+  }
+
+  function drawSingleTransform() {
+    const tx = sx(state.tx);
+    const ty = sy(state.ty);
+    const sc = state.scaleAmount / 100;
+    const angle = radians(state.rotation + spin);
+
+    drawTransformGuide(tx, ty, angle, sc);
+
+    push();
+    translate(tx, ty);
+    rotate(angle);
+    scale(sc);
+    drawLocalShape(0);
+    pop();
+  }
+
+  function drawRadialPattern() {
+    const centerX = sx(state.tx);
+    const centerY = sy(state.ty);
+    const radius = ss(88);
+    const sc = state.scaleAmount / 100;
+
+    if (state.showLabels) {
+      noStroke();
+      fill(61, 90, 128);
+      circle(centerX, centerY, 8);
+      textAlign(CENTER, CENTER);
+      textSize(11);
+      text('pattern center', centerX, centerY - 15);
+    }
+
+    for (let i = 0; i < state.copies; i++) {
+      const angle = TWO_PI / state.copies * i + radians(state.rotation + spin);
+      const x = centerX + cos(angle) * radius;
+      const y = centerY + sin(angle) * radius;
+      drawTransformGuide(x, y, angle, sc, 0.45);
+      push();
+      translate(x, y);
+      rotate(angle);
+      scale(sc);
+      drawLocalShape(i);
+      pop();
+    }
+  }
+
+  function drawTransformGuide(x, y, angle, sc, alpha = 1) {
+    if (!state.showAxes) return;
+    push();
+    translate(x, y);
+    rotate(angle);
+    scale(sc);
+
+    strokeWeight(2 / max(sc, 0.3));
+    stroke(61, 90, 128, 190 * alpha);
+    line(0, 0, 70, 0);
+    stroke(224, 122, 95, 190 * alpha);
+    line(0, 0, 0, 70);
+
+    noStroke();
+    fill(61, 90, 128, 220 * alpha);
+    triangle(70, 0, 58, -5, 58, 5);
+    fill(224, 122, 95, 220 * alpha);
+    triangle(0, 70, -5, 58, 5, 58);
+    fill(44, 42, 38, 220 * alpha);
+    circle(0, 0, 7);
+
+    if (state.showLabels && alpha === 1) {
+      textFont('DM Mono');
+      textSize(11 / max(sc, 0.5));
+      textAlign(LEFT, CENTER);
+      fill(61, 90, 128);
+      text('local x', 76, 0);
+      fill(224, 122, 95);
+      text('local y', 8, 76);
+      fill(44, 42, 38);
+      text('(0, 0)', 8, -13);
+    }
+    pop();
+  }
+
+  function drawLocalShape(index) {
+    if (state.shape === 'rect') drawRectShape();
+    if (state.shape === 'triangle') drawTriangleShape();
+    if (state.shape === 'flower') drawFlowerShape(index);
+    if (state.shape === 'orbit') drawOrbitShape(index);
+  }
+
+  function drawRectShape() {
+    rectMode(CENTER);
+    stroke(61, 90, 128);
+    strokeWeight(3);
+    fill(242, 204, 143, 215);
+    rect(0, 0, 100, 60, 10);
+    noStroke();
+    fill(224, 122, 95);
+    circle(35, 0, 12);
+  }
+
+  function drawTriangleShape() {
+    stroke(61, 90, 128);
+    strokeWeight(3);
+    fill(129, 178, 154, 220);
+    triangle(-50, 38, 50, 38, 0, -48);
+    noStroke();
+    fill(224, 122, 95);
+    circle(0, 0, 11);
+  }
+
+  function drawFlowerShape(index) {
+    noStroke();
+    fill(242, 204, 143, 220);
+    for (let i = 0; i < 8; i++) {
+      push();
+      rotate(TWO_PI / 8 * i);
+      ellipse(32, 0, 46, 18);
+      pop();
+    }
+    fill(224, 122, 95);
+    circle(0, 0, 28);
+  }
+
+  function drawOrbitShape(index) {
+    noFill();
+    stroke(61, 90, 128);
+    strokeWeight(3);
+    circle(0, 0, 92);
+    noStroke();
+    fill(224, 122, 95);
+    circle(46, 0, 18);
+    fill(129, 178, 154);
+    circle(0, 0, 22);
+  }
+
+  function updateReadouts() {
+    document.getElementById('translateReadout').textContent = `${state.tx}, ${state.ty}`;
+    document.getElementById('rotateReadout').textContent = `${Math.round(state.rotation + spin) % 360}°`;
+    document.getElementById('scaleReadout').textContent = (state.scaleAmount / 100).toFixed(2);
+    document.getElementById('localReadout').textContent = state.radial ? `${state.copies} copies` : '0, 0';
+  }
+
+  function buildShapeButtons() {
+    const wrap = document.getElementById('shapeButtons');
+    wrap.innerHTML = '';
+    shapes.forEach(shape => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toggle-btn' + (state.shape === shape.id ? ' active' : '');
+      btn.textContent = shape.label;
+      btn.addEventListener('click', () => {
+        state.shape = shape.id;
+        buildShapeButtons();
+        updateCode();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  function syncSliders() {
+    document.getElementById('translateXSlider').value = state.tx;
+    document.getElementById('translateXValue').textContent = state.tx;
+    document.getElementById('translateYSlider').value = state.ty;
+    document.getElementById('translateYValue').textContent = state.ty;
+    document.getElementById('rotationSlider').value = state.rotation;
+    document.getElementById('rotationValue').textContent = `${state.rotation}°`;
+    document.getElementById('scaleSlider').value = state.scaleAmount;
+    document.getElementById('scaleValue').textContent = (state.scaleAmount / 100).toFixed(2);
+    document.getElementById('copiesSlider').value = state.copies;
+    document.getElementById('copiesValue').textContent = state.copies;
+  }
+
+  function updateButtons() {
+    const radialBtn = document.getElementById('radialBtn');
+    radialBtn.textContent = state.radial ? 'Radial Pattern' : 'Single Shape';
+    radialBtn.classList.toggle('active', state.radial);
+
+    const animateBtn = document.getElementById('animateBtn');
+    animateBtn.textContent = state.animate ? 'Animation On' : 'Animation Off';
+    animateBtn.classList.toggle('active', state.animate);
+
+    const gridBtn = document.getElementById('gridBtn');
+    gridBtn.textContent = state.showGrid ? 'Global Grid On' : 'Global Grid Off';
+    gridBtn.classList.toggle('active', state.showGrid);
+
+    const axesBtn = document.getElementById('axesBtn');
+    axesBtn.textContent = state.showAxes ? 'Local Axes On' : 'Local Axes Off';
+    axesBtn.classList.toggle('active', state.showAxes);
+
+    const labelsBtn = document.getElementById('labelsBtn');
+    labelsBtn.textContent = state.showLabels ? 'Labels On' : 'Labels Off';
+    labelsBtn.classList.toggle('active', state.showLabels);
+
+    const pushPopBtn = document.getElementById('pushPopBtn');
+    pushPopBtn.textContent = state.usePushPop ? 'Use push/pop' : 'No push/pop';
+    pushPopBtn.classList.toggle('active', state.usePushPop);
+  }
+
+  function shapeCodeHtml() {
+    if (state.shape === 'rect') return [
+      `  <span class="fn">rectMode</span>(CENTER);`,
+      `  <span class="fn">stroke</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>);`,
+      `  <span class="fn">fill</span>(<span class="num">242</span>, <span class="num">204</span>, <span class="num">143</span>);`,
+      `  <span class="fn">rect</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">100</span>, <span class="num">60</span>, <span class="num">10</span>);`
+    ].join('\n');
+    if (state.shape === 'triangle') return [
+      `  <span class="fn">stroke</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>);`,
+      `  <span class="fn">fill</span>(<span class="num">129</span>, <span class="num">178</span>, <span class="num">154</span>);`,
+      `  <span class="fn">triangle</span>(-<span class="num">50</span>, <span class="num">38</span>, <span class="num">50</span>, <span class="num">38</span>, <span class="num">0</span>, -<span class="num">48</span>);`
+    ].join('\n');
+    if (state.shape === 'flower') return [
+      `  <span class="fn">noStroke</span>();`,
+      `  <span class="fn">fill</span>(<span class="num">242</span>, <span class="num">204</span>, <span class="num">143</span>);`,
+      `  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < <span class="num">8</span>; i++) {`,
+      `    <span class="fn">rotate</span>(TWO_PI / <span class="num">8</span>);`,
+      `    <span class="fn">ellipse</span>(<span class="num">32</span>, <span class="num">0</span>, <span class="num">46</span>, <span class="num">18</span>);`,
+      `  }`,
+      `  <span class="fn">fill</span>(<span class="num">224</span>, <span class="num">122</span>, <span class="num">95</span>);`,
+      `  <span class="fn">circle</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">28</span>);`
+    ].join('\n');
+    return [
+      `  <span class="fn">noFill</span>();`,
+      `  <span class="fn">stroke</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>);`,
+      `  <span class="fn">circle</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">92</span>);`,
+      `  <span class="fn">fill</span>(<span class="num">224</span>, <span class="num">122</span>, <span class="num">95</span>);`,
+      `  <span class="fn">circle</span>(<span class="num">46</span>, <span class="num">0</span>, <span class="num">18</span>);`
+    ].join('\n');
+  }
+
+  function shapeCodePlain() {
+    if (state.shape === 'rect') return `  rectMode(CENTER);\n  stroke(61, 90, 128);\n  fill(242, 204, 143);\n  rect(0, 0, 100, 60, 10);`;
+    if (state.shape === 'triangle') return `  stroke(61, 90, 128);\n  fill(129, 178, 154);\n  triangle(-50, 38, 50, 38, 0, -48);`;
+    if (state.shape === 'flower') return `  noStroke();\n  fill(242, 204, 143);\n  for (let i = 0; i < 8; i++) {\n    rotate(TWO_PI / 8);\n    ellipse(32, 0, 46, 18);\n  }\n  fill(224, 122, 95);\n  circle(0, 0, 28);`;
+    return `  noFill();\n  stroke(61, 90, 128);\n  circle(0, 0, 92);\n  fill(224, 122, 95);\n  circle(46, 0, 18);`;
+  }
+
+  function updateCode() {
+    const sc = (state.scaleAmount / 100).toFixed(2);
+    const rotationLine = state.animate ? `rotation + frameCount` : `rotation`;
+    const lines = [];
+    lines.push(`<span class="cm">// Transformations Explorer starter code</span>`);
+    lines.push(`<span class="kw">let</span> rotation = <span class="num">${state.rotation}</span>;`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">setup</span>() {`);
+    lines.push(`  <span class="fn">createCanvas</span>(<span class="num">400</span>, <span class="num">300</span>);`);
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">draw</span>() {`);
+    lines.push(`  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>);`);
+
+    if (state.radial) {
+      lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < <span class="num">${state.copies}</span>; i++) {`);
+      lines.push(`    <span class="kw">let</span> angle = TWO_PI / <span class="num">${state.copies}</span> * i;`);
+      lines.push(`    <span class="kw">let</span> x = <span class="num">${state.tx}</span> + <span class="fn">cos</span>(angle) * <span class="num">88</span>;`);
+      lines.push(`    <span class="kw">let</span> y = <span class="num">${state.ty}</span> + <span class="fn">sin</span>(angle) * <span class="num">88</span>;`);
+      if (state.usePushPop) lines.push(`    <span class="fn">push</span>();`);
+      lines.push(`    <span class="hi"><span class="fn">translate</span>(x, y);</span>`);
+      lines.push(`    <span class="hi"><span class="fn">rotate</span>(angle + <span class="fn">radians</span>(${rotationLine}));</span>`);
+      lines.push(`    <span class="hi"><span class="fn">scale</span>(<span class="num">${sc}</span>);</span>`);
+      lines.push(shapeCodeHtml().split('\n').map(line => '  ' + line).join('\n'));
+      if (state.usePushPop) lines.push(`    <span class="fn">pop</span>();`);
+      lines.push(`  }`);
+    } else {
+      if (state.usePushPop) lines.push(`  <span class="fn">push</span>();`);
+      lines.push(`  <span class="hi"><span class="fn">translate</span>(<span class="num">${state.tx}</span>, <span class="num">${state.ty}</span>);</span>`);
+      lines.push(`  <span class="hi"><span class="fn">rotate</span>(<span class="fn">radians</span>(${rotationLine}));</span>`);
+      lines.push(`  <span class="hi"><span class="fn">scale</span>(<span class="num">${sc}</span>);</span>`);
+      lines.push('');
+      lines.push(shapeCodeHtml());
+      if (state.usePushPop) lines.push(`  <span class="fn">pop</span>();`);
+    }
+
+    lines.push(`}`);
+    document.getElementById('codeOutput').innerHTML = lines.join('\n');
+  }
+
+  function plainCode() {
+    const sc = (state.scaleAmount / 100).toFixed(2);
+    const rotationLine = state.animate ? `rotation + frameCount` : `rotation`;
+    const lines = [];
+    lines.push('// Transformations Explorer starter code');
+    lines.push(`let rotation = ${state.rotation};`);
+    lines.push('');
+    lines.push('function setup() {');
+    lines.push('  createCanvas(400, 300);');
+    lines.push('}');
+    lines.push('');
+    lines.push('function draw() {');
+    lines.push('  background(250, 246, 240);');
+
+    if (state.radial) {
+      lines.push(`  for (let i = 0; i < ${state.copies}; i++) {`);
+      lines.push(`    let angle = TWO_PI / ${state.copies} * i;`);
+      lines.push(`    let x = ${state.tx} + cos(angle) * 88;`);
+      lines.push(`    let y = ${state.ty} + sin(angle) * 88;`);
+      if (state.usePushPop) lines.push('    push();');
+      lines.push('    translate(x, y);');
+      lines.push(`    rotate(angle + radians(${rotationLine}));`);
+      lines.push(`    scale(${sc});`);
+      lines.push(shapeCodePlain().split('\n').map(line => '  ' + line).join('\n'));
+      if (state.usePushPop) lines.push('    pop();');
+      lines.push('  }');
+    } else {
+      if (state.usePushPop) lines.push('  push();');
+      lines.push(`  translate(${state.tx}, ${state.ty});`);
+      lines.push(`  rotate(radians(${rotationLine}));`);
+      lines.push(`  scale(${sc});`);
+      lines.push('');
+      lines.push(shapeCodePlain());
+      if (state.usePushPop) lines.push('  pop();');
+    }
+    lines.push('}');
+    return lines.join('\n');
+  }
+
+  function copyCode(button) {
+    navigator.clipboard.writeText(plainCode()).then(() => {
+      const old = button.textContent;
+      button.textContent = 'Copied!';
+      setTimeout(() => { button.textContent = old; }, 1400);
+    }).catch(() => window.prompt('Copy this code:', plainCode()));
+  }
+
+  function setState(values) {
+    Object.assign(state, values);
+    syncSliders();
+    updateButtons();
+    buildShapeButtons();
+    updateCode();
+  }
+
+  function wireControls() {
+    const sliderMap = {
+      translateXSlider: 'tx',
+      translateYSlider: 'ty',
+      rotationSlider: 'rotation',
+      scaleSlider: 'scaleAmount',
+      copiesSlider: 'copies'
+    };
+
+    Object.entries(sliderMap).forEach(([id, key]) => {
+      document.getElementById(id).addEventListener('input', e => {
+        state[key] = Number(e.target.value);
+        syncSliders();
+        updateCode();
+      });
+    });
+
+    document.getElementById('radialBtn').addEventListener('click', () => {
+      state.radial = !state.radial;
+      updateButtons();
+      updateCode();
+    });
+
+    document.getElementById('animateBtn').addEventListener('click', () => {
+      state.animate = !state.animate;
+      updateButtons();
+      updateCode();
+    });
+
+    document.getElementById('gridBtn').addEventListener('click', () => {
+      state.showGrid = !state.showGrid;
+      updateButtons();
+    });
+
+    document.getElementById('axesBtn').addEventListener('click', () => {
+      state.showAxes = !state.showAxes;
+      updateButtons();
+    });
+
+    document.getElementById('labelsBtn').addEventListener('click', () => {
+      state.showLabels = !state.showLabels;
+      updateButtons();
+    });
+
+    document.getElementById('pushPopBtn').addEventListener('click', () => {
+      state.usePushPop = !state.usePushPop;
+      updateButtons();
+      updateCode();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      spin = 0;
+      setState({ ...defaults });
+    });
+
+    document.getElementById('presetBtn').addEventListener('click', () => {
+      const presets = [
+        { shape: 'flower', tx: 200, ty: 150, rotation: 0, scaleAmount: 80, radial: true, copies: 12, animate: true },
+        { shape: 'orbit', tx: 200, ty: 150, rotation: 35, scaleAmount: 115, radial: true, copies: 8, animate: false },
+        { shape: 'triangle', tx: 200, ty: 150, rotation: -45, scaleAmount: 140, radial: false, copies: 10, animate: false },
+        { shape: 'rect', tx: 200, ty: 150, rotation: 0, scaleAmount: 100, radial: false, copies: 10, animate: true }
+      ];
+      const preset = presets[presetIndex % presets.length];
+      presetIndex++;
+      setState(preset);
+    });
+
+    document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
+    document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
+  }
+
+  buildShapeButtons();
+  syncSliders();
+  updateButtons();
+  wireControls();
+  updateCode();
+</script>
+</body>
+</html>

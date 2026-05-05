@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>If / Else Decision Studio — CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #FAF6F0;
+    --cream-dark: #F0EBE3;
+    --cream-darker: #E5DFD5;
+    --ink: #2C2A26;
+    --ink-light: #6B6760;
+    --ink-faint: #9E998F;
+    --accent: #3D5A80;
+    --accent-light: #5B7EA1;
+    --highlight: #E07A5F;
+    --highlight-light: #F2CC8F;
+    --success: #81B29A;
+    --danger: #C1666B;
+    --grid-bg: #FFFFFF;
+    --code-bg: #2C2A26;
+    --code-text: #F0EBE3;
+    --code-keyword: #81B29A;
+    --code-number: #F2CC8F;
+    --code-comment: #8F8A81;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04);
+    --shadow-strong: 0 6px 24px rgba(44,42,38,.09), 0 0 0 1px rgba(0,0,0,.04);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+  }
+
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  .header {
+    margin-bottom: 24px;
+  }
+
+  .stage-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(61,90,128,.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    max-width: 780px;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 14px;
+  }
+
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    background: var(--cream-dark);
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(340px, .85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 950px) {
+    .workspace { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .panel-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .panel-desc {
+    font-size: 13px;
+    color: var(--ink-light);
+  }
+
+  .canvas-panel {
+    padding: 14px;
+  }
+
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 1.2 / 1;
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  #canvas-container canvas { display: block; }
+
+  .readout-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 680px) {
+    .readout-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .readout-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+  }
+
+  .readout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .readout-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .readout-value.true { color: var(--success); font-weight: 700; }
+  .readout-value.false { color: var(--danger); font-weight: 700; }
+
+  .controls {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .control-group {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .control-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+
+  .condition-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .condition-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: #fff;
+    color: var(--ink-light);
+    border: 1px solid var(--cream-darker);
+    text-align: left;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .condition-btn.active {
+    color: var(--accent);
+    border-color: rgba(61,90,128,.35);
+    background: rgba(61,90,128,.08);
+  }
+
+  .condition-chip {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 92px 1fr 54px;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+  }
+
+  .slider-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .value-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    text-align: center;
+    padding: 3px 6px;
+  }
+
+  .button-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .button-row.two { grid-template-columns: repeat(2, 1fr); }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  }
+
+  button:hover { transform: translateY(-1px); }
+
+  .primary-btn {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .secondary-btn {
+    background: #fff;
+    color: var(--accent);
+    border: 1px solid var(--cream-darker);
+  }
+
+  .toggle-btn {
+    background: #fff;
+    color: var(--ink-light);
+    border: 1px solid var(--cream-darker);
+  }
+
+  .toggle-btn.active {
+    background: rgba(61,90,128,.08);
+    color: var(--accent);
+    border-color: rgba(61,90,128,.3);
+  }
+
+  .mini-note {
+    font-size: 12px;
+    color: var(--ink-light);
+    margin-top: 8px;
+  }
+
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 850px) {
+    .lesson-grid { grid-template-columns: 1fr; }
+  }
+
+  .lesson-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+
+  .lesson-card h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .lesson-card p {
+    font-size: 14px;
+    color: var(--ink-light);
+  }
+
+  .code-panel {
+    margin-top: 18px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+  }
+
+  .code-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .code-toolbar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(240,235,227,.68);
+  }
+
+  .copy-btn {
+    background: rgba(255,255,255,.06);
+    color: rgba(240,235,227,.75);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .copy-btn:hover {
+    background: rgba(255,255,255,.1);
+    color: #fff;
+  }
+
+  pre {
+    margin: 0;
+    padding: 15px 18px 18px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre;
+  }
+
+  .kw { color: var(--code-keyword); }
+  .num { color: var(--code-number); }
+  .cm { color: var(--code-comment); }
+  .fn { color: #A7C7E7; }
+  .str { color: #F2CC8F; }
+  .bool { color: #E07A5F; }
+  .hi {
+    background: rgba(224,122,95,.22);
+    border-radius: 4px;
+    padding: 1px 2px;
+    margin: -1px -2px;
+  }
+
+  .footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cream-dark);
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="stage-tag">Missing Tool 2 — Logic + Interaction</div>
+      <h1>If / Else Decision Studio</h1>
+      <p class="subtitle">Move, click, press a key, or change a value. Watch a condition switch between true and false, then see how an <strong>if / else</strong> statement chooses what the sketch should do.</p>
+      <div class="tag-row" aria-label="Concept tags">
+        <span class="tag">conditionals</span>
+        <span class="tag">if / else</span>
+        <span class="tag">booleans</span>
+        <span class="tag">mouse input</span>
+        <span class="tag">interaction</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Decision Playground</div>
+          <div class="panel-desc">Move inside the canvas. The sketch checks the selected condition every frame.</div>
+        </div>
+        <div class="canvas-panel">
+          <div id="canvas-container" aria-label="p5.js canvas showing true and false zones for if else conditions"></div>
+          <div class="readout-row">
+            <div class="readout-card">
+              <div class="readout-label">condition</div>
+              <div class="readout-value" id="conditionReadout">mouseX &gt; width / 2</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">result</div>
+              <div class="readout-value true" id="resultReadout">true</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">action</div>
+              <div class="readout-value" id="actionReadout">true branch</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">pointer</div>
+              <div class="readout-value" id="pointerReadout">x 200, y 150</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Choose the Rule</div>
+          <div class="panel-desc">A condition is a question that can be answered true or false.</div>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <div class="control-group-title">Condition Presets</div>
+            <div class="condition-grid" id="conditionGrid"></div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Adjust the Comparison</div>
+            <div class="slider-row">
+              <label for="thresholdSlider">threshold</label>
+              <input id="thresholdSlider" type="range" min="0" max="400" value="200" />
+              <span class="value-pill" id="thresholdValue">200</span>
+            </div>
+            <div class="slider-row">
+              <label for="radiusSlider">radius</label>
+              <input id="radiusSlider" type="range" min="20" max="180" value="100" />
+              <span class="value-pill" id="radiusValue">100</span>
+            </div>
+            <div class="slider-row">
+              <label for="valueSlider">value</label>
+              <input id="valueSlider" type="range" min="0" max="100" value="65" />
+              <span class="value-pill" id="valueValue">65</span>
+            </div>
+            <p class="mini-note">The threshold controls line-based rules. Radius controls the center-distance rule. Value is for the number comparison rule.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">View + Actions</div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="zonesBtn" type="button">Zones On</button>
+              <button class="toggle-btn active" id="labelsBtn" type="button">Labels On</button>
+            </div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="gridBtn" type="button">Grid On</button>
+              <button class="toggle-btn" id="freezeBtn" type="button">Follow Mouse</button>
+            </div>
+            <div class="button-row">
+              <button class="secondary-btn" id="resetBtn" type="button">Reset</button>
+              <button class="secondary-btn" id="demoBtn" type="button">Demo Move</button>
+              <button class="primary-btn" id="copyTopBtn" type="button">Copy Code</button>
+            </div>
+            <p class="mini-note">For <code>mouseIsPressed</code>, click and hold in the canvas. For <code>keyIsPressed</code>, press any key.</p>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="lesson-grid" aria-label="Learning prompts">
+      <div class="lesson-card">
+        <h2>Try this</h2>
+        <p>Move from one side of the canvas to the other and watch the condition change from false to true.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Notice this</h2>
+        <p>The code inside <strong>if</strong> runs when the condition is true. The code inside <strong>else</strong> runs when it is false.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Remix this</h2>
+        <p>Use a condition to change color, size, background, movement, or whether a shape appears at all.</p>
+      </div>
+    </section>
+
+    <section class="code-panel" aria-label="Generated code preview">
+      <div class="code-toolbar">
+        <div class="code-toolbar-title">Starter Code Preview</div>
+        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
+      </div>
+      <pre id="codeOutput"></pre>
+    </section>
+
+    <footer class="footer">If / Else Decision Studio · CC Fest Coding Camp · p5.js learning tool</footer>
+  </div>
+
+<script>
+  const conditions = [
+    {
+      id: 'rightHalf',
+      label: 'mouseX > width / 2',
+      chip: 'left / right',
+      code: 'mouseX > width / 2',
+      plain: 'mouseX > width / 2',
+      check: () => state.pointerX > width / 2,
+      note: 'Is the pointer on the right side?'
+    },
+    {
+      id: 'belowLine',
+      label: 'mouseY > height / 2',
+      chip: 'top / bottom',
+      code: 'mouseY > height / 2',
+      plain: 'mouseY > height / 2',
+      check: () => state.pointerY > height / 2,
+      note: 'Is the pointer in the lower half?'
+    },
+    {
+      id: 'pastThreshold',
+      label: 'mouseX > threshold',
+      chip: 'custom line',
+      code: () => `mouseX > ${state.threshold}`,
+      plain: () => `mouseX > ${state.threshold}`,
+      check: () => state.pointerX > mapCanvasX(state.threshold),
+      note: 'Is mouseX greater than the threshold?'
+    },
+    {
+      id: 'nearCenter',
+      label: 'distance < radius',
+      chip: 'near / far',
+      code: () => `dist(mouseX, mouseY, width / 2, height / 2) < ${state.radius}`,
+      plain: () => `dist(mouseX, mouseY, width / 2, height / 2) < ${state.radius}`,
+      check: () => dist(state.pointerX, state.pointerY, width / 2, height / 2) < mapRadius(state.radius),
+      note: 'Is the pointer close to the center?'
+    },
+    {
+      id: 'mousePressed',
+      label: 'mouseIsPressed',
+      chip: 'click state',
+      code: 'mouseIsPressed',
+      plain: 'mouseIsPressed',
+      check: () => state.mouseDown,
+      note: 'Is the mouse currently being pressed?'
+    },
+    {
+      id: 'keyPressed',
+      label: 'keyIsPressed',
+      chip: 'keyboard',
+      code: 'keyIsPressed',
+      plain: 'keyIsPressed',
+      check: () => state.keyDown,
+      note: 'Is any key currently being pressed?'
+    },
+    {
+      id: 'valueThreshold',
+      label: 'value > 50',
+      chip: 'number rule',
+      code: () => `value > 50`,
+      plain: () => `value > 50`,
+      check: () => state.value > 50,
+      note: 'Is a number above a chosen cutoff?'
+    }
+  ];
+
+  const defaults = {
+    conditionId: 'rightHalf',
+    threshold: 200,
+    radius: 100,
+    value: 65,
+    pointerX: 220,
+    pointerY: 150,
+    showZones: true,
+    showLabels: true,
+    showGrid: true,
+    frozen: false,
+    demo: false,
+    mouseDown: false,
+    keyDown: false
+  };
+
+  const state = { ...defaults };
+  let demoT = 0;
+  let lastResult = false;
+  let activeLine = 'condition';
+
+  function setup() {
+    const holder = document.getElementById('canvas-container');
+    const canvas = createCanvas(holder.clientWidth, holder.clientHeight);
+    canvas.parent('canvas-container');
+    pixelDensity(2);
+    state.pointerX = width * 0.55;
+    state.pointerY = height * 0.5;
+  }
+
+  function windowResized() {
+    const holder = document.getElementById('canvas-container');
+    resizeCanvas(holder.clientWidth, holder.clientHeight);
+    state.pointerX = constrain(state.pointerX, 0, width);
+    state.pointerY = constrain(state.pointerY, 0, height);
+  }
+
+  function draw() {
+    background(250, 246, 240);
+
+    if (state.demo) {
+      demoT += 0.018;
+      state.pointerX = map(sin(demoT), -1, 1, width * 0.12, width * 0.88);
+      state.pointerY = map(cos(demoT * 0.8), -1, 1, height * 0.18, height * 0.82);
+    } else if (!state.frozen && isMouseInside()) {
+      state.pointerX = mouseX;
+      state.pointerY = mouseY;
+    }
+
+    if (state.showGrid) drawGrid();
+    drawConditionZone();
+
+    const result = currentCondition().check();
+    lastResult = result;
+
+    drawActionVisual(result);
+    drawPointer(result);
+    updateReadouts(result);
+    updateCode(result);
+  }
+
+  function isMouseInside() {
+    return mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height;
+  }
+
+  function mousePressed() {
+    if (isMouseInside()) {
+      state.mouseDown = true;
+      state.pointerX = mouseX;
+      state.pointerY = mouseY;
+      state.demo = false;
+      updateButtons();
+    }
+  }
+
+  function mouseReleased() {
+    state.mouseDown = false;
+  }
+
+  function keyPressed() {
+    state.keyDown = true;
+  }
+
+  function keyReleased() {
+    state.keyDown = false;
+  }
+
+  function mapCanvasX(value) {
+    return map(value, 0, 400, 0, width);
+  }
+
+  function mapCanvasY(value) {
+    return map(value, 0, 300, 0, height);
+  }
+
+  function mapRadius(value) {
+    return value * Math.min(width / 400, height / 300);
+  }
+
+  function currentCondition() {
+    return conditions.find(c => c.id === state.conditionId) || conditions[0];
+  }
+
+  function getConditionCode() {
+    const c = currentCondition();
+    return typeof c.code === 'function' ? c.code() : c.code;
+  }
+
+  function getConditionPlain() {
+    const c = currentCondition();
+    return typeof c.plain === 'function' ? c.plain() : c.plain;
+  }
+
+  function drawGrid() {
+    stroke(229, 223, 213);
+    strokeWeight(1);
+    const step = 40;
+    for (let x = 0; x <= width; x += step) line(x, 0, x, height);
+    for (let y = 0; y <= height; y += step) line(0, y, width, y);
+
+    stroke(61, 90, 128, 120);
+    strokeWeight(1.5);
+    line(0, 0, width, 0);
+    line(0, 0, 0, height);
+  }
+
+  function drawConditionZone() {
+    const c = currentCondition();
+    if (!state.showZones) return;
+
+    noStroke();
+
+    if (c.id === 'rightHalf') {
+      fill(129, 178, 154, 70);
+      rect(width / 2, 0, width / 2, height);
+      fill(193, 102, 107, 45);
+      rect(0, 0, width / 2, height);
+      drawBoundaryLine(width / 2, 0, width / 2, height, 'width / 2');
+    }
+
+    if (c.id === 'belowLine') {
+      fill(129, 178, 154, 70);
+      rect(0, height / 2, width, height / 2);
+      fill(193, 102, 107, 45);
+      rect(0, 0, width, height / 2);
+      drawBoundaryLine(0, height / 2, width, height / 2, 'height / 2');
+    }
+
+    if (c.id === 'pastThreshold') {
+      const tx = mapCanvasX(state.threshold);
+      fill(129, 178, 154, 70);
+      rect(tx, 0, width - tx, height);
+      fill(193, 102, 107, 45);
+      rect(0, 0, tx, height);
+      drawBoundaryLine(tx, 0, tx, height, `x = ${state.threshold}`);
+    }
+
+    if (c.id === 'nearCenter') {
+      fill(193, 102, 107, 35);
+      rect(0, 0, width, height);
+      fill(129, 178, 154, 70);
+      circle(width / 2, height / 2, mapRadius(state.radius) * 2);
+      stroke(61, 90, 128, 120);
+      strokeWeight(1.5);
+      noFill();
+      circle(width / 2, height / 2, mapRadius(state.radius) * 2);
+      noStroke();
+      fill(61, 90, 128);
+      circle(width / 2, height / 2, 7);
+      if (state.showLabels) drawSmallLabel(`radius = ${state.radius}`, width / 2 + mapRadius(state.radius) + 8, height / 2);
+    }
+
+    if (c.id === 'mousePressed') {
+      fill(129, 178, 154, state.mouseDown ? 95 : 30);
+      rect(0, 0, width, height);
+      if (state.showLabels) drawCenterMessage('Click and hold inside the canvas');
+    }
+
+    if (c.id === 'keyPressed') {
+      fill(129, 178, 154, state.keyDown ? 95 : 30);
+      rect(0, 0, width, height);
+      if (state.showLabels) drawCenterMessage('Press any key');
+    }
+
+    if (c.id === 'valueThreshold') {
+      const barW = width * 0.66;
+      const barH = 18;
+      const x = width * 0.17;
+      const y = height * 0.48;
+      fill(193, 102, 107, 55);
+      rect(x, y, barW * 0.5, barH, 99);
+      fill(129, 178, 154, 80);
+      rect(x + barW * 0.5, y, barW * 0.5, barH, 99);
+      fill(61, 90, 128);
+      circle(x + map(state.value, 0, 100, 0, barW), y + barH / 2, 18);
+      if (state.showLabels) {
+        drawSmallLabel('0', x, y + 42);
+        drawSmallLabel('50', x + barW / 2 - 8, y + 42);
+        drawSmallLabel('100', x + barW - 18, y + 42);
+        drawSmallLabel(`value = ${state.value}`, x + map(state.value, 0, 100, 0, barW) - 34, y - 14);
+      }
+    }
+  }
+
+  function drawBoundaryLine(x1, y1, x2, y2, label) {
+    stroke(61, 90, 128);
+    strokeWeight(2);
+    drawingContext.setLineDash([7, 7]);
+    line(x1, y1, x2, y2);
+    drawingContext.setLineDash([]);
+    if (state.showLabels) drawSmallLabel(label, x1 + 8, y1 + 22);
+  }
+
+  function drawSmallLabel(label, x, y) {
+    noStroke();
+    fill(44, 42, 38, 220);
+    rect(x - 4, y - 15, textWidth(label) + 8, 20, 5);
+    fill(250, 246, 240);
+    textFont('DM Mono');
+    textSize(11);
+    textAlign(LEFT, CENTER);
+    text(label, x, y - 5);
+  }
+
+  function drawCenterMessage(message) {
+    textFont('DM Sans');
+    textSize(16);
+    textAlign(CENTER, CENTER);
+    noStroke();
+    fill(44, 42, 38, 220);
+    text(message, width / 2, height / 2);
+  }
+
+  function drawActionVisual(result) {
+    const fillColor = result ? color(129, 178, 154) : color(224, 122, 95);
+    const label = result ? 'TRUE: run the if block' : 'FALSE: run the else block';
+
+    noStroke();
+    fill(fillColor);
+    circle(width - 54, 52, result ? 48 : 34);
+
+    fill(44, 42, 38);
+    textFont('DM Sans');
+    textSize(13);
+    textAlign(RIGHT, CENTER);
+    text(label, width - 88, 52);
+  }
+
+  function drawPointer(result) {
+    const pointerColor = result ? color(129, 178, 154) : color(224, 122, 95);
+
+    stroke(44, 42, 38, 90);
+    strokeWeight(1.25);
+    line(state.pointerX, 0, state.pointerX, height);
+    line(0, state.pointerY, width, state.pointerY);
+
+    noStroke();
+    fill(pointerColor);
+    circle(state.pointerX, state.pointerY, 25);
+
+    fill(44, 42, 38);
+    circle(state.pointerX, state.pointerY, 5);
+
+    if (state.showLabels && currentCondition().id !== 'valueThreshold') {
+      fill(44, 42, 38);
+      textFont('DM Mono');
+      textSize(12);
+      textAlign(LEFT, BOTTOM);
+      text(`mouseX ${Math.round(state.pointerX / width * 400)}`, state.pointerX + 12, state.pointerY - 8);
+      text(`mouseY ${Math.round(state.pointerY / height * 300)}`, state.pointerX + 12, state.pointerY + 8);
+    }
+  }
+
+  function updateReadouts(result) {
+    const c = currentCondition();
+    document.getElementById('conditionReadout').textContent = getConditionPlain();
+    const resultEl = document.getElementById('resultReadout');
+    resultEl.textContent = result ? 'true' : 'false';
+    resultEl.classList.toggle('true', result);
+    resultEl.classList.toggle('false', !result);
+    document.getElementById('actionReadout').textContent = result ? 'if block' : 'else block';
+    document.getElementById('pointerReadout').textContent = c.id === 'valueThreshold'
+      ? `value ${state.value}`
+      : `x ${Math.round(state.pointerX / width * 400)}, y ${Math.round(state.pointerY / height * 300)}`;
+  }
+
+  function buildConditionButtons() {
+    const grid = document.getElementById('conditionGrid');
+    grid.innerHTML = '';
+    conditions.forEach(condition => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'condition-btn' + (condition.id === state.conditionId ? ' active' : '');
+      btn.innerHTML = `<span>${condition.label}</span><span class="condition-chip">${condition.chip}</span>`;
+      btn.addEventListener('click', () => {
+        state.conditionId = condition.id;
+        state.demo = false;
+        activeLine = 'condition';
+        buildConditionButtons();
+        updateButtons();
+        updateCode(lastResult);
+      });
+      grid.appendChild(btn);
+    });
+  }
+
+  function updateButtons() {
+    const zonesBtn = document.getElementById('zonesBtn');
+    zonesBtn.textContent = state.showZones ? 'Zones On' : 'Zones Off';
+    zonesBtn.classList.toggle('active', state.showZones);
+
+    const labelsBtn = document.getElementById('labelsBtn');
+    labelsBtn.textContent = state.showLabels ? 'Labels On' : 'Labels Off';
+    labelsBtn.classList.toggle('active', state.showLabels);
+
+    const gridBtn = document.getElementById('gridBtn');
+    gridBtn.textContent = state.showGrid ? 'Grid On' : 'Grid Off';
+    gridBtn.classList.toggle('active', state.showGrid);
+
+    const freezeBtn = document.getElementById('freezeBtn');
+    freezeBtn.textContent = state.frozen ? 'Pointer Frozen' : 'Follow Mouse';
+    freezeBtn.classList.toggle('active', state.frozen);
+
+    const demoBtn = document.getElementById('demoBtn');
+    demoBtn.textContent = state.demo ? 'Stop Demo' : 'Demo Move';
+  }
+
+  function highlight(key, html) {
+    return key === activeLine ? `<span class="hi">${html}</span>` : html;
+  }
+
+  function updateCode(result) {
+    const code = document.getElementById('codeOutput');
+    const condition = getConditionCode();
+    const usesValue = state.conditionId === 'valueThreshold';
+    const lines = [];
+
+    lines.push(`<span class="cm">// If / Else Decision Studio starter code</span>`);
+    if (usesValue) {
+      lines.push(`<span class="kw">let</span> value = <span class="num">${state.value}</span>;`);
+    }
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">setup</span>() {`);
+    lines.push(`  <span class="fn">createCanvas</span>(<span class="num">400</span>, <span class="num">300</span>);`);
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">draw</span>() {`);
+    lines.push(`  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>);`);
+    if (usesValue) {
+      lines.push(`  <span class="cm">// Try changing this number.</span>`);
+      lines.push(`  value = <span class="num">${state.value}</span>;`);
+    }
+    lines.push('');
+    lines.push(highlight('condition', `  <span class="kw">if</span> (${condition}) {`));
+    lines.push(`    <span class="cm">// TRUE branch</span>`);
+    lines.push(`    <span class="fn">fill</span>(<span class="num">129</span>, <span class="num">178</span>, <span class="num">154</span>);`);
+    lines.push(`    <span class="fn">circle</span>(width / <span class="num">2</span>, height / <span class="num">2</span>, <span class="num">100</span>);`);
+    lines.push(`  } <span class="kw">else</span> {`);
+    lines.push(`    <span class="cm">// FALSE branch</span>`);
+    lines.push(`    <span class="fn">fill</span>(<span class="num">224</span>, <span class="num">122</span>, <span class="num">95</span>);`);
+    lines.push(`    <span class="fn">rect</span>(width / <span class="num">2</span> - <span class="num">50</span>, height / <span class="num">2</span> - <span class="num">50</span>, <span class="num">100</span>, <span class="num">100</span>, <span class="num">10</span>);`);
+    lines.push(`  }`);
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="cm">// Current result: ${result ? 'true → if block runs' : 'false → else block runs'}</span>`);
+
+    code.innerHTML = lines.join('\n');
+  }
+
+  function plainCode() {
+    const condition = getConditionPlain();
+    const usesValue = state.conditionId === 'valueThreshold';
+    const lines = [];
+
+    lines.push('// If / Else Decision Studio starter code');
+    if (usesValue) lines.push(`let value = ${state.value};`);
+    lines.push('');
+    lines.push('function setup() {');
+    lines.push('  createCanvas(400, 300);');
+    lines.push('}');
+    lines.push('');
+    lines.push('function draw() {');
+    lines.push('  background(250, 246, 240);');
+    if (usesValue) {
+      lines.push('  // Try changing this number.');
+      lines.push(`  value = ${state.value};`);
+    }
+    lines.push('');
+    lines.push(`  if (${condition}) {`);
+    lines.push('    // TRUE branch');
+    lines.push('    fill(129, 178, 154);');
+    lines.push('    circle(width / 2, height / 2, 100);');
+    lines.push('  } else {');
+    lines.push('    // FALSE branch');
+    lines.push('    fill(224, 122, 95);');
+    lines.push('    rect(width / 2 - 50, height / 2 - 50, 100, 100, 10);');
+    lines.push('  }');
+    lines.push('}');
+    return lines.join('\n');
+  }
+
+  function copyCode(button) {
+    navigator.clipboard.writeText(plainCode()).then(() => {
+      const old = button.textContent;
+      button.textContent = 'Copied!';
+      setTimeout(() => { button.textContent = old; }, 1400);
+    }).catch(() => {
+      window.prompt('Copy this code:', plainCode());
+    });
+  }
+
+  function reset() {
+    Object.assign(state, defaults);
+    document.getElementById('thresholdSlider').value = state.threshold;
+    document.getElementById('radiusSlider').value = state.radius;
+    document.getElementById('valueSlider').value = state.value;
+    document.getElementById('thresholdValue').textContent = state.threshold;
+    document.getElementById('radiusValue').textContent = state.radius;
+    document.getElementById('valueValue').textContent = state.value;
+    state.pointerX = width * 0.55;
+    state.pointerY = height * 0.5;
+    demoT = 0;
+    buildConditionButtons();
+    updateButtons();
+  }
+
+  function wireControls() {
+    document.getElementById('thresholdSlider').addEventListener('input', e => {
+      state.threshold = Number(e.target.value);
+      document.getElementById('thresholdValue').textContent = state.threshold;
+      activeLine = 'condition';
+      updateCode(lastResult);
+    });
+
+    document.getElementById('radiusSlider').addEventListener('input', e => {
+      state.radius = Number(e.target.value);
+      document.getElementById('radiusValue').textContent = state.radius;
+      activeLine = 'condition';
+      updateCode(lastResult);
+    });
+
+    document.getElementById('valueSlider').addEventListener('input', e => {
+      state.value = Number(e.target.value);
+      document.getElementById('valueValue').textContent = state.value;
+      activeLine = 'condition';
+      updateCode(lastResult);
+    });
+
+    document.getElementById('zonesBtn').addEventListener('click', () => {
+      state.showZones = !state.showZones;
+      updateButtons();
+    });
+
+    document.getElementById('labelsBtn').addEventListener('click', () => {
+      state.showLabels = !state.showLabels;
+      updateButtons();
+    });
+
+    document.getElementById('gridBtn').addEventListener('click', () => {
+      state.showGrid = !state.showGrid;
+      updateButtons();
+    });
+
+    document.getElementById('freezeBtn').addEventListener('click', () => {
+      state.frozen = !state.frozen;
+      state.demo = false;
+      updateButtons();
+    });
+
+    document.getElementById('demoBtn').addEventListener('click', () => {
+      state.demo = !state.demo;
+      state.frozen = false;
+      updateButtons();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', reset);
+    document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
+    document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
+  }
+
+  buildConditionButtons();
+  wireControls();
+  updateButtons();
+  updateCode(false);
+</script>
+</body>
+</html>

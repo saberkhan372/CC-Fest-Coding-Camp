@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Map() Explorer — CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #FAF6F0;
+    --cream-dark: #F0EBE3;
+    --cream-darker: #E5DFD5;
+    --ink: #2C2A26;
+    --ink-light: #6B6760;
+    --ink-faint: #9E998F;
+    --accent: #3D5A80;
+    --accent-light: #5B7EA1;
+    --highlight: #E07A5F;
+    --highlight-light: #F2CC8F;
+    --success: #81B29A;
+    --grid-bg: #FFFFFF;
+    --code-bg: #2C2A26;
+    --code-text: #F0EBE3;
+    --code-keyword: #81B29A;
+    --code-number: #F2CC8F;
+    --code-comment: #8F8A81;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04);
+    --shadow-strong: 0 6px 24px rgba(44,42,38,.09), 0 0 0 1px rgba(0,0,0,.04);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; }
+  .header { margin-bottom: 24px; }
+
+  .stage-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(61,90,128,.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    max-width: 820px;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    background: var(--cream-dark);
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(340px, .85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 950px) { .workspace { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .panel-desc { font-size: 13px; color: var(--ink-light); }
+
+  .canvas-panel { padding: 14px; }
+
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 1.2 / 1;
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  #canvas-container canvas { display: block; }
+
+  .readout-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 680px) { .readout-row { grid-template-columns: repeat(2, 1fr); } }
+
+  .readout-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+  }
+
+  .readout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .readout-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .controls { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .control-group {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .control-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+
+  .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .button-row.two { grid-template-columns: repeat(2, 1fr); }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  }
+
+  button:hover { transform: translateY(-1px); }
+  .primary-btn { background: var(--accent); color: #fff; }
+  .secondary-btn { background: #fff; color: var(--accent); border: 1px solid var(--cream-darker); }
+  .toggle-btn { background: #fff; color: var(--ink-light); border: 1px solid var(--cream-darker); }
+  .toggle-btn.active { background: rgba(61,90,128,.08); color: var(--accent); border-color: rgba(61,90,128,.3); }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 58px;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+  }
+
+  .slider-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+  .value-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    text-align: center;
+    padding: 3px 6px;
+  }
+
+  .mini-note { font-size: 12px; color: var(--ink-light); margin-top: 8px; }
+
+  .range-card {
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    margin-top: 8px;
+  }
+
+  .range-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 5px;
+  }
+
+  .range-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 850px) { .lesson-grid { grid-template-columns: 1fr; } }
+
+  .lesson-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+
+  .lesson-card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .lesson-card p { font-size: 14px; color: var(--ink-light); }
+
+  .code-panel {
+    margin-top: 18px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+  }
+
+  .code-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .code-toolbar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(240,235,227,.68);
+  }
+
+  .copy-btn {
+    background: rgba(255,255,255,.06);
+    color: rgba(240,235,227,.75);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .copy-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  pre {
+    margin: 0;
+    padding: 15px 18px 18px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre;
+  }
+
+  .kw { color: var(--code-keyword); }
+  .num { color: var(--code-number); }
+  .cm { color: var(--code-comment); }
+  .fn { color: #A7C7E7; }
+  .str { color: #F2CC8F; }
+  .hi { background: rgba(224,122,95,.22); border-radius: 4px; padding: 1px 2px; margin: -1px -2px; }
+
+  .footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cream-dark);
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="stage-tag">Missing Tool 4 — Mapping + Interaction</div>
+      <h1>Map() Explorer</h1>
+      <p class="subtitle">Use <strong>map()</strong> to translate one range of numbers into another. Turn mouse position, a slider, or time into size, color, opacity, rotation, stroke weight, or speed.</p>
+      <div class="tag-row" aria-label="Concept tags">
+        <span class="tag">map()</span>
+        <span class="tag">ranges</span>
+        <span class="tag">mouse input</span>
+        <span class="tag">data mapping</span>
+        <span class="tag">interaction</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Mapping Playground</div>
+          <div class="panel-desc">Move your mouse in the canvas or change the input mode. The mapped output controls the sketch.</div>
+        </div>
+        <div class="canvas-panel">
+          <div id="canvas-container" aria-label="p5.js canvas showing mapped input and output values"></div>
+          <div class="readout-row">
+            <div class="readout-card">
+              <div class="readout-label">input</div>
+              <div class="readout-value" id="inputReadout">mouseX = 200</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">output</div>
+              <div class="readout-value" id="outputReadout">size = 75</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">mapping</div>
+              <div class="readout-value" id="mappingReadout">0–400 → 20–140</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">controls</div>
+              <div class="readout-value" id="controlsReadout">circle size</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Build the Mapping</div>
+          <div class="panel-desc">Choose an input range, an output range, and what the mapped value controls.</div>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <div class="control-group-title">Input Value</div>
+            <div class="button-grid" id="inputButtons"></div>
+            <div class="slider-row">
+              <label for="manualSlider">manual</label>
+              <input id="manualSlider" type="range" min="0" max="400" value="200" />
+              <span class="value-pill" id="manualValue">200</span>
+            </div>
+            <p class="mini-note">The input is the original number. In p5.js, this is often <code>mouseX</code>, <code>mouseY</code>, time, or a data value.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Output Control</div>
+            <div class="button-grid" id="outputButtons"></div>
+            <p class="mini-note">The output is the new number. It can control almost anything visual.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Output Range</div>
+            <div class="slider-row">
+              <label for="outMinSlider">out min</label>
+              <input id="outMinSlider" type="range" min="0" max="255" value="20" />
+              <span class="value-pill" id="outMinValue">20</span>
+            </div>
+            <div class="slider-row">
+              <label for="outMaxSlider">out max</label>
+              <input id="outMaxSlider" type="range" min="0" max="255" value="140" />
+              <span class="value-pill" id="outMaxValue">140</span>
+            </div>
+            <div class="button-row two" style="margin-top:8px">
+              <button class="toggle-btn" id="reverseBtn" type="button">Reverse Output</button>
+              <button class="toggle-btn active" id="clampBtn" type="button">Constrain On</button>
+            </div>
+            <div class="range-card">
+              <div class="range-title">Map Statement</div>
+              <div class="range-text" id="mapStatement">map(mouseX, 0, width, 20, 140)</div>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">View + Actions</div>
+            <div class="button-row two" style="margin-bottom:8px">
+              <button class="toggle-btn active" id="guidesBtn" type="button">Guides On</button>
+              <button class="toggle-btn active" id="labelsBtn" type="button">Labels On</button>
+            </div>
+            <div class="button-row">
+              <button class="secondary-btn" id="resetBtn" type="button">Reset</button>
+              <button class="secondary-btn" id="demoBtn" type="button">Demo Move</button>
+              <button class="primary-btn" id="copyTopBtn" type="button">Copy Code</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="lesson-grid" aria-label="Learning prompts">
+      <div class="lesson-card">
+        <h2>Try this</h2>
+        <p>Make the circle grow as your mouse moves right. Then reverse the output so it shrinks instead.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Notice this</h2>
+        <p><strong>map()</strong> does not make randomness. It converts one range into another range using a relationship you choose.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Remix this</h2>
+        <p>Use <code>mouseX</code> for size and <code>mouseY</code> for color, or map data values to build a visual story.</p>
+      </div>
+    </section>
+
+    <section class="code-panel" aria-label="Generated code preview">
+      <div class="code-toolbar">
+        <div class="code-toolbar-title">Starter Code Preview</div>
+        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
+      </div>
+      <pre id="codeOutput"></pre>
+    </section>
+
+    <footer class="footer">Map() Explorer · CC Fest Coding Camp · p5.js learning tool</footer>
+  </div>
+
+<script>
+  const inputModes = [
+    { id: 'mouseX', label: 'mouseX', range: '0, width', min: 0, max: 400, code: 'mouseX', read: 'mouseX' },
+    { id: 'mouseY', label: 'mouseY', range: '0, height', min: 0, max: 300, code: 'mouseY', read: 'mouseY' },
+    { id: 'manual', label: 'manual value', range: '0, 400', min: 0, max: 400, code: 'inputValue', read: 'inputValue' },
+    { id: 'time', label: 'time wave', range: '0, 400', min: 0, max: 400, code: 'inputValue', read: 'timeWave' }
+  ];
+
+  const outputModes = [
+    { id: 'size', label: 'circle size', varName: 'circleSize', defaultMin: 20, defaultMax: 140 },
+    { id: 'brightness', label: 'brightness', varName: 'brightness', defaultMin: 30, defaultMax: 255 },
+    { id: 'opacity', label: 'opacity', varName: 'alpha', defaultMin: 30, defaultMax: 255 },
+    { id: 'rotation', label: 'rotation', varName: 'angle', defaultMin: 0, defaultMax: 180 },
+    { id: 'stroke', label: 'stroke weight', varName: 'strokeW', defaultMin: 1, defaultMax: 18 },
+    { id: 'yPosition', label: 'y position', varName: 'mappedY', defaultMin: 40, defaultMax: 260 }
+  ];
+
+  const defaults = {
+    inputMode: 'mouseX',
+    outputMode: 'size',
+    manualValue: 200,
+    outMin: 20,
+    outMax: 140,
+    constrainOutput: true,
+    showGuides: true,
+    showLabels: true,
+    demo: false
+  };
+
+  const state = { ...defaults };
+  let pointerX = 200;
+  let pointerY = 150;
+  let demoT = 0;
+  let mappedValue = 75;
+  let inputValue = 200;
+
+  function setup() {
+    const holder = document.getElementById('canvas-container');
+    const canvas = createCanvas(holder.clientWidth, holder.clientHeight);
+    canvas.parent('canvas-container');
+    pixelDensity(2);
+  }
+
+  function windowResized() {
+    const holder = document.getElementById('canvas-container');
+    resizeCanvas(holder.clientWidth, holder.clientHeight);
+  }
+
+  function draw() {
+    background(250, 246, 240);
+    if (state.showGuides) drawGrid();
+
+    updateInput();
+    mappedValue = calculateMappedValue();
+
+    drawRangeDiagram();
+    drawMappedVisual();
+    drawPointer();
+    updateReadouts();
+    updateCode();
+  }
+
+  function updateInput() {
+    if (state.demo) {
+      demoT += 0.025;
+      pointerX = map(sin(demoT), -1, 1, width * 0.08, width * 0.92);
+      pointerY = map(cos(demoT * 0.75), -1, 1, height * 0.15, height * 0.85);
+    } else if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+      pointerX = mouseX;
+      pointerY = mouseY;
+    }
+
+    if (state.inputMode === 'mouseX') inputValue = map(pointerX, 0, width, 0, 400);
+    if (state.inputMode === 'mouseY') inputValue = map(pointerY, 0, height, 0, 300);
+    if (state.inputMode === 'manual') inputValue = state.manualValue;
+    if (state.inputMode === 'time') inputValue = map(sin(frameCount * 0.025), -1, 1, 0, 400);
+  }
+
+  function calculateMappedValue() {
+    const mode = inputModes.find(m => m.id === state.inputMode);
+    let result = map(inputValue, mode.min, mode.max, state.outMin, state.outMax);
+    if (state.constrainOutput) {
+      result = constrain(result, Math.min(state.outMin, state.outMax), Math.max(state.outMin, state.outMax));
+    }
+    return result;
+  }
+
+  function drawGrid() {
+    stroke(229, 223, 213);
+    strokeWeight(1);
+    for (let x = 0; x <= width; x += 40) line(x, 0, x, height);
+    for (let y = 0; y <= height; y += 40) line(0, y, width, y);
+    stroke(61, 90, 128, 110);
+    strokeWeight(1.5);
+    line(0, 0, width, 0);
+    line(0, 0, 0, height);
+  }
+
+  function drawRangeDiagram() {
+    const left = width * 0.08;
+    const right = width * 0.92;
+    const inputY = height - 72;
+    const outputY = height - 34;
+    const mode = inputModes.find(m => m.id === state.inputMode);
+    const t = constrain((inputValue - mode.min) / (mode.max - mode.min), 0, 1);
+    const outT = state.outMax === state.outMin ? 0 : constrain((mappedValue - Math.min(state.outMin, state.outMax)) / Math.abs(state.outMax - state.outMin), 0, 1);
+    const inputX = lerp(left, right, t);
+    const outputX = lerp(left, right, outT);
+
+    strokeWeight(7);
+    stroke(229, 223, 213);
+    line(left, inputY, right, inputY);
+    line(left, outputY, right, outputY);
+
+    stroke(61, 90, 128);
+    strokeWeight(7);
+    line(left, inputY, inputX, inputY);
+
+    stroke(224, 122, 95);
+    line(left, outputY, outputX, outputY);
+
+    noStroke();
+    fill(61, 90, 128);
+    circle(inputX, inputY, 15);
+    fill(224, 122, 95);
+    circle(outputX, outputY, 15);
+
+    if (state.showLabels) {
+      textFont('DM Mono');
+      textSize(11);
+      noStroke();
+      fill(44, 42, 38);
+      textAlign(LEFT, CENTER);
+      text(`input: ${mode.min} → ${mode.max}`, left, inputY - 18);
+      text(`output: ${state.outMin} → ${state.outMax}`, left, outputY - 18);
+      textAlign(RIGHT, CENTER);
+      text(Math.round(inputValue), right, inputY - 18);
+      text(Math.round(mappedValue), right, outputY - 18);
+    }
+  }
+
+  function drawMappedVisual() {
+    const cx = width / 2;
+    const cy = height * 0.36;
+    const output = outputModes.find(m => m.id === state.outputMode);
+
+    let circleSize = 88;
+    let brightness = 150;
+    let alpha = 230;
+    let angle = 0;
+    let strokeW = 4;
+    let mappedY = cy;
+
+    if (output.id === 'size') circleSize = mappedValue;
+    if (output.id === 'brightness') brightness = mappedValue;
+    if (output.id === 'opacity') alpha = mappedValue;
+    if (output.id === 'rotation') angle = radians(mappedValue);
+    if (output.id === 'stroke') strokeW = mappedValue;
+    if (output.id === 'yPosition') mappedY = map(mappedValue, state.outMin, state.outMax, height * 0.18, height * 0.58);
+
+    push();
+    translate(cx, mappedY);
+    rotate(angle);
+
+    stroke(61, 90, 128);
+    strokeWeight(strokeW);
+    fill(brightness, 160, 220, alpha);
+    rectMode(CENTER);
+    rect(0, 0, circleSize, circleSize * 0.72, 14);
+
+    noStroke();
+    fill(224, 122, 95, alpha);
+    circle(0, 0, circleSize * 0.42);
+    pop();
+
+    if (state.showLabels) {
+      noStroke();
+      fill(44, 42, 38);
+      textFont('DM Mono');
+      textSize(12);
+      textAlign(CENTER, CENTER);
+      text(`${output.varName} = ${Math.round(mappedValue)}`, cx, height * 0.08);
+    }
+  }
+
+  function drawPointer() {
+    if (state.inputMode === 'manual' || state.inputMode === 'time') return;
+    stroke(44, 42, 38, 90);
+    strokeWeight(1.25);
+    line(pointerX, 0, pointerX, height);
+    line(0, pointerY, width, pointerY);
+    noStroke();
+    fill(61, 90, 128);
+    circle(pointerX, pointerY, 18);
+  }
+
+  function updateReadouts() {
+    const input = inputModes.find(m => m.id === state.inputMode);
+    const output = outputModes.find(m => m.id === state.outputMode);
+    const inMaxLabel = input.id === 'mouseY' ? 'height' : input.id === 'mouseX' ? 'width' : input.max;
+
+    document.getElementById('inputReadout').textContent = `${input.read} = ${Math.round(inputValue)}`;
+    document.getElementById('outputReadout').textContent = `${output.varName} = ${Math.round(mappedValue)}`;
+    document.getElementById('mappingReadout').textContent = `${input.min}–${inMaxLabel} → ${state.outMin}–${state.outMax}`;
+    document.getElementById('controlsReadout').textContent = output.label;
+    document.getElementById('mapStatement').textContent = getMapExpressionPlain();
+  }
+
+  function getMapExpressionPlain() {
+    const input = inputModes.find(m => m.id === state.inputMode);
+    return `map(${input.code}, ${input.range}, ${state.outMin}, ${state.outMax})`;
+  }
+
+  function getMapExpressionHtml() {
+    const input = inputModes.find(m => m.id === state.inputMode);
+    const rangeParts = input.range.split(',');
+    return `<span class="fn">map</span>(${input.code}, <span class="num">${rangeParts[0].trim()}</span>, ${rangeParts[1].trim()}, <span class="num">${state.outMin}</span>, <span class="num">${state.outMax}</span>)`;
+  }
+
+  function buildButtons() {
+    const inputWrap = document.getElementById('inputButtons');
+    inputWrap.innerHTML = '';
+    inputModes.forEach(mode => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toggle-btn' + (state.inputMode === mode.id ? ' active' : '');
+      btn.textContent = mode.label;
+      btn.addEventListener('click', () => {
+        state.inputMode = mode.id;
+        buildButtons();
+        updateCode();
+      });
+      inputWrap.appendChild(btn);
+    });
+
+    const outputWrap = document.getElementById('outputButtons');
+    outputWrap.innerHTML = '';
+    outputModes.forEach(mode => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toggle-btn' + (state.outputMode === mode.id ? ' active' : '');
+      btn.textContent = mode.label;
+      btn.addEventListener('click', () => {
+        state.outputMode = mode.id;
+        if (mode.defaultMin !== undefined) {
+          state.outMin = mode.defaultMin;
+          state.outMax = mode.defaultMax;
+          syncSliders();
+        }
+        buildButtons();
+        updateCode();
+      });
+      outputWrap.appendChild(btn);
+    });
+  }
+
+  function syncSliders() {
+    document.getElementById('manualSlider').value = state.manualValue;
+    document.getElementById('manualValue').textContent = state.manualValue;
+    document.getElementById('outMinSlider').value = state.outMin;
+    document.getElementById('outMinValue').textContent = state.outMin;
+    document.getElementById('outMaxSlider').value = state.outMax;
+    document.getElementById('outMaxValue').textContent = state.outMax;
+  }
+
+  function updateButtons() {
+    const reverseBtn = document.getElementById('reverseBtn');
+    reverseBtn.classList.toggle('active', state.outMin > state.outMax);
+
+    const clampBtn = document.getElementById('clampBtn');
+    clampBtn.textContent = state.constrainOutput ? 'Constrain On' : 'Constrain Off';
+    clampBtn.classList.toggle('active', state.constrainOutput);
+
+    const guidesBtn = document.getElementById('guidesBtn');
+    guidesBtn.textContent = state.showGuides ? 'Guides On' : 'Guides Off';
+    guidesBtn.classList.toggle('active', state.showGuides);
+
+    const labelsBtn = document.getElementById('labelsBtn');
+    labelsBtn.textContent = state.showLabels ? 'Labels On' : 'Labels Off';
+    labelsBtn.classList.toggle('active', state.showLabels);
+
+    document.getElementById('demoBtn').textContent = state.demo ? 'Stop Demo' : 'Demo Move';
+  }
+
+  function updateCode() {
+    const output = outputModes.find(m => m.id === state.outputMode);
+    const input = inputModes.find(m => m.id === state.inputMode);
+    const lines = [];
+
+    lines.push(`<span class="cm">// Map() Explorer starter code</span>`);
+    if (state.inputMode === 'manual' || state.inputMode === 'time') lines.push(`<span class="kw">let</span> inputValue = <span class="num">${Math.round(inputValue)}</span>;`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">setup</span>() {`);
+    lines.push(`  <span class="fn">createCanvas</span>(<span class="num">400</span>, <span class="num">300</span>);`);
+    lines.push(`}`);
+    lines.push('');
+    lines.push(`<span class="kw">function</span> <span class="fn">draw</span>() {`);
+    lines.push(`  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>);`);
+    if (state.inputMode === 'time') lines.push(`  inputValue = <span class="fn">map</span>(<span class="fn">sin</span>(frameCount * <span class="num">0.025</span>), <span class="num">-1</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">400</span>);`);
+    if (state.inputMode === 'manual') lines.push(`  inputValue = <span class="num">${state.manualValue}</span>;`);
+    lines.push('');
+    lines.push(`  <span class="kw">let</span> ${output.varName} = <span class="hi">${getMapExpressionHtml()}</span>;`);
+    if (state.constrainOutput) {
+      lines.push(`  ${output.varName} = <span class="fn">constrain</span>(${output.varName}, <span class="fn">min</span>(<span class="num">${state.outMin}</span>, <span class="num">${state.outMax}</span>), <span class="fn">max</span>(<span class="num">${state.outMin}</span>, <span class="num">${state.outMax}</span>));`);
+    }
+    lines.push('');
+
+    if (output.id === 'size') {
+      lines.push(`  <span class="fn">fill</span>(<span class="num">120</span>, <span class="num">160</span>, <span class="num">220</span>);`);
+      lines.push(`  <span class="fn">circle</span>(width / <span class="num">2</span>, height / <span class="num">2</span>, circleSize);`);
+    } else if (output.id === 'brightness') {
+      lines.push(`  <span class="fn">fill</span>(brightness, <span class="num">160</span>, <span class="num">220</span>);`);
+      lines.push(`  <span class="fn">circle</span>(width / <span class="num">2</span>, height / <span class="num">2</span>, <span class="num">100</span>);`);
+    } else if (output.id === 'opacity') {
+      lines.push(`  <span class="fn">fill</span>(<span class="num">120</span>, <span class="num">160</span>, <span class="num">220</span>, alpha);`);
+      lines.push(`  <span class="fn">circle</span>(width / <span class="num">2</span>, height / <span class="num">2</span>, <span class="num">100</span>);`);
+    } else if (output.id === 'rotation') {
+      lines.push(`  <span class="fn">push</span>();`);
+      lines.push(`  <span class="fn">translate</span>(width / <span class="num">2</span>, height / <span class="num">2</span>);`);
+      lines.push(`  <span class="fn">rotate</span>(<span class="fn">radians</span>(angle));`);
+      lines.push(`  <span class="fn">rect</span>(-<span class="num">50</span>, -<span class="num">35</span>, <span class="num">100</span>, <span class="num">70</span>, <span class="num">10</span>);`);
+      lines.push(`  <span class="fn">pop</span>();`);
+    } else if (output.id === 'stroke') {
+      lines.push(`  <span class="fn">stroke</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>);`);
+      lines.push(`  <span class="fn">strokeWeight</span>(strokeW);`);
+      lines.push(`  <span class="fn">fill</span>(<span class="num">242</span>, <span class="num">204</span>, <span class="num">143</span>);`);
+      lines.push(`  <span class="fn">circle</span>(width / <span class="num">2</span>, height / <span class="num">2</span>, <span class="num">100</span>);`);
+    } else {
+      lines.push(`  <span class="fn">fill</span>(<span class="num">120</span>, <span class="num">160</span>, <span class="num">220</span>);`);
+      lines.push(`  <span class="fn">circle</span>(width / <span class="num">2</span>, mappedY, <span class="num">90</span>);`);
+    }
+
+    lines.push(`}`);
+    document.getElementById('codeOutput').innerHTML = lines.join('\n');
+  }
+
+  function plainCode() {
+    const output = outputModes.find(m => m.id === state.outputMode);
+    const lines = [];
+    lines.push('// Map() Explorer starter code');
+    if (state.inputMode === 'manual' || state.inputMode === 'time') lines.push(`let inputValue = ${Math.round(inputValue)};`);
+    lines.push('');
+    lines.push('function setup() {');
+    lines.push('  createCanvas(400, 300);');
+    lines.push('}');
+    lines.push('');
+    lines.push('function draw() {');
+    lines.push('  background(250, 246, 240);');
+    if (state.inputMode === 'time') lines.push('  inputValue = map(sin(frameCount * 0.025), -1, 1, 0, 400);');
+    if (state.inputMode === 'manual') lines.push(`  inputValue = ${state.manualValue};`);
+    lines.push('');
+    lines.push(`  let ${output.varName} = ${getMapExpressionPlain()};`);
+    if (state.constrainOutput) lines.push(`  ${output.varName} = constrain(${output.varName}, min(${state.outMin}, ${state.outMax}), max(${state.outMin}, ${state.outMax}));`);
+    lines.push('');
+    if (output.id === 'size') {
+      lines.push('  fill(120, 160, 220);');
+      lines.push('  circle(width / 2, height / 2, circleSize);');
+    } else if (output.id === 'brightness') {
+      lines.push('  fill(brightness, 160, 220);');
+      lines.push('  circle(width / 2, height / 2, 100);');
+    } else if (output.id === 'opacity') {
+      lines.push('  fill(120, 160, 220, alpha);');
+      lines.push('  circle(width / 2, height / 2, 100);');
+    } else if (output.id === 'rotation') {
+      lines.push('  push();');
+      lines.push('  translate(width / 2, height / 2);');
+      lines.push('  rotate(radians(angle));');
+      lines.push('  rect(-50, -35, 100, 70, 10);');
+      lines.push('  pop();');
+    } else if (output.id === 'stroke') {
+      lines.push('  stroke(61, 90, 128);');
+      lines.push('  strokeWeight(strokeW);');
+      lines.push('  fill(242, 204, 143);');
+      lines.push('  circle(width / 2, height / 2, 100);');
+    } else {
+      lines.push('  fill(120, 160, 220);');
+      lines.push('  circle(width / 2, mappedY, 90);');
+    }
+    lines.push('}');
+    return lines.join('\n');
+  }
+
+  function copyCode(button) {
+    navigator.clipboard.writeText(plainCode()).then(() => {
+      const old = button.textContent;
+      button.textContent = 'Copied!';
+      setTimeout(() => { button.textContent = old; }, 1400);
+    }).catch(() => window.prompt('Copy this code:', plainCode()));
+  }
+
+  function wireControls() {
+    document.getElementById('manualSlider').addEventListener('input', e => {
+      state.manualValue = Number(e.target.value);
+      document.getElementById('manualValue').textContent = state.manualValue;
+    });
+
+    document.getElementById('outMinSlider').addEventListener('input', e => {
+      state.outMin = Number(e.target.value);
+      document.getElementById('outMinValue').textContent = state.outMin;
+      updateButtons();
+    });
+
+    document.getElementById('outMaxSlider').addEventListener('input', e => {
+      state.outMax = Number(e.target.value);
+      document.getElementById('outMaxValue').textContent = state.outMax;
+      updateButtons();
+    });
+
+    document.getElementById('reverseBtn').addEventListener('click', () => {
+      const temp = state.outMin;
+      state.outMin = state.outMax;
+      state.outMax = temp;
+      syncSliders();
+      updateButtons();
+    });
+
+    document.getElementById('clampBtn').addEventListener('click', () => {
+      state.constrainOutput = !state.constrainOutput;
+      updateButtons();
+    });
+
+    document.getElementById('guidesBtn').addEventListener('click', () => {
+      state.showGuides = !state.showGuides;
+      updateButtons();
+    });
+
+    document.getElementById('labelsBtn').addEventListener('click', () => {
+      state.showLabels = !state.showLabels;
+      updateButtons();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      Object.assign(state, defaults);
+      syncSliders();
+      buildButtons();
+      updateButtons();
+    });
+
+    document.getElementById('demoBtn').addEventListener('click', () => {
+      state.demo = !state.demo;
+      updateButtons();
+    });
+
+    document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
+    document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
+  }
+
+  buildButtons();
+  syncSliders();
+  updateButtons();
+  wireControls();
+  updateCode();
+</script>
+</body>
+</html>
