@@ -1026,36 +1026,22 @@ function keyPressed() {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #f7f1e7;
-      font-family: sans-serif;
+      background: #faf6f0;
     }
     body {
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    #canvas-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      box-sizing: border-box;
-    }
     canvas {
-      max-width: 100%;
+      width: 100% !important;
       height: auto !important;
       display: block;
-      border-radius: 18px;
-      box-shadow: 0 8px 24px rgba(44,42,38,.08);
-      background: white;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"><\/script>
 </head>
 <body>
-  <div id="canvas-container"></div>
   <script>
     window.addEventListener("error", function(event) {
       const pre = document.createElement("pre");
