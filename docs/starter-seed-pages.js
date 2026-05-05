@@ -1357,30 +1357,37 @@ ${code}
 
         <main class="sketch-layout">
           <section class="card editor-card">
-            <div class="card-inner">
-              <div class="editor-toolbar">
-                <div>
-                  <h2>Starter Editor</h2>
-                  <p>${seed.liveSeed}</p>
+            <div class="editor-chrome">
+              <div class="chrome-left">
+                <div class="window-dots">
+                  <span class="wdot wdot-r"></span>
+                  <span class="wdot wdot-y"></span>
+                  <span class="wdot wdot-g"></span>
                 </div>
-                <div class="button-row">
-                  <button class="button primary" id="run-button" type="button">Play</button>
-                  <button class="button ghost" id="stop-button" type="button">Stop</button>
-                  <button class="button ghost" id="reset-button" type="button">Reset</button>
-                </div>
+                <span class="chrome-filename">sketch.js</span>
               </div>
-              <div class="editor-layout">
-                <div class="editor-pane">
-                  <div class="pane-label">Code</div>
-                  <textarea id="starter-editor" class="code-editor" spellcheck="false"></textarea>
+              <div class="chrome-right">
+                <span class="run-status" id="run-status">● ready</span>
+                <button class="edbtn edbtn-run" id="run-button" type="button">▶ Run</button>
+                <button class="edbtn edbtn-stop" id="stop-button" type="button">■ Stop</button>
+                <button class="edbtn edbtn-reset" id="reset-button" type="button">↺ Reset</button>
+              </div>
+            </div>
+            <div class="editor-hint">${seed.liveSeed}</div>
+            <div class="editor-layout">
+              <div class="editor-pane">
+                <div class="pane-chrome">Code</div>
+                <textarea id="starter-editor" class="code-editor" spellcheck="false"></textarea>
+              </div>
+              <div class="preview-pane">
+                <div class="pane-chrome pane-chrome-light">
+                  <span>Canvas</span>
+                  <span class="live-badge" id="live-badge">● live</span>
                 </div>
-                <div class="preview-pane">
-                  <div class="pane-label">Canvas</div>
-                  <div class="preview-stage">
-                    <iframe id="preview-frame" class="preview-frame" title="${seed.title} preview"></iframe>
-                  </div>
-                  <div class="editor-status">Use Play to rerun your code after edits. Stop clears the preview.</div>
+                <div class="preview-stage">
+                  <iframe id="preview-frame" class="preview-frame" title="${seed.title} preview"></iframe>
                 </div>
+                <div class="editor-status">Edit code · press Run to see changes · Reset restores the original</div>
               </div>
             </div>
           </section>
@@ -1420,16 +1427,33 @@ ${code}
     const runButton = document.getElementById("run-button");
     const stopButton = document.getElementById("stop-button");
     const resetButton = document.getElementById("reset-button");
+    const statusEl = document.getElementById("run-status");
+    const liveBadge = document.getElementById("live-badge");
     const initialCode = seed.code.trim();
 
     editor.value = initialCode;
 
+    function setStatus(text, color) {
+      if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || ""; }
+    }
+
+    function setLive(on) {
+      if (liveBadge) liveBadge.style.opacity = on ? "0.8" : "0.28";
+    }
+
     function runCurrentCode() {
+      setStatus("● running", "var(--gold)");
+      setLive(false);
       frame.srcdoc = buildRunnerDoc(editor.value);
+      setTimeout(() => { setStatus("● live", "var(--success)"); setLive(true); }, 900);
     }
 
     runButton.addEventListener("click", runCurrentCode);
-    stopButton.addEventListener("click", () => stopRunner(frame));
+    stopButton.addEventListener("click", () => {
+      setStatus("■ stopped", "rgba(240,235,227,.45)");
+      setLive(false);
+      stopRunner(frame);
+    });
     resetButton.addEventListener("click", () => {
       editor.value = initialCode;
       runCurrentCode();
