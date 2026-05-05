@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<title>Random Sentence Generator — CC Fest Coding Camp</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    <main>
+    </main>
+    <script>
+// let x = 0;
+let x = [3, 7, 9, 2];
+
+let verbs = ["runs", "jumps","swims"];
+let nouns = ["saber", "meghna", "anaya"];
+let adverbs = ["fast", "slowly", "quietly"];
+
+function setup() {
+  createCanvas(400, 400);
+  //console.log(x[0]);
+  
+}
+
+function mousePressed(){
+  background(255);
+  for(let i = 0; i < 3; i = i + 1){
+    textSize(20);
+    text(random(nouns) + " " + random(verbs) + " " + random(adverbs) + ".", 50 * i + 50, 50 * i + 50)
+    
+  }
+}
+
+
+</script>
+  </body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Animation Explorer — CC Fest Coding Camp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .controls {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .variable-display {
+            font-family: monospace;
+            background: #282c34;
+            color: #61dafb;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            width: 400px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        button {
+            margin: 5px;
+            padding: 8px 12px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>Animation Explorer</h2>
+        <div>
+            <label>Speed X: <input type="range" min="-5" max="5" value="1" step="0.1" oninput="updateSpeedX(this.value)"></label>
+            <label>Speed Y: <input type="range" min="-5" max="5" value="1" step="0.1" oninput="updateSpeedY(this.value)"></label>
+            <label>Ball Size: <input type="range" min="10" max="100" value="20" step="1" oninput="updateBallSize(this.value)"></label>
+        </div>
+        <div>
+            <button onclick="togglePath()">Toggle Path</button>
+            <button onclick="togglePause()">Pause/Resume</button>
+            <button onclick="resetAnimation()">Reset</button>
+        </div>
+    </div>
+    <div class="variable-display" id="variables">// Variables will appear here</div>
+    <script>
+// Tool 5 animation explorer
+
+let x, y;
+let speedX = 1;
+let speedY = 1;
+let showPath = false;
+let path = [];
+let ballSize = 20;
+let paused = false;
+let edgeCollisions = 0;
+
+function setup() {
+  createCanvas(400, 400);
+  resetAnimation();
+}
+
+function draw() {
+  if (paused) return;
+
+  // Clear background
+  if (!showPath) {
+    background(220);
+  } else {
+    background(220, 10); // Create a fading effect
+  }
+
+  // Update position
+  x += speedX;
+  y += speedY;
+
+  // Bounce off edges
+  if (x < 0 || x > width) {
+    speedX *= -1;
+    edgeCollisions++;
+  }
+  if (y < 0 || y > height) {
+    speedY *= -1;
+    edgeCollisions++;
+  }
+
+  // Keep within bounds
+  x = constrain(x, 0, width);
+  y = constrain(y, 0, height);
+
+  // Draw the ball
+  fill(255, 0, 0);
+  noStroke();
+  circle(x, y, ballSize);
+
+  // Store and draw path
+  if (showPath) {
+    path.push({ x, y });
+    if (path.length > 100) path.shift();
+
+    noFill();
+    stroke(255, 0, 0, 150);
+    beginShape();
+    for (let i = 0; i < path.length; i++) {
+      stroke(255, 0, 0, map(i, 0, path.length, 50, 255)); // Gradient fading
+      vertex(path[i].x, path[i].y);
+    }
+    endShape();
+  }
+
+  // Update variable display
+  updateVariableDisplay();
+}
+
+function updateSpeedX(value) {
+  speedX = Number(value);
+}
+
+function updateSpeedY(value) {
+  speedY = Number(value);
+}
+
+function updateBallSize(value) {
+  ballSize = Number(value);
+}
+
+function togglePath() {
+  showPath = !showPath;
+  if (!showPath) path = [];
+}
+
+function togglePause() {
+  paused = !paused;
+}
+
+function resetAnimation() {
+  x = width / 2;
+  y = height / 2;
+  path = [];
+  edgeCollisions = 0;
+  paused = false;
+}
+
+function updateVariableDisplay() {
+  const variables = {
+    x: Math.round(x),
+    y: Math.round(y),
+    speedX: speedX.toFixed(1),
+    speedY: speedY.toFixed(1),
+    ballSize: ballSize,
+    edgeCollisions: edgeCollisions,
+  };
+  document.getElementById("variables").innerText = Object.entries(variables)
+    .map(([key, value]) => `${key} = ${value}`)
+    .join("\n");
+}
+
+</script>
+    </script>
+</body>
+</html>

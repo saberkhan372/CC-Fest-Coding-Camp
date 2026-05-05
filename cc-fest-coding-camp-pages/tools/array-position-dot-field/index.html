@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<title>Array of Positions / Dot Field Sketch — CC Fest Coding Camp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <script>
+// two empty arrays
+var xPositions = [];
+var yPositions = [];
+
+var index = 0;
+
+
+
+function setup() {
+  createCanvas(400, 400);
+  noStroke();
+  
+  // push a bunch of random positions into the arrays
+  for (var i = 0; i < 100; i++) {    
+    xPositions.push( random(400) );
+    yPositions.push( random(400) );
+  }
+
+}
+
+function draw() {
+  background(220);
+  fill(0);
+  
+  // loop through the arrays and draw ellipses at the x and y positions
+  for(var i = 0; i < xPositions.length; i++){
+    ellipse(xPositions[i], yPositions[i], 10, 10);
+  }
+
+}
+
+
+</script>
+  </body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simple Array Explorer — CC Fest Coding Camp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .controls {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .controls button {
+            margin: 5px;
+            padding: 8px 12px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
+        }
+        .controls label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        .controls select {
+            width: 100%;
+        }
+        .array-display {
+            font-family: monospace;
+            background: #282c34;
+            color: #61dafb;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            width: 400px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>Array Explorer</h2>
+        <button onclick="addValue()">Add Value</button>
+        <button onclick="removeValue()">Remove Value</button>
+        <button onclick="sortArray()">Sort Array</button>
+        <button onclick="shuffleArray()">Shuffle</button>
+        <label>Max Array Size:
+            <input type="range" min="2" max="15" value="10" oninput="updateMaxArraySize(this.value)">
+        </label>
+        <label>Visualization:
+            <select onchange="changeVisualization(this.value)">
+                <option value="bars">Bars</option>
+                <option value="circles">Circles</option>
+                <option value="line">Line Graph</option>
+            </select>
+        </label>
+    </div>
+    <div class="array-display" id="array-display">// Array operations will appear here</div>
+    <script>
+let numbers = [5, 8, 3, 2, 9];
+let visualizationType = "bars";
+let highlighted = -1;
+let maxArraySize = 10;
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(220);
+
+  // Draw array visualization
+  if (visualizationType === "bars") {
+    drawBars();
+  } else if (visualizationType === "circles") {
+    drawCircles();
+  } else if (visualizationType === "line") {
+    drawLine();
+  }
+
+  // Update array display
+  updateArrayDisplay();
+}
+
+function drawBars() {
+  let barWidth = width / numbers.length;
+  for (let i = 0; i < numbers.length; i++) {
+    let x = i * barWidth;
+    let h = map(numbers[i], 0, 10, 0, height - 50);
+
+    if (mouseX > x && mouseX < x + barWidth) {
+      fill(100, 200, 255);
+      highlighted = i;
+    } else {
+      fill(100, 150, 200);
+    }
+
+    rect(x, height - h, barWidth - 2, h);
+
+    fill(0);
+    textAlign(CENTER);
+    text(numbers[i], x + barWidth / 2, height - h - 10);
+  }
+}
+
+function drawCircles() {
+  let angle = TWO_PI / numbers.length;
+  let radius = min(width, height) * 0.4;
+
+  for (let i = 0; i < numbers.length; i++) {
+    let a = angle * i - PI / 2;
+    let x = width / 2 + cos(a) * radius;
+    let y = height / 2 + sin(a) * radius;
+    let size = map(numbers[i], 0, 10, 10, 50);
+
+    let d = dist(mouseX, mouseY, x, y);
+    if (d < size / 2) {
+      fill(100, 200, 255);
+      highlighted = i;
+    } else {
+      fill(100, 150, 200);
+    }
+
+    circle(x, y, size);
+
+    fill(0);
+    textAlign(CENTER);
+    text(numbers[i], x, y);
+  }
+}
+
+function drawLine() {
+  stroke(100, 150, 200);
+  strokeWeight(2);
+
+  for (let i = 0; i < numbers.length - 1; i++) {
+    let x1 = map(i, 0, numbers.length - 1, 50, width - 50);
+    let y1 = map(numbers[i], 0, 10, height - 50, 50);
+    let x2 = map(i + 1, 0, numbers.length - 1, 50, width - 50);
+    let y2 = map(numbers[i + 1], 0, 10, height - 50, 50);
+
+    line(x1, y1, x2, y2);
+
+    // Draw points
+    fill(100, 150, 200);
+    ellipse(x1, y1, 10);
+
+    // Highlight points under mouse
+    if (dist(mouseX, mouseY, x1, y1) < 10) {
+      fill(100, 200, 255);
+      ellipse(x1, y1, 10);
+      highlighted = i;
+    }
+
+    fill(0);
+    noStroke();
+    textAlign(CENTER);
+    text(numbers[i], x1, y1 - 10);
+    stroke(100, 150, 200);
+  }
+
+  // Draw last point
+  let xLast = map(numbers.length - 1, 0, numbers.length - 1, 50, width - 50);
+  let yLast = map(numbers[numbers.length - 1], 0, 10, height - 50, 50);
+
+  fill(100, 150, 200);
+  ellipse(xLast, yLast, 10);
+
+  if (dist(mouseX, mouseY, xLast, yLast) < 10) {
+    fill(100, 200, 255);
+    ellipse(xLast, yLast, 10);
+    highlighted = numbers.length - 1;
+  }
+
+  fill(0);
+  noStroke();
+  text(numbers[numbers.length - 1], xLast, yLast - 10);
+}
+
+function addValue() {
+  if (numbers.length < maxArraySize) {
+    numbers.push(floor(random(1, 11)));
+  }
+}
+
+function removeValue() {
+  if (numbers.length > 1) {
+    numbers.pop();
+  }
+}
+
+function sortArray() {
+  numbers.sort((a, b) => a - b);
+}
+
+function shuffleArray() {
+  for (let i = numbers.length - 1; i > 0; i--) {
+    let j = floor(random(i + 1));
+    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+  }
+}
+
+function changeVisualization(type) {
+  visualizationType = type;
+}
+
+function updateMaxArraySize(value) {
+  maxArraySize = Number(value);
+  while (numbers.length > maxArraySize) {
+    numbers.pop();
+  }
+}
+
+function updateArrayDisplay() {
+  let code = `// Array operations\nlet numbers = [${numbers.join(", ")}];`;
+  if (highlighted >= 0) {
+    code += `\nnumbers[${highlighted}] = ${numbers[highlighted]}; // Selected element`;
+  }
+  document.getElementById("array-display").innerText = code;
+}
+
+</script>
+  </body>
+</html>

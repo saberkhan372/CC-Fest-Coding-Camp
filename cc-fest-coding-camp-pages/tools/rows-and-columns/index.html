@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Rows and Columns Tool — CC Fest Coding Camp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .controls label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .controls input,
+        .controls select {
+            width: 100%;
+        }
+        .controls button {
+            grid-column: span 2;
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
+        }
+        .code-preview {
+            font-family: monospace;
+            background: #282c34;
+            color: #61dafb;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 8px;
+            width: 400px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <div>
+            <label>Rows:</label>
+            <input type="range" min="1" max="20" value="5" oninput="updateRows(this.value)">
+        </div>
+        <div>
+            <label>Columns:</label>
+            <input type="range" min="1" max="20" value="5" oninput="updateCols(this.value)">
+        </div>
+        <div>
+            <label>Size:</label>
+            <input type="range" min="10" max="50" value="30" oninput="updateSize(this.value)">
+        </div>
+        <div>
+            <label>Color Mode:</label>
+            <select onchange="updateColorMode(this.value)">
+                <option value="rainbow">Rainbow</option>
+                <option value="gradient">Gradient</option>
+                <option value="random">Random</option>
+            </select>
+        </div>
+        <div>
+            <label>Shape:</label>
+            <select onchange="updateShape(this.value)">
+                <option value="rect">Rectangle</option>
+                <option value="circle">Circle</option>
+                <option value="triangle">Triangle</option>
+            </select>
+        </div>
+        <div>
+            <label>Rotation:</label>
+            <input type="checkbox" onchange="toggleRotation(this.checked)">
+        </div>
+        <button onclick="copyCode()">Copy Code</button>
+    </div>
+    <div id="canvas-container"></div>
+    <div class="code-preview" id="code-preview">// Code preview will appear here</div>
+    <script>
+ let rows = 5;
+        let cols = 5;
+        let size = 30;
+        let colorMode = 'rainbow';
+        let shape = 'rect';
+        let rotateShapes = false;
+        let angle = 0;
+
+        function setup() {
+            let canvas = createCanvas(400, 400);
+            canvas.parent('canvas-container');
+            angleMode(DEGREES);
+            updateCodePreview();
+        }
+
+        function draw() {
+            background(220);
+
+            let spacingX = width / (cols + 1);
+            let spacingY = height / (rows + 1);
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    let x = (j + 1) * spacingX;
+                    let y = (i + 1) * spacingY;
+
+                    if (colorMode === 'rainbow') {
+                        fill(map(i * cols + j, 0, rows * cols, 0, 360), 80, 80);
+                    } else if (colorMode === 'gradient') {
+                        fill(map(x, 0, width, 0, 360), map(y, 0, height, 0, 100), 80);
+                    } else if (colorMode === 'random') {
+                        fill(random(360), 80, 80);
+                    }
+
+                    push();
+                    translate(x, y);
+                    if (rotateShapes) {
+                        rotate(angle);
+                    }
+
+                    if (shape === 'rect') {
+                        rectMode(CENTER);
+                        rect(0, 0, size, size);
+                    } else if (shape === 'circle') {
+                        circle(0, 0, size);
+                    } else if (shape === 'triangle') {
+                        triangle(-size / 2, size / 2, 0, -size / 2, size / 2, size / 2);
+                    }
+
+                    pop();
+                }
+            }
+
+            if (rotateShapes) {
+                angle += 0.5;
+            }
+        }
+
+        function updateRows(value) {
+            rows = Number(value);
+            updateCodePreview();
+        }
+
+        function updateCols(value) {
+            cols = Number(value);
+            updateCodePreview();
+        }
+
+        function updateSize(value) {
+            size = Number(value);
+            updateCodePreview();
+        }
+
+        function updateColorMode(value) {
+            colorMode = value;
+            updateCodePreview();
+        }
+
+        function updateShape(value) {
+            shape = value;
+            updateCodePreview();
+        }
+
+        function toggleRotation(value) {
+            rotateShapes = value;
+        }
+
+        function updateCodePreview() {
+            const code = `// Pattern configuration
+let rows = ${rows};
+let cols = ${cols};
+let size = ${size};
+let colorMode = '${colorMode}';
+let shape = '${shape}';
+let rotateShapes = ${rotateShapes};
+
+// Main loop
+for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+        let x = (j + 1) * width / (cols + 1);
+        let y = (i + 1) * height / (rows + 1);
+
+        if (rotateShapes) {
+            rotate(angle);
+        }
+
+        // Draw ${shape} at position (x, y)
+    }
+}`;
+            document.getElementById('code-preview').innerText = code;
+        }
+
+        function copyCode() {
+            const code = document.getElementById('code-preview').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            });
+        }
+</script>
+  </body>
+</html>
