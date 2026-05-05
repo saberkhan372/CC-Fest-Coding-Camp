@@ -3,15 +3,17 @@
   --cream-dark:#f0ebe3;
   --cream-deep:#e4dccf;
   --panel:#ffffff;
-  --ink:#2c2a26;
-  --ink-light:#6b6760;
-  --accent:#3d5a80;
-  --accent-soft:#d9e4f0;
+  --ink:#1a1917;
+  --ink-light:#5c5650;
+  --accent:#0e72c8;
+  --accent-soft:#d6ecf9;
+  --gold:#f5a800;
+  --gold-soft:#fef3d4;
   --highlight:#e07a5f;
   --success:#81b29a;
   --radius:18px;
   --radius-sm:12px;
-  --shadow:0 18px 55px rgba(53,43,32,.08);
+  --shadow:0 18px 55px rgba(0,0,0,.07);
 }
 
 *{box-sizing:border-box}
@@ -22,12 +24,16 @@ body{
   margin:0;
   font-family:"DM Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:
-    radial-gradient(circle at top left, rgba(224,122,95,.14), transparent 28%),
-    radial-gradient(circle at top right, rgba(61,90,128,.14), transparent 24%),
+    radial-gradient(circle at top left, rgba(245,168,0,.13), transparent 28%),
+    radial-gradient(circle at top right, rgba(14,114,200,.13), transparent 24%),
     var(--cream);
   color:var(--ink);
   line-height:1.5;
   position:relative;
+}
+
+h1,h2,h3{
+  font-family:"Nunito","DM Sans",system-ui,sans-serif;
 }
 
 body::before{
@@ -75,8 +81,14 @@ a{color:inherit}
   width:14px;
   height:14px;
   border-radius:999px;
-  background:linear-gradient(135deg,var(--accent),var(--highlight));
-  box-shadow:0 0 0 5px rgba(61,90,128,.08);
+  background:linear-gradient(135deg,var(--accent),var(--gold));
+  box-shadow:0 0 0 5px rgba(14,114,200,.1);
+}
+
+.topbar-links{
+  display:flex;
+  gap:20px;
+  align-items:center;
 }
 
 .topbar-link{
@@ -137,14 +149,22 @@ a{color:inherit}
 .hero-aside{
   padding:18px;
   border-radius:var(--radius);
-  background:linear-gradient(180deg,rgba(240,235,227,.9),rgba(255,255,255,.72));
-  border:1px solid rgba(44,42,38,.07);
+  background:linear-gradient(160deg,rgba(14,114,200,.07),rgba(245,168,0,.06),rgba(255,255,255,.72));
+  border:1px solid rgba(14,114,200,.12);
   align-self:end;
 }
 
 .hero-aside h2{
+  margin:0 0 4px;
+  font-size:18px;
+  letter-spacing:-.02em;
+}
+
+.aside-byline{
   margin:0 0 12px;
-  font-size:15px;
+  font-size:12px;
+  color:var(--accent);
+  font-weight:600;
 }
 
 .hero-aside ul{
@@ -159,11 +179,12 @@ a{color:inherit}
   min-height:320px;
   border-radius:28px;
   overflow:hidden;
-  border:1px solid rgba(44,42,38,.08);
+  border:1px solid rgba(14,114,200,.12);
   background:
-    radial-gradient(circle at 20% 20%, rgba(224,122,95,.16), transparent 34%),
-    radial-gradient(circle at 78% 18%, rgba(129,178,154,.18), transparent 28%),
-    linear-gradient(180deg,#fffdf8,#f4eee3);
+    radial-gradient(circle at 20% 20%, rgba(14,114,200,.16), transparent 38%),
+    radial-gradient(circle at 78% 18%, rgba(245,168,0,.22), transparent 32%),
+    radial-gradient(circle at 44% 80%, rgba(224,122,95,.12), transparent 30%),
+    linear-gradient(165deg,#f0f7ff,#fffdf5);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.36);
 }
 
@@ -171,8 +192,8 @@ a{color:inherit}
   position:absolute;
   inset:0;
   background-image:
-    linear-gradient(rgba(61,90,128,.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(61,90,128,.08) 1px, transparent 1px);
+    linear-gradient(rgba(14,114,200,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,114,200,.07) 1px, transparent 1px);
   background-size:28px 28px;
 }
 
@@ -186,7 +207,7 @@ a{color:inherit}
   height:22px;
   left:34px;
   top:36px;
-  background:var(--highlight);
+  background:var(--gold);
 }
 
 .dot-b{
@@ -202,7 +223,7 @@ a{color:inherit}
   height:16px;
   left:52%;
   bottom:34px;
-  background:var(--success);
+  background:var(--highlight);
 }
 
 .poster-card{
@@ -413,15 +434,15 @@ a{color:inherit}
   content:"";
   position:absolute;
   inset:0 0 auto 0;
-  height:8px;
-  background:linear-gradient(90deg,var(--accent),var(--highlight),var(--success));
+  height:5px;
+  background:linear-gradient(90deg,var(--accent),var(--gold),var(--highlight));
 }
 
 #starter-sketches .tool-card::before{
   background:repeating-linear-gradient(
     90deg,
-    var(--highlight) 0 18px,
-    #f2cc8f 18px 36px,
+    var(--gold) 0 18px,
+    var(--highlight) 18px 36px,
     var(--accent) 36px 54px
   );
 }
