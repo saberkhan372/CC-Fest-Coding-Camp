@@ -160,14 +160,17 @@ a{color:inherit}
 }
 
 #canvas-container{
-  min-height:400px;
+  min-height:clamp(360px,52vh,560px);
   display:flex;
   align-items:center;
   justify-content:center;
+  padding:6px;
 }
 
 #canvas-container canvas{
   display:block;
+  max-width:100%;
+  height:auto !important;
   border:1px solid var(--cream-deep);
   border-radius:18px;
   box-shadow:0 8px 24px rgba(44,42,38,.08);
@@ -293,6 +296,12 @@ a{color:inherit}
   font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:13px;
   line-height:1.6;
+}
+
+.code-panel[contenteditable="true"],
+pre[contenteditable="true"]{
+  outline:none;
+  min-height:180px;
 }
 
 .copy-button{flex-shrink:0}
