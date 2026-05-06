@@ -177,10 +177,30 @@ a{color:inherit}
   border:1px solid rgba(200,57,29,.14);
 }
 
+.hero-credit{
+  padding:16px 18px;
+  border-radius:var(--radius);
+  background:rgba(255,255,255,.62);
+  border:1px solid rgba(82,58,47,.12);
+}
+
 .hero-aside h2{
   margin:0 0 4px;
   font-size:18px;
   letter-spacing:-.02em;
+}
+
+.hero-credit h2{
+  margin:0 0 8px;
+  font-size:15px;
+  letter-spacing:0;
+}
+
+.hero-credit p{
+  margin:0;
+  color:var(--ink-light);
+  font-size:13px;
+  line-height:1.55;
 }
 
 .aside-byline{
