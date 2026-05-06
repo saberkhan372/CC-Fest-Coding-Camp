@@ -752,21 +752,21 @@ a{color:inherit}
 }
 
 @keyframes cardFallIn{
-  from{opacity:0;transform:rotate(var(--card-tilt)) translateY(-22px) scale(.96)}
+  from{opacity:0;transform:rotate(var(--card-tilt)) translateY(-55px) scale(.88)}
   to{opacity:1;transform:rotate(var(--card-tilt)) translateY(0) scale(1)}
 }
 
-.tool-card{animation:cardFallIn .38s cubic-bezier(.22,.68,0,1.2) both}
-.tool-card:nth-child(1){animation-delay:.04s}
-.tool-card:nth-child(2){animation-delay:.08s}
-.tool-card:nth-child(3){animation-delay:.12s}
-.tool-card:nth-child(4){animation-delay:.16s}
-.tool-card:nth-child(5){animation-delay:.2s}
-.tool-card:nth-child(6){animation-delay:.24s}
-.tool-card:nth-child(7){animation-delay:.28s}
-.tool-card:nth-child(8){animation-delay:.32s}
-.tool-card:nth-child(9){animation-delay:.36s}
-.tool-card:nth-child(n+10){animation-delay:.4s}
+.tool-card{animation:cardFallIn .55s cubic-bezier(.22,.68,0,1.15) both}
+.tool-card:nth-child(1){animation-delay:.05s}
+.tool-card:nth-child(2){animation-delay:.12s}
+.tool-card:nth-child(3){animation-delay:.19s}
+.tool-card:nth-child(4){animation-delay:.26s}
+.tool-card:nth-child(5){animation-delay:.33s}
+.tool-card:nth-child(6){animation-delay:.4s}
+.tool-card:nth-child(7){animation-delay:.47s}
+.tool-card:nth-child(8){animation-delay:.54s}
+.tool-card:nth-child(9){animation-delay:.61s}
+.tool-card:nth-child(n+10){animation-delay:.68s}
 
 .tool-card:nth-child(3n+1){--card-tilt:-.4deg}
 .tool-card:nth-child(3n+2){--card-tilt:.5deg}
