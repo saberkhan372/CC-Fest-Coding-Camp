@@ -80,4 +80,34 @@
     event.preventDefault();
     remixPoster();
   });
+
+  document.querySelectorAll("#interactive-tools .station").forEach((station, index) => {
+    if (index === 0) return;
+    const header = station.querySelector(".station-header");
+    const grid = station.querySelector(".tool-grid");
+    if (!header || !grid) return;
+
+    const label = station.querySelector(".station-name")?.textContent?.trim() || `Tool section ${index + 1}`;
+    const gridId = `station-tools-${index + 1}`;
+    grid.id = grid.id || gridId;
+    station.classList.add("is-collapsible");
+    header.setAttribute("role", "button");
+    header.setAttribute("tabindex", "0");
+    header.setAttribute("aria-controls", grid.id);
+    header.setAttribute("aria-expanded", "false");
+    header.setAttribute("aria-label", `Show ${label} tools`);
+
+    const toggleStation = () => {
+      const isOpen = station.classList.toggle("is-open");
+      header.setAttribute("aria-expanded", String(isOpen));
+      header.setAttribute("aria-label", `${isOpen ? "Hide" : "Show"} ${label} tools`);
+    };
+
+    header.addEventListener("click", toggleStation);
+    header.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      toggleStation();
+    });
+  });
 })();

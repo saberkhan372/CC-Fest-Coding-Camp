@@ -578,6 +578,51 @@ a{color:inherit}
   flex-wrap:wrap;
 }
 
+.station.is-collapsible .station-header{
+  align-items:center;
+  cursor:pointer;
+  padding:14px 16px;
+  margin-bottom:0;
+  border:1px solid rgba(44,42,38,.08);
+  border-radius:16px;
+  background:rgba(255,255,255,.66);
+  transition:border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+.station.is-collapsible .station-header:hover,
+.station.is-collapsible .station-header:focus-visible{
+  border-color:rgba(200,57,29,.2);
+  background:#fff;
+  transform:translateY(-1px);
+  outline:none;
+}
+
+.station.is-collapsible .station-header::after{
+  content:"Show tools";
+  margin-left:auto;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--accent);
+  color:#fff;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.station.is-collapsible.is-open .station-header{
+  margin-bottom:20px;
+}
+
+.station.is-collapsible.is-open .station-header::after{
+  content:"Hide tools";
+  background:var(--cream);
+  color:var(--accent);
+}
+
+.station.is-collapsible:not(.is-open) .tool-grid{
+  display:none;
+}
+
 .station-name{
   font-family:"Fraunces","DM Sans",system-ui,sans-serif;
   font-size:24px;
