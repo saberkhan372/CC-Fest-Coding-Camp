@@ -86,13 +86,24 @@
     }, 1200);
   }
 
+  function pageAlreadyHasCopyControl(target) {
+    const localContainer = target.closest(".code-panel,.code-box,.panel,.card,.group,aside,section") || document;
+    const copyButtons = Array.from(localContainer.querySelectorAll("button"));
+    const pageCopyButtons = Array.from(document.querySelectorAll("button"));
+    return [...copyButtons, ...pageCopyButtons].some((button) => {
+      if (button.classList.contains("p5-export-btn")) return false;
+      return /copy/i.test(button.textContent || "");
+    });
+  }
+
   function insertBar(target) {
     if (!target || target.dataset.p5ExportReady) return;
     target.dataset.p5ExportReady = "true";
+    const hasCopyControl = pageAlreadyHasCopyControl(target);
 
     const bar = document.createElement("div");
     bar.className = "p5-export-bar";
-    bar.setAttribute("aria-label", "Copy this generated p5.js code");
+    bar.setAttribute("aria-label", "Open this generated p5.js code in the p5.js Web Editor");
 
     const copyButton = document.createElement("button");
     copyButton.className = "p5-export-btn";
@@ -119,7 +130,8 @@
       window.open(EDITOR_URL, "_blank", "noopener,noreferrer");
     });
 
-    bar.append(copyButton, p5Button);
+    if (!hasCopyControl) bar.append(copyButton);
+    bar.append(p5Button);
     target.insertAdjacentElement("beforebegin", bar);
   }
 
