@@ -201,6 +201,31 @@
   }
 })();
 
+// Core tool badges
+(function() {
+  const CORE = new Set([
+    "coordinate-system-explorer", "shape-and-color-explorer", "text-basics-studio", "rgb-hsb-color-lab",
+    "animation-explorer", "framerate-visualizer", "map-explorer", "lerp-explorer", "if-else-decision-studio",
+    "for-loop-stepper", "rows-and-columns", "function-builder", "noise-vs-random-explorer",
+    "data-story-planner", "data-mapper", "csv-loadtable-data-explorer",
+    "image-remix-studio", "sound-shape-visualizer", "postcard-studio", "game-state-starter", "particle-system-seed"
+  ]);
+  document.querySelectorAll(".tool-card").forEach(card => {
+    const link = card.querySelector(".tool-actions a");
+    if (!link) return;
+    const slug = link.getAttribute("href").replace(/^tools\/|\/$/g, "");
+    if (!CORE.has(slug)) return;
+    card.dataset.core = "";
+    const meta = card.querySelector(".tool-meta");
+    if (meta) {
+      const pill = document.createElement("span");
+      pill.className = "pill core";
+      pill.textContent = "Core";
+      meta.appendChild(pill);
+    }
+  });
+})();
+
 // Suit filter bar
 (function() {
   const filterBar = document.querySelector(".suit-filter-bar");

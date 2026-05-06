@@ -531,6 +531,34 @@ a{color:inherit}
   line-height:1.4;
 }
 
+.sequence-tools{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-top:10px;
+}
+
+.sequence-tools a{
+  display:inline-block;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.04em;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.7);
+  border:1.5px solid rgba(44,42,38,.1);
+  color:var(--ink);
+  text-decoration:none;
+  transition:background .12s,border-color .12s,color .12s;
+  white-space:nowrap;
+}
+
+.sequence-tools a:hover{
+  background:#fff;
+  border-color:var(--accent);
+  color:var(--accent);
+}
+
 /* ─── CAMP WORDS STRIP ─── */
 
 .camp-words{
@@ -930,6 +958,17 @@ a{color:inherit}
   background:#fff;
   color:var(--purple);
   border-color:var(--purple);
+}
+
+.pill.core{
+  background:linear-gradient(135deg,var(--accent),var(--gold));
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 1px 4px rgba(200,57,29,.25);
+}
+
+.tool-card[data-core]{
+  border-color:rgba(200,57,29,.15);
 }
 
 .tool-card h3{
