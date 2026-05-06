@@ -182,19 +182,21 @@
       header,
       grid,
       label: `${label} tools`,
-      openByDefault: false
+      openByDefault: index === 0
     });
 
     const remaining = grid.querySelectorAll(".tool-card").length - 1;
-    const trigger = document.createElement("div");
-    trigger.className = "station-peek-trigger";
-    trigger.setAttribute("aria-hidden", "true");
-    const btn = document.createElement("span");
-    btn.className = "station-peek-btn";
-    btn.textContent = `Show ${remaining} more tool${remaining !== 1 ? "s" : ""} →`;
-    trigger.appendChild(btn);
-    grid.appendChild(trigger);
-    trigger.addEventListener("click", () => header.click());
+    if (remaining > 0) {
+      const trigger = document.createElement("div");
+      trigger.className = "station-peek-trigger";
+      trigger.setAttribute("aria-hidden", "true");
+      const btn = document.createElement("span");
+      btn.className = "station-peek-btn";
+      btn.textContent = `Show ${remaining} more ${label} tool${remaining !== 1 ? "s" : ""} →`;
+      trigger.appendChild(btn);
+      grid.appendChild(trigger);
+      trigger.addEventListener("click", () => header.click());
+    }
   });
 
   const starterSection = document.querySelector("#starter-sketches");

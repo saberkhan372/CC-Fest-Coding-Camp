@@ -470,7 +470,6 @@
     <section class="code-panel" aria-label="Generated code preview">
       <div class="code-toolbar">
         <div class="code-toolbar-title">Starter Code Preview</div>
-        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
       </div>
       <pre id="codeOutput"></pre>
     </section>
@@ -552,8 +551,8 @@
     line(0, 0, 0, height);
   }
 
-  function getScaleX() { return width / 400; }
-  function getScaleY() { return height / 300; }
+  function getScaleX() { return (width || 400) / 400; }
+  function getScaleY() { return (height || 300) / 300; }
   function sx(v) { return v * getScaleX(); }
   function sy(v) { return v * getScaleY(); }
   function ss(v) { return v * Math.min(getScaleX(), getScaleY()); }
@@ -946,7 +945,6 @@
       updateAll();
     });
 
-    document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
     document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
   }
 

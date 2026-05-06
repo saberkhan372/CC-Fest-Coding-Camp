@@ -470,7 +470,6 @@
     <section class="code-panel" aria-label="Generated code preview">
       <div class="code-toolbar">
         <div class="code-toolbar-title">Starter Code Preview</div>
-        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
       </div>
       <pre id="codeOutput"></pre>
     </section>
@@ -743,6 +742,8 @@
     syncBtn.classList.toggle('active', state.synced);
   }
 
+  function jsMap(v, a, b, c, d) { return c + (v - a) / (b - a) * (d - c); }
+
   function updateCode() {
     const lines = [];
     lines.push(`<span class="cm">// Noise vs Random Explorer starter code</span>`);
@@ -753,7 +754,7 @@
     lines.push(`}`);
     lines.push('');
     lines.push(`<span class="kw">function</span> <span class="fn">draw</span>() {`);
-    lines.push(`  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>, <span class="num">${Math.round(map(state.trails, 0, 95, 255, 15))}</span>);`);
+    lines.push(`  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>, <span class="num">${Math.round(jsMap(state.trails, 0, 95, 255, 15))}</span>);`);
     lines.push(`  t += <span class="num">${(state.speed * 0.0015).toFixed(4)}</span>;`);
     lines.push('');
 
@@ -792,7 +793,7 @@
 
   function plainCode() {
     if (state.mode === 'movers') {
-      return `// Noise vs Random Explorer starter code\nlet t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  background(250, 246, 240, ${Math.round(map(state.trails, 0, 95, 255, 15))});\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  // random(): unrelated jumps\n  let randomX = random(20, width / 2 - 20);\n  let randomY = random(40, height - 30);\n  circle(randomX, randomY, 18);\n\n  // noise(): smooth related values\n  let noiseX = map(noise(t), 0, 1, width / 2 + 20, width - 20);\n  let noiseY = map(noise(t + 100), 0, 1, 40, height - 30);\n  circle(noiseX, noiseY, 18);\n}`;
+      return `// Noise vs Random Explorer starter code\nlet t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  background(250, 246, 240, ${Math.round(jsMap(state.trails, 0, 95, 255, 15))});\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  // random(): unrelated jumps\n  let randomX = random(20, width / 2 - 20);\n  let randomY = random(40, height - 30);\n  circle(randomX, randomY, 18);\n\n  // noise(): smooth related values\n  let noiseX = map(noise(t), 0, 1, width / 2 + 20, width - 20);\n  let noiseY = map(noise(t + 100), 0, 1, 40, height - 30);\n  circle(noiseX, noiseY, 18);\n}`;
     }
 
     if (state.mode === 'waves') {
@@ -868,7 +869,6 @@
     });
 
     document.getElementById('newSeedBtn').addEventListener('click', () => resetSystem(true));
-    document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
     document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
   }
 

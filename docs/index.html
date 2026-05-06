@@ -16,7 +16,7 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="CC Fest Coding Camp: Creative Coding Tools for p5.js">
-  <meta name="twitter:description" content="41 workshop tools and 30 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:description" content="41 workshop tools and 30 starter sketches for teaching p5.js and creative coding. Free, open, and remixable.">
   <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -40,7 +40,7 @@
         <div class="hero-text">
           <p class="eyebrow">CC Fest Coding Camp · Free · Open to everyone</p>
           <h1>Tools for Creative Coding.</h1>
-          <p class="lede">Hi, I'm <a href="https://www.linkedin.com/in/edsaber/" target="_blank" rel="noopener">Saber Khan</a>. I run <a href="https://ccfest.rocks/coding-camp" target="_blank" rel="noopener">CC Fest Coding Camp</a>, a free five-week program where educators, artists, students, and others learn <a href="https://p5js.org">p5.js</a> and creative coding together. I built these tools for our sessions. 41 workshop tools and 30 starter sketches. They're open. Use them, remix them, make them yours. If you find them useful please get in touch.</p>
+          <p class="lede">41 workshop tools and 30 starter sketches for teaching <a href="https://p5js.org">p5.js</a> and creative coding. Built by <a href="https://www.linkedin.com/in/edsaber/" target="_blank" rel="noopener">Saber Khan</a> for <a href="https://ccfest.rocks/coding-camp" target="_blank" rel="noopener">CC Fest Coding Camp</a>. Free, open, remixable.</p>
           <div class="hero-actions">
             <a class="button primary" href="#interactive-tools">Browse Tools</a>
             <a class="button secondary" href="#starter-sketches">Starter Sketches</a>
@@ -64,9 +64,9 @@
             <h2>Creative coding for all.</h2>
             <p class="aside-byline">— Saber Khan, CC Fest</p>
             <ul>
-              <li>Code can help you express your ideas.</li>
+              <li>You don't need to be a programmer.</li>
               <li>The code and the canvas are connected.</li>
-              <li>You can use the code in the tools and examples.</li>
+              <li>Change one thing. See what happens.</li>
               <li>Everything here is yours to remix.</li>
             </ul>
           </aside>
@@ -93,7 +93,7 @@
         <div class="sequence">
           <div class="sequence-card">
             <strong>1 · Your Canvas, Your Voice</strong>
-            <span>Shapes, color, coordinates, identity</span>
+            <span>Make your first marks and find your canvas voice</span>
             <div class="sequence-tools">
               <a href="tools/coordinate-system-explorer/">Coordinates</a>
               <a href="tools/shape-and-color-explorer/">Shape + Color</a>
@@ -103,7 +103,7 @@
           </div>
           <div class="sequence-card">
             <strong>2 · Things That Move, Things That Listen</strong>
-            <span>Variables, animation, events, map(), lerp()</span>
+            <span>Build things that move, react, and respond</span>
             <div class="sequence-tools">
               <a href="tools/animation-explorer/">Animation</a>
               <a href="tools/framerate-visualizer/">frameRate()</a>
@@ -114,7 +114,7 @@
           </div>
           <div class="sequence-card">
             <strong>3 · Patterns, Systems, and What They Say</strong>
-            <span>Loops, noise, randomness, generative systems</span>
+            <span>Let the code repeat, branch, and think for itself</span>
             <div class="sequence-tools">
               <a href="tools/for-loop-stepper/">For Loop</a>
               <a href="tools/rows-and-columns/">Rows + Cols</a>
@@ -124,7 +124,7 @@
           </div>
           <div class="sequence-card">
             <strong>4 · Data as Material</strong>
-            <span>Arrays, mapping, visualization, data storytelling</span>
+            <span>Turn numbers into pictures that mean something personal</span>
             <div class="sequence-tools">
               <a href="tools/data-story-planner/">Story Planner</a>
               <a href="tools/data-mapper/">Data Mapper</a>
@@ -168,10 +168,11 @@
             <button class="suit-btn" data-filter="data">▦ Data</button>
             <button class="suit-btn" data-filter="open">☽ Open</button>
           </div>
+          <p class="suit-legend">✦ Marks · drawing &amp; color &nbsp;·&nbsp; ◎ Motion · animation &amp; interaction &nbsp;·&nbsp; ⬡ Systems · loops &amp; generative &nbsp;·&nbsp; ▦ Data · visualization &amp; data &nbsp;·&nbsp; ☽ Open · images, sound, 3D</p>
 
           <div class="station-list">
 
-            <div class="station" data-suit="marks">
+            <div class="station" id="station-marks" data-suit="marks">
               <div class="station-header">
                 <span class="station-name">Draw + Color</span>
                 <p class="station-desc">First marks, coordinates, shape, and color. The tools you open on day one.</p>
@@ -243,7 +244,7 @@
               </div>
             </div>
 
-            <div class="station" data-suit="motion">
+            <div class="station" id="station-motion" data-suit="motion">
               <div class="station-header">
                 <span class="station-name">Motion + Interaction</span>
                 <p class="station-desc">Things that move, react, and listen. Variables in time, events in space.</p>
@@ -342,7 +343,7 @@
               </div>
             </div>
 
-            <div class="station" data-suit="systems">
+            <div class="station" id="station-systems" data-suit="systems">
               <div class="station-header">
                 <span class="station-name">Patterns + Systems</span>
                 <p class="station-desc">Loops, repetition, noise, and functions. Where code starts feeling like a system.</p>
@@ -450,7 +451,7 @@
               </div>
             </div>
 
-            <div class="station" data-suit="data">
+            <div class="station" id="station-data" data-suit="data">
               <div class="station-header">
                 <span class="station-name">Stories + Data</span>
                 <p class="station-desc">Data as material. Plan it, map it, draw it. Numbers that mean something personal.</p>
@@ -504,7 +505,7 @@
               </div>
             </div>
 
-            <div class="station" data-suit="open">
+            <div class="station" id="station-open" data-suit="open">
               <div class="station-header">
                 <span class="station-name">Remix + Media</span>
                 <p class="station-desc">Images, sound, games, 3D. Where the canvas opens up and anything feels possible.</p>
@@ -576,7 +577,7 @@
               </div>
             </div>
 
-            <div class="station" data-suit="support">
+            <div class="station" id="station-support" data-suit="support">
               <div class="station-header">
                 <span class="station-name">Debugging + Confidence</span>
                 <p class="station-desc">Practice recovering from broken code. Debugging is not failure; debugging is the work.</p>
