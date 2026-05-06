@@ -1686,6 +1686,7 @@ ${code}
                 <button class="edbtn edbtn-run" id="run-button" type="button">▶ Run</button>
                 <button class="edbtn edbtn-stop" id="stop-button" type="button">■ Stop</button>
                 <button class="edbtn edbtn-reset" id="reset-button" type="button">↺ Reset</button>
+                <button class="edbtn edbtn-p5" id="p5-export-button" type="button">↗ p5 Editor</button>
               </div>
             </div>
             <div class="editor-hint">${seed.liveSeed}</div>
@@ -1742,6 +1743,7 @@ ${code}
     const runButton = document.getElementById("run-button");
     const stopButton = document.getElementById("stop-button");
     const resetButton = document.getElementById("reset-button");
+    const p5ExportButton = document.getElementById("p5-export-button");
     const statusEl = document.getElementById("run-status");
     const liveBadge = document.getElementById("live-badge");
     const initialCode = seed.code.trim();
@@ -1763,6 +1765,19 @@ ${code}
       setTimeout(() => { setStatus("● live", "var(--success)"); setLive(true); }, 900);
     }
 
+    async function exportToP5Editor() {
+      const code = editor.value;
+      try {
+        await navigator.clipboard.writeText(code);
+        setStatus("↗ copied", "var(--gold)");
+      } catch (error) {
+        editor.focus();
+        editor.select();
+        setStatus("↗ select code", "var(--gold)");
+      }
+      window.open("https://editor.p5js.org/", "_blank", "noopener,noreferrer");
+    }
+
     runButton.addEventListener("click", runCurrentCode);
     stopButton.addEventListener("click", () => {
       setStatus("■ stopped", "rgba(240,235,227,.45)");
@@ -1773,6 +1788,7 @@ ${code}
       editor.value = initialCode;
       runCurrentCode();
     });
+    p5ExportButton.addEventListener("click", exportToP5Editor);
 
     runCurrentCode();
   }

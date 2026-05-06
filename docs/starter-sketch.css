@@ -236,6 +236,7 @@ a{color:inherit}
 .edbtn-run{background:#3a7d56;color:#fff;border-color:#3a7d56}
 .edbtn-stop{background:rgba(255,255,255,.08);color:rgba(240,235,227,.6);border-color:rgba(255,255,255,.1)}
 .edbtn-reset{background:rgba(255,255,255,.05);color:rgba(240,235,227,.45);border-color:rgba(255,255,255,.07)}
+.edbtn-p5{background:var(--gold);color:var(--ink);border-color:var(--gold)}
 
 .editor-hint{
   padding:9px 18px;
