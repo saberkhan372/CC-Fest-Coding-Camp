@@ -696,9 +696,56 @@ a{color:inherit}
   color:var(--accent);
 }
 
-.station.is-collapsible:not(.is-open) .tool-grid,
-#starter-sketches.is-collapsible:not(.is-open) .tool-grid{
+.station.is-collapsible:not(.is-open) .tool-grid{
   display:none;
+}
+
+/* Starter sketches: always show first 3 cards as a peek, hide the rest */
+#starter-sketches.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+4){
+  display:none;
+}
+
+.station-chips{
+  width:100%;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+  margin-top:4px;
+}
+
+.station.is-collapsible.is-open .station-chips{
+  display:none;
+}
+
+.station-count{
+  font-family:"DM Mono",ui-monospace,monospace;
+  font-size:11px;
+  font-weight:700;
+  color:var(--accent);
+  background:var(--cream);
+  border:1px solid rgba(44,42,38,.12);
+  border-radius:999px;
+  padding:3px 9px;
+}
+
+.station-chip{
+  font-size:11px;
+  color:var(--ink-light);
+  background:rgba(255,255,255,.8);
+  border:1px solid rgba(44,42,38,.08);
+  border-radius:999px;
+  padding:3px 9px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:200px;
+}
+
+.station-chip-more{
+  color:var(--ink-faint);
+  background:transparent;
+  border-color:transparent;
 }
 
 .station-name{

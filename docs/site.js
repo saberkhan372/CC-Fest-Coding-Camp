@@ -184,6 +184,30 @@
       label: `${label} tools`,
       openByDefault: index === 0
     });
+
+    const cards = grid.querySelectorAll(".tool-card");
+    const count = cards.length;
+    const names = Array.from(cards).slice(0, 4)
+      .map(c => c.querySelector("h3")?.textContent?.trim()).filter(Boolean);
+    const chipsEl = document.createElement("div");
+    chipsEl.className = "station-chips";
+    const countEl = document.createElement("span");
+    countEl.className = "station-count";
+    countEl.textContent = `${count} tools`;
+    chipsEl.appendChild(countEl);
+    names.forEach(name => {
+      const chip = document.createElement("span");
+      chip.className = "station-chip";
+      chip.textContent = name;
+      chipsEl.appendChild(chip);
+    });
+    if (count > 4) {
+      const more = document.createElement("span");
+      more.className = "station-chip station-chip-more";
+      more.textContent = `+${count - 4} more`;
+      chipsEl.appendChild(more);
+    }
+    header.appendChild(chipsEl);
   });
 
   const starterSection = document.querySelector("#starter-sketches");
