@@ -31,17 +31,18 @@
           </div>
         </div>
         <div class="hero-visual">
-          <div class="hero-poster" aria-hidden="true">
+          <div class="hero-poster" role="button" tabindex="0" aria-label="Interactive creative coding panel. Move your pointer to tilt it, or click to remix the code tiles." data-hero-poster>
             <div class="poster-grid"></div>
             <div class="poster-dot dot-a"></div>
             <div class="poster-dot dot-b"></div>
             <div class="poster-dot dot-c"></div>
-            <div class="poster-card card-a">x, y</div>
-            <div class="poster-card card-b">loop()</div>
-            <div class="poster-card card-c">remix ✦</div>
-            <div class="poster-card card-d">noise()</div>
-            <div class="poster-card card-e">p5.js</div>
-            <div class="poster-card card-f">draw()</div>
+            <div class="poster-card card-a" data-token>x, y</div>
+            <div class="poster-card card-b" data-token>loop()</div>
+            <div class="poster-card card-c" data-token>remix ✦</div>
+            <div class="poster-card card-d" data-token>noise()</div>
+            <div class="poster-card card-e" data-token>p5.js</div>
+            <div class="poster-card card-f" data-token>draw()</div>
+            <div class="poster-hint">click to remix</div>
           </div>
           <aside class="hero-aside">
             <h2>Creative coding for all.</h2>
@@ -595,5 +596,6 @@
     </footer>
   </div>
   <script src="preview-sketches.js?v=20260505-artifact-media-state"></script>
+  <script src="site.js?v=20260505-hero-poster"></script>
 </body>
 </html>
