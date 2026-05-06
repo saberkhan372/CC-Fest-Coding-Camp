@@ -23,9 +23,13 @@
     const cy = rect.top + rect.height / 2;
     const x = (clientX - cx) / rect.width;
     const y = (clientY - cy) / rect.height;
+    const localX = ((clientX - rect.left) / rect.width) * 100;
+    const localY = ((clientY - rect.top) / rect.height) * 100;
 
     poster.style.setProperty("--tilt-x", `${x * 8}deg`);
     poster.style.setProperty("--tilt-y", `${y * -8}deg`);
+    poster.style.setProperty("--mouse-x", `${localX}%`);
+    poster.style.setProperty("--mouse-y", `${localY}%`);
 
     items.forEach((item, index) => {
       const depth = index % 2 === 0 ? 18 : -14;
@@ -37,6 +41,8 @@
   const resetPush = () => {
     poster.style.setProperty("--tilt-x", "0deg");
     poster.style.setProperty("--tilt-y", "0deg");
+    poster.style.setProperty("--mouse-x", "50%");
+    poster.style.setProperty("--mouse-y", "50%");
     [...tokens, ...dots].forEach((item) => {
       item.style.setProperty("--push-x", "0px");
       item.style.setProperty("--push-y", "0px");

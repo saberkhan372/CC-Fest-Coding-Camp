@@ -150,6 +150,12 @@ a{color:inherit}
   color:var(--ink-light);
 }
 
+.lede a{
+  color:var(--accent);
+  text-decoration-thickness:1px;
+  text-underline-offset:4px;
+}
+
 .hero-grid{
   display:grid;
   grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);
@@ -226,6 +232,7 @@ a{color:inherit}
   outline:none;
   border:1px solid rgba(200,57,29,.14);
   background:
+    radial-gradient(circle at var(--mouse-x,50%) var(--mouse-y,50%), rgba(245,168,0,.28), transparent 24%),
     radial-gradient(circle at 20% 20%, rgba(200,57,29,.13), transparent 38%),
     radial-gradient(circle at 78% 18%, rgba(245,168,0,.22), transparent 32%),
     radial-gradient(circle at 44% 80%, rgba(224,122,95,.14), transparent 30%),
@@ -256,6 +263,17 @@ a{color:inherit}
   background-size:28px 28px;
   animation:gridDrift 14s linear infinite;
   transform:translateZ(-12px);
+}
+
+.hero-poster::after{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  pointer-events:none;
+  background:radial-gradient(circle at var(--mouse-x,50%) var(--mouse-y,50%), rgba(255,255,255,.42), transparent 22%);
+  mix-blend-mode:screen;
+  opacity:.65;
+  transition:opacity .2s ease;
 }
 
 .poster-dot{
@@ -328,29 +346,6 @@ a{color:inherit}
 .card-d{right:52px;bottom:68px;--rotate:-8deg;--float-speed:6.8s;animation-delay:-2.2s;background:#2d6a4f;font-size:12px}
 .card-e{left:52%;top:44px;--rotate:3deg;--float-speed:6.5s;animation-delay:-.8s;background:var(--ink);font-size:11px}
 .card-f{right:82px;top:52%;--rotate:-5deg;--float-speed:5.6s;animation-delay:-1.2s;background:#5c4084;font-size:12px}
-
-.poster-hint{
-  position:absolute;
-  right:18px;
-  bottom:14px;
-  padding:6px 9px;
-  border-radius:999px;
-  background:rgba(255,255,255,.72);
-  border:1px solid rgba(200,57,29,.12);
-  color:var(--accent);
-  font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:10px;
-  font-weight:700;
-  opacity:0;
-  transform:translateY(5px);
-  transition:opacity .2s ease, transform .2s ease;
-}
-
-.hero-poster:hover .poster-hint,
-.hero-poster:focus-visible .poster-hint{
-  opacity:1;
-  transform:translateY(0);
-}
 
 @keyframes gridDrift{
   from{background-position:0 0,0 0}
