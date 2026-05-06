@@ -751,6 +751,23 @@ a{color:inherit}
   transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 }
 
+@keyframes cardFallIn{
+  from{opacity:0;transform:rotate(var(--card-tilt)) translateY(-22px) scale(.96)}
+  to{opacity:1;transform:rotate(var(--card-tilt)) translateY(0) scale(1)}
+}
+
+.tool-card{animation:cardFallIn .38s cubic-bezier(.22,.68,0,1.2) both}
+.tool-card:nth-child(1){animation-delay:.04s}
+.tool-card:nth-child(2){animation-delay:.08s}
+.tool-card:nth-child(3){animation-delay:.12s}
+.tool-card:nth-child(4){animation-delay:.16s}
+.tool-card:nth-child(5){animation-delay:.2s}
+.tool-card:nth-child(6){animation-delay:.24s}
+.tool-card:nth-child(7){animation-delay:.28s}
+.tool-card:nth-child(8){animation-delay:.32s}
+.tool-card:nth-child(9){animation-delay:.36s}
+.tool-card:nth-child(n+10){animation-delay:.4s}
+
 .tool-card:nth-child(3n+1){--card-tilt:-.4deg}
 .tool-card:nth-child(3n+2){--card-tilt:.5deg}
 .tool-card:nth-child(3n){--card-tilt:-.2deg}
@@ -791,8 +808,15 @@ a{color:inherit}
   display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:center;
   line-height:1;
-  gap:1px;
+  gap:4px;
+  min-width:30px;
+  min-height:40px;
+  padding:7px 8px;
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(250,246,240,.72));
+  box-shadow:0 0 0 1px rgba(44,42,38,.045);
   color:var(--suit-color,var(--accent));
   font-family:"DM Mono",ui-monospace,monospace;
   pointer-events:none;
@@ -800,8 +824,8 @@ a{color:inherit}
 }
 .card-pip{top:14px;left:16px}
 .card-pip-br{bottom:14px;right:16px;transform:rotate(180deg)}
-.card-pip .pip-num,.card-pip-br .pip-num{font-size:11px;font-weight:700;letter-spacing:0}
-.card-pip .pip-sym,.card-pip-br .pip-sym{font-size:10px}
+.card-pip .pip-num,.card-pip-br .pip-num{font-size:13px;font-weight:800;letter-spacing:.03em}
+.card-pip .pip-sym,.card-pip-br .pip-sym{font-size:11px}
 
 #starter-sketches .tool-card::before{
   background:repeating-linear-gradient(
