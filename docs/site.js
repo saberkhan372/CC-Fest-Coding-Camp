@@ -90,6 +90,8 @@
       token.style.top = origTop + "px";
       token.style.zIndex = "10";
       token.style.transition = "none";
+      token.style.animation = "none";
+      token.style.transform = "none";
       token.style.cursor = "grabbing";
     });
 
@@ -111,6 +113,8 @@
       token.style.zIndex = "";
       token.style.cursor = "";
       token.style.transition = "";
+      token.style.animation = "";
+      token.style.transform = "";
     });
   });
 
@@ -145,6 +149,16 @@
       const isOpen = container.classList.toggle("is-open");
       header.setAttribute("aria-expanded", String(isOpen));
       header.setAttribute("aria-label", `${isOpen ? "Hide" : "Show"} ${label}`);
+      if (isOpen) {
+        // Re-animate cards and fix preview canvas sizes (were 0 while display:none)
+        grid.querySelectorAll(".tool-card").forEach((card, i) => {
+          card.style.animationDelay = `${i * 0.07}s`;
+          card.style.animation = "none";
+          card.offsetHeight;
+          card.style.animation = "";
+        });
+        requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+      }
     };
 
     header.addEventListener("click", toggle);
