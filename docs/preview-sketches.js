@@ -7,6 +7,7 @@
     "variable-playground": { family: "variable", label: "Variables" },
     "rgb-hsb-color-lab": { family: "colorLab", label: "Color Lab" },
     "animation-explorer": { family: "bounce", label: "Motion" },
+    "framerate-visualizer": { family: "frameRate", label: "FPS" },
     "transformations-explorer": { family: "transform", label: "Transforms" },
     "map-explorer": { family: "mapping", label: "Map" },
     "lerp-explorer": { family: "lerpSeed", label: "lerp()" },
@@ -27,6 +28,8 @@
     "webgl-3d-workshop": { family: "cube", label: "3D" },
     "sound-shape-visualizer": { family: "sound", label: "Sound" },
     "image-remix-studio": { family: "image", label: "Remix" },
+    "pixel-webcam-remix-studio": { family: "pixels", label: "Pixels" },
+    "postcard-studio": { family: "postcard", label: "Postcard" },
     "debugging-playground": { family: "function", label: "Debug" },
     "mouse-trail-drawing-seed": { family: "trailSeed", label: "Trail" },
     "draw-your-name-seed": { family: "nameSeed", label: "Name" },
@@ -45,6 +48,7 @@
     "sound-pulse-seed": { family: "sound", label: "Sound" },
     "mini-generative-poster-seed": { family: "poster", label: "Poster" },
     "particle-system-seed": { family: "trailSeed", label: "Particles" },
+    "game-state-starter": { family: "gameState", label: "State" },
     "nested-loop-array-grid": { family: "gridSeed", label: "Seed" },
     "array-position-dot-field": { family: "dots", label: "Positions" },
     "random-poetry-generator": { family: "poetry", label: "Poetry" },
@@ -326,6 +330,24 @@
         ctx.fillStyle = "#3d5a80";
         ctx.font = "700 10px DM Mono, monospace";
         ctx.fillText("if edge, reverse", 22, 28);
+        break;
+      }
+      case "frameRate": {
+        ctx.fillStyle = "#fff";
+        roundedRect(ctx, 16, 14, w - 32, h - 28, 14);
+        ctx.fill();
+        const fps = hover ? 12 : 30;
+        const ghostCount = hover ? 7 : 18;
+        for (let i = 0; i < ghostCount; i++) {
+          const x = 26 + ((t * fps * 3 + i * 18) % (w - 52));
+          ctx.fillStyle = `rgba(61,90,128,${0.08 + i / ghostCount * 0.24})`;
+          ctx.beginPath();
+          ctx.arc(x, h * 0.58, 10, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = "#e07a5f";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText(`${fps} fps`, 18, 30);
         break;
       }
       case "transform": {
@@ -740,6 +762,49 @@
         ctx.fillRect(w * 0.76, 30, 5, h - 60);
         break;
       }
+      case "pixels": {
+        const cell = 18;
+        for (let y = 18; y < h - 12; y += cell) {
+          for (let x = 18; x < w - 12; x += cell) {
+            const hue = (x * 1.5 + y * 2 + t * 28) % 360;
+            const br = 42 + Math.sin(x * 0.04 + y * 0.08 + t) * 24;
+            ctx.fillStyle = `hsl(${hue} 55% ${br + 18}%)`;
+            if (hover) {
+              ctx.beginPath();
+              ctx.arc(x, y, 3 + (br / 90) * 7, 0, Math.PI * 2);
+              ctx.fill();
+            } else {
+              ctx.fillRect(x - 5, y - 5, 12, 12);
+            }
+          }
+        }
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText("pixels[]", 14, h - 12);
+        break;
+      }
+      case "postcard": {
+        ctx.fillStyle = "#fff8f0";
+        roundedRect(ctx, 16, 14, w - 32, h - 28, 14);
+        ctx.fill();
+        ctx.strokeStyle = "#e07a5f";
+        ctx.lineWidth = 2;
+        roundedRect(ctx, 28, 28, w - 56, h - 56, 12);
+        ctx.stroke();
+        ctx.fillStyle = "#f2cc8f";
+        for (let i = 0; i < 10; i++) {
+          ctx.beginPath();
+          ctx.arc(42 + i * 22, 54 + Math.sin(t + i) * 8, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = "#3d5a80";
+        ctx.font = "800 17px Fraunces, serif";
+        ctx.fillText("hello", 42, h * 0.58);
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "10px DM Mono, monospace";
+        ctx.fillText("save png", 42, h * 0.72);
+        break;
+      }
       case "poster": {
         ctx.fillStyle = "rgba(61,90,128,.14)";
         roundedRect(ctx, 18, 16, w - 36, h - 32, 14);
@@ -850,6 +915,28 @@
         ctx.fillStyle = "#3d5a80";
         ctx.font = "700 10px DM Mono, monospace";
         ctx.fillText("dist()", 14, h - 14);
+        break;
+      }
+      case "gameState": {
+        const states = ["start", "play", "win"];
+        const active = Math.floor(t * 1.1) % states.length;
+        states.forEach((label, i) => {
+          const x = 28 + i * ((w - 56) / 3);
+          const y = h * 0.42;
+          ctx.fillStyle = i === active ? "#3d5a80" : "#f0ebe3";
+          roundedRect(ctx, x, y, (w - 78) / 3, 34, 10);
+          ctx.fill();
+          ctx.fillStyle = i === active ? "#fff" : "#6b6760";
+          ctx.font = "700 10px DM Mono, monospace";
+          ctx.fillText(label, x + 12, y + 22);
+        });
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(36 + ((t * 40) % (w - 72)), h * 0.7, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText('state = "play"', 14, h - 12);
         break;
       }
       case "hsbSeed": {

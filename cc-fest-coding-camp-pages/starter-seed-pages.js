@@ -214,6 +214,101 @@ class Particle {
   }
 }`
     },
+    "game-state-starter": {
+      title: "Game State Starter",
+      session: "Session 5",
+      subtitle: "A tiny complete game structure with start, play, win, lose, and restart screens controlled by one state variable.",
+      tags: ["state", "games", "conditionals"],
+      liveSeed: "Press space to start. Move the mouse to touch the target before time runs out. Press r to restart.",
+      tryText: "Change the win score, time limit, target size, or player shape. Add enemies when the structure makes sense.",
+      noticeText: "The state variable decides which screen runs. That keeps the game from becoming one giant draw().",
+      remixText: "Turn it into a maze, collecting game, reaction game, kindness quest, ecology game, or classroom challenge.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Game states and screens",
+      code: `let state = "start";
+let score = 0;
+let timeLeft = 15;
+let targetX = 280;
+let targetY = 180;
+
+function setup() {
+  createCanvas(400, 400);
+  textAlign(CENTER, CENTER);
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  if (state === "start") {
+    drawStart();
+  } else if (state === "play") {
+    drawPlay();
+  } else if (state === "win") {
+    drawWin();
+  } else if (state === "lose") {
+    drawLose();
+  }
+}
+
+function drawStart() {
+  textSize(30);
+  fill(44, 42, 38);
+  text("Collect 5 targets", width / 2, 150);
+  textSize(16);
+  text("press space to start", width / 2, 210);
+}
+
+function drawPlay() {
+  timeLeft -= 1 / 60;
+
+  fill(224, 122, 95);
+  circle(targetX, targetY, 44);
+
+  fill(61, 90, 128);
+  circle(mouseX, mouseY, 34);
+
+  if (dist(mouseX, mouseY, targetX, targetY) < 39) {
+    score++;
+    targetX = random(50, width - 50);
+    targetY = random(80, height - 50);
+  }
+
+  fill(44, 42, 38);
+  textSize(16);
+  text("score: " + score, 70, 28);
+  text("time: " + ceil(timeLeft), 320, 28);
+
+  if (score >= 5) state = "win";
+  if (timeLeft <= 0) state = "lose";
+}
+
+function drawWin() {
+  textSize(34);
+  fill(129, 178, 154);
+  text("You win!", width / 2, 170);
+  textSize(16);
+  text("press r to restart", width / 2, 225);
+}
+
+function drawLose() {
+  textSize(34);
+  fill(224, 122, 95);
+  text("Try again", width / 2, 170);
+  textSize(16);
+  text("press r to restart", width / 2, 225);
+}
+
+function keyPressed() {
+  if (key === " " && state === "start") {
+    state = "play";
+  }
+
+  if (key === "r") {
+    state = "start";
+    score = 0;
+    timeLeft = 15;
+  }
+}`
+    },
     "mouse-trail-drawing-seed": {
       title: "Mouse Trail Drawing Seed",
       session: "Session 2",
