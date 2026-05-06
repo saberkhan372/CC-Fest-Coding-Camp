@@ -3,27 +3,36 @@
     "coordinate-system-explorer": { family: "coordinates", label: "Coordinates" },
     "interactive-shape-explorer": { family: "shapes", label: "Shapes" },
     "shape-and-color-explorer": { family: "shapeColor", label: "Color" },
+    "text-basics-studio": { family: "textBasics", label: "Text" },
     "variable-playground": { family: "variable", label: "Variables" },
     "rgb-hsb-color-lab": { family: "colorLab", label: "Color Lab" },
     "animation-explorer": { family: "bounce", label: "Motion" },
     "transformations-explorer": { family: "transform", label: "Transforms" },
     "map-explorer": { family: "mapping", label: "Map" },
+    "lerp-explorer": { family: "lerpSeed", label: "lerp()" },
     "if-else-decision-studio": { family: "threshold", label: "Logic" },
+    "for-loop-stepper": { family: "gridSeed", label: "Loop" },
     "rows-and-columns": { family: "grid", label: "Patterns" },
+    "modulo-pattern-explorer": { family: "hsbSeed", label: "Modulo" },
     "simple-array-explorer": { family: "arrays", label: "Arrays" },
     "polished-array-explorer": { family: "dataBars", label: "Data" },
     "function-builder": { family: "function", label: "Functions" },
     "noise-vs-random-explorer": { family: "noiseRandom", label: "Noise" },
     "data-story-planner": { family: "planner", label: "Planning" },
     "data-mapper": { family: "dataMap", label: "Mapping" },
+    "csv-loadtable-data-explorer": { family: "dataBars", label: "CSV" },
     "event-handler-studio": { family: "ripple", label: "Events" },
     "collision-detection-explorer": { family: "collision", label: "Collisions" },
     "interactive-shape-drawing-app": { family: "objects", label: "Objects" },
     "webgl-3d-workshop": { family: "cube", label: "3D" },
     "sound-shape-visualizer": { family: "sound", label: "Sound" },
     "image-remix-studio": { family: "image", label: "Remix" },
+    "debugging-playground": { family: "function", label: "Debug" },
     "mouse-trail-drawing-seed": { family: "trailSeed", label: "Trail" },
+    "draw-your-name-seed": { family: "nameSeed", label: "Name" },
     "bouncing-ball-starter": { family: "bounceSeed", label: "Bounce" },
+    "framecount-animation-seed": { family: "poster", label: "Clock" },
+    "sine-cosine-motion-seed": { family: "lerpSeed", label: "Sine" },
     "click-to-create-shapes": { family: "stampSeed", label: "Click" },
     "color-from-position": { family: "shapeColor", label: "Color" },
     "noise-walker": { family: "noiseRandom", label: "Noise" },
@@ -31,14 +40,20 @@
     "keyboard-controlled-character": { family: "keyboardSeed", label: "Keys" },
     "simple-collision-game-seed": { family: "collision", label: "Collision" },
     "data-self-portrait-seed": { family: "dataPortraitSeed", label: "Data" },
+    "tiny-csv-portrait-seed": { family: "dataBars", label: "CSV" },
     "image-grid-remix-seed": { family: "image", label: "Image" },
     "sound-pulse-seed": { family: "sound", label: "Sound" },
     "mini-generative-poster-seed": { family: "poster", label: "Poster" },
+    "particle-system-seed": { family: "trailSeed", label: "Particles" },
     "nested-loop-array-grid": { family: "gridSeed", label: "Seed" },
     "array-position-dot-field": { family: "dots", label: "Positions" },
     "random-poetry-generator": { family: "poetry", label: "Poetry" },
     "random-sentence-generator": { family: "words", label: "Words" },
-    "arrays-in-motion": { family: "movingWords", label: "Text Motion" }
+    "arrays-in-motion": { family: "movingWords", label: "Text Motion" },
+    "lerp-follow-seed": { family: "lerpSeed", label: "lerp()" },
+    "dist-proximity-seed": { family: "distSeed", label: "dist()" },
+    "hsb-color-seed": { family: "hsbSeed", label: "HSB" },
+    "text-as-visual-seed": { family: "textVisual", label: "Text" }
   };
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -218,6 +233,28 @@
           ctx.arc(0, 0, size, Math.PI * 0.2, Math.PI * 1.6);
           ctx.stroke();
         }
+        break;
+      }
+      case "textBasics": {
+        drawGrid(ctx, w, h, 24, "rgba(61,90,128,.08)");
+        const x = 22 + px * (w - 44);
+        const y = 28 + py * (h - 56);
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate((px - 0.5) * 0.45);
+        ctx.font = `800 ${Math.max(28, h * 0.34)}px Fraunces, serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#3d5a80";
+        ctx.fillText("hello", 0, 0);
+        ctx.restore();
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(44,42,38,.72)";
+        ctx.font = "11px DM Mono, monospace";
+        ctx.fillText(`text("hello", ${Math.round(x)}, ${Math.round(y)})`, 14, h - 12);
         break;
       }
       case "shapeColor": {
@@ -757,6 +794,115 @@
           ctx.fillStyle = i === 1 ? "#e07a5f" : "#3d5a80";
           ctx.fillText(word, x, 34 + i * 30);
         });
+        break;
+      }
+      case "lerpSeed": {
+        const tgtX = w * 0.5 + Math.cos(t * 1.1) * (w * 0.3);
+        const tgtY = h * 0.5 + Math.sin(t * 0.85) * (h * 0.26);
+        const lag = 0.55;
+        const fX = w * 0.5 + Math.cos((t - lag) * 1.1) * (w * 0.3);
+        const fY = h * 0.5 + Math.sin((t - lag) * 0.85) * (h * 0.26);
+        ctx.strokeStyle = "rgba(224,122,95,.28)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(fX, fY);
+        ctx.lineTo(tgtX, tgtY);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(224,122,95,.7)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(tgtX, tgtY, 9, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(61,90,128,.18)";
+        ctx.beginPath();
+        ctx.arc(fX, fY, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#3d5a80";
+        ctx.beginPath();
+        ctx.arc(fX, fY, 11, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#3d5a80";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText("lerp()", 14, h - 14);
+        break;
+      }
+      case "distSeed": {
+        const mx = 22 + px * (w - 44);
+        const my = 20 + py * (h - 40);
+        const dotPositions = [
+          [w * 0.25, h * 0.35], [w * 0.5, h * 0.28], [w * 0.75, h * 0.36],
+          [w * 0.2, h * 0.62], [w * 0.5, h * 0.66], [w * 0.8, h * 0.6]
+        ];
+        dotPositions.forEach(([dx, dy]) => {
+          const d = Math.sqrt((mx - dx) ** 2 + (my - dy) ** 2);
+          const maxD = Math.sqrt(w * w + h * h) * 0.48;
+          const size = 7 + (1 - Math.min(d / maxD, 1)) * 26;
+          const alpha = 0.22 + (1 - Math.min(d / maxD, 1)) * 0.68;
+          ctx.fillStyle = `rgba(61,90,128,${alpha})`;
+          ctx.beginPath();
+          ctx.arc(dx, dy, size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.fillStyle = "rgba(224,122,95,.8)";
+        ctx.beginPath();
+        ctx.arc(mx, my, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#3d5a80";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText("dist()", 14, h - 14);
+        break;
+      }
+      case "hsbSeed": {
+        const sat = clamp((1 - py) * 100, 0, 100);
+        for (let i = 0; i < 7; i++) {
+          const hue = (i * 50 + t * 8) % 360;
+          ctx.fillStyle = `hsl(${hue} ${sat}% 62%)`;
+          const x = 14 + i * ((w - 28) / 7);
+          roundedRect(ctx, x, 18, (w - 42) / 7, h - 36, 10);
+          ctx.fill();
+        }
+        ctx.fillStyle = "rgba(44,42,38,.7)";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText(`sat: ${Math.round(sat)}%`, 14, h - 10);
+        break;
+      }
+      case "textVisual": {
+        const wds = ["make", "code", "remix", "play"];
+        const positions = [
+          [w * 0.26, h * 0.36], [w * 0.64, h * 0.28],
+          [w * 0.34, h * 0.64], [w * 0.72, h * 0.7]
+        ];
+        wds.forEach((word, i) => {
+          const [x, y] = positions[i];
+          const sz = 13 + i * 4;
+          const angle = Math.sin(t * 0.9 + i * 1.3) * 0.24;
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(angle);
+          ctx.fillStyle = i % 2 ? "#e07a5f" : "#3d5a80";
+          ctx.font = `700 ${sz}px Nunito, DM Sans, sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(word, 0, 0);
+          ctx.restore();
+        });
+        break;
+      }
+      case "nameSeed": {
+        ctx.fillStyle = "#f5f5f5";
+        ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = "#1e64dc";
+        ctx.font = `800 ${Math.max(46, h * 0.48)}px DM Sans, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("SK", w / 2, h / 2);
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(w / 2, h / 2, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(44,42,38,.72)";
+        ctx.font = "11px DM Mono, monospace";
+        ctx.fillText("textAlign(CENTER, CENTER)", w / 2, h - 16);
         break;
       }
       default:

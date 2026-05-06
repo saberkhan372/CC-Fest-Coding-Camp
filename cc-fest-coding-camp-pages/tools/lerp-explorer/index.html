@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>lerp() Explorer - CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box} body{margin:0;padding:24px;background:#faf6f0;color:#2c2a26;font-family:"DM Sans",system-ui,sans-serif;line-height:1.5}.wrap{max-width:1120px;margin:auto}.top{display:flex;justify-content:space-between;gap:16px;margin-bottom:22px}.top a{color:#6b6760;text-decoration:none}.tag{display:inline-block;padding:5px 10px;border-radius:6px;background:#edf1f5;color:#3d5a80;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase}h1{font-size:clamp(32px,5vw,54px);line-height:1;margin:10px 0 8px}.lede{max-width:780px;color:#6b6760}.chips{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 22px}.chips span{font:12px "DM Mono";background:#f0ebe3;border:1px solid #e5dfd5;border-radius:999px;padding:5px 9px}.grid{display:grid;grid-template-columns:minmax(420px,1.1fr) minmax(320px,.9fr);gap:18px}@media(max-width:900px){.grid{grid-template-columns:1fr}body{padding:17px}}.card{background:#fff;border:1px solid #e5dfd5;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}.head{padding:16px 18px;border-bottom:1px solid #f0ebe3}.head b{display:block}.head span{color:#6b6760;font-size:13px}.stage{padding:14px}canvas{display:block;width:100%;height:auto;border:1px solid #e5dfd5;border-radius:10px;background:#fff}.controls{padding:14px;display:grid;gap:12px}.group{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:12px}.group h2{margin:0 0 8px;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase;color:#3d5a80}.row{display:grid;grid-template-columns:88px 1fr 52px;gap:10px;align-items:center;margin:8px 0}.row label,.val{font:12px "DM Mono";color:#6b6760}.val{text-align:right;color:#2c2a26}input[type=range]{width:100%;accent-color:#e07a5f}.btns{display:flex;flex-wrap:wrap;gap:8px}button{border:1px solid #e5dfd5;border-radius:999px;background:#fff;padding:8px 12px;font-weight:700;color:#6b6760;cursor:pointer}button.active{background:#3d5a80;color:#fff;border-color:#3d5a80}.read{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}@media(max-width:620px){.read{grid-template-columns:1fr}.row{grid-template-columns:72px 1fr 44px}}.read div{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:10px}.read small{display:block;font:10px "DM Mono";color:#9e998f;text-transform:uppercase}.read strong{font:16px "DM Mono"}.code{margin-top:18px;background:#2c2a26;color:#f0ebe3;border-radius:14px;padding:16px;overflow:auto;font:13px/1.6 "DM Mono";white-space:pre}.note{margin-top:18px;background:#fff;border:1px solid #e5dfd5;border-radius:14px;padding:16px;color:#6b6760}.note b{color:#2c2a26}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top"><a href="../../index.html">← Back to tool library</a><a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a></nav>
+  <span class="tag">Session 2 · Easing + Motion</span>
+  <h1>lerp() Explorer</h1>
+  <p class="lede">See the difference between one-time interpolation and every-frame easing. lerp() gives one value between two values, but using it repeatedly in draw() creates smooth motion over time.</p>
+  <div class="chips"><span>lerp()</span><span>easing</span><span>motion</span><span>smooth follow</span></div>
+  <main class="grid">
+    <section class="card">
+      <div class="head"><b id="stageTitle">Number Line Mode</b><span id="stageDesc">One lerp() call finds one point between start and target.</span></div>
+      <div class="stage"><canvas id="canvas" width="680" height="420"></canvas>
+        <div class="read">
+          <div><small>result</small><strong id="resultRead">0</strong></div>
+          <div><small>distance left</small><strong id="distanceRead">0</strong></div>
+          <div><small>personality</small><strong id="feelRead">smooth</strong></div>
+        </div>
+      </div>
+    </section>
+    <aside class="card">
+      <div class="head"><b>Controls</b><span>Drag amt and switch modes.</span></div>
+      <div class="controls">
+        <div class="group"><h2>Mode</h2><div class="btns"><button class="active" data-mode="line">Number Line</button><button data-mode="follow">Follow Mouse</button><button data-mode="color">lerpColor()</button></div></div>
+        <div class="group"><h2>Values</h2>
+          <div class="row"><label>start</label><input id="start" type="range" min="40" max="620" value="120"><span class="val" id="startVal">120</span></div>
+          <div class="row"><label>target</label><input id="target" type="range" min="40" max="620" value="560"><span class="val" id="targetVal">560</span></div>
+          <div class="row"><label>amt</label><input id="amt" type="range" min="0.01" max="1" value="0.08" step="0.01"><span class="val" id="amtVal">0.08</span></div>
+        </div>
+        <div class="group"><h2>Guides</h2><div class="btns"><button class="active" id="formula">Formula On</button><button class="active" id="distance">Distance On</button><button class="active" id="trail">Trail On</button><button id="reset">Reset</button></div></div>
+      </div>
+    </aside>
+  </main>
+  <pre class="code" id="code"></pre>
+  <div class="note"><b>Key distinction:</b> <code>lerp(a, b, amt)</code> gives you one point between two values. <code>x = lerp(x, target, amt)</code> inside <code>draw()</code> creates smooth motion over time.</div>
+</div>
+<script>
+const c=document.getElementById("canvas"),ctx=c.getContext("2d");const s={mode:"line",start:120,target:560,amt:.08,x:120,mouseX:340,mouseY:210,showFormula:true,showDistance:true,showTrail:true,trail:[]};const $=id=>document.getElementById(id);
+function feel(){return s.amt<.04?"dreamy":s.amt<.16?"smooth":s.amt<.6?"snappy":"instant"}
+function draw(){ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle="#fffdf9";ctx.fillRect(0,0,c.width,c.height);ctx.strokeStyle="#e5dfd5";for(let x=40;x<c.width;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,c.height);ctx.stroke()}let result=s.start+(s.target-s.start)*s.amt;if(s.mode==="line"){ctx.strokeStyle="#9e998f";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(60,210);ctx.lineTo(620,210);ctx.stroke();dot(s.start,210,"#3d5a80","start");dot(s.target,210,"#e07a5f","target");dot(result,210,"#81b29a","result");if(s.showDistance){ctx.strokeStyle="#e07a5f";ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(result,245);ctx.lineTo(s.target,245);ctx.stroke();ctx.setLineDash([])}}else if(s.mode==="follow"){s.x=s.x+(s.mouseX-s.x)*s.amt;s.trail.push({x:s.x,y:s.mouseY});if(s.trail.length>45)s.trail.shift();if(s.showTrail)s.trail.forEach((p,i)=>{ctx.fillStyle=`rgba(61,90,128,${i/s.trail.length*.28})`;ctx.beginPath();ctx.arc(p.x,p.y,18,0,7);ctx.fill()});dot(s.mouseX,s.mouseY,"#e07a5f","target");dot(s.x,s.mouseY,"#3d5a80","x = lerp(x, target, amt)")}else{let t=s.amt;let a=[61,90,128],b=[224,122,95],m=a.map((v,i)=>Math.round(v+(b[i]-v)*t));ctx.fillStyle=`rgb(${a})`;ctx.fillRect(90,120,120,170);ctx.fillStyle=`rgb(${b})`;ctx.fillRect(470,120,120,170);ctx.fillStyle=`rgb(${m})`;ctx.beginPath();ctx.arc(result,205,58,0,7);ctx.fill();dot(result,300,"#2c2a26",`lerpColor at ${t.toFixed(2)}`)}if(s.showFormula){ctx.fillStyle="#2c2a26";ctx.font="14px DM Mono";ctx.fillText(s.mode==="follow"?"x = lerp(x, mouseX, amt)":"result = lerp(start, target, amt)",28,34)}$("resultRead").textContent=Math.round(s.mode==="follow"?s.x:result);$("distanceRead").textContent=Math.round(Math.abs((s.mode==="follow"?s.mouseX:s.target)-(s.mode==="follow"?s.x:result)));$("feelRead").textContent=feel();requestAnimationFrame(draw)}
+function dot(x,y,color,label){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,16,0,7);ctx.fill();ctx.fillStyle="#2c2a26";ctx.font="13px DM Mono";ctx.textAlign="center";ctx.fillText(label,x,y-25);ctx.textAlign="start"}
+function code(){let txt=s.mode==="follow"?`let x = 200;\n\nfunction draw() {\n  background(250);\n  x = lerp(x, mouseX, ${s.amt.toFixed(2)});\n  circle(x, mouseY, 40);\n}`:`let result = lerp(${s.start}, ${s.target}, ${s.amt.toFixed(2)});\ncircle(result, 200, 40);`;if(s.mode==="color")txt=`let c = lerpColor(color(61, 90, 128), color(224, 122, 95), ${s.amt.toFixed(2)});\nfill(c);\ncircle(x, y, 80);`;$("code").textContent=txt}
+["start","target","amt"].forEach(id=>$(id).oninput=e=>{s[id]=Number(e.target.value);$(id+"Val").textContent=e.target.value;code()});document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-mode]").forEach(x=>x.classList.remove("active"));b.classList.add("active");s.mode=b.dataset.mode;s.x=s.start;s.trail=[];$("stageTitle").textContent=b.textContent+" Mode";$("stageDesc").textContent=s.mode==="follow"?"Repeated lerp() in draw() creates easing.":"One lerp() call finds one value between two values.";code()});["formula","distance","trail"].forEach(id=>$(id).onclick=e=>{s["show"+id[0].toUpperCase()+id.slice(1)]=!s["show"+id[0].toUpperCase()+id.slice(1)];e.target.classList.toggle("active")});$("reset").onclick=()=>{s.x=s.start;s.trail=[]};c.onpointermove=e=>{let r=c.getBoundingClientRect();s.mouseX=(e.clientX-r.left)*c.width/r.width;s.mouseY=(e.clientY-r.top)*c.height/r.height};code();draw();
+</script>
+</body>
+</html>

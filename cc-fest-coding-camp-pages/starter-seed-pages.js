@@ -1,5 +1,219 @@
 (() => {
   const seeds = {
+    "draw-your-name-seed": {
+      title: "Draw Your Name / Initials Seed",
+      session: "Session 1",
+      subtitle: "A first text sketch where a name, initials, or meaningful word becomes a designed mark on the canvas.",
+      tags: ["text()", "identity", "coordinates"],
+      liveSeed: "Start by changing the letters. Then change the size, color, or position to make it feel like yours.",
+      tryText: "Replace SK with your initials, name, a place, or one word you want on screen.",
+      noticeText: "text() uses x and y just like a shape. textAlign(CENTER, CENTER) makes that point the center of the words.",
+      remixText: "Turn it into a name badge, title card, poster, classroom label, poem fragment, or personal logo.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Text, identity, and coordinates",
+      code: `function setup() {
+  createCanvas(600, 400);
+}
+
+function draw() {
+  background(245);
+
+  textAlign(CENTER, CENTER);
+  textSize(72);
+  fill(30, 100, 220);
+
+  text("SK", width / 2, height / 2);
+}`,
+      sketch: (p) => {
+        p.setup = () => {
+          const canvas = p.createCanvas(400, 400);
+          canvas.parent("canvas-container");
+        };
+        p.draw = () => {
+          p.background(245);
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textSize(72);
+          p.noStroke();
+          p.fill(30, 100, 220);
+          p.text("SK", p.width / 2, p.height / 2);
+          p.fill(224, 122, 95);
+          p.circle(p.width / 2, p.height / 2, 8);
+          p.fill(107, 103, 96);
+          p.textSize(13);
+          p.text("change the letters", p.width / 2, p.height - 28);
+        };
+      }
+    },
+    "framecount-animation-seed": {
+      title: "frameCount Animation Seed",
+      session: "Session 2",
+      subtitle: "A tiny clock-driven animation where p5.js keeps moving even when nobody touches the mouse or keyboard.",
+      tags: ["frameCount", "time", "animation"],
+      liveSeed: "Watch the circle pulse and the color cycle automatically. Press Run after changing the modulo values.",
+      tryText: "Change `% 100` to `% 200`, or change the color range from 360 to 120.",
+      noticeText: "frameCount increases by 1 every time draw() runs, so the sketch has its own clock.",
+      remixText: "Make a breathing badge, rotating poster, pulsing moon, or automatic title screen.",
+      footer: "CC Fest Coding Camp · Starter Sketch · frameCount as a clock",
+      code: `function setup() {
+  createCanvas(400, 400);
+  colorMode(HSB, 360, 100, 100);
+}
+
+function draw() {
+  let hue = frameCount % 360;
+  let pulse = frameCount % 100;
+  let size = map(pulse, 0, 99, 30, 180);
+
+  background(hue, 25, 96);
+  fill((hue + 120) % 360, 70, 90);
+  noStroke();
+  circle(width / 2, height / 2, size);
+
+  fill(0, 0, 20);
+  textAlign(CENTER);
+  text("frameCount: " + frameCount, width / 2, height - 26);
+}`
+    },
+    "sine-cosine-motion-seed": {
+      title: "Sine / Cosine Motion Seed",
+      session: "Session 2",
+      subtitle: "A smooth motion seed where sin() moves a ball back and forth using center, amplitude, and speed.",
+      tags: ["sin()", "cos()", "cyclical motion"],
+      liveSeed: "The ball moves by itself. Change amplitude and speed to feel how sine motion works.",
+      tryText: "Change amplitude from 120 to 40, then change speed from 0.03 to 0.08.",
+      noticeText: "Amplitude controls how far the ball moves. The multiplier controls how fast it cycles.",
+      remixText: "Turn the ball into a pendulum, orbiting dot, floating word, bobbing creature, or wave.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Smooth sine motion",
+      code: `let centerX = 200;
+let amplitude = 120;
+let speed = 0.03;
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  // center: where the motion starts
+  // amplitude: how far it moves
+  // speed: how fast it cycles
+  let x = centerX + sin(frameCount * speed) * amplitude;
+
+  stroke(220);
+  line(centerX - amplitude, 200, centerX + amplitude, 200);
+
+  noStroke();
+  fill(61, 90, 128);
+  circle(x, 200, 54);
+}`
+    },
+    "tiny-csv-portrait-seed": {
+      title: "Tiny CSV Portrait Seed",
+      session: "Session 4",
+      subtitle: "A minimal data-file sketch: load rows from a CSV and draw one bar for each value.",
+      tags: ["CSV", "loadTable()", "data"],
+      liveSeed: "This runner uses inline sample rows so it works here, but the code shows the real loadTable() pattern.",
+      tryText: "Change the activity names and hours. Then imagine those rows living in a separate data.csv file.",
+      noticeText: "Headers name the columns. Each row gives one label and one numeric value.",
+      remixText: "Make a daily habit chart, class survey, mood portrait, or tiny schedule visualization.",
+      footer: "CC Fest Coding Camp · Starter Sketch · CSV rows become bars",
+      code: `// In the p5.js Web Editor, put this in data.csv:
+// activity,hours
+// sleep,8
+// school,7
+// screen,4
+// reading,1
+// movement,2
+
+let rows = [
+  { activity: "sleep", hours: 8 },
+  { activity: "school", hours: 7 },
+  { activity: "screen", hours: 4 },
+  { activity: "reading", hours: 1 },
+  { activity: "movement", hours: 2 }
+];
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  for (let i = 0; i < rows.length; i++) {
+    let row = rows[i];
+    let barHeight = map(row.hours, 0, 10, 0, 240);
+    let x = 48 + i * 68;
+
+    fill(61, 90, 128);
+    rect(x, 320 - barHeight, 42, barHeight, 10);
+    fill(44, 42, 38);
+    textAlign(CENTER);
+    text(row.activity, x + 21, 348);
+  }
+}`
+    },
+    "particle-system-seed": {
+      title: "Particle System Seed",
+      session: "Session 5",
+      subtitle: "A satisfying open-studio seed that combines arrays, objects, motion, randomness, lifespan, and cleanup.",
+      tags: ["particles", "classes", "arrays"],
+      liveSeed: "Drag on the canvas to emit particles. Each particle moves, fades, and then gets removed.",
+      tryText: "Change the velocity range, color, life decrease, or number of particles added each frame.",
+      noticeText: "The array stores many Particle objects. The loop updates each one and removes it when it is done.",
+      remixText: "Make fireworks, sparks, rain, snow, emotion particles, glitter trails, or magic dust.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Particle systems",
+      code: `let particles = [];
+
+function setup() {
+  createCanvas(400, 400);
+  noStroke();
+}
+
+function draw() {
+  background(250, 246, 240, 30);
+
+  if (mouseIsPressed) {
+    particles.push(new Particle(mouseX, mouseY));
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    particles[i].update();
+    particles[i].display();
+
+    if (particles[i].isDone()) {
+      particles.splice(i, 1);
+    }
+  }
+}
+
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = random(-2, 2);
+    this.vy = random(-3, 1);
+    this.life = 255;
+    this.size = random(8, 18);
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += 0.04;
+    this.life -= 4;
+  }
+
+  display() {
+    fill(61, 90, 128, this.life);
+    circle(this.x, this.y, this.size);
+  }
+
+  isDone() {
+    return this.life < 0;
+  }
+}`
+    },
     "mouse-trail-drawing-seed": {
       title: "Mouse Trail Drawing Seed",
       session: "Session 2",
@@ -718,8 +932,8 @@ function mousePressed() {
       session: "Session 5",
       subtitle: "A small poster generator that combines text, shapes, and randomness so code immediately produces something publishable-looking.",
       tags: ["randomness", "text", "composition"],
-      liveSeed: "Click to generate a new abstract poster with different titles, colors, and shape compositions.",
-      tryText: "Change the word bank, add a subtitle, or use loops to create bigger shape systems.",
+      liveSeed: "Click to generate a new abstract poster. Press s to save the current poster as a PNG.",
+      tryText: "Change the word bank, add a subtitle, or press s after generating a version you want to keep.",
       noticeText: "A few arrays and random choices are enough to make each poster feel distinct.",
       remixText: "Make event posters, music flyers, poetry cards, album covers, or mood posters.",
       footer: "CC Fest Coding Camp · Starter Sketch · Generative poster design",
@@ -752,6 +966,12 @@ function draw() {
 function mousePressed() {
   buildPoster();
   redraw();
+}
+
+function keyPressed() {
+  if (key === "s") {
+    saveCanvas("cc-fest-poster", "png");
+  }
 }`,
       sketch: (p) => {
         const titles = ["code bloom", "night signal", "open studio", "future play", "signal garden"];
@@ -956,6 +1176,272 @@ function mousePressed() {
   generateSentences();
 }`
     },
+    "lerp-follow-seed": {
+      title: "lerp() Follow Seed",
+      session: "Things That Move",
+      subtitle: "A smooth-motion seed where a circle follows the mouse using lerp() — the simplest way to feel the difference between snapping and easing.",
+      tags: ["lerp()", "motion", "easing"],
+      liveSeed: "Move the mouse slowly, then quickly. The circle eases toward you instead of jumping.",
+      tryText: "Change 0.08 to 0.3 for a faster follow, or 0.02 for a very dreamy one. Each value gives the motion a personality.",
+      noticeText: "lerp() moves 8% of the remaining distance every frame — so it slows down as it gets closer.",
+      remixText: "Make multiple circles each following at different speeds, or make the follower leave a fading trail.",
+      footer: "CC Fest Coding Camp · Starter Sketch · lerp() and easing",
+      code: `let x = 200;
+let y = 200;
+
+function setup() {
+  createCanvas(400, 400);
+  noStroke();
+}
+
+function draw() {
+  background(250, 246, 240, 30);
+
+  x = lerp(x, mouseX, 0.08);
+  y = lerp(y, mouseY, 0.08);
+
+  // target ring
+  stroke(224, 122, 95, 120);
+  noFill();
+  strokeWeight(1.5);
+  circle(mouseX, mouseY, 28);
+
+  // follower
+  noStroke();
+  fill(61, 90, 128, 220);
+  circle(x, y, 42);
+}`,
+      sketch: (p) => {
+        let x = 200;
+        let y = 200;
+        p.setup = () => {
+          const canvas = p.createCanvas(400, 400);
+          canvas.parent("canvas-container");
+        };
+        p.draw = () => {
+          p.background(250, 246, 240, 30);
+          x = p.lerp(x, p.mouseX, 0.08);
+          y = p.lerp(y, p.mouseY, 0.08);
+          p.stroke(224, 122, 95, 120);
+          p.noFill();
+          p.strokeWeight(1.5);
+          p.circle(p.mouseX, p.mouseY, 28);
+          p.noStroke();
+          p.fill(61, 90, 128, 50);
+          p.circle(x, y, 60);
+          p.fill(61, 90, 128, 220);
+          p.circle(x, y, 42);
+        };
+      }
+    },
+    "dist-proximity-seed": {
+      title: "dist() Proximity Seed",
+      session: "Things That Move",
+      subtitle: "A seed where shapes continuously react to mouse distance — size and opacity shift in real time, making dist() feel physical before it feels like code.",
+      tags: ["dist()", "proximity", "interaction"],
+      liveSeed: "Move the mouse near and far from the circles. The closer you get, the bigger and brighter they grow.",
+      tryText: "Change 300 in the map() call to 150 so the effect only activates when you're closer.",
+      noticeText: "dist() returns a number — the bigger the number, the farther away. map() turns that number into a size.",
+      remixText: "Make circles repel the mouse instead of attracting it, or change color instead of size.",
+      footer: "CC Fest Coding Camp · Starter Sketch · dist() and continuous proximity",
+      code: `let dots = [];
+
+function setup() {
+  createCanvas(400, 400);
+  noStroke();
+  for (let i = 0; i < 9; i++) {
+    dots.push({
+      x: 60 + (i % 3) * 140,
+      y: 120 + floor(i / 3) * 80
+    });
+  }
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  for (let dot of dots) {
+    let d = dist(mouseX, mouseY, dot.x, dot.y);
+    let size = map(d, 0, 300, 80, 16);
+    let alpha = map(d, 0, 300, 255, 70);
+
+    fill(61, 90, 128, alpha);
+    circle(dot.x, dot.y, size);
+  }
+}`,
+      sketch: (p) => {
+        const dots = [];
+        p.setup = () => {
+          const canvas = p.createCanvas(400, 400);
+          canvas.parent("canvas-container");
+          p.noStroke();
+          for (let i = 0; i < 9; i++) {
+            dots.push({ x: 60 + (i % 3) * 140, y: 120 + Math.floor(i / 3) * 80 });
+          }
+        };
+        p.draw = () => {
+          p.background(250, 246, 240);
+          for (const dot of dots) {
+            const d = p.dist(p.mouseX, p.mouseY, dot.x, dot.y);
+            const size = p.map(d, 0, 300, 80, 16);
+            const alpha = p.map(d, 0, 300, 255, 70);
+            p.fill(61, 90, 128, alpha);
+            p.circle(dot.x, dot.y, size);
+          }
+        };
+      }
+    },
+    "hsb-color-seed": {
+      title: "HSB Color Expression Seed",
+      session: "Your Canvas, Your Voice",
+      subtitle: "A seed where mouse Y controls saturation across a row of hues — drag down and every color drains to gray, making HSB click instantly.",
+      tags: ["HSB", "color", "map()"],
+      liveSeed: "Move the mouse up and down. Watch every hue drain to gray as saturation hits zero.",
+      tryText: "Try mapping mouseX to hue rotation instead of mouseY to saturation — you get a completely different effect.",
+      noticeText: "The magic moment: drag to the bottom. All seven circles turn the same gray. Hue stops mattering when saturation is 0.",
+      remixText: "Add a second row where brightness changes, or turn the circles into a gradient stripe background.",
+      footer: "CC Fest Coding Camp · Starter Sketch · HSB color and saturation",
+      code: `function setup() {
+  createCanvas(400, 400);
+  colorMode(HSB, 360, 100, 100);
+  noStroke();
+}
+
+function draw() {
+  background(0, 0, 96);
+
+  let sat = map(mouseY, 0, height, 100, 0);
+
+  for (let i = 0; i < 7; i++) {
+    let hue = map(i, 0, 6, 0, 300);
+    let x = 36 + i * 52;
+
+    fill(hue, sat, 78);
+    circle(x, height / 2, 44);
+
+    fill(0, 0, 30);
+    textSize(11);
+    textAlign(CENTER);
+    text(floor(hue) + "°", x, height / 2 + 34);
+  }
+
+  fill(0, 0, 30);
+  textSize(14);
+  textAlign(LEFT);
+  text("saturation: " + floor(sat) + "%", 18, 30);
+}`,
+      sketch: (p) => {
+        p.setup = () => {
+          const canvas = p.createCanvas(400, 400);
+          canvas.parent("canvas-container");
+          p.colorMode(p.HSB, 360, 100, 100);
+          p.noStroke();
+        };
+        p.draw = () => {
+          p.background(0, 0, 96);
+          const sat = p.map(p.mouseY, 0, p.height, 100, 0, true);
+          for (let i = 0; i < 7; i++) {
+            const hue = p.map(i, 0, 6, 0, 300);
+            const x = 36 + i * 52;
+            p.fill(hue, sat, 78);
+            p.circle(x, p.height / 2, 44);
+            p.fill(0, 0, 30);
+            p.textSize(10);
+            p.textAlign(p.CENTER);
+            p.text(Math.floor(hue) + "°", x, p.height / 2 + 34);
+          }
+          p.fill(0, 0, 30);
+          p.textSize(13);
+          p.textAlign(p.LEFT);
+          p.text("sat: " + Math.floor(sat) + "%", 18, 28);
+        };
+      }
+    },
+    "text-as-visual-seed": {
+      title: "Text as Visual Material",
+      session: "Open Studio",
+      subtitle: "A seed where words become visual objects — each one placed, sized, rotated, and colored independently, treating text like a drawn shape.",
+      tags: ["text", "composition", "randomness"],
+      liveSeed: "Click to regenerate the layout. Change the words and colors to make it feel like you.",
+      tryText: "Change the words array to your own words — your name, a place, a feeling. Watch the composition shift.",
+      noticeText: "Each word is drawn with push()/pop() so translate and rotate apply only to that word, then reset.",
+      remixText: "Make all words the same size but different colors, or have size grow based on word position from center.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Text as visual material",
+      code: `let words = ["make", "code", "remix", "play", "build", "explore", "yes", "now"];
+
+function setup() {
+  createCanvas(400, 400);
+  noLoop();
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  for (let i = 0; i < 14; i++) {
+    let x = random(30, width - 30);
+    let y = random(40, height - 20);
+    let s = random(14, 72);
+    let a = random(-PI / 5, PI / 5);
+    let c = random([
+      color(61, 90, 128, 220),
+      color(224, 122, 95, 210),
+      color(129, 178, 154, 220)
+    ]);
+
+    push();
+    translate(x, y);
+    rotate(a);
+    noStroke();
+    fill(c);
+    textSize(s);
+    textAlign(CENTER, CENTER);
+    text(random(words), 0, 0);
+    pop();
+  }
+}
+
+function mousePressed() {
+  redraw();
+}`,
+      sketch: (p) => {
+        const words = ["make", "code", "remix", "play", "build", "explore"];
+        let items = [];
+        function build() {
+          items = [];
+          for (let i = 0; i < 10; i++) {
+            items.push({
+              x: p.random(20, 380),
+              y: p.random(30, 370),
+              s: p.random(12, 64),
+              a: p.random(-Math.PI / 5, Math.PI / 5),
+              word: p.random(words),
+              c: p.random([p.color(61, 90, 128, 210), p.color(224, 122, 95, 200), p.color(129, 178, 154, 210)])
+            });
+          }
+        }
+        p.setup = () => {
+          const canvas = p.createCanvas(400, 400);
+          canvas.parent("canvas-container");
+          p.noLoop();
+          build();
+        };
+        p.draw = () => {
+          p.background(250, 246, 240);
+          p.noStroke();
+          for (const item of items) {
+            p.push();
+            p.translate(item.x, item.y);
+            p.rotate(item.a);
+            p.fill(item.c);
+            p.textSize(item.s);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.text(item.word, 0, 0);
+            p.pop();
+          }
+        };
+        p.mousePressed = () => { build(); p.redraw(); };
+      }
+    },
     "arrays-in-motion": {
       title: "Moving Sentence Machine",
       session: "Session 4",
@@ -1026,36 +1512,22 @@ function keyPressed() {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #f7f1e7;
-      font-family: sans-serif;
+      background: #faf6f0;
     }
     body {
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    #canvas-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      box-sizing: border-box;
-    }
     canvas {
-      max-width: 100%;
+      width: 100% !important;
       height: auto !important;
       display: block;
-      border-radius: 18px;
-      box-shadow: 0 8px 24px rgba(44,42,38,.08);
-      background: white;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"><\/script>
 </head>
 <body>
-  <div id="canvas-container"></div>
   <script>
     window.addEventListener("error", function(event) {
       const pre = document.createElement("pre");
@@ -1105,30 +1577,37 @@ ${code}
 
         <main class="sketch-layout">
           <section class="card editor-card">
-            <div class="card-inner">
-              <div class="editor-toolbar">
-                <div>
-                  <h2>Starter Editor</h2>
-                  <p>${seed.liveSeed}</p>
+            <div class="editor-chrome">
+              <div class="chrome-left">
+                <div class="window-dots">
+                  <span class="wdot wdot-r"></span>
+                  <span class="wdot wdot-y"></span>
+                  <span class="wdot wdot-g"></span>
                 </div>
-                <div class="button-row">
-                  <button class="button primary" id="run-button" type="button">Play</button>
-                  <button class="button ghost" id="stop-button" type="button">Stop</button>
-                  <button class="button ghost" id="reset-button" type="button">Reset</button>
-                </div>
+                <span class="chrome-filename">sketch.js</span>
               </div>
-              <div class="editor-layout">
-                <div class="editor-pane">
-                  <div class="pane-label">Code</div>
-                  <textarea id="starter-editor" class="code-editor" spellcheck="false"></textarea>
+              <div class="chrome-right">
+                <span class="run-status" id="run-status">● ready</span>
+                <button class="edbtn edbtn-run" id="run-button" type="button">▶ Run</button>
+                <button class="edbtn edbtn-stop" id="stop-button" type="button">■ Stop</button>
+                <button class="edbtn edbtn-reset" id="reset-button" type="button">↺ Reset</button>
+              </div>
+            </div>
+            <div class="editor-hint">${seed.liveSeed}</div>
+            <div class="editor-layout">
+              <div class="editor-pane">
+                <div class="pane-chrome">Code</div>
+                <textarea id="starter-editor" class="code-editor" spellcheck="false"></textarea>
+              </div>
+              <div class="preview-pane">
+                <div class="pane-chrome pane-chrome-light">
+                  <span>Canvas</span>
+                  <span class="live-badge" id="live-badge">● live</span>
                 </div>
-                <div class="preview-pane">
-                  <div class="pane-label">Canvas</div>
-                  <div class="preview-stage">
-                    <iframe id="preview-frame" class="preview-frame" title="${seed.title} preview"></iframe>
-                  </div>
-                  <div class="editor-status">Use Play to rerun your code after edits. Stop clears the preview.</div>
+                <div class="preview-stage">
+                  <iframe id="preview-frame" class="preview-frame" title="${seed.title} preview"></iframe>
                 </div>
+                <div class="editor-status">Edit code · press Run to see changes · Reset restores the original</div>
               </div>
             </div>
           </section>
@@ -1168,16 +1647,33 @@ ${code}
     const runButton = document.getElementById("run-button");
     const stopButton = document.getElementById("stop-button");
     const resetButton = document.getElementById("reset-button");
+    const statusEl = document.getElementById("run-status");
+    const liveBadge = document.getElementById("live-badge");
     const initialCode = seed.code.trim();
 
     editor.value = initialCode;
 
+    function setStatus(text, color) {
+      if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || ""; }
+    }
+
+    function setLive(on) {
+      if (liveBadge) liveBadge.style.opacity = on ? "0.8" : "0.28";
+    }
+
     function runCurrentCode() {
+      setStatus("● running", "var(--gold)");
+      setLive(false);
       frame.srcdoc = buildRunnerDoc(editor.value);
+      setTimeout(() => { setStatus("● live", "var(--success)"); setLive(true); }, 900);
     }
 
     runButton.addEventListener("click", runCurrentCode);
-    stopButton.addEventListener("click", () => stopRunner(frame));
+    stopButton.addEventListener("click", () => {
+      setStatus("■ stopped", "rgba(240,235,227,.45)");
+      setLive(false);
+      stopRunner(frame);
+    });
     resetButton.addEventListener("click", () => {
       editor.value = initialCode;
       runCurrentCode();

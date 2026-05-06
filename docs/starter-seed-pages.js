@@ -1,5 +1,219 @@
 (() => {
   const seeds = {
+    "draw-your-name-seed": {
+      title: "Draw Your Name / Initials Seed",
+      session: "Session 1",
+      subtitle: "A first text sketch where a name, initials, or meaningful word becomes a designed mark on the canvas.",
+      tags: ["text()", "identity", "coordinates"],
+      liveSeed: "Start by changing the letters. Then change the size, color, or position to make it feel like yours.",
+      tryText: "Replace SK with your initials, name, a place, or one word you want on screen.",
+      noticeText: "text() uses x and y just like a shape. textAlign(CENTER, CENTER) makes that point the center of the words.",
+      remixText: "Turn it into a name badge, title card, poster, classroom label, poem fragment, or personal logo.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Text, identity, and coordinates",
+      code: `function setup() {
+  createCanvas(600, 400);
+}
+
+function draw() {
+  background(245);
+
+  textAlign(CENTER, CENTER);
+  textSize(72);
+  fill(30, 100, 220);
+
+  text("SK", width / 2, height / 2);
+}`,
+      sketch: (p) => {
+        p.setup = () => {
+          const canvas = p.createCanvas(400, 400);
+          canvas.parent("canvas-container");
+        };
+        p.draw = () => {
+          p.background(245);
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textSize(72);
+          p.noStroke();
+          p.fill(30, 100, 220);
+          p.text("SK", p.width / 2, p.height / 2);
+          p.fill(224, 122, 95);
+          p.circle(p.width / 2, p.height / 2, 8);
+          p.fill(107, 103, 96);
+          p.textSize(13);
+          p.text("change the letters", p.width / 2, p.height - 28);
+        };
+      }
+    },
+    "framecount-animation-seed": {
+      title: "frameCount Animation Seed",
+      session: "Session 2",
+      subtitle: "A tiny clock-driven animation where p5.js keeps moving even when nobody touches the mouse or keyboard.",
+      tags: ["frameCount", "time", "animation"],
+      liveSeed: "Watch the circle pulse and the color cycle automatically. Press Run after changing the modulo values.",
+      tryText: "Change `% 100` to `% 200`, or change the color range from 360 to 120.",
+      noticeText: "frameCount increases by 1 every time draw() runs, so the sketch has its own clock.",
+      remixText: "Make a breathing badge, rotating poster, pulsing moon, or automatic title screen.",
+      footer: "CC Fest Coding Camp · Starter Sketch · frameCount as a clock",
+      code: `function setup() {
+  createCanvas(400, 400);
+  colorMode(HSB, 360, 100, 100);
+}
+
+function draw() {
+  let hue = frameCount % 360;
+  let pulse = frameCount % 100;
+  let size = map(pulse, 0, 99, 30, 180);
+
+  background(hue, 25, 96);
+  fill((hue + 120) % 360, 70, 90);
+  noStroke();
+  circle(width / 2, height / 2, size);
+
+  fill(0, 0, 20);
+  textAlign(CENTER);
+  text("frameCount: " + frameCount, width / 2, height - 26);
+}`
+    },
+    "sine-cosine-motion-seed": {
+      title: "Sine / Cosine Motion Seed",
+      session: "Session 2",
+      subtitle: "A smooth motion seed where sin() moves a ball back and forth using center, amplitude, and speed.",
+      tags: ["sin()", "cos()", "cyclical motion"],
+      liveSeed: "The ball moves by itself. Change amplitude and speed to feel how sine motion works.",
+      tryText: "Change amplitude from 120 to 40, then change speed from 0.03 to 0.08.",
+      noticeText: "Amplitude controls how far the ball moves. The multiplier controls how fast it cycles.",
+      remixText: "Turn the ball into a pendulum, orbiting dot, floating word, bobbing creature, or wave.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Smooth sine motion",
+      code: `let centerX = 200;
+let amplitude = 120;
+let speed = 0.03;
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  // center: where the motion starts
+  // amplitude: how far it moves
+  // speed: how fast it cycles
+  let x = centerX + sin(frameCount * speed) * amplitude;
+
+  stroke(220);
+  line(centerX - amplitude, 200, centerX + amplitude, 200);
+
+  noStroke();
+  fill(61, 90, 128);
+  circle(x, 200, 54);
+}`
+    },
+    "tiny-csv-portrait-seed": {
+      title: "Tiny CSV Portrait Seed",
+      session: "Session 4",
+      subtitle: "A minimal data-file sketch: load rows from a CSV and draw one bar for each value.",
+      tags: ["CSV", "loadTable()", "data"],
+      liveSeed: "This runner uses inline sample rows so it works here, but the code shows the real loadTable() pattern.",
+      tryText: "Change the activity names and hours. Then imagine those rows living in a separate data.csv file.",
+      noticeText: "Headers name the columns. Each row gives one label and one numeric value.",
+      remixText: "Make a daily habit chart, class survey, mood portrait, or tiny schedule visualization.",
+      footer: "CC Fest Coding Camp · Starter Sketch · CSV rows become bars",
+      code: `// In the p5.js Web Editor, put this in data.csv:
+// activity,hours
+// sleep,8
+// school,7
+// screen,4
+// reading,1
+// movement,2
+
+let rows = [
+  { activity: "sleep", hours: 8 },
+  { activity: "school", hours: 7 },
+  { activity: "screen", hours: 4 },
+  { activity: "reading", hours: 1 },
+  { activity: "movement", hours: 2 }
+];
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  for (let i = 0; i < rows.length; i++) {
+    let row = rows[i];
+    let barHeight = map(row.hours, 0, 10, 0, 240);
+    let x = 48 + i * 68;
+
+    fill(61, 90, 128);
+    rect(x, 320 - barHeight, 42, barHeight, 10);
+    fill(44, 42, 38);
+    textAlign(CENTER);
+    text(row.activity, x + 21, 348);
+  }
+}`
+    },
+    "particle-system-seed": {
+      title: "Particle System Seed",
+      session: "Session 5",
+      subtitle: "A satisfying open-studio seed that combines arrays, objects, motion, randomness, lifespan, and cleanup.",
+      tags: ["particles", "classes", "arrays"],
+      liveSeed: "Drag on the canvas to emit particles. Each particle moves, fades, and then gets removed.",
+      tryText: "Change the velocity range, color, life decrease, or number of particles added each frame.",
+      noticeText: "The array stores many Particle objects. The loop updates each one and removes it when it is done.",
+      remixText: "Make fireworks, sparks, rain, snow, emotion particles, glitter trails, or magic dust.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Particle systems",
+      code: `let particles = [];
+
+function setup() {
+  createCanvas(400, 400);
+  noStroke();
+}
+
+function draw() {
+  background(250, 246, 240, 30);
+
+  if (mouseIsPressed) {
+    particles.push(new Particle(mouseX, mouseY));
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    particles[i].update();
+    particles[i].display();
+
+    if (particles[i].isDone()) {
+      particles.splice(i, 1);
+    }
+  }
+}
+
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = random(-2, 2);
+    this.vy = random(-3, 1);
+    this.life = 255;
+    this.size = random(8, 18);
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += 0.04;
+    this.life -= 4;
+  }
+
+  display() {
+    fill(61, 90, 128, this.life);
+    circle(this.x, this.y, this.size);
+  }
+
+  isDone() {
+    return this.life < 0;
+  }
+}`
+    },
     "mouse-trail-drawing-seed": {
       title: "Mouse Trail Drawing Seed",
       session: "Session 2",
@@ -718,8 +932,8 @@ function mousePressed() {
       session: "Session 5",
       subtitle: "A small poster generator that combines text, shapes, and randomness so code immediately produces something publishable-looking.",
       tags: ["randomness", "text", "composition"],
-      liveSeed: "Click to generate a new abstract poster with different titles, colors, and shape compositions.",
-      tryText: "Change the word bank, add a subtitle, or use loops to create bigger shape systems.",
+      liveSeed: "Click to generate a new abstract poster. Press s to save the current poster as a PNG.",
+      tryText: "Change the word bank, add a subtitle, or press s after generating a version you want to keep.",
       noticeText: "A few arrays and random choices are enough to make each poster feel distinct.",
       remixText: "Make event posters, music flyers, poetry cards, album covers, or mood posters.",
       footer: "CC Fest Coding Camp · Starter Sketch · Generative poster design",
@@ -752,6 +966,12 @@ function draw() {
 function mousePressed() {
   buildPoster();
   redraw();
+}
+
+function keyPressed() {
+  if (key === "s") {
+    saveCanvas("cc-fest-poster", "png");
+  }
 }`,
       sketch: (p) => {
         const titles = ["code bloom", "night signal", "open studio", "future play", "signal garden"];

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Text Basics Studio - CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --cream: #FAF6F0;
+    --cream-dark: #F0EBE3;
+    --cream-darker: #E5DFD5;
+    --ink: #2C2A26;
+    --ink-light: #6B6760;
+    --ink-faint: #9E998F;
+    --accent: #3D5A80;
+    --highlight: #E07A5F;
+    --success: #81B29A;
+    --gold: #F2CC8F;
+    --grid-bg: #FFFFFF;
+    --code-bg: #2C2A26;
+    --code-text: #F0EBE3;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04);
+  }
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+  }
+  .container { max-width: 1180px; margin: 0 auto; }
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .topbar a { color: var(--ink-light); text-decoration: none; }
+  .topbar a:hover { color: var(--highlight); }
+  .header { margin-bottom: 24px; }
+  .stage-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(61,90,128,.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: clamp(30px, 4vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    max-width: 820px;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    background: var(--cream-dark);
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(330px, .85fr);
+    gap: 18px;
+    align-items: start;
+  }
+  @media (max-width: 950px) { .workspace { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+  .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .panel-desc { font-size: 13px; color: var(--ink-light); }
+  .canvas-panel { padding: 14px; }
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 1.5 / 1;
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+  #canvas-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .readout-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+  @media (max-width: 620px) { .readout-row { grid-template-columns: repeat(2, 1fr); } }
+  .readout-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+  }
+  .readout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .readout-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    color: var(--ink);
+    margin-top: 2px;
+  }
+  .controls {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .control-group {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+  .control-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+  .text-input {
+    width: 100%;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 10px 11px;
+    color: var(--ink);
+    background: #fff;
+    font: 500 15px 'DM Sans', sans-serif;
+  }
+  .slider-row {
+    display: grid;
+    grid-template-columns: 88px 1fr 54px;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+  }
+  .slider-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+  input[type="range"] { width: 100%; accent-color: var(--highlight); }
+  input[type="color"] {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    padding: 4px;
+  }
+  .value {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    text-align: right;
+    color: var(--ink);
+  }
+  .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  button {
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink-light);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    padding: 8px 11px;
+    cursor: pointer;
+  }
+  button.active {
+    border-color: var(--accent);
+    color: #fff;
+    background: var(--accent);
+  }
+  .code-panel { margin-top: 18px; }
+  .code-block {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius);
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre;
+  }
+  .copy-button {
+    margin-top: 10px;
+    background: var(--highlight);
+    color: white;
+    border-color: transparent;
+  }
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+  @media (max-width: 760px) { .lesson-grid { grid-template-columns: 1fr; } }
+  .lesson-card {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+  .lesson-card h2 { font-size: 18px; margin-bottom: 6px; }
+  .lesson-card p { color: var(--ink-light); font-size: 14px; }
+  .footer {
+    margin-top: 24px;
+    color: var(--ink-faint);
+    font-size: 13px;
+    text-align: center;
+  }
+  @media (max-width: 620px) {
+    body { padding: 17px; }
+    .topbar { flex-wrap: wrap; }
+    .slider-row { grid-template-columns: 74px 1fr 44px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <nav class="topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </nav>
+
+    <header class="header">
+      <div class="stage-tag">Session 1 · Text + Identity</div>
+      <h1>Text Basics Studio</h1>
+      <p class="subtitle">Type a word, name, or short phrase and design it on the canvas. In p5.js, text is drawn like a shape: it has coordinates, color, size, alignment, and composition.</p>
+      <div class="tag-row">
+        <span class="tag">text()</span>
+        <span class="tag">coordinates</span>
+        <span class="tag">fill</span>
+        <span class="tag">alignment</span>
+        <span class="tag">identity</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Live Text Canvas</div>
+          <div class="panel-desc">Change the controls and watch your word become a designed object.</div>
+        </div>
+        <div class="canvas-panel">
+          <div id="canvas-container" aria-label="p5.js canvas showing editable text"></div>
+          <div class="readout-row">
+            <div class="readout-card"><div class="readout-label">text</div><div class="readout-value" id="textReadout">hello</div></div>
+            <div class="readout-card"><div class="readout-label">x, y</div><div class="readout-value" id="xyReadout">300, 200</div></div>
+            <div class="readout-card"><div class="readout-label">size</div><div class="readout-value" id="sizeReadout">72</div></div>
+            <div class="readout-card"><div class="readout-label">align</div><div class="readout-value" id="alignReadout">CENTER</div></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Text Controls</div>
+          <div class="panel-desc">Start with language, then shape it with code ideas from Session 1.</div>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <div class="control-group-title">Your words</div>
+            <input class="text-input" id="textInput" value="hello" maxlength="24" aria-label="Text to draw">
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Position + size</div>
+            <div class="slider-row"><label for="xSlider">x</label><input id="xSlider" type="range" min="0" max="600" value="300"><span class="value" id="xValue">300</span></div>
+            <div class="slider-row"><label for="ySlider">y</label><input id="ySlider" type="range" min="0" max="400" value="200"><span class="value" id="yValue">200</span></div>
+            <div class="slider-row"><label for="sizeSlider">size</label><input id="sizeSlider" type="range" min="16" max="160" value="72"><span class="value" id="sizeValue">72</span></div>
+            <div class="slider-row"><label for="rotateSlider">rotate</label><input id="rotateSlider" type="range" min="-45" max="45" value="0"><span class="value" id="rotateValue">0</span></div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Color</div>
+            <input id="fillPicker" type="color" value="#1e64dc" aria-label="Text fill color">
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Horizontal align</div>
+            <div class="button-row" id="horizontalButtons">
+              <button type="button" data-align="LEFT">Left</button>
+              <button class="active" type="button" data-align="CENTER">Center</button>
+              <button type="button" data-align="RIGHT">Right</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Vertical align</div>
+            <div class="button-row" id="verticalButtons">
+              <button type="button" data-valign="TOP">Top</button>
+              <button class="active" type="button" data-valign="CENTER">Center</button>
+              <button type="button" data-valign="BASELINE">Baseline</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Guides</div>
+            <div class="button-row">
+              <button class="active" type="button" id="anchorButton">Anchor On</button>
+              <button type="button" id="boxButton">Box Off</button>
+              <button class="active" type="button" id="labelButton">Label On</button>
+              <button type="button" id="backgroundButton">Warm BG</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="panel code-panel">
+      <div class="panel-header">
+        <div class="panel-title">Code Preview</div>
+        <div class="panel-desc">The current design translated into beginner-friendly p5.js code.</div>
+      </div>
+      <div style="padding:14px;">
+        <pre class="code-block" id="codePreview"></pre>
+        <button class="copy-button" id="copyCode" type="button">Copy Code</button>
+      </div>
+    </section>
+
+    <section class="lesson-grid" aria-label="Teaching notes">
+      <div class="lesson-card">
+        <h2>Try this</h2>
+        <p>Type your name, initials, a place, or a word that matters to you. Move only x and y first so coordinates feel like composition.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Notice this</h2>
+        <p>The anchor dot is the text position. Alignment changes how the text is arranged around that point.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Remix this</h2>
+        <p>Use text like a poster, label, badge, poem, title card, or identity mark. Code can design with language.</p>
+      </div>
+    </section>
+
+    <footer class="footer">CC Fest Coding Camp · Session 1 · Text as a shape</footer>
+  </div>
+
+<script>
+const state = {
+  text: "hello",
+  x: 300,
+  y: 200,
+  size: 72,
+  rotation: 0,
+  fill: "#1e64dc",
+  align: "CENTER",
+  valign: "CENTER",
+  showAnchor: true,
+  showBox: false,
+  showLabel: true,
+  warmBackground: true
+};
+
+const els = {};
+
+function hexToRgb(hex) {
+  const value = hex.replace("#", "");
+  return {
+    r: parseInt(value.slice(0, 2), 16),
+    g: parseInt(value.slice(2, 4), 16),
+    b: parseInt(value.slice(4, 6), 16)
+  };
+}
+
+function p5Align(p, name) {
+  return p[name] || name;
+}
+
+function updateButtons() {
+  document.querySelectorAll("[data-align]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.align === state.align);
+  });
+  document.querySelectorAll("[data-valign]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.valign === state.valign);
+  });
+  els.anchorButton.classList.toggle("active", state.showAnchor);
+  els.anchorButton.textContent = state.showAnchor ? "Anchor On" : "Anchor Off";
+  els.boxButton.classList.toggle("active", state.showBox);
+  els.boxButton.textContent = state.showBox ? "Box On" : "Box Off";
+  els.labelButton.classList.toggle("active", state.showLabel);
+  els.labelButton.textContent = state.showLabel ? "Label On" : "Label Off";
+  els.backgroundButton.classList.toggle("active", !state.warmBackground);
+  els.backgroundButton.textContent = state.warmBackground ? "Warm BG" : "White BG";
+}
+
+function updateReadouts() {
+  els.textReadout.textContent = state.text || " ";
+  els.xyReadout.textContent = `${state.x}, ${state.y}`;
+  els.sizeReadout.textContent = state.size;
+  els.alignReadout.textContent = state.align;
+  els.xValue.textContent = state.x;
+  els.yValue.textContent = state.y;
+  els.sizeValue.textContent = state.size;
+  els.rotateValue.textContent = state.rotation;
+}
+
+function currentCode() {
+  const rgb = hexToRgb(state.fill);
+  const safeText = (state.text || "hello").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const lines = [
+    "function setup() {",
+    "  createCanvas(600, 400);",
+    "}",
+    "",
+    "function draw() {",
+    `  background(${state.warmBackground ? "250, 246, 240" : "255"});`,
+    "",
+    `  textAlign(${state.align}, ${state.valign});`,
+    `  textSize(${state.size});`,
+    `  fill(${rgb.r}, ${rgb.g}, ${rgb.b});`
+  ];
+  if (state.rotation !== 0) {
+    lines.push("");
+    lines.push("  push();");
+    lines.push(`  translate(${state.x}, ${state.y});`);
+    lines.push(`  rotate(radians(${state.rotation}));`);
+    lines.push(`  text("${safeText}", 0, 0);`);
+    lines.push("  pop();");
+  } else {
+    lines.push("");
+    lines.push(`  text("${safeText}", ${state.x}, ${state.y});`);
+  }
+  lines.push("}");
+  return lines.join("\n");
+}
+
+function syncUi() {
+  updateButtons();
+  updateReadouts();
+  els.codePreview.textContent = currentCode();
+}
+
+function setupControls() {
+  Object.assign(els, {
+    textInput: document.getElementById("textInput"),
+    xSlider: document.getElementById("xSlider"),
+    ySlider: document.getElementById("ySlider"),
+    sizeSlider: document.getElementById("sizeSlider"),
+    rotateSlider: document.getElementById("rotateSlider"),
+    fillPicker: document.getElementById("fillPicker"),
+    xValue: document.getElementById("xValue"),
+    yValue: document.getElementById("yValue"),
+    sizeValue: document.getElementById("sizeValue"),
+    rotateValue: document.getElementById("rotateValue"),
+    textReadout: document.getElementById("textReadout"),
+    xyReadout: document.getElementById("xyReadout"),
+    sizeReadout: document.getElementById("sizeReadout"),
+    alignReadout: document.getElementById("alignReadout"),
+    codePreview: document.getElementById("codePreview"),
+    anchorButton: document.getElementById("anchorButton"),
+    boxButton: document.getElementById("boxButton"),
+    labelButton: document.getElementById("labelButton"),
+    backgroundButton: document.getElementById("backgroundButton")
+  });
+
+  els.textInput.addEventListener("input", (event) => {
+    state.text = event.target.value;
+    syncUi();
+  });
+  [
+    ["xSlider", "x"],
+    ["ySlider", "y"],
+    ["sizeSlider", "size"],
+    ["rotateSlider", "rotation"]
+  ].forEach(([id, key]) => {
+    els[id].addEventListener("input", (event) => {
+      state[key] = Number(event.target.value);
+      syncUi();
+    });
+  });
+  els.fillPicker.addEventListener("input", (event) => {
+    state.fill = event.target.value;
+    syncUi();
+  });
+  document.querySelectorAll("[data-align]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.align = button.dataset.align;
+      syncUi();
+    });
+  });
+  document.querySelectorAll("[data-valign]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.valign = button.dataset.valign;
+      syncUi();
+    });
+  });
+  els.anchorButton.addEventListener("click", () => { state.showAnchor = !state.showAnchor; syncUi(); });
+  els.boxButton.addEventListener("click", () => { state.showBox = !state.showBox; syncUi(); });
+  els.labelButton.addEventListener("click", () => { state.showLabel = !state.showLabel; syncUi(); });
+  els.backgroundButton.addEventListener("click", () => { state.warmBackground = !state.warmBackground; syncUi(); });
+  document.getElementById("copyCode").addEventListener("click", async (event) => {
+    await navigator.clipboard.writeText(currentCode());
+    event.currentTarget.textContent = "Copied";
+    setTimeout(() => { event.currentTarget.textContent = "Copy Code"; }, 900);
+  });
+  syncUi();
+}
+
+new p5((p) => {
+  p.setup = () => {
+    const canvas = p.createCanvas(600, 400);
+    canvas.parent("canvas-container");
+    setupControls();
+  };
+
+  p.draw = () => {
+    p.background(state.warmBackground ? p.color(250, 246, 240) : 255);
+    p.stroke(229, 223, 213);
+    p.strokeWeight(1);
+    for (let x = 0; x <= p.width; x += 40) p.line(x, 0, x, p.height);
+    for (let y = 0; y <= p.height; y += 40) p.line(0, y, p.width, y);
+
+    p.push();
+    p.translate(state.x, state.y);
+    p.rotate(p.radians(state.rotation));
+    p.textAlign(p5Align(p, state.align), p5Align(p, state.valign));
+    p.textSize(state.size);
+    p.noStroke();
+    const rgb = hexToRgb(state.fill);
+    p.fill(rgb.r, rgb.g, rgb.b);
+    p.text(state.text || " ", 0, 0);
+    const bounds = p.drawingContext.measureText(state.text || " ");
+    if (state.showBox) {
+      const w = bounds.width;
+      const ascent = bounds.actualBoundingBoxAscent || state.size * 0.75;
+      const descent = bounds.actualBoundingBoxDescent || state.size * 0.25;
+      let left = 0;
+      if (state.align === "CENTER") left = -w / 2;
+      if (state.align === "RIGHT") left = -w;
+      let top = -ascent;
+      if (state.valign === "TOP") top = 0;
+      if (state.valign === "CENTER") top = -(ascent - descent) / 2 - ascent / 2;
+      p.noFill();
+      p.stroke(224, 122, 95);
+      p.strokeWeight(2);
+      p.rect(left - 4, top - 4, w + 8, ascent + descent + 8);
+    }
+    p.pop();
+
+    if (state.showAnchor) {
+      p.noStroke();
+      p.fill(224, 122, 95);
+      p.circle(state.x, state.y, 12);
+    }
+    if (state.showLabel) {
+      const label = `x ${state.x}, y ${state.y}`;
+      const labelX = Math.min(Math.max(state.x + 12, 8), p.width - 112);
+      const labelY = Math.min(Math.max(state.y + 14, 8), p.height - 28);
+      p.textSize(13);
+      p.textAlign(p.LEFT, p.TOP);
+      const labelW = p.textWidth(label) + 12;
+      p.noStroke();
+      p.fill(250, 246, 240, 235);
+      p.rect(labelX - 6, labelY - 4, labelW, 22, 6);
+      p.fill(44, 42, 38);
+      p.text(label, labelX, labelY);
+    }
+  };
+});
+</script>
+</body>
+</html>

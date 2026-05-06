@@ -3,25 +3,31 @@
   --cream-dark:#f0ebe3;
   --cream-deep:#e4dccf;
   --panel:#ffffff;
-  --ink:#2c2a26;
-  --ink-light:#6b6760;
-  --accent:#3d5a80;
+  --ink:#1a1917;
+  --ink-light:#5c5650;
+  --accent:#c8391d;
+  --gold:#f5a800;
   --highlight:#e07a5f;
   --success:#81b29a;
-  --code-bg:#2c2a26;
+  --code-bg:#1a1917;
   --code-text:#f0ebe3;
   --radius:18px;
-  --shadow:0 18px 55px rgba(53,43,32,.08);
+  --shadow:0 18px 55px rgba(0,0,0,.07);
 }
 
 *{box-sizing:border-box}
+
+h1,h2,h3{
+  font-family:"Fraunces","DM Sans",system-ui,sans-serif;
+  font-weight:800;
+}
 
 body{
   margin:0;
   font-family:"DM Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:
-    radial-gradient(circle at top left, rgba(224,122,95,.14), transparent 28%),
-    radial-gradient(circle at top right, rgba(61,90,128,.14), transparent 22%),
+    radial-gradient(circle at top left, rgba(245,168,0,.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(14,114,200,.12), transparent 22%),
     var(--cream);
   color:var(--ink);
   line-height:1.5;
@@ -142,86 +148,196 @@ a{color:inherit}
   font-size:14px;
 }
 
-.editor-card .card-inner{padding:18px}
+/* ─── EDITOR WORKSPACE ─── */
 
-.editor-toolbar{
+.editor-card{
+  overflow:hidden;
+  padding:0;
+}
+
+.editor-chrome{
   display:flex;
+  align-items:center;
   justify-content:space-between;
-  align-items:flex-start;
-  gap:16px;
-  margin-bottom:16px;
+  gap:12px;
+  padding:10px 16px;
+  background:var(--code-bg);
+  border-bottom:1px solid rgba(255,255,255,.06);
 }
 
-.editor-toolbar h2{
-  margin:0 0 6px;
-  font-size:22px;
+.chrome-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
 }
 
-.editor-toolbar p{
-  margin:0;
+.window-dots{
+  display:flex;
+  gap:6px;
+  flex-shrink:0;
+}
+
+.wdot{
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.wdot-r{background:#ff5f56}
+.wdot-y{background:#febc2e}
+.wdot-g{background:#28c840}
+
+.chrome-filename{
+  font-family:"DM Mono",ui-monospace,monospace;
+  font-size:12px;
+  color:rgba(240,235,227,.36);
+  letter-spacing:.04em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.chrome-right{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+}
+
+.run-status{
+  font-family:"DM Mono",ui-monospace,monospace;
+  font-size:11px;
+  color:var(--success);
+  opacity:.72;
+  letter-spacing:.04em;
+  margin-right:8px;
+  white-space:nowrap;
+}
+
+.edbtn{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:6px 14px;
+  border-radius:7px;
+  border:1px solid transparent;
+  font-family:"DM Mono",ui-monospace,monospace;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition:opacity .14s, transform .1s;
+  letter-spacing:.02em;
+}
+
+.edbtn:hover{opacity:.84;transform:translateY(-1px)}
+
+.edbtn-run{background:#3a7d56;color:#fff;border-color:#3a7d56}
+.edbtn-stop{background:rgba(255,255,255,.08);color:rgba(240,235,227,.6);border-color:rgba(255,255,255,.1)}
+.edbtn-reset{background:rgba(255,255,255,.05);color:rgba(240,235,227,.45);border-color:rgba(255,255,255,.07)}
+
+.editor-hint{
+  padding:9px 18px;
+  font-size:13px;
   color:var(--ink-light);
-  font-size:14px;
-  max-width:560px;
+  background:rgba(250,246,240,.78);
+  border-bottom:1px solid var(--cream-dark);
+  line-height:1.45;
 }
 
 .editor-layout{
   display:grid;
-  grid-template-columns:minmax(0,1.06fr) minmax(360px,.94fr);
-  gap:18px;
+  grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);
+  gap:0;
 }
 
-.editor-pane,
+.editor-pane{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid rgba(255,255,255,.05);
+}
+
 .preview-pane{
   min-width:0;
+  display:flex;
+  flex-direction:column;
+  border-left:1px solid var(--cream-dark);
 }
 
-.pane-label{
-  margin-bottom:10px;
-  font-size:11px;
+.pane-chrome{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:7px 14px;
+  background:rgba(26,25,23,.9);
+  border-bottom:1px solid rgba(255,255,255,.05);
+  font-family:"DM Mono",ui-monospace,monospace;
+  font-size:10px;
   font-weight:700;
-  letter-spacing:.08em;
+  letter-spacing:.14em;
+  color:rgba(240,235,227,.32);
   text-transform:uppercase;
-  color:var(--accent);
+  user-select:none;
+}
+
+.pane-chrome-light{
+  background:var(--cream-dark);
+  border-bottom:1px solid var(--cream-deep);
+  color:var(--ink-light);
+}
+
+.live-badge{
+  font-size:10px;
+  color:var(--success);
+  opacity:.8;
+  letter-spacing:.1em;
 }
 
 .code-editor{
+  flex:1;
   width:100%;
   min-height:clamp(360px,52vh,620px);
   resize:vertical;
   border:none;
   outline:none;
-  border-radius:18px;
+  border-radius:0;
   padding:18px;
   background:var(--code-bg);
   color:var(--code-text);
   font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:13px;
   line-height:1.6;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
 }
 
 .preview-stage{
+  flex:1;
   min-height:clamp(360px,52vh,620px);
-  padding:12px;
-  background:linear-gradient(180deg,var(--cream),#fff);
-  border:1px solid var(--cream-dark);
-  border-radius:18px;
+  padding:0;
+  background:#fff;
+  border:none;
+  border-radius:0;
+  display:flex;
+  flex-direction:column;
 }
 
 .preview-frame{
   width:100%;
-  height:100%;
-  min-height:clamp(336px,48vh,596px);
+  flex:1;
   border:none;
-  border-radius:16px;
+  border-radius:0;
   background:#fff;
-  box-shadow:0 8px 24px rgba(44,42,38,.08);
+  display:block;
 }
 
 .editor-status{
-  margin-top:10px;
+  padding:8px 14px;
   color:var(--ink-light);
-  font-size:13px;
+  font-size:12px;
+  font-family:"DM Mono",ui-monospace,monospace;
+  background:var(--cream);
+  border-top:1px solid var(--cream-dark);
 }
 
 .button-row{
@@ -304,6 +420,8 @@ a{color:inherit}
 
 @media(max-width:960px){
   .editor-layout{grid-template-columns:1fr}
+  .editor-pane{border-right:none;border-bottom:1px solid rgba(255,255,255,.05)}
+  .preview-pane{border-left:none;border-top:1px solid var(--cream-dark)}
 }
 
 @media(max-width:720px){
@@ -311,7 +429,7 @@ a{color:inherit}
   .sketch-header,.card-inner{padding:20px}
   .card-header,.sketch-topbar{display:block}
   .sketch-topbar a{display:inline-block;margin-top:10px}
-  .editor-toolbar{display:block}
-  .button-row{margin-top:12px}
-  .editor-card .card-inner{padding:16px}
+  .chrome-right{gap:4px}
+  .edbtn{padding:5px 10px;font-size:11px}
+  .run-status{display:none}
 }

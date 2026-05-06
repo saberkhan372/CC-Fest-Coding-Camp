@@ -3,27 +3,36 @@
     "coordinate-system-explorer": { family: "coordinates", label: "Coordinates" },
     "interactive-shape-explorer": { family: "shapes", label: "Shapes" },
     "shape-and-color-explorer": { family: "shapeColor", label: "Color" },
+    "text-basics-studio": { family: "textBasics", label: "Text" },
     "variable-playground": { family: "variable", label: "Variables" },
     "rgb-hsb-color-lab": { family: "colorLab", label: "Color Lab" },
     "animation-explorer": { family: "bounce", label: "Motion" },
     "transformations-explorer": { family: "transform", label: "Transforms" },
     "map-explorer": { family: "mapping", label: "Map" },
+    "lerp-explorer": { family: "lerpSeed", label: "lerp()" },
     "if-else-decision-studio": { family: "threshold", label: "Logic" },
+    "for-loop-stepper": { family: "gridSeed", label: "Loop" },
     "rows-and-columns": { family: "grid", label: "Patterns" },
+    "modulo-pattern-explorer": { family: "hsbSeed", label: "Modulo" },
     "simple-array-explorer": { family: "arrays", label: "Arrays" },
     "polished-array-explorer": { family: "dataBars", label: "Data" },
     "function-builder": { family: "function", label: "Functions" },
     "noise-vs-random-explorer": { family: "noiseRandom", label: "Noise" },
     "data-story-planner": { family: "planner", label: "Planning" },
     "data-mapper": { family: "dataMap", label: "Mapping" },
+    "csv-loadtable-data-explorer": { family: "dataBars", label: "CSV" },
     "event-handler-studio": { family: "ripple", label: "Events" },
     "collision-detection-explorer": { family: "collision", label: "Collisions" },
     "interactive-shape-drawing-app": { family: "objects", label: "Objects" },
     "webgl-3d-workshop": { family: "cube", label: "3D" },
     "sound-shape-visualizer": { family: "sound", label: "Sound" },
     "image-remix-studio": { family: "image", label: "Remix" },
+    "debugging-playground": { family: "function", label: "Debug" },
     "mouse-trail-drawing-seed": { family: "trailSeed", label: "Trail" },
+    "draw-your-name-seed": { family: "nameSeed", label: "Name" },
     "bouncing-ball-starter": { family: "bounceSeed", label: "Bounce" },
+    "framecount-animation-seed": { family: "poster", label: "Clock" },
+    "sine-cosine-motion-seed": { family: "lerpSeed", label: "Sine" },
     "click-to-create-shapes": { family: "stampSeed", label: "Click" },
     "color-from-position": { family: "shapeColor", label: "Color" },
     "noise-walker": { family: "noiseRandom", label: "Noise" },
@@ -31,9 +40,11 @@
     "keyboard-controlled-character": { family: "keyboardSeed", label: "Keys" },
     "simple-collision-game-seed": { family: "collision", label: "Collision" },
     "data-self-portrait-seed": { family: "dataPortraitSeed", label: "Data" },
+    "tiny-csv-portrait-seed": { family: "dataBars", label: "CSV" },
     "image-grid-remix-seed": { family: "image", label: "Image" },
     "sound-pulse-seed": { family: "sound", label: "Sound" },
     "mini-generative-poster-seed": { family: "poster", label: "Poster" },
+    "particle-system-seed": { family: "trailSeed", label: "Particles" },
     "nested-loop-array-grid": { family: "gridSeed", label: "Seed" },
     "array-position-dot-field": { family: "dots", label: "Positions" },
     "random-poetry-generator": { family: "poetry", label: "Poetry" },
@@ -222,6 +233,28 @@
           ctx.arc(0, 0, size, Math.PI * 0.2, Math.PI * 1.6);
           ctx.stroke();
         }
+        break;
+      }
+      case "textBasics": {
+        drawGrid(ctx, w, h, 24, "rgba(61,90,128,.08)");
+        const x = 22 + px * (w - 44);
+        const y = 28 + py * (h - 56);
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate((px - 0.5) * 0.45);
+        ctx.font = `800 ${Math.max(28, h * 0.34)}px Fraunces, serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#3d5a80";
+        ctx.fillText("hello", 0, 0);
+        ctx.restore();
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(44,42,38,.72)";
+        ctx.font = "11px DM Mono, monospace";
+        ctx.fillText(`text("hello", ${Math.round(x)}, ${Math.round(y)})`, 14, h - 12);
         break;
       }
       case "shapeColor": {
@@ -853,6 +886,23 @@
           ctx.fillText(word, 0, 0);
           ctx.restore();
         });
+        break;
+      }
+      case "nameSeed": {
+        ctx.fillStyle = "#f5f5f5";
+        ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = "#1e64dc";
+        ctx.font = `800 ${Math.max(46, h * 0.48)}px DM Sans, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("SK", w / 2, h / 2);
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(w / 2, h / 2, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(44,42,38,.72)";
+        ctx.font = "11px DM Mono, monospace";
+        ctx.fillText("textAlign(CENTER, CENTER)", w / 2, h - 16);
         break;
       }
       default:

@@ -325,12 +325,30 @@
     font-size: 12px;
     color: var(--ink-faint);
   }
+
+  .page-topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0 18px;
+    font-size:13px;
+    font-family:'DM Sans',system-ui,sans-serif;
+  }
+  .page-topbar a{
+    text-decoration:none;
+    color:#5c5650;
+  }
+  .page-topbar a:hover{color:#c8391d}
 </style>
 </head>
 <body>
+  <div class="page-topbar">
+    <a href="../../index.html">← Back to tool library</a>
+    <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+  </div>
   <div class="container">
     <header class="header">
-      <div class="stage-tag">Missing Tool 7 — Color Systems</div>
+      <div class="stage-tag">Session 1 · Color</div>
       <h1>RGB / HSB Color Lab</h1>
       <p class="subtitle">Compare two ways of thinking about color in p5.js. <strong>RGB</strong> mixes red, green, and blue light. <strong>HSB</strong> lets you work with hue, saturation, and brightness — often a more intuitive system for palettes, moods, gradients, and generative art.</p>
       <div class="tag-row" aria-label="Concept tags">

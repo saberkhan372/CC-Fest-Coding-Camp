@@ -24,9 +24,9 @@ https://saberkhan372.github.io/CC-Fest-Coding-Camp/
 
 ## Publishing notes
 
-- GitHub Pages serves the `docs/` directory in the repo root.
-- This folder is the original source copy kept alongside the published Pages version.
-- If you edit both copies manually, keep `docs/` and this folder in sync.
+- GitHub Pages serves this `docs/` directory.
+- The repo also contains a duplicate source copy in `cc-fest-coding-camp-pages/` for the original site files.
+- When making content or design changes, update `docs/` first so the published site stays correct.
 
 ## Notes
 
