@@ -185,29 +185,16 @@
       openByDefault: index === 0
     });
 
-    const cards = grid.querySelectorAll(".tool-card");
-    const count = cards.length;
-    const names = Array.from(cards).slice(0, 4)
-      .map(c => c.querySelector("h3")?.textContent?.trim()).filter(Boolean);
-    const chipsEl = document.createElement("div");
-    chipsEl.className = "station-chips";
-    const countEl = document.createElement("span");
-    countEl.className = "station-count";
-    countEl.textContent = `${count} tools`;
-    chipsEl.appendChild(countEl);
-    names.forEach(name => {
-      const chip = document.createElement("span");
-      chip.className = "station-chip";
-      chip.textContent = name;
-      chipsEl.appendChild(chip);
-    });
-    if (count > 4) {
-      const more = document.createElement("span");
-      more.className = "station-chip station-chip-more";
-      more.textContent = `+${count - 4} more`;
-      chipsEl.appendChild(more);
-    }
-    header.appendChild(chipsEl);
+    const remaining = grid.querySelectorAll(".tool-card").length - 1;
+    const trigger = document.createElement("div");
+    trigger.className = "station-peek-trigger";
+    trigger.setAttribute("aria-hidden", "true");
+    const btn = document.createElement("span");
+    btn.className = "station-peek-btn";
+    btn.textContent = `Show ${remaining} more tool${remaining !== 1 ? "s" : ""} →`;
+    trigger.appendChild(btn);
+    grid.appendChild(trigger);
+    trigger.addEventListener("click", () => header.click());
   });
 
   const starterSection = document.querySelector("#starter-sketches");

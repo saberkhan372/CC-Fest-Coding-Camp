@@ -645,7 +645,7 @@ a{color:inherit}
   align-items:center;
   cursor:pointer;
   padding:14px 16px;
-  margin-bottom:0;
+  margin-bottom:16px;
   border:1px solid rgba(44,42,38,.08);
   border-radius:16px;
   background:rgba(255,255,255,.66);
@@ -662,9 +662,22 @@ a{color:inherit}
   outline:none;
 }
 
-.station.is-collapsible .station-header::after,
+/* Station collapsed: no header button — the peek trigger is the CTA */
+/* Station open: show "Hide tools" */
+.station.is-collapsible.is-open .station-header::after{
+  content:"Hide tools";
+  margin-left:auto;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--cream);
+  color:var(--accent);
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
 #starter-sketches.is-collapsible .gallery-header::after{
-  content:"Show tools";
+  content:"Show sketches";
   margin-left:auto;
   padding:6px 10px;
   border-radius:999px;
@@ -680,72 +693,56 @@ a{color:inherit}
   margin-bottom:20px;
 }
 
-.station.is-collapsible.is-open .station-header::after{
-  content:"Hide tools";
-  background:var(--cream);
-  color:var(--accent);
-}
-
-#starter-sketches.is-collapsible .gallery-header::after{
-  content:"Show sketches";
-}
-
 #starter-sketches.is-collapsible.is-open .gallery-header::after{
   content:"Hide sketches";
   background:var(--cream);
   color:var(--accent);
 }
 
-.station.is-collapsible:not(.is-open) .tool-grid{
+/* Station collapsed: show first card only, hide the rest */
+.station.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+2){
   display:none;
 }
 
-/* Starter sketches: always show first 3 cards as a peek, hide the rest */
+/* Starter sketches: show first 3 cards as a peek */
 #starter-sketches.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+4){
   display:none;
 }
 
-.station-chips{
-  width:100%;
+/* Peek trigger — spans remaining grid columns next to the first card */
+.station-peek-trigger{
+  grid-column:2 / -1;
   display:flex;
-  flex-wrap:wrap;
   align-items:center;
-  gap:6px;
-  margin-top:4px;
+  justify-content:center;
+  border-radius:20px;
+  border:2px dashed rgba(44,42,38,.13);
+  background:rgba(255,255,255,.38);
+  cursor:pointer;
+  min-height:80px;
+  transition:background .15s ease, border-color .15s ease;
 }
 
-.station.is-collapsible.is-open .station-chips{
+.station-peek-trigger:hover{
+  background:#fff;
+  border-color:var(--suit-color,var(--accent));
+  border-style:solid;
+}
+
+.station.is-collapsible.is-open .station-peek-trigger{
   display:none;
 }
 
-.station-count{
-  font-family:"DM Mono",ui-monospace,monospace;
-  font-size:11px;
+.station-peek-btn{
+  font-family:"DM Sans",sans-serif;
+  font-size:13px;
   font-weight:700;
-  color:var(--accent);
-  background:var(--cream);
-  border:1px solid rgba(44,42,38,.12);
-  border-radius:999px;
-  padding:3px 9px;
-}
-
-.station-chip{
-  font-size:11px;
-  color:var(--ink-light);
-  background:rgba(255,255,255,.8);
-  border:1px solid rgba(44,42,38,.08);
-  border-radius:999px;
-  padding:3px 9px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  max-width:200px;
-}
-
-.station-chip-more{
-  color:var(--ink-faint);
-  background:transparent;
-  border-color:transparent;
+  color:var(--suit-color,var(--accent));
+  background:none;
+  border:none;
+  cursor:pointer;
+  padding:0;
+  pointer-events:none;
 }
 
 .station-name{
