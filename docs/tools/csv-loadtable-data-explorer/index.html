@@ -15,4 +15,5 @@ function draw(){ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle="#fffdf9";ctx.
 function table(){let lab=$("labelCol").value,val=$("valueCol").value;$("table").innerHTML=`<div><b>${lab}</b><b>${val}</b></div>`+rows.map(r=>`<div><span>${r[lab]}</span><span>${r[val]}</span></div>`).join("")}
 function code(){$("code").textContent=`let table;\n\nfunction preload() {\n  table = loadTable("data.csv", "csv", "header");\n}\n\nfunction draw() {\n  for (let row of table.rows) {\n    let label = row.get("${$("labelCol").value}");\n    let value = row.getNum("${$("valueCol").value}");\n    // map value to a visual size or height\n  }\n}`}
 $("parse").onclick=parse;$("labelCol").onchange=()=>{draw();table();code()};$("valueCol").onchange=()=>{draw();table();code()};document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-view]").forEach(x=>x.classList.remove("primary"));b.classList.add("primary");view=b.dataset.view;draw()});parse();
-</script></body></html>
+</script>  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body></html>
