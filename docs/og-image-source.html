@@ -7,65 +7,69 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{width:1200px;height:630px;overflow:hidden;background:#f6f0e7;font-family:"DM Sans",system-ui,sans-serif;position:relative}
 
-.bg-blob-1{position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(201,111,74,.18),transparent 70%);top:-140px;left:-120px}
-.bg-blob-2{position:absolute;width:440px;height:440px;border-radius:50%;background:radial-gradient(circle,rgba(122,94,168,.13),transparent 70%);top:-80px;right:-80px}
-.bg-blob-3{position:absolute;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(245,168,0,.16),transparent 70%);bottom:-60px;right:200px}
+.bg-blob-1{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(201,111,74,.16),transparent 70%);top:-200px;left:-160px}
+.bg-blob-2{position:absolute;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(122,94,168,.12),transparent 70%);top:-100px;right:-100px}
 
-.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(44,42,38,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(44,42,38,.022) 1px,transparent 1px);background-size:28px 28px}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(44,42,38,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(44,42,38,.02) 1px,transparent 1px);background-size:28px 28px}
 
-.card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:58px 72px 100px}
+/* ── LEFT CONTENT ── */
+.left{position:absolute;left:68px;top:0;bottom:0;width:680px;display:flex;flex-direction:column;justify-content:center;gap:0}
 
-.eyebrow{font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#c8391d;margin-bottom:16px;display:flex;align-items:center;gap:10px}
-.eyebrow::before{content:"";width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#c8391d,#f5a800)}
+.eyebrow{font-size:14px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#c8391d;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#c8391d,#f5a800);flex-shrink:0}
 
-.headline{font-family:"Fraunces",serif;font-weight:900;font-size:112px;line-height:.88;letter-spacing:-.06em;color:#201c1a;margin-bottom:24px}
-.headline span{color:#c8391d}
+.headline{font-family:"Fraunces",serif;font-weight:900;font-size:104px;line-height:.86;letter-spacing:-.055em;color:#201c1a;margin-bottom:18px}
+.headline em{color:#c8391d;font-style:normal}
 
-.tagline{font-size:21px;color:#5c5751;font-weight:400;max-width:560px;line-height:1.4;margin-bottom:32px}
+.tagline{font-size:26px;color:#3d3830;font-weight:500;line-height:1.35;margin-bottom:20px;max-width:620px}
 
-.chips{display:flex;gap:10px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;padding:6px 13px;border-radius:8px;font-family:"DM Mono",monospace;font-size:12px;font-weight:500;border:1.5px solid;box-shadow:2px 2px 0 rgba(0,0,0,.12)}
-.chip-red{background:#fff;color:#c8391d;border-color:#c8391d}
-.chip-gold{background:#fff;color:#b87d00;border-color:#f5a800}
-.chip-slate{background:#fff;color:#49627a;border-color:#49627a}
-.chip-purple{background:#fff;color:#7a5ea8;border-color:#7a5ea8}
-.chip-green{background:#fff;color:#3f6d59;border-color:#81b29a}
+.bottom-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 
-.right-panel{position:absolute;right:72px;top:46%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px;align-items:flex-end}
+.cta{display:inline-flex;align-items:center;gap:8px;background:#c8391d;color:#fff;font-family:"DM Mono",monospace;font-size:16px;font-weight:700;padding:12px 22px;border-radius:10px;letter-spacing:.02em;box-shadow:3px 3px 0 rgba(0,0,0,.18)}
 
-.sticker{display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;border-radius:14px;color:#fff;font-family:"DM Mono",monospace;font-size:15px;font-weight:700;letter-spacing:.02em;box-shadow:0 6px 18px rgba(53,43,32,.25),0 1px 0 rgba(255,255,255,.3) inset}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;padding:8px 14px;border-radius:7px;font-family:"DM Mono",monospace;font-size:13px;font-weight:600;border:1.5px solid;box-shadow:2px 2px 0 rgba(0,0,0,.1)}
+.p-gold{background:#fff;color:#a06d00;border-color:#f5a800}
+.p-purple{background:#fff;color:#7a5ea8;border-color:#7a5ea8}
+.p-green{background:#fff;color:#2d6a4f;border-color:#2d6a4f}
+
+.byline{margin-top:0;margin-bottom:22px;font-size:16px;font-weight:600;color:#5c5751;font-family:"DM Sans",sans-serif;letter-spacing:.01em}
+
+/* ── RIGHT STICKERS ── */
+.right{position:absolute;right:60px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:16px;align-items:flex-end}
+
+.sticker{display:inline-flex;align-items:center;justify-content:center;padding:14px 24px;border-radius:14px;color:#fff;font-family:"DM Mono",monospace;font-size:17px;font-weight:700;letter-spacing:.02em;box-shadow:0 6px 20px rgba(53,43,32,.22),0 1px 0 rgba(255,255,255,.25) inset;white-space:nowrap}
 .s1{background:#c8391d;transform:rotate(-4deg)}
 .s2{background:#f5a800;color:#201c1a;transform:rotate(3deg)}
-.s3{background:#5c4084;transform:rotate(-2deg)}
+.s3{background:#5c4084;transform:rotate(-2.5deg)}
 .s4{background:#2d6a4f;transform:rotate(5deg)}
-.s5{background:#201c1a;font-size:12px;transform:rotate(-3deg)}
+.s5{background:#201c1a;font-size:14px;transform:rotate(-3deg)}
 
-.url{position:absolute;bottom:14px;right:72px;font-size:12px;color:#5c5751;font-family:"DM Mono",monospace;letter-spacing:.04em}
-
-/* ── bottom strip ── */
-.bottom-strip{position:absolute;bottom:0;left:0;right:0;height:88px;overflow:hidden}
+/* ── BOTTOM WAVE STRIP ── */
+.wave-strip{position:absolute;bottom:0;left:0;right:0;height:72px}
 </style>
 </head>
 <body>
   <div class="bg-blob-1"></div>
   <div class="bg-blob-2"></div>
-  <div class="bg-blob-3"></div>
   <div class="grid"></div>
 
-  <div class="card">
+  <div class="left">
     <div class="eyebrow">CC Fest Coding Camp</div>
-    <div class="headline">Tools for<br>creative<br>coding<span>.</span></div>
-    <div class="tagline">31 workshop tools and 26 starter sketches for educators learning p5.js creative coding.</div>
-    <div class="chips">
-      <span class="chip chip-red">Workshop Tools</span>
-      <span class="chip chip-gold">Starter Sketches</span>
-      <span class="chip chip-slate">p5.js</span>
-      <span class="chip chip-purple">Free &amp; Open</span>
-      <span class="chip chip-green">5 Sessions</span>
+    <div class="byline">by Saber Khan</div>
+    <div class="headline">Tools for<br>creative<br>coding<em>.</em></div>
+    <div class="tagline">Free tools for learning creative coding with p5.js.</div>
+    <div class="bottom-row">
+      <span class="cta">Explore free tools →</span>
+      <div class="pills">
+        <span class="pill p-gold">Starter Sketches</span>
+        <span class="pill p-purple">Free &amp; Open</span>
+        <span class="pill p-green">30+ tools</span>
+      </div>
     </div>
   </div>
 
-  <div class="right-panel">
+  <div class="right">
     <span class="sticker s1">draw()</span>
     <span class="sticker s2">x, y</span>
     <span class="sticker s3">loop()</span>
@@ -73,49 +77,44 @@ body{width:1200px;height:630px;overflow:hidden;background:#f6f0e7;font-family:"D
     <span class="sticker s5">p5.js</span>
   </div>
 
-  <!-- bottom: sine wave + dots -->
-  <div class="bottom-strip">
-    <svg width="1200" height="88" viewBox="0 0 1200 88" xmlns="http://www.w3.org/2000/svg">
-      <!-- chaotic layered sine waves -->
-      <path d="M0,44 C30,20 60,68 90,44 C120,20 150,68 180,44 C210,20 240,68 270,44 C300,20 330,68 360,44 C390,20 420,68 450,44 C480,20 510,68 540,44 C570,20 600,68 630,44 C660,20 690,68 720,44 C750,20 780,68 810,44 C840,20 870,68 900,44 C930,20 960,68 990,44 C1020,20 1050,68 1080,44 C1110,20 1140,68 1170,44 C1200,20 1230,68 1260,44"
-        fill="none" stroke="#c8391d" stroke-width="2.2" opacity="0.5"/>
-      <path d="M0,52 C20,28 55,76 80,52 C105,28 140,76 165,52 C190,28 225,76 250,52 C275,28 310,76 335,52 C360,28 395,76 420,52 C445,28 480,76 505,52 C530,28 565,76 590,52 C615,28 650,76 675,52 C700,28 735,76 760,52 C785,28 820,76 845,52 C870,28 905,76 930,52 C955,28 990,76 1015,52 C1040,28 1075,76 1100,52 C1125,28 1160,76 1185,52"
-        fill="none" stroke="#f5a800" stroke-width="1.8" opacity="0.55"/>
-      <path d="M0,38 C45,14 70,62 115,38 C160,14 185,62 230,38 C275,14 300,62 345,38 C390,14 415,62 460,38 C505,14 530,62 575,38 C620,14 645,62 690,38 C735,14 760,62 805,38 C850,14 875,62 920,38 C965,14 990,62 1035,38 C1080,14 1105,62 1150,38 C1195,14 1220,62 1265,38"
-        fill="none" stroke="#7a5ea8" stroke-width="1.5" opacity="0.4"/>
-      <path d="M0,60 C15,36 40,84 65,60 C90,36 115,84 140,60 C165,36 190,84 215,60 C240,36 265,84 290,60 C315,36 340,84 365,60 C390,36 415,84 440,60 C465,36 490,84 515,60 C540,36 565,84 590,60 C615,36 640,84 665,60 C690,36 715,84 740,60 C765,36 790,84 815,60 C840,36 865,84 890,60 C915,36 940,84 965,60 C990,36 1015,84 1040,60 C1065,36 1090,84 1115,60 C1140,36 1165,84 1190,60"
-        fill="none" stroke="#49627a" stroke-width="1.4" opacity="0.35"/>
+  <div class="wave-strip">
+    <svg width="1200" height="72" viewBox="0 0 1200 72" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,36 C30,14 60,58 90,36 C120,14 150,58 180,36 C210,14 240,58 270,36 C300,14 330,58 360,36 C390,14 420,58 450,36 C480,14 510,58 540,36 C570,14 600,58 630,36 C660,14 690,58 720,36 C750,14 780,58 810,36 C840,14 870,58 900,36 C930,14 960,58 990,36 C1020,14 1050,58 1080,36 C1110,14 1140,58 1170,36 C1200,14 1230,58 1260,36"
+        fill="none" stroke="#c8391d" stroke-width="2.5" opacity="0.45"/>
+      <path d="M0,44 C25,22 55,66 80,44 C105,22 135,66 160,44 C185,22 215,66 240,44 C265,22 295,66 320,44 C345,22 375,66 400,44 C425,22 455,66 480,44 C505,22 535,66 560,44 C585,22 615,66 640,44 C665,22 695,66 720,44 C745,22 775,66 800,44 C825,22 855,66 880,44 C905,22 935,66 960,44 C985,22 1015,66 1040,44 C1065,22 1095,66 1120,44 C1145,22 1175,66 1200,44"
+        fill="none" stroke="#f5a800" stroke-width="2" opacity="0.5"/>
+      <path d="M0,28 C40,6 65,50 105,28 C145,6 170,50 210,28 C250,6 275,50 315,28 C355,6 380,50 420,28 C460,6 485,50 525,28 C565,6 590,50 630,28 C670,6 695,50 735,28 C775,6 800,50 840,28 C880,6 905,50 945,28 C985,6 1010,50 1050,28 C1090,6 1115,50 1155,28 C1195,6 1220,50 1260,28"
+        fill="none" stroke="#7a5ea8" stroke-width="1.8" opacity="0.38"/>
+      <path d="M0,52 C18,30 42,74 65,52 C88,30 112,74 135,52 C158,30 182,74 205,52 C228,30 252,74 275,52 C298,30 322,74 345,52 C368,30 392,74 415,52 C438,30 462,74 485,52 C508,30 532,74 555,52 C578,30 602,74 625,52 C648,30 672,74 695,52 C718,30 742,74 765,52 C788,30 812,74 835,52 C858,30 882,74 905,52 C928,30 952,74 975,52 C998,30 1022,74 1045,52 C1068,30 1092,74 1115,52 C1138,30 1162,74 1185,52"
+        fill="none" stroke="#49627a" stroke-width="1.6" opacity="0.32"/>
 
-      <!-- colorful dots scattered along the bottom -->
-      <circle cx="48" cy="72" r="7" fill="#c8391d"/>
-      <circle cx="92" cy="64" r="5" fill="#f5a800"/>
-      <circle cx="138" cy="76" r="8" fill="#7a5ea8"/>
-      <circle cx="184" cy="60" r="4" fill="#2d6a4f"/>
-      <circle cx="228" cy="74" r="6" fill="#c8391d" opacity=".7"/>
-      <circle cx="276" cy="66" r="9" fill="#f5a800"/>
-      <circle cx="320" cy="78" r="5" fill="#49627a"/>
-      <circle cx="368" cy="62" r="7" fill="#e07a5f"/>
-      <circle cx="412" cy="72" r="4" fill="#7a5ea8"/>
-      <circle cx="458" cy="68" r="8" fill="#c8391d"/>
-      <circle cx="504" cy="76" r="5" fill="#f5a800" opacity=".8"/>
-      <circle cx="548" cy="60" r="6" fill="#2d6a4f"/>
-      <circle cx="596" cy="74" r="9" fill="#7a5ea8"/>
-      <circle cx="640" cy="64" r="4" fill="#c8391d" opacity=".6"/>
-      <circle cx="686" cy="78" r="7" fill="#f5a800"/>
-      <circle cx="730" cy="66" r="5" fill="#e07a5f"/>
-      <circle cx="778" cy="72" r="8" fill="#49627a"/>
-      <circle cx="822" cy="60" r="4" fill="#c8391d"/>
-      <circle cx="868" cy="76" r="6" fill="#7a5ea8"/>
-      <circle cx="914" cy="68" r="7" fill="#f5a800" opacity=".7"/>
-      <circle cx="958" cy="74" r="5" fill="#2d6a4f"/>
-      <circle cx="1006" cy="62" r="8" fill="#c8391d"/>
-      <circle cx="1050" cy="78" r="4" fill="#e07a5f"/>
-      <circle cx="1096" cy="66" r="6" fill="#7a5ea8"/>
-      <circle cx="1142" cy="72" r="7" fill="#f5a800"/>
-      <circle cx="1186" cy="60" r="5" fill="#49627a"/>
+      <!-- dots -->
+      <circle cx="44"  cy="58" r="7"  fill="#c8391d"/>
+      <circle cx="88"  cy="50" r="5"  fill="#f5a800"/>
+      <circle cx="136" cy="62" r="9"  fill="#7a5ea8"/>
+      <circle cx="182" cy="48" r="5"  fill="#2d6a4f"/>
+      <circle cx="228" cy="60" r="6"  fill="#c8391d" opacity=".7"/>
+      <circle cx="278" cy="52" r="8"  fill="#f5a800"/>
+      <circle cx="324" cy="64" r="5"  fill="#49627a"/>
+      <circle cx="370" cy="50" r="7"  fill="#e07a5f"/>
+      <circle cx="418" cy="60" r="4"  fill="#7a5ea8"/>
+      <circle cx="464" cy="54" r="9"  fill="#c8391d"/>
+      <circle cx="512" cy="62" r="5"  fill="#f5a800" opacity=".8"/>
+      <circle cx="558" cy="48" r="7"  fill="#2d6a4f"/>
+      <circle cx="606" cy="60" r="8"  fill="#7a5ea8"/>
+      <circle cx="652" cy="52" r="4"  fill="#c8391d" opacity=".6"/>
+      <circle cx="698" cy="64" r="6"  fill="#f5a800"/>
+      <circle cx="746" cy="50" r="5"  fill="#e07a5f"/>
+      <circle cx="792" cy="58" r="9"  fill="#49627a"/>
+      <circle cx="838" cy="48" r="5"  fill="#c8391d"/>
+      <circle cx="886" cy="62" r="7"  fill="#7a5ea8"/>
+      <circle cx="932" cy="54" r="6"  fill="#f5a800" opacity=".7"/>
+      <circle cx="980" cy="60" r="4"  fill="#2d6a4f"/>
+      <circle cx="1028" cy="50" r="8" fill="#c8391d"/>
+      <circle cx="1074" cy="64" r="5" fill="#e07a5f"/>
+      <circle cx="1120" cy="52" r="7" fill="#7a5ea8"/>
+      <circle cx="1168" cy="60" r="6" fill="#f5a800"/>
     </svg>
   </div>
-
-  <div class="url">saberkhan372.github.io/CC-Fest-Coding-Camp</div>
 </body>
 </html>
