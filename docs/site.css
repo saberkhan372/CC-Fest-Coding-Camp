@@ -557,6 +557,37 @@ a{color:inherit}
 
 /* ─── TOOL STATIONS ─── */
 
+.suit-filter-bar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:28px;
+}
+.suit-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:6px 14px;
+  border-radius:999px;
+  border:1.5px solid var(--line);
+  background:transparent;
+  color:var(--ink-light);
+  font-family:"DM Mono",ui-monospace,monospace;
+  font-size:12px;
+  font-weight:500;
+  letter-spacing:.02em;
+  cursor:pointer;
+  transition:border-color .15s,color .15s,background .15s;
+  white-space:nowrap;
+}
+.suit-btn:hover{border-color:var(--ink-light);color:var(--ink)}
+.suit-btn[data-filter="marks"].active,.suit-btn[data-filter="marks"]:hover{border-color:#c8391d;color:#c8391d;background:rgba(200,57,29,.07)}
+.suit-btn[data-filter="motion"].active,.suit-btn[data-filter="motion"]:hover{border-color:#b07d00;color:#b07d00;background:rgba(176,125,0,.07)}
+.suit-btn[data-filter="systems"].active,.suit-btn[data-filter="systems"]:hover{border-color:#2d6a4f;color:#2d6a4f;background:rgba(45,106,79,.07)}
+.suit-btn[data-filter="data"].active,.suit-btn[data-filter="data"]:hover{border-color:#1a5fa0;color:#1a5fa0;background:rgba(26,95,160,.07)}
+.suit-btn[data-filter="open"].active,.suit-btn[data-filter="open"]:hover{border-color:#5c4084;color:#5c4084;background:rgba(92,64,132,.07)}
+.suit-btn[data-filter="all"].active{border-color:var(--ink);color:var(--ink)}
+
 .station-list{
   display:flex;
   flex-direction:column;
@@ -649,10 +680,14 @@ a{color:inherit}
 }
 
 .station-name::before{
-  content:"✦ ";
-  color:var(--accent);
   font-size:.7em;
 }
+.station[data-suit="marks"]  .station-name::before{content:"✦ ";color:#c8391d}
+.station[data-suit="motion"] .station-name::before{content:"◎ ";color:#b07d00}
+.station[data-suit="systems"].station-name::before,.station[data-suit="systems"] .station-name::before{content:"⬡ ";color:#2d6a4f}
+.station[data-suit="data"]   .station-name::before{content:"▦ ";color:#1a5fa0}
+.station[data-suit="open"]   .station-name::before{content:"☽ ";color:#5c4084}
+.station[data-suit="support"].station-name::before,.station[data-suit="support"] .station-name::before{content:"⊕ ";color:var(--ink-light)}
 
 .station-desc{
   margin:0;
@@ -740,6 +775,7 @@ a{color:inherit}
 .suit-systems{--suit-color:#2d6a4f;--suit-border:rgba(45,106,79,.18);--suit-bg:rgba(45,106,79,.07)}
 .suit-data   {--suit-color:#1a5fa0;--suit-border:rgba(26,95,160,.18);--suit-bg:rgba(26,95,160,.07)}
 .suit-open   {--suit-color:#5c4084;--suit-border:rgba(92,64,132,.18);--suit-bg:rgba(92,64,132,.07)}
+.suit-support{--suit-color:#6b6560;--suit-border:rgba(107,101,96,.18);--suit-bg:rgba(107,101,96,.07)}
 
 .tool-card[class*="suit-"]::before{background:var(--suit-color)}
 .tool-card[class*="suit-"]:hover{border-color:var(--suit-border)}

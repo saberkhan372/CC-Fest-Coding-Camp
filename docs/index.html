@@ -122,9 +122,18 @@
             </div>
             <div class="gallery-count">31 tools</div>
           </div>
+          <div class="suit-filter-bar" role="group" aria-label="Filter by suit">
+            <button class="suit-btn active" data-filter="all">All</button>
+            <button class="suit-btn" data-filter="marks">✦ Marks</button>
+            <button class="suit-btn" data-filter="motion">◎ Motion</button>
+            <button class="suit-btn" data-filter="systems">⬡ Systems</button>
+            <button class="suit-btn" data-filter="data">▦ Data</button>
+            <button class="suit-btn" data-filter="open">☽ Open</button>
+          </div>
+
           <div class="station-list">
 
-            <div class="station">
+            <div class="station" data-suit="marks">
               <div class="station-header">
                 <span class="station-name">Draw + Color</span>
                 <p class="station-desc">First marks, coordinates, shape, and color. The tools you open on day one.</p>
@@ -187,7 +196,7 @@
               </div>
             </div>
 
-            <div class="station">
+            <div class="station" data-suit="motion">
               <div class="station-header">
                 <span class="station-name">Motion + Interaction</span>
                 <p class="station-desc">Things that move, react, and listen. Variables in time, events in space.</p>
@@ -259,7 +268,7 @@
               </div>
             </div>
 
-            <div class="station">
+            <div class="station" data-suit="systems">
               <div class="station-header">
                 <span class="station-name">Patterns + Systems</span>
                 <p class="station-desc">Loops, repetition, noise, and functions. Where code starts feeling like a system.</p>
@@ -331,7 +340,7 @@
               </div>
             </div>
 
-            <div class="station">
+            <div class="station" data-suit="data">
               <div class="station-header">
                 <span class="station-name">Stories + Data</span>
                 <p class="station-desc">Data as material. Plan it, map it, draw it. Numbers that mean something personal.</p>
@@ -376,7 +385,7 @@
               </div>
             </div>
 
-            <div class="station">
+            <div class="station" data-suit="open">
               <div class="station-header">
                 <span class="station-name">Remix + Media</span>
                 <p class="station-desc">Images, sound, games, 3D. Where the canvas opens up and anything feels possible.</p>
@@ -439,18 +448,20 @@
               </div>
             </div>
 
-            <div class="station">
+            <div class="station" data-suit="support">
               <div class="station-header">
                 <span class="station-name">Debugging + Confidence</span>
                 <p class="station-desc">Practice recovering from broken code. Debugging is not failure; debugging is the work.</p>
               </div>
               <div class="tool-grid">
-                <article class="tool-card">
-                  <div class="tool-meta"><span class="pill session">Support</span><span class="pill type">Practice Lab</span></div>
+                <article class="tool-card suit-support">
+                  <div class="card-pip"><span class="pip-num">I</span><span class="pip-sym">⊕</span></div>
+                  <div class="tool-meta"><span class="pill session">⊕ Support · I</span><span class="pill type">Practice Lab</span></div>
                   <h3>Debugging Playground</h3>
                   <p class="tool-description">Fix five small broken sketches: missing braces, misspelled variables, assignment bugs, loop mistakes, and behavior surprises. Build confidence on purpose.</p>
                   <div class="tag-row"><span class="tag">debugging</span><span class="tag">errors</span><span class="tag">confidence</span></div>
                   <div class="tool-actions"><a class="button primary" href="tools/debugging-playground/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">I</span><span class="pip-sym">⊕</span></div>
                 </article>
               </div>
             </div>

@@ -136,3 +136,29 @@
     });
   }
 })();
+
+// Suit filter bar
+(function() {
+  const filterBar = document.querySelector(".suit-filter-bar");
+  if (!filterBar) return;
+
+  const stations = document.querySelectorAll("#interactive-tools .station");
+  const sketchCards = document.querySelectorAll("#starter-sketches .tool-card");
+
+  filterBar.addEventListener("click", function(e) {
+    const btn = e.target.closest(".suit-btn");
+    if (!btn) return;
+
+    const filter = btn.dataset.filter;
+    filterBar.querySelectorAll(".suit-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    if (filter === "all") {
+      stations.forEach(s => s.hidden = false);
+      sketchCards.forEach(c => c.hidden = false);
+    } else {
+      stations.forEach(s => { s.hidden = s.dataset.suit !== filter; });
+      sketchCards.forEach(c => { c.hidden = !c.classList.contains("suit-" + filter); });
+    }
+  });
+})();
