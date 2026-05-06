@@ -673,6 +673,39 @@ a{color:inherit}
   background:linear-gradient(90deg,var(--accent),var(--gold),var(--highlight));
 }
 
+/* ── tarot suit treatment ── */
+.suit-marks  {--suit-color:#c8391d;--suit-border:rgba(200,57,29,.18);--suit-bg:rgba(200,57,29,.07)}
+.suit-motion {--suit-color:#b07d00;--suit-border:rgba(176,125,0,.18);--suit-bg:rgba(176,125,0,.07)}
+.suit-systems{--suit-color:#2d6a4f;--suit-border:rgba(45,106,79,.18);--suit-bg:rgba(45,106,79,.07)}
+.suit-data   {--suit-color:#1a5fa0;--suit-border:rgba(26,95,160,.18);--suit-bg:rgba(26,95,160,.07)}
+.suit-open   {--suit-color:#5c4084;--suit-border:rgba(92,64,132,.18);--suit-bg:rgba(92,64,132,.07)}
+
+.tool-card[class*="suit-"]::before{background:var(--suit-color)}
+.tool-card[class*="suit-"]:hover{border-color:var(--suit-border)}
+
+.tool-card[class*="suit-"] .pill.session{
+  color:var(--suit-color);
+  border-color:var(--suit-color);
+  background:var(--suit-bg);
+}
+
+.card-pip,.card-pip-br{
+  position:absolute;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  line-height:1;
+  gap:1px;
+  color:var(--suit-color,var(--accent));
+  font-family:"DM Mono",ui-monospace,monospace;
+  pointer-events:none;
+  z-index:2;
+}
+.card-pip{top:14px;left:16px}
+.card-pip-br{bottom:14px;right:16px;transform:rotate(180deg)}
+.card-pip .pip-num,.card-pip-br .pip-num{font-size:11px;font-weight:700;letter-spacing:0}
+.card-pip .pip-sym,.card-pip-br .pip-sym{font-size:10px}
+
 #starter-sketches .tool-card::before{
   background:repeating-linear-gradient(
     90deg,
