@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800;9..144,900&family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1200px;height:630px;overflow:hidden;background:#f6f0e7;font-family:"DM Sans",system-ui,sans-serif;position:relative}
+
+.bg-blob-1{position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(201,111,74,.18),transparent 70%);top:-140px;left:-120px}
+.bg-blob-2{position:absolute;width:440px;height:440px;border-radius:50%;background:radial-gradient(circle,rgba(122,94,168,.13),transparent 70%);top:-80px;right:-80px}
+.bg-blob-3{position:absolute;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(245,168,0,.14),transparent 70%);bottom:-100px;right:180px}
+
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(44,42,38,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(44,42,38,.022) 1px,transparent 1px);background-size:28px 28px}
+
+.card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:64px 72px}
+
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#c8391d;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#c8391d,#f5a800)}
+
+.headline{font-family:"Fraunces",serif;font-weight:900;font-size:118px;line-height:.88;letter-spacing:-.06em;color:#201c1a;margin-bottom:28px}
+.headline span{color:#c8391d}
+
+.tagline{font-size:22px;color:#5c5751;font-weight:400;max-width:580px;line-height:1.4;margin-bottom:40px}
+
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;padding:7px 14px;border-radius:8px;font-family:"DM Mono",monospace;font-size:13px;font-weight:500;border:1.5px solid;box-shadow:2px 2px 0 rgba(0,0,0,.12)}
+.chip-red{background:#fff;color:#c8391d;border-color:#c8391d}
+.chip-gold{background:#fff;color:#b87d00;border-color:#f5a800}
+.chip-slate{background:#fff;color:#49627a;border-color:#49627a}
+.chip-purple{background:#fff;color:#7a5ea8;border-color:#7a5ea8}
+.chip-green{background:#fff;color:#3f6d59;border-color:#81b29a}
+
+.right-panel{position:absolute;right:72px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px;align-items:flex-end}
+
+.sticker{display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;border-radius:14px;color:#fff;font-family:"DM Mono",monospace;font-size:15px;font-weight:700;letter-spacing:.02em;box-shadow:0 6px 18px rgba(53,43,32,.25),0 1px 0 rgba(255,255,255,.3) inset}
+.s1{background:#c8391d;transform:rotate(-4deg)}
+.s2{background:#f5a800;color:#201c1a;transform:rotate(3deg)}
+.s3{background:#5c4084;transform:rotate(-2deg)}
+.s4{background:#2d6a4f;transform:rotate(5deg)}
+.s5{background:#201c1a;font-size:12px;transform:rotate(-3deg)}
+
+.dot-a{position:absolute;width:18px;height:18px;border-radius:50%;background:#f5a800;bottom:80px;left:72px}
+.dot-b{position:absolute;width:12px;height:12px;border-radius:50%;background:#c8391d;bottom:110px;left:112px}
+
+.url{position:absolute;bottom:38px;right:72px;font-size:13px;color:#5c5751;font-family:"DM Mono",monospace;letter-spacing:.04em}
+</style>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/og-image-source.html/">
+  <meta property="og:title" content="CC Fest Coding Camp Tools">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CC Fest Coding Camp Tools">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.png">
+</head>
+<body>
+  <div class="bg-blob-1"></div>
+  <div class="bg-blob-2"></div>
+  <div class="bg-blob-3"></div>
+  <div class="grid"></div>
+
+  <div class="card">
+    <div class="eyebrow">CC Fest Coding Camp</div>
+    <div class="headline">Tools for<br>creative<br>coding<span>.</span></div>
+    <div class="tagline">31 workshop tools and 26 starter sketches for educators learning p5.js creative coding.</div>
+    <div class="chips">
+      <span class="chip chip-red">Workshop Tools</span>
+      <span class="chip chip-gold">Starter Sketches</span>
+      <span class="chip chip-slate">p5.js</span>
+      <span class="chip chip-purple">Free &amp; Open</span>
+      <span class="chip chip-green">5 Sessions</span>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <span class="sticker s1">draw()</span>
+    <span class="sticker s2">x, y</span>
+    <span class="sticker s3">loop()</span>
+    <span class="sticker s4">remix +</span>
+    <span class="sticker s5">p5.js</span>
+  </div>
+
+  <div class="dot-a"></div>
+  <div class="dot-b"></div>
+  <div class="url">saberkhan372.github.io/CC-Fest-Coding-Camp</div>
+</body>
+</html>
