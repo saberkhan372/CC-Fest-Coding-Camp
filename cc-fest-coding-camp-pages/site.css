@@ -578,7 +578,8 @@ a{color:inherit}
   flex-wrap:wrap;
 }
 
-.station.is-collapsible .station-header{
+.station.is-collapsible .station-header,
+#starter-sketches.is-collapsible .gallery-header{
   align-items:center;
   cursor:pointer;
   padding:14px 16px;
@@ -590,14 +591,17 @@ a{color:inherit}
 }
 
 .station.is-collapsible .station-header:hover,
-.station.is-collapsible .station-header:focus-visible{
+.station.is-collapsible .station-header:focus-visible,
+#starter-sketches.is-collapsible .gallery-header:hover,
+#starter-sketches.is-collapsible .gallery-header:focus-visible{
   border-color:rgba(200,57,29,.2);
   background:#fff;
   transform:translateY(-1px);
   outline:none;
 }
 
-.station.is-collapsible .station-header::after{
+.station.is-collapsible .station-header::after,
+#starter-sketches.is-collapsible .gallery-header::after{
   content:"Show tools";
   margin-left:auto;
   padding:6px 10px;
@@ -609,7 +613,8 @@ a{color:inherit}
   white-space:nowrap;
 }
 
-.station.is-collapsible.is-open .station-header{
+.station.is-collapsible.is-open .station-header,
+#starter-sketches.is-collapsible.is-open .gallery-header{
   margin-bottom:20px;
 }
 
@@ -619,7 +624,18 @@ a{color:inherit}
   color:var(--accent);
 }
 
-.station.is-collapsible:not(.is-open) .tool-grid{
+#starter-sketches.is-collapsible .gallery-header::after{
+  content:"Show sketches";
+}
+
+#starter-sketches.is-collapsible.is-open .gallery-header::after{
+  content:"Hide sketches";
+  background:var(--cream);
+  color:var(--accent);
+}
+
+.station.is-collapsible:not(.is-open) .tool-grid,
+#starter-sketches.is-collapsible:not(.is-open) .tool-grid{
   display:none;
 }
 
@@ -717,6 +733,39 @@ a{color:inherit}
   height:5px;
   background:linear-gradient(90deg,var(--accent),var(--gold),var(--highlight));
 }
+
+/* ── tarot suit treatment ── */
+.suit-marks  {--suit-color:#c8391d;--suit-border:rgba(200,57,29,.18);--suit-bg:rgba(200,57,29,.07)}
+.suit-motion {--suit-color:#b07d00;--suit-border:rgba(176,125,0,.18);--suit-bg:rgba(176,125,0,.07)}
+.suit-systems{--suit-color:#2d6a4f;--suit-border:rgba(45,106,79,.18);--suit-bg:rgba(45,106,79,.07)}
+.suit-data   {--suit-color:#1a5fa0;--suit-border:rgba(26,95,160,.18);--suit-bg:rgba(26,95,160,.07)}
+.suit-open   {--suit-color:#5c4084;--suit-border:rgba(92,64,132,.18);--suit-bg:rgba(92,64,132,.07)}
+
+.tool-card[class*="suit-"]::before{background:var(--suit-color)}
+.tool-card[class*="suit-"]:hover{border-color:var(--suit-border)}
+
+.tool-card[class*="suit-"] .pill.session{
+  color:var(--suit-color);
+  border-color:var(--suit-color);
+  background:var(--suit-bg);
+}
+
+.card-pip,.card-pip-br{
+  position:absolute;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  line-height:1;
+  gap:1px;
+  color:var(--suit-color,var(--accent));
+  font-family:"DM Mono",ui-monospace,monospace;
+  pointer-events:none;
+  z-index:2;
+}
+.card-pip{top:14px;left:16px}
+.card-pip-br{bottom:14px;right:16px;transform:rotate(180deg)}
+.card-pip .pip-num,.card-pip-br .pip-num{font-size:11px;font-weight:700;letter-spacing:0}
+.card-pip .pip-sym,.card-pip-br .pip-sym{font-size:10px}
 
 #starter-sketches .tool-card::before{
   background:repeating-linear-gradient(

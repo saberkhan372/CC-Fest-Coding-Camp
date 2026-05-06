@@ -81,8 +81,31 @@
     remixPoster();
   });
 
+  const makeCollapsible = ({ container, header, grid, label, openByDefault = false }) => {
+    if (!container || !header || !grid) return;
+    container.classList.add("is-collapsible");
+    if (openByDefault) container.classList.add("is-open");
+    header.setAttribute("role", "button");
+    header.setAttribute("tabindex", "0");
+    header.setAttribute("aria-controls", grid.id);
+    header.setAttribute("aria-expanded", String(openByDefault));
+    header.setAttribute("aria-label", `${openByDefault ? "Hide" : "Show"} ${label}`);
+
+    const toggle = () => {
+      const isOpen = container.classList.toggle("is-open");
+      header.setAttribute("aria-expanded", String(isOpen));
+      header.setAttribute("aria-label", `${isOpen ? "Hide" : "Show"} ${label}`);
+    };
+
+    header.addEventListener("click", toggle);
+    header.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      toggle();
+    });
+  };
+
   document.querySelectorAll("#interactive-tools .station").forEach((station, index) => {
-    if (index === 0) return;
     const header = station.querySelector(".station-header");
     const grid = station.querySelector(".tool-grid");
     if (!header || !grid) return;
@@ -90,24 +113,26 @@
     const label = station.querySelector(".station-name")?.textContent?.trim() || `Tool section ${index + 1}`;
     const gridId = `station-tools-${index + 1}`;
     grid.id = grid.id || gridId;
-    station.classList.add("is-collapsible");
-    header.setAttribute("role", "button");
-    header.setAttribute("tabindex", "0");
-    header.setAttribute("aria-controls", grid.id);
-    header.setAttribute("aria-expanded", "false");
-    header.setAttribute("aria-label", `Show ${label} tools`);
-
-    const toggleStation = () => {
-      const isOpen = station.classList.toggle("is-open");
-      header.setAttribute("aria-expanded", String(isOpen));
-      header.setAttribute("aria-label", `${isOpen ? "Hide" : "Show"} ${label} tools`);
-    };
-
-    header.addEventListener("click", toggleStation);
-    header.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      event.preventDefault();
-      toggleStation();
+    makeCollapsible({
+      container: station,
+      header,
+      grid,
+      label: `${label} tools`,
+      openByDefault: index === 0
     });
   });
+
+  const starterSection = document.querySelector("#starter-sketches");
+  const starterHeader = starterSection?.querySelector(".gallery-header");
+  const starterGrid = starterSection?.querySelector(".tool-grid");
+  if (starterSection && starterHeader && starterGrid) {
+    starterGrid.id = starterGrid.id || "starter-sketch-grid";
+    makeCollapsible({
+      container: starterSection,
+      header: starterHeader,
+      grid: starterGrid,
+      label: "starter sketches",
+      openByDefault: false
+    });
+  }
 })();
