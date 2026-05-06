@@ -182,7 +182,7 @@
       header,
       grid,
       label: `${label} tools`,
-      openByDefault: index === 0
+      openByDefault: false
     });
 
     const remaining = grid.querySelectorAll(".tool-card").length - 1;
