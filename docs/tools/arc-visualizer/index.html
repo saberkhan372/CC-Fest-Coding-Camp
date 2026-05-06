@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Arc Visualizer — CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #FAF6F0;
+    --cream-dark: #F0EBE3;
+    --cream-darker: #E5DFD5;
+    --ink: #2C2A26;
+    --ink-light: #6B6760;
+    --ink-faint: #9E998F;
+    --accent: #3D5A80;
+    --accent-light: #5B7EA1;
+    --highlight: #E07A5F;
+    --highlight-light: #F2CC8F;
+    --success: #81B29A;
+    --grid-bg: #FFFFFF;
+    --code-bg: #2C2A26;
+    --code-text: #F0EBE3;
+    --code-keyword: #81B29A;
+    --code-number: #F2CC8F;
+    --code-comment: #8F8A81;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04);
+    --shadow-strong: 0 6px 24px rgba(44,42,38,.09), 0 0 0 1px rgba(0,0,0,.04);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; }
+  .header { margin-bottom: 24px; }
+
+  .stage-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(61,90,128,.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    max-width: 820px;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    background: var(--cream-dark);
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(420px, 1.15fr) minmax(340px, .85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  @media (max-width: 950px) { .workspace { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--grid-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .panel-desc { font-size: 13px; color: var(--ink-light); }
+
+  .canvas-panel { padding: 14px; }
+
+  #canvas-container {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  #canvas-container canvas { display: block; }
+
+  .readout-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 680px) { .readout-row { grid-template-columns: repeat(2, 1fr); } }
+
+  .readout-card {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+  }
+
+  .readout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .readout-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .controls { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .control-group {
+    background: var(--cream);
+    border: 1px solid var(--cream-darker);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .control-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 9px;
+  }
+
+  .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .button-row.two { grid-template-columns: repeat(2, 1fr); }
+  .button-row.five { grid-template-columns: repeat(5, 1fr); }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  }
+
+  button:hover { transform: translateY(-1px); }
+  .primary-btn { background: var(--accent); color: #fff; }
+  .secondary-btn { background: #fff; color: var(--accent); border: 1px solid var(--cream-darker); }
+  .toggle-btn { background: #fff; color: var(--ink-light); border: 1px solid var(--cream-darker); }
+  .toggle-btn.active { background: rgba(61,90,128,.08); color: var(--accent); border-color: rgba(61,90,128,.3); }
+
+  .color-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    padding: 0;
+    flex-shrink: 0;
+    transition: transform .12s ease, border-color .12s ease;
+  }
+  .color-btn.active { border-color: var(--ink); transform: scale(1.18); }
+
+  .color-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 58px;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+  }
+
+  .slider-row label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+  .value-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--cream-darker);
+    border-radius: 999px;
+    text-align: center;
+    padding: 3px 6px;
+  }
+
+  .mini-note { font-size: 12px; color: var(--ink-light); margin-top: 8px; }
+
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 850px) { .lesson-grid { grid-template-columns: 1fr; } }
+
+  .lesson-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+
+  .lesson-card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .lesson-card p { font-size: 14px; color: var(--ink-light); }
+
+  .code-panel {
+    margin-top: 18px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+  }
+
+  .code-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .code-toolbar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(240,235,227,.68);
+  }
+
+  .copy-btn {
+    background: rgba(255,255,255,.06);
+    color: rgba(240,235,227,.75);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .copy-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  pre {
+    margin: 0;
+    padding: 15px 18px 18px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre;
+  }
+
+  .kw { color: var(--code-keyword); }
+  .num { color: var(--code-number); }
+  .cm { color: var(--code-comment); }
+  .fn { color: #A7C7E7; }
+  .str { color: #F2CC8F; }
+  .hi { background: rgba(224,122,95,.22); border-radius: 4px; padding: 1px 2px; margin: -1px -2px; }
+
+  .footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cream-dark);
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  .page-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0 18px;
+    font-size: 13px;
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+  .page-topbar a {
+    text-decoration: none;
+    color: #5c5650;
+  }
+  .page-topbar a:hover { color: #c8391d; }
+</style>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/arc-visualizer/">
+  <meta property="og:title" content="Arc Visualizer — CC Fest Coding Camp">
+  <meta property="og:description" content="See how arc() parameters create different curves. Adjust start and stop angles, choose a mode, and watch the shape update live.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Arc Visualizer — CC Fest Coding Camp">
+  <meta name="twitter:description" content="See how arc() parameters create different curves. Adjust start and stop angles, choose a mode, and watch the shape update live.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="page-topbar">
+    <a href="../../index.html">← Back to tool library</a>
+    <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+  </div>
+  <div class="container">
+    <header class="header">
+      <div class="stage-tag">Session 1 · Shapes</div>
+      <h1>Arc Visualizer</h1>
+      <p class="subtitle">See how <strong>arc()</strong> parameters create different curves. Adjust start and stop angles, choose a mode, and watch the shape update live.</p>
+      <div class="tag-row" aria-label="Concept tags">
+        <span class="tag">arc()</span>
+        <span class="tag">angles</span>
+        <span class="tag">radians</span>
+        <span class="tag">OPEN</span>
+        <span class="tag">CHORD</span>
+        <span class="tag">PIE</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Arc Canvas</div>
+          <div class="panel-desc">Adjust sliders and mode buttons. The arc updates live.</div>
+        </div>
+        <div class="canvas-panel">
+          <div id="canvas-container" aria-label="p5.js canvas showing an arc shape with angle annotations"></div>
+          <div class="readout-row">
+            <div class="readout-card">
+              <div class="readout-label">x, y</div>
+              <div class="readout-value" id="readoutXY">200, 200</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">w × h</div>
+              <div class="readout-value" id="readoutWH">200 × 200</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">start (rad)</div>
+              <div class="readout-value" id="readoutStart">0.00</div>
+            </div>
+            <div class="readout-card">
+              <div class="readout-label">stop (rad)</div>
+              <div class="readout-value" id="readoutStop">4.71</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Arc Parameters</div>
+          <div class="panel-desc">Every slider maps directly to an arc() argument.</div>
+        </div>
+        <div class="controls">
+
+          <div class="control-group">
+            <div class="control-group-title">Position &amp; Size</div>
+            <div class="slider-row">
+              <label for="xSlider">x (center)</label>
+              <input id="xSlider" type="range" min="50" max="350" value="200" />
+              <span class="value-pill" id="xValue">200</span>
+            </div>
+            <div class="slider-row">
+              <label for="ySlider">y (center)</label>
+              <input id="ySlider" type="range" min="50" max="350" value="200" />
+              <span class="value-pill" id="yValue">200</span>
+            </div>
+            <div class="slider-row">
+              <label for="wSlider">w (width)</label>
+              <input id="wSlider" type="range" min="50" max="350" value="200" />
+              <span class="value-pill" id="wValue">200</span>
+            </div>
+            <div class="slider-row">
+              <label for="hSlider">h (height)</label>
+              <input id="hSlider" type="range" min="50" max="350" value="200" />
+              <span class="value-pill" id="hValue">200</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Angles (degrees)</div>
+            <div class="slider-row">
+              <label for="startSlider">start</label>
+              <input id="startSlider" type="range" min="0" max="360" value="0" />
+              <span class="value-pill" id="startValue">0°</span>
+            </div>
+            <div class="slider-row">
+              <label for="stopSlider">stop</label>
+              <input id="stopSlider" type="range" min="0" max="360" value="270" />
+              <span class="value-pill" id="stopValue">270°</span>
+            </div>
+            <p class="mini-note">Angles are shown as degrees here, but arc() uses radians. See the code panel for the converted values.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Mode</div>
+            <div class="button-row" id="modeButtons"></div>
+            <p class="mini-note" style="margin-top:6px"><strong>OPEN</strong> — just the arc stroke. <strong>CHORD</strong> — straight line closes it. <strong>PIE</strong> — radii close it like a pie slice.</p>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Fill Color</div>
+            <div class="color-row" id="colorButtons"></div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-group-title">Overlays</div>
+            <div class="button-row two" style="margin-bottom:6px">
+              <button class="toggle-btn active" id="refCircleBtn" type="button">Ref Circle On</button>
+              <button class="toggle-btn active" id="angleLineBtn" type="button">Angle Lines On</button>
+            </div>
+            <button class="primary-btn" id="copyTopBtn" type="button" style="width:100%">Copy Code</button>
+          </div>
+
+        </div>
+      </aside>
+    </main>
+
+    <section class="lesson-grid" aria-label="Learning prompts">
+      <div class="lesson-card">
+        <h2>Try this</h2>
+        <p>Set start to 0° and drag stop from 0° to 360°. Watch the arc grow from nothing to a full circle.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Notice this</h2>
+        <p>p5.js measures angles in radians. <strong>TWO_PI</strong> is a full circle (360°). <strong>PI</strong> is half (180°). The code panel shows the real radian values.</p>
+      </div>
+      <div class="lesson-card">
+        <h2>Remix this</h2>
+        <p>Use <code>arc()</code> to make a pie chart slice, a Pac-Man shape, or a clock hand. Try changing w and h to make an elliptical arc.</p>
+      </div>
+    </section>
+
+    <section class="code-panel" aria-label="Generated code preview">
+      <div class="code-toolbar">
+        <div class="code-toolbar-title">Starter Code Preview</div>
+        <button class="copy-btn" id="copyCodeBtn" type="button">Copy Code</button>
+      </div>
+      <pre id="codeOutput"></pre>
+    </section>
+
+    <footer class="footer">Arc Visualizer · CC Fest Coding Camp · p5.js learning tool</footer>
+  </div>
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  const state = {
+    x: 200,
+    y: 200,
+    w: 200,
+    h: 200,
+    startDeg: 0,
+    stopDeg: 270,
+    mode: 'PIE',
+    colorKey: 'blue',
+    showRefCircle: true,
+    showAngleLines: true,
+  };
+
+  // Fill color palette
+  const COLORS = {
+    blue:  { r: 100, g: 149, b: 220, label: 'Blue'  },
+    coral: { r: 224, g: 122, b: 95,  label: 'Coral' },
+    green: { r: 129, g: 178, b: 154, label: 'Green' },
+    gold:  { r: 242, g: 204, b: 143, label: 'Gold'  },
+    ink:   { r: 44,  g: 42,  b: 38,  label: 'Ink'   },
+  };
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function degToRad(d) { return d * Math.PI / 180; }
+
+  function radLabel(r) {
+    // Express as nice fraction of PI where possible
+    const pi = Math.PI;
+    const ratio = r / pi;
+    if (Math.abs(ratio - Math.round(ratio)) < 0.01) {
+      const n = Math.round(ratio);
+      if (n === 0) return '0';
+      if (n === 1) return 'PI';
+      if (n === 2) return 'TWO_PI';
+      return `${n} * PI`;
+    }
+    // halves, quarters, thirds
+    const fracs = [[1,2],[1,3],[2,3],[1,4],[3,4],[1,6],[5,6],[3,2],[5,4],[7,4]];
+    for (const [num, den] of fracs) {
+      if (Math.abs(ratio - num/den) < 0.01) {
+        const top = num === 1 ? '' : `${num} * `;
+        return den === 1 ? `${top}PI` : `${top}PI / ${den}`;
+      }
+    }
+    return r.toFixed(3);
+  }
+
+  function codeRadStr(deg) {
+    const r = degToRad(deg);
+    const pi = Math.PI;
+    const ratio = r / pi;
+    if (Math.abs(ratio) < 0.001) return '0';
+    if (Math.abs(ratio - 2) < 0.01) return 'TWO_PI';
+    if (Math.abs(ratio - 1) < 0.01) return 'PI';
+    if (Math.abs(ratio - 0.5) < 0.01) return 'PI / 2';
+    if (Math.abs(ratio - 1.5) < 0.01) return 'TWO_PI * 0.75';
+    if (Math.abs(ratio - 0.25) < 0.01) return 'PI / 4';
+    if (Math.abs(ratio - 0.75) < 0.01) return 'PI * 0.75';
+    if (Math.abs(ratio - 1.0/3) < 0.01) return 'PI / 3';
+    if (Math.abs(ratio - 2.0/3) < 0.01) return 'TWO_PI / 3';
+    // fallback: TWO_PI fraction
+    const frac = (deg / 360).toFixed(2);
+    return `TWO_PI * ${frac}`;
+  }
+
+  // ── p5 sketch ─────────────────────────────────────────────────────────────
+  function sketch(p) {
+
+    p.setup = function () {
+      const holder = document.getElementById('canvas-container');
+      const size = holder.clientWidth;
+      const canvas = p.createCanvas(size, size);
+      canvas.parent('canvas-container');
+      p.pixelDensity(2);
+      p.textFont('DM Mono');
+      p.angleMode(p.RADIANS);
+    };
+
+    p.windowResized = function () {
+      const holder = document.getElementById('canvas-container');
+      p.resizeCanvas(holder.clientWidth, holder.clientWidth);
+    };
+
+    p.draw = function () {
+      p.background(250, 246, 240);
+
+      // Scale factor: our sliders use 0-400 coords; canvas may be different size
+      const scale = p.width / 400;
+
+      const cx = state.x * scale;
+      const cy = state.y * scale;
+      const aw = state.w * scale;
+      const ah = state.h * scale;
+      const startRad = degToRad(state.startDeg);
+      const stopRad  = degToRad(state.stopDeg);
+      const col = COLORS[state.colorKey];
+
+      // Reference circle (dashed effect via many arc segments)
+      if (state.showRefCircle) {
+        p.noFill();
+        p.stroke(229, 223, 213);
+        p.strokeWeight(1.5 * scale);
+        // draw dashed ellipse manually
+        const steps = 60;
+        for (let k = 0; k < steps; k++) {
+          if (k % 2 === 0) {
+            const a0 = (k / steps) * p.TWO_PI;
+            const a1 = ((k + 1) / steps) * p.TWO_PI;
+            p.arc(cx, cy, aw, ah, a0, a1);
+          }
+        }
+      }
+
+      // Angle reference lines (radii from center to start/stop)
+      if (state.showAngleLines) {
+        const rx = aw / 2;
+        const ry = ah / 2;
+        p.stroke(61, 90, 128, 140);
+        p.strokeWeight(1.5 * scale);
+        // start line
+        p.line(cx, cy, cx + rx * Math.cos(startRad), cy + ry * Math.sin(startRad));
+        // stop line
+        p.stroke(224, 122, 95, 180);
+        p.line(cx, cy, cx + rx * Math.cos(stopRad), cy + ry * Math.sin(stopRad));
+
+        // Angle labels
+        p.noStroke();
+        p.textSize(11 * scale);
+
+        const startLabelX = cx + (rx * 0.72) * Math.cos(startRad);
+        const startLabelY = cy + (ry * 0.72) * Math.sin(startRad);
+        p.fill(61, 90, 128);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text('start', startLabelX, startLabelY - 10 * scale);
+
+        const stopLabelX = cx + (rx * 0.72) * Math.cos(stopRad);
+        const stopLabelY = cy + (ry * 0.72) * Math.sin(stopRad);
+        p.fill(224, 122, 95);
+        p.text('stop', stopLabelX, stopLabelY + 10 * scale);
+      }
+
+      // The arc
+      p.stroke(col.r * 0.55, col.g * 0.55, col.b * 0.55);
+      p.strokeWeight(2.5 * scale);
+      p.fill(col.r, col.g, col.b, 210);
+
+      if (state.mode === 'OPEN') {
+        p.arc(cx, cy, aw, ah, startRad, stopRad, p.OPEN);
+      } else if (state.mode === 'CHORD') {
+        p.arc(cx, cy, aw, ah, startRad, stopRad, p.CHORD);
+      } else {
+        p.arc(cx, cy, aw, ah, startRad, stopRad, p.PIE);
+      }
+
+      // Center dot
+      p.noStroke();
+      p.fill(44, 42, 38, 120);
+      p.circle(cx, cy, 7 * scale);
+
+      // Update readouts
+      document.getElementById('readoutXY').textContent = `${state.x}, ${state.y}`;
+      document.getElementById('readoutWH').textContent = `${state.w} × ${state.h}`;
+      document.getElementById('readoutStart').textContent = degToRad(state.startDeg).toFixed(2);
+      document.getElementById('readoutStop').textContent = degToRad(state.stopDeg).toFixed(2);
+    };
+  }
+
+  // ── Code generation ────────────────────────────────────────────────────────
+  function plainCode() {
+    const col = COLORS[state.colorKey];
+    const sr = codeRadStr(state.startDeg);
+    const er = codeRadStr(state.stopDeg);
+    return `function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  fill(${col.r}, ${col.g}, ${col.b});
+  arc(${state.x}, ${state.y}, ${state.w}, ${state.h}, ${sr}, ${er}, ${state.mode});
+}`;
+  }
+
+  function highlightedCode() {
+    const col = COLORS[state.colorKey];
+    const sr = codeRadStr(state.startDeg);
+    const er = codeRadStr(state.stopDeg);
+    // color the radian constant names
+    function radHtml(s) {
+      return s.replace(/(TWO_PI|PI)/g, '<span class="kw">$1</span>')
+              .replace(/[\d.]+/g, m => `<span class="num">${m}</span>`);
+    }
+    return `<span class="kw">function</span> <span class="fn">setup</span>() {
+  <span class="fn">createCanvas</span>(<span class="num">400</span>, <span class="num">400</span>);
+}
+
+<span class="kw">function</span> <span class="fn">draw</span>() {
+  <span class="fn">background</span>(<span class="num">250</span>, <span class="num">246</span>, <span class="num">240</span>);
+
+  <span class="fn">fill</span>(<span class="num">${col.r}</span>, <span class="num">${col.g}</span>, <span class="num">${col.b}</span>);
+  <span class="fn hi">arc</span>(<span class="num">${state.x}</span>, <span class="num">${state.y}</span>, <span class="num">${state.w}</span>, <span class="num">${state.h}</span>, ${radHtml(sr)}, ${radHtml(er)}, <span class="kw">${state.mode}</span>);
+}`;
+  }
+
+  function updateCode() {
+    document.getElementById('codeOutput').innerHTML = highlightedCode();
+  }
+
+  // ── Build mode buttons ─────────────────────────────────────────────────────
+  const MODES = ['OPEN', 'CHORD', 'PIE'];
+  function buildModeButtons() {
+    const wrap = document.getElementById('modeButtons');
+    wrap.innerHTML = '';
+    MODES.forEach(m => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toggle-btn' + (state.mode === m ? ' active' : '');
+      btn.textContent = m;
+      btn.addEventListener('click', () => {
+        state.mode = m;
+        buildModeButtons();
+        updateCode();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  // ── Build color buttons ────────────────────────────────────────────────────
+  function buildColorButtons() {
+    const wrap = document.getElementById('colorButtons');
+    wrap.innerHTML = '';
+    Object.entries(COLORS).forEach(([key, col]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'color-btn' + (state.colorKey === key ? ' active' : '');
+      btn.title = col.label;
+      btn.style.background = `rgb(${col.r},${col.g},${col.b})`;
+      btn.setAttribute('aria-label', col.label);
+      btn.addEventListener('click', () => {
+        state.colorKey = key;
+        buildColorButtons();
+        updateCode();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  // ── Wire controls ──────────────────────────────────────────────────────────
+  function wireSlider(id, stateKey, pillId, suffix) {
+    const el = document.getElementById(id);
+    el.addEventListener('input', e => {
+      state[stateKey] = Number(e.target.value);
+      document.getElementById(pillId).textContent = state[stateKey] + (suffix || '');
+      updateCode();
+    });
+  }
+
+  function wireControls() {
+    wireSlider('xSlider',     'x',        'xValue',     '');
+    wireSlider('ySlider',     'y',        'yValue',     '');
+    wireSlider('wSlider',     'w',        'wValue',     '');
+    wireSlider('hSlider',     'h',        'hValue',     '');
+    wireSlider('startSlider', 'startDeg', 'startValue', '°');
+    wireSlider('stopSlider',  'stopDeg',  'stopValue',  '°');
+
+    document.getElementById('refCircleBtn').addEventListener('click', () => {
+      state.showRefCircle = !state.showRefCircle;
+      const btn = document.getElementById('refCircleBtn');
+      btn.textContent = state.showRefCircle ? 'Ref Circle On' : 'Ref Circle Off';
+      btn.classList.toggle('active', state.showRefCircle);
+    });
+
+    document.getElementById('angleLineBtn').addEventListener('click', () => {
+      state.showAngleLines = !state.showAngleLines;
+      const btn = document.getElementById('angleLineBtn');
+      btn.textContent = state.showAngleLines ? 'Angle Lines On' : 'Angle Lines Off';
+      btn.classList.toggle('active', state.showAngleLines);
+    });
+
+    function doCopy(btn) {
+      navigator.clipboard.writeText(plainCode()).then(() => {
+        const old = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = old; }, 1400);
+      }).catch(() => window.prompt('Copy this code:', plainCode()));
+    }
+    document.getElementById('copyCodeBtn').addEventListener('click', e => doCopy(e.currentTarget));
+    document.getElementById('copyTopBtn').addEventListener('click', e => doCopy(e.currentTarget));
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  buildModeButtons();
+  buildColorButtons();
+  wireControls();
+  updateCode();
+  new p5(sketch);
+</script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

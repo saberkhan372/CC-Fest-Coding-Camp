@@ -1537,6 +1537,144 @@ function mousePressed() {
         p.mousePressed = () => { build(); p.redraw(); };
       }
     },
+    "code-postcard-from-my-world": {
+      title: "Code Postcard from My World",
+      session: "Session 1",
+      subtitle: "A tiny visual hello built from background, shapes, color, and one personal design decision.",
+      tags: ["shapes", "color", "identity"],
+      liveSeed: "Change the colors and shapes until the scene feels like a place, memory, classroom, or mood.",
+      tryText: "Replace the mountains with buildings, desks, windows, trees, or any shapes from your world.",
+      noticeText: "This sketch is personal before it is complicated. A few shapes can already communicate a point of view.",
+      remixText: "Add text, make one part move with frameCount, or turn the color palette into a weather or feeling code.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Code postcard",
+      code: `function setup() {
+  createCanvas(400, 400);
+  colorMode(HSB, 360, 100, 100);
+  noStroke();
+}
+
+function draw() {
+  // Sky
+  background(210, 40, 95);
+
+  // Mountains, buildings, or another place from your world
+  fill(220, 60, 60);
+  triangle(0, 300, 130, 150, 260, 300);
+  fill(220, 50, 70);
+  triangle(140, 300, 280, 120, 400, 300);
+
+  // Ground
+  fill(100, 50, 60);
+  rect(0, 300, 400, 100);
+
+  // Sun or moon
+  fill(50, 80, 100);
+  ellipse(320, 80, 60, 60);
+
+  // A window of light
+  fill(60, 90, 100);
+  rect(170, 220, 60, 60, 4);
+}`
+    },
+    "one-dataset-three-views": {
+      title: "One Dataset, Three Views",
+      session: "Session 4",
+      subtitle: "The same values become bars, circles, or a color field. Data visualization is a design decision.",
+      tags: ["arrays", "data", "mapping"],
+      liveSeed: "Press 1, 2, or 3 in the preview to switch visual forms while keeping the same numbers.",
+      tryText: "Change the values array, then compare which view makes the difference easiest to see.",
+      noticeText: "The data does not change. The representation changes what the viewer notices.",
+      remixText: "Add labels, a title, a second dataset, hover interaction, or a note about what the chart hides.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Same data, different stories",
+      code: `let values = [3, 7, 5, 9, 4, 8, 2, 6];
+let labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon"];
+let view = 1;
+
+function setup() {
+  createCanvas(500, 300);
+  textAlign(CENTER);
+}
+
+function draw() {
+  background(245);
+  let maxVal = max(values);
+  let spacing = width / values.length;
+
+  for (let i = 0; i < values.length; i++) {
+    let v = values[i];
+
+    if (view === 1) {
+      let h = map(v, 0, maxVal, 0, height - 70);
+      fill(61, 90, 128);
+      rect(i * spacing + 6, height - h - 35, spacing - 12, h);
+    } else if (view === 2) {
+      let d = map(v, 0, maxVal, 14, 80);
+      fill(224, 122, 95, 190);
+      circle(i * spacing + spacing / 2, height / 2, d);
+    } else {
+      let shade = map(v, 0, maxVal, 230, 50);
+      fill(shade);
+      rect(i * spacing, 0, spacing, height);
+    }
+
+    fill(44);
+    text(labels[i], i * spacing + spacing / 2, height - 12);
+  }
+}
+
+function keyPressed() {
+  if (key === "1") view = 1;
+  if (key === "2") view = 2;
+  if (key === "3") view = 3;
+}`
+    },
+    "classroom-grid-array-seed": {
+      title: "Classroom Grid / Intentional Array Seed",
+      session: "Session 4",
+      subtitle: "A grid where each cell reads a value from an array, bridging loop patterns into data stories.",
+      tags: ["nested loops", "arrays", "systems"],
+      liveSeed: "Each square reads from the access array. Change the 0s, 1s, and 2s to redesign the classroom map.",
+      tryText: "Change a few values in the array, then change the colors that represent quiet, medium, and buzzing.",
+      noticeText: "The nested loop gives each cell a row and column. The array gives that cell a stored value.",
+      remixText: "Make the values represent attendance, mood, garden sensors, neighborhood blocks, or a weekly classroom rhythm.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Grid as data model",
+      code: `let rows = 6;
+let cols = 10;
+
+// 0 = quiet, 1 = medium, 2 = buzzing
+let access = [
+  0, 1, 2, 1, 0, 2, 1, 2, 0, 1,
+  2, 0, 1, 2, 1, 0, 2, 1, 2, 0,
+  1, 2, 0, 1, 2, 1, 0, 2, 1, 2,
+  0, 1, 2, 0, 1, 2, 1, 0, 2, 1,
+  2, 1, 0, 2, 0, 1, 2, 1, 0, 2,
+  1, 0, 2, 1, 2, 0, 1, 2, 1, 0
+];
+
+function setup() {
+  createCanvas(500, 320);
+  noLoop();
+}
+
+function draw() {
+  background(245);
+  let cellW = width / cols;
+  let cellH = height / rows;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      let index = row * cols + col;
+      let val = access[index];
+
+      if (val === 0) fill("#a8d8ea");
+      else if (val === 1) fill("#f9c74f");
+      else fill("#90be6d");
+
+      rect(col * cellW + 3, row * cellH + 3, cellW - 6, cellH - 6, 5);
+    }
+  }
+}`
+    },
     "arrays-in-motion": {
       title: "Moving Sentence Machine",
       session: "Session 4",
