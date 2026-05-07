@@ -206,6 +206,7 @@ a{color:inherit}
 }
 
 .control select,
+.control input[type="text"],
 .control input[type="color"]{
   width:100%;
   border:1px solid var(--cream-deep);
@@ -215,7 +216,8 @@ a{color:inherit}
   font:inherit;
 }
 
-.control select{
+.control select,
+.control input[type="text"]{
   padding:10px 12px;
 }
 

@@ -17,6 +17,10 @@
     "dist-map-lerp-chain": { family: "distPipeline", label: "Pipeline" },
     "trails-ghosting-studio": { family: "ghostTrail", label: "Trails" },
     "assets-preload-helper": { family: "assetLoader", label: "Assets" },
+    "gravity-acceleration-playground": { family: "gravityPhysics", label: "Gravity" },
+    "atan2-rotation-studio": { family: "angleMouse", label: "atan2()" },
+    "sine-cosine-motion-explorer": { family: "sineWave", label: "Sine/Cos" },
+    "easing-types-comparison": { family: "easingCurves", label: "Easing" },
     "transformations-explorer": { family: "transform", label: "Transforms" },
     "map-explorer": { family: "mapping", label: "Map" },
     "lerp-explorer": { family: "lerpSeed", label: "lerp()" },
@@ -31,12 +35,16 @@
     "noise-lab": { family: "noiseRandom", label: "Noise Lab" },
     "pattern-systems-lab": { family: "grid", label: "Systems" },
     "modulo-framecount-studio": { family: "moduloFrame", label: "Modulo Time" },
+    "object-lifecycle-visualizer": { family: "lifecycle", label: "Lifecycle" },
+    "class-inheritance-explorer": { family: "inheritancePreview", label: "Extends" },
     "function-builder": { family: "function", label: "Functions" },
     "noise-vs-random-explorer": { family: "noiseRandom", label: "Noise" },
     "data-story-planner": { family: "planner", label: "Planning" },
     "data-mapper": { family: "dataMap", label: "Mapping" },
     "csv-loadtable-data-explorer": { family: "dataBars", label: "CSV" },
     "api-loadjson-data-explorer": { family: "dataBars", label: "JSON" },
+    "hover-data-chart": { family: "hoverData", label: "Hover Data" },
+    "string-text-manipulation-studio": { family: "stringsPreview", label: "Strings" },
     "event-handler-studio": { family: "ripple", label: "Events" },
     "collision-detection-explorer": { family: "collision", label: "Collisions" },
     "interactive-shape-drawing-app": { family: "objects", label: "Objects" },
@@ -47,14 +55,27 @@
     "postcard-studio": { family: "postcard", label: "Postcard" },
     "remix-machine": { family: "poster", label: "Remix" },
     "class-builder": { family: "classBuilder", label: "Class" },
+    "game-state-studio": { family: "gameState", label: "State" },
+    "agents-rules-playground": { family: "agentsPreview", label: "Agents" },
     "debugging-playground": { family: "function", label: "Debug" },
     "array-objects-debugger": { family: "objectDebugger", label: "Object Debug" },
+    "readable-code-coach": { family: "readablePreview", label: "Readable" },
     "mouse-trail-drawing-seed": { family: "trailSeed", label: "Trail" },
     "draw-your-name-seed": { family: "nameSeed", label: "Name" },
     "code-postcard-from-my-world": { family: "postcard", label: "Postcard" },
     "bouncing-ball-starter": { family: "bounceSeed", label: "Bounce" },
     "framecount-animation-seed": { family: "poster", label: "Clock" },
     "sine-cosine-motion-seed": { family: "lerpSeed", label: "Sine" },
+    "gravity-bounce-seed": { family: "gravityPhysics", label: "Gravity" },
+    "angle-to-mouse-seed": { family: "angleMouse", label: "atan2()" },
+    "sine-oscillation-seed": { family: "sineWave", label: "Sine" },
+    "particle-emitter-seed": { family: "lifecycle", label: "Emitter" },
+    "hover-data-bar-chart-seed": { family: "hoverData", label: "Hover Data" },
+    "wander-agent-seed": { family: "agentsPreview", label: "Agent" },
+    "state-machine-game-seed": { family: "gameState", label: "State" },
+    "circular-motion-orbit-seed": { family: "sineWave", label: "Orbit" },
+    "generative-tile-pattern-seed": { family: "tilePattern", label: "Tiles" },
+    "class-creature-stamp-seed": { family: "classBuilder", label: "Creature" },
     "click-to-create-shapes": { family: "stampSeed", label: "Click" },
     "color-from-position": { family: "shapeColor", label: "Color" },
     "noise-walker": { family: "noiseRandom", label: "Noise" },
@@ -123,6 +144,27 @@
       ctx.lineTo(w, y);
       ctx.stroke();
     }
+    ctx.restore();
+  }
+
+  function arrow(ctx, x1, y1, x2, y2, color) {
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.translate(x2, y2);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(-8, -4);
+    ctx.lineTo(-8, 4);
+    ctx.closePath();
+    ctx.fill();
     ctx.restore();
   }
 
@@ -1150,6 +1192,266 @@
         ctx.fillStyle = "#3d5a80";
         ctx.font = "700 10px DM Mono, monospace";
         ctx.fillText("dist()", 14, h - 14);
+        break;
+      }
+      case "gravityPhysics": {
+        ctx.fillStyle = "#fff";
+        roundedRect(ctx, 16, 14, w - 32, h - 28, 14);
+        ctx.fill();
+        const floor = h - 24;
+        const phase = (Math.sin(t * 1.5) + 1) / 2;
+        const y = 30 + Math.pow(phase, 1.8) * (floor - 62);
+        const x = 32 + ((t * 52) % (w - 64));
+        ctx.strokeStyle = "rgba(44,42,38,.12)";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(18, floor);
+        ctx.lineTo(w - 18, floor);
+        ctx.stroke();
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(x, y, 14, 0, Math.PI * 2);
+        ctx.fill();
+        arrow(ctx, x, y, x, Math.min(floor - 4, y + 34), "#81b29a");
+        ctx.fillStyle = "#3d5a80";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText("vy += gravity", 16, 28);
+        break;
+      }
+      case "angleMouse": {
+        const ox = w * 0.48;
+        const oy = h * 0.55;
+        const tx = 24 + px * (w - 48);
+        const ty = 22 + py * (h - 44);
+        const angle = Math.atan2(ty - oy, tx - ox);
+        ctx.strokeStyle = "rgba(224,122,95,.32)";
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(tx, ty);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.save();
+        ctx.translate(ox, oy);
+        ctx.rotate(angle);
+        ctx.fillStyle = "#3d5a80";
+        ctx.beginPath();
+        ctx.moveTo(42, 0);
+        ctx.lineTo(-18, -16);
+        ctx.lineTo(-7, 0);
+        ctx.lineTo(-18, 16);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(tx, ty, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText("atan2(dy, dx)", 14, h - 12);
+        break;
+      }
+      case "sineWave": {
+        const cx = w * 0.3;
+        const cy = h * 0.54;
+        const r = 34 + px * 18;
+        const a = t * 2 + px * 2;
+        const bx = cx + Math.cos(a) * r;
+        const by = cy + Math.sin(a) * r;
+        ctx.strokeStyle = "rgba(61,90,128,.2)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(bx, by, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#3d5a80";
+        ctx.beginPath();
+        for (let i = 0; i < 86; i++) {
+          const x = w * 0.5 + i * ((w * 0.42) / 85);
+          const y = cy + Math.sin(a + i * 0.2) * 24;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        break;
+      }
+      case "easingCurves": {
+        const names = ["linear", "in", "out", "bounce"];
+        const progress = (t * 0.65) % 1;
+        names.forEach((name, i) => {
+          const y = 28 + i * ((h - 56) / (names.length - 1));
+          const x0 = 58;
+          const x1 = w - 28;
+          let e = progress;
+          if (name === "in") e = progress * progress;
+          if (name === "out") e = 1 - Math.pow(1 - progress, 2);
+          if (name === "bounce") e = Math.abs(Math.sin(progress * Math.PI * 2)) * (1 - progress) + progress;
+          ctx.strokeStyle = "rgba(44,42,38,.12)";
+          ctx.beginPath();
+          ctx.moveTo(x0, y);
+          ctx.lineTo(x1, y);
+          ctx.stroke();
+          ctx.fillStyle = i % 2 ? "#3d5a80" : "#e07a5f";
+          ctx.beginPath();
+          ctx.arc(x0 + (x1 - x0) * e, y, 7, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "#6b6760";
+          ctx.font = "700 9px DM Mono, monospace";
+          ctx.fillText(name, 14, y + 3);
+        });
+        break;
+      }
+      case "lifecycle": {
+        for (let i = 0; i < 16; i++) {
+          const age = (i / 15 + t * 0.18) % 1;
+          const x = 22 + (i % 8) * ((w - 44) / 7);
+          const y = 38 + Math.floor(i / 8) * 54 + Math.sin(t * 2 + i) * 5;
+          const life = 1 - age;
+          ctx.fillStyle = `rgba(61,90,128,${0.12 + life * 0.72})`;
+          ctx.beginPath();
+          ctx.arc(x, y, 5 + life * 13, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = `rgba(224,122,95,${0.28 + life * 0.6})`;
+          ctx.fillRect(x - 16, y + 20, 32 * life, 4);
+        }
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText("born -> age -> splice", 14, h - 12);
+        break;
+      }
+      case "hoverData": {
+        const values = [8, 7, 4, 2, 3, 5];
+        const labels = ["sleep", "school", "screen", "read", "move", "friends"];
+        let nearest = 0;
+        let nd = Infinity;
+        values.forEach((value, i) => {
+          const x = 24 + i * ((w - 48) / (values.length - 1));
+          const d = Math.abs((22 + px * (w - 44)) - x);
+          if (d < nd) { nd = d; nearest = i; }
+        });
+        values.forEach((value, i) => {
+          const x = 24 + i * ((w - 48) / (values.length - 1));
+          const bh = value / 8 * (h - 48);
+          ctx.fillStyle = i === nearest ? "#e07a5f" : "#3d5a80";
+          roundedRect(ctx, x - 10, h - 18 - bh, 20, bh, 7);
+          ctx.fill();
+        });
+        const tx = 24 + nearest * ((w - 48) / (values.length - 1));
+        ctx.fillStyle = "#fff";
+        roundedRect(ctx, tx - 34, 16, 68, 28, 8);
+        ctx.fill();
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 9px DM Mono, monospace";
+        ctx.fillText(`${labels[nearest]} ${values[nearest]}`, tx - 26, 34);
+        break;
+      }
+      case "agentsPreview": {
+        ctx.fillStyle = "#f2cc8f";
+        ctx.beginPath();
+        ctx.arc(w * 0.5, h * 0.5, 13, 0, Math.PI * 2);
+        ctx.fill();
+        for (let i = 0; i < 24; i++) {
+          const a = t * 0.7 + i * 1.7;
+          const radius = 18 + (i % 6) * 12 + px * 20;
+          const x = w * 0.5 + Math.cos(a + i) * radius;
+          const y = h * 0.5 + Math.sin(a * 0.8 + i) * radius * 0.6;
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(a);
+          ctx.fillStyle = i % 3 ? "#3d5a80" : "#e07a5f";
+          ctx.beginPath();
+          ctx.moveTo(8, 0);
+          ctx.lineTo(-6, -4);
+          ctx.lineTo(-6, 4);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+        break;
+      }
+      case "readablePreview": {
+        const lines = hover ? ["let ballX", "let speed", "drawBall()"] : ["let x", "let y", "d()"];
+        ctx.fillStyle = "#fff";
+        roundedRect(ctx, 18, 16, w - 36, h - 32, 14);
+        ctx.fill();
+        lines.forEach((line, i) => {
+          ctx.fillStyle = hover ? "rgba(129,178,154,.16)" : "rgba(224,122,95,.14)";
+          roundedRect(ctx, 32, 30 + i * 28, w - 64, 20, 6);
+          ctx.fill();
+          ctx.fillStyle = hover ? "#2d6a4f" : "#c8391d";
+          ctx.font = "700 11px DM Mono, monospace";
+          ctx.fillText(line, 42, 44 + i * 28);
+        });
+        break;
+      }
+      case "stringsPreview": {
+        const words = ["creative", "coding", "connects"];
+        ctx.fillStyle = "#fff";
+        roundedRect(ctx, 16, 16, w - 32, 34, 10);
+        ctx.fill();
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 11px DM Sans, sans-serif";
+        ctx.fillText(words.join(" "), 28, 38);
+        words.forEach((word, i) => {
+          const x = 18 + i * ((w - 36) / 3);
+          ctx.fillStyle = i % 2 ? "#3d5a80" : "#e07a5f";
+          roundedRect(ctx, x, 72 + Math.sin(t + i) * 4, (w - 54) / 3, 24, 8);
+          ctx.fill();
+          ctx.fillStyle = "#fff";
+          ctx.font = "700 9px DM Mono, monospace";
+          ctx.fillText(word, x + 8, 88 + Math.sin(t + i) * 4);
+        });
+        break;
+      }
+      case "inheritancePreview": {
+        const boxes = [
+          { x: 24, y: 34, w: 78, h: 48, label: "Parent", c: "#3d5a80" },
+          { x: w - 104, y: 58, w: 78, h: 48, label: "Child", c: "#e07a5f" }
+        ];
+        boxes.forEach((box) => {
+          ctx.fillStyle = "#fff";
+          roundedRect(ctx, box.x, box.y, box.w, box.h, 10);
+          ctx.fill();
+          ctx.strokeStyle = box.c;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.fillStyle = box.c;
+          ctx.font = "700 10px DM Mono, monospace";
+          ctx.fillText(box.label, box.x + 10, box.y + 28);
+        });
+        ctx.strokeStyle = "rgba(44,42,38,.28)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(w - 104, 82);
+        ctx.lineTo(106, 58);
+        ctx.stroke();
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText("extends + super()", 18, h - 14);
+        break;
+      }
+      case "tilePattern": {
+        const cell = 24;
+        for (let y = 12; y < h - 10; y += cell) {
+          for (let x = 12; x < w - 10; x += cell) {
+            const col = Math.floor(x / cell);
+            const row = Math.floor(y / cell);
+            const hue = (col * 28 + row * 18 + t * 30) % 360;
+            ctx.fillStyle = `hsl(${hue} 58% ${56 + Math.sin(t + col + row) * 8}%)`;
+            if ((col + row) % 3 === 0) {
+              ctx.beginPath();
+              ctx.arc(x, y, 7 + px * 5, 0, Math.PI * 2);
+              ctx.fill();
+            } else {
+              roundedRect(ctx, x - 8, y - 8, 16, 16, 5);
+              ctx.fill();
+            }
+          }
+        }
         break;
       }
       case "gameState": {
