@@ -6,8 +6,12 @@
     "text-basics-studio": { family: "textBasics", label: "Text" },
     "variable-playground": { family: "variable", label: "Variables" },
     "rgb-hsb-color-lab": { family: "colorLab", label: "Color Lab" },
+    "arc-visualizer": { family: "shapes", label: "Arc" },
     "animation-explorer": { family: "bounce", label: "Motion" },
     "framerate-visualizer": { family: "frameRate", label: "FPS" },
+    "draw-loop-visualizer": { family: "frameRate", label: "draw()" },
+    "bounce-logic-explainer": { family: "bounce", label: "Bounce" },
+    "motion-playground": { family: "mapping", label: "Motion Map" },
     "transformations-explorer": { family: "transform", label: "Transforms" },
     "map-explorer": { family: "mapping", label: "Map" },
     "lerp-explorer": { family: "lerpSeed", label: "lerp()" },
@@ -17,11 +21,16 @@
     "modulo-pattern-explorer": { family: "hsbSeed", label: "Modulo" },
     "simple-array-explorer": { family: "arrays", label: "Arrays" },
     "polished-array-explorer": { family: "dataBars", label: "Data" },
+    "grid-maker": { family: "gridSeed", label: "Grid" },
+    "pattern-logic-explorer": { family: "grid", label: "Logic" },
+    "noise-lab": { family: "noiseRandom", label: "Noise Lab" },
+    "pattern-systems-lab": { family: "grid", label: "Systems" },
     "function-builder": { family: "function", label: "Functions" },
     "noise-vs-random-explorer": { family: "noiseRandom", label: "Noise" },
     "data-story-planner": { family: "planner", label: "Planning" },
     "data-mapper": { family: "dataMap", label: "Mapping" },
     "csv-loadtable-data-explorer": { family: "dataBars", label: "CSV" },
+    "api-loadjson-data-explorer": { family: "dataBars", label: "JSON" },
     "event-handler-studio": { family: "ripple", label: "Events" },
     "collision-detection-explorer": { family: "collision", label: "Collisions" },
     "interactive-shape-drawing-app": { family: "objects", label: "Objects" },
@@ -30,9 +39,11 @@
     "image-remix-studio": { family: "image", label: "Remix" },
     "pixel-webcam-remix-studio": { family: "pixels", label: "Pixels" },
     "postcard-studio": { family: "postcard", label: "Postcard" },
+    "remix-machine": { family: "poster", label: "Remix" },
     "debugging-playground": { family: "function", label: "Debug" },
     "mouse-trail-drawing-seed": { family: "trailSeed", label: "Trail" },
     "draw-your-name-seed": { family: "nameSeed", label: "Name" },
+    "code-postcard-from-my-world": { family: "postcard", label: "Postcard" },
     "bouncing-ball-starter": { family: "bounceSeed", label: "Bounce" },
     "framecount-animation-seed": { family: "poster", label: "Clock" },
     "sine-cosine-motion-seed": { family: "lerpSeed", label: "Sine" },
@@ -44,6 +55,8 @@
     "simple-collision-game-seed": { family: "collision", label: "Collision" },
     "data-self-portrait-seed": { family: "dataPortraitSeed", label: "Data" },
     "tiny-csv-portrait-seed": { family: "dataBars", label: "CSV" },
+    "one-dataset-three-views": { family: "dataBars", label: "3 Views" },
+    "classroom-grid-array-seed": { family: "gridSeed", label: "Grid Data" },
     "image-grid-remix-seed": { family: "image", label: "Image" },
     "sound-pulse-seed": { family: "sound", label: "Sound" },
     "mini-generative-poster-seed": { family: "poster", label: "Poster" },
@@ -1014,6 +1027,9 @@
       entries.forEach((entry) => {
         const preview = previews.find((item) => item.stage === entry.target);
         if (preview) {
+          if (entry.isIntersecting && !preview.visible) {
+            preview.updateSize();
+          }
           preview.visible = entry.isIntersecting;
           if (!entry.isIntersecting && reduceMotion) draw(preview, 0);
         }

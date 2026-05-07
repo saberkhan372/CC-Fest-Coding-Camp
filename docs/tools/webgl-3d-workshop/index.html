@@ -190,75 +190,106 @@ let rotationZ = 0;
 let sceneScale = 1;
 let cameraZ = 0;
 
-new p5((p) => {
-  let time = 0;
+function supportsWebGL() {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")));
+  } catch (error) {
+    return false;
+  }
+}
 
-  p.setup = () => {
-    const canvas = p.createCanvas(560, 560, p.WEBGL);
-    canvas.parent("canvas-container");
-    p.noStroke();
-    updateCodeDisplay();
-    updateStateDisplay();
-  };
+function showWebGLFallback() {
+  const holder = document.getElementById("canvas-container");
+  holder.innerHTML = `
+    <div style="min-height:360px;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;border:1px dashed rgba(224,122,95,.45);border-radius:18px;background:linear-gradient(135deg,rgba(250,246,240,.92),rgba(255,255,255,.96));">
+      <div>
+        <h3 style="margin:0 0 8px;font-family:'DM Sans',sans-serif;color:#2c2a26;">WEBGL is unavailable in this browser.</h3>
+        <p style="margin:0 auto;max-width:420px;color:#5f5a52;line-height:1.5;">The 3D preview needs a browser or device with WebGL enabled. The controls and generated starter code still work, so you can copy or open the sketch in the p5.js Web Editor.</p>
+      </div>
+    </div>
+  `;
+  updateCodeDisplay();
+  updateStateDisplay();
+}
 
-  p.draw = () => {
-    p.background(250, 246, 240);
-    p.ambientLight(60);
-    p.pointLight(255, 255, 255, 70, 70, 120);
+function startWebGLSketch() {
+  new p5((p) => {
+    let time = 0;
 
-    if (p.mouseIsPressed) {
-      cameraZ = p.map(p.mouseY, 0, p.height, -500, 500);
-    }
-    p.camera(0, 0, 300 + cameraZ, 0, 0, 0, 0, 1, 0);
+    p.setup = () => {
+      const canvas = p.createCanvas(560, 560, p.WEBGL);
+      canvas.parent("canvas-container");
+      p.noStroke();
+      updateCodeDisplay();
+      updateStateDisplay();
+    };
 
-    p.scale(sceneScale);
-    p.rotateX(p.radians(rotationX + (autoRotate ? time : 0)));
-    p.rotateY(p.radians(rotationY + (autoRotate ? time * 1.5 : 0)));
-    p.rotateZ(p.radians(rotationZ));
+    p.draw = () => {
+      p.background(250, 246, 240);
+      p.ambientLight(60);
+      p.pointLight(255, 255, 255, 70, 70, 120);
 
-    switch (material) {
-      case "normal":
-        p.normalMaterial();
-        break;
-      case "basic":
-        p.fill(shapeColor);
-        break;
-      default:
-        p.specularMaterial(250);
-        p.fill(shapeColor);
-        break;
-    }
+      if (p.mouseIsPressed) {
+        cameraZ = p.map(p.mouseY, 0, p.height, -500, 500);
+      }
+      p.camera(0, 0, 300 + cameraZ, 0, 0, 0, 0, 1, 0);
 
-    switch (shape) {
-      case "box":
-        p.box(100);
-        break;
-      case "sphere":
-        p.sphere(50);
-        break;
-      case "cylinder":
-        p.cylinder(30, 100);
-        break;
-      case "cone":
-        p.cone(40, 100);
-        break;
-      case "torus":
-        p.torus(50, 20);
-        break;
-      default:
-        drawCustomShape(p);
-        break;
-    }
+      p.scale(sceneScale);
+      p.rotateX(p.radians(rotationX + (autoRotate ? time : 0)));
+      p.rotateY(p.radians(rotationY + (autoRotate ? time * 1.5 : 0)));
+      p.rotateZ(p.radians(rotationZ));
 
-    drawCoordinateSystem(p);
+      switch (material) {
+        case "normal":
+          p.normalMaterial();
+          break;
+        case "basic":
+          p.fill(shapeColor);
+          break;
+        default:
+          p.specularMaterial(250);
+          p.fill(shapeColor);
+          break;
+      }
 
-    if (autoRotate) {
-      time += 0.5;
-    }
+      switch (shape) {
+        case "box":
+          p.box(100);
+          break;
+        case "sphere":
+          p.sphere(50);
+          break;
+        case "cylinder":
+          p.cylinder(30, 100);
+          break;
+        case "cone":
+          p.cone(40, 100);
+          break;
+        case "torus":
+          p.torus(50, 20);
+          break;
+        default:
+          drawCustomShape(p);
+          break;
+      }
 
-    updateStateDisplay();
-  };
-}, "canvas-container");
+      drawCoordinateSystem(p);
+
+      if (autoRotate) {
+        time += 0.5;
+      }
+
+      updateStateDisplay();
+    };
+  }, "canvas-container");
+}
+
+if (supportsWebGL()) {
+  startWebGLSketch();
+} else {
+  showWebGLFallback();
+}
 
 function drawCoordinateSystem(p) {
   p.push();

@@ -548,7 +548,6 @@
             <div class="button-row">
               <button class="secondary-btn" id="resetBtn" type="button">Reset</button>
               <button class="secondary-btn" id="demoBtn" type="button">Demo Move</button>
-              <button class="primary-btn" id="copyTopBtn" type="button">Copy Code</button>
             </div>
             <p class="mini-note">For <code>mouseIsPressed</code>, click and hold in the canvas. For <code>keyIsPressed</code>, press any key.</p>
           </div>
@@ -1126,7 +1125,6 @@
 
     document.getElementById('resetBtn').addEventListener('click', reset);
     document.getElementById('copyCodeBtn').addEventListener('click', e => copyCode(e.currentTarget));
-    document.getElementById('copyTopBtn').addEventListener('click', e => copyCode(e.currentTarget));
   }
 
   buildConditionButtons();

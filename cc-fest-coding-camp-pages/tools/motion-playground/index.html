@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion Playground - CC Fest Coding Camp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link rel="stylesheet" href="../../tool-page.css">
+<style>
+  body{background:#faf6f0;color:#2c2a26;font-family:"DM Sans",system-ui,sans-serif;margin:0;padding:24px}
+  .wrap{max-width:1180px;margin:0 auto}.top{display:flex;justify-content:space-between;margin-bottom:22px}
+  .top a{color:#c8391d;text-decoration:none;font-weight:700}.tag{font:700 12px "DM Mono",monospace;color:#b07d00;text-transform:uppercase;letter-spacing:.08em}
+  h1{font-size:clamp(34px,5vw,58px);line-height:.95;margin:10px 0}.lede{max-width:760px;color:#5f5a54;font-size:18px}
+  .grid{display:grid;grid-template-columns:minmax(420px,1.2fr) minmax(320px,.8fr);gap:18px}.card{background:white;border:1px solid #e8dfd2;border-radius:18px;box-shadow:0 10px 30px rgba(44,42,38,.08);padding:18px}
+  canvas{width:100%;height:auto;border-radius:12px;border:1px solid #eadfce;background:white}.row{display:grid;grid-template-columns:120px 1fr 52px;gap:10px;align-items:center;margin:12px 0}
+  label{font:700 12px "DM Mono",monospace;color:#6b6760}input,select{width:100%;accent-color:#b07d00}button{border:1px solid #e2d6c7;border-radius:999px;background:#fff;padding:9px 12px;font-weight:800;cursor:pointer}button.active,.primary{background:#b07d00;color:#fff;border-color:#b07d00}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.stat{background:#faf6f0;border:1px solid #e8dfd2;border-radius:12px;padding:10px}.stat small{display:block;color:#777;font:700 10px "DM Mono",monospace;text-transform:uppercase}.stat strong{font:700 16px "DM Mono",monospace}
+  #code{background:#2c2a26;color:#f7efe3;border-radius:14px;padding:16px;white-space:pre-wrap;overflow:auto;margin-top:18px;font:13px/1.5 "DM Mono",monospace}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="wrap">
+<nav class="top"><a href="../../index.html">Back to tool library</a><a href="https://editor.p5js.org/">p5.js editor</a></nav>
+<span class="tag">Session 2 - map() as translation</span><h1>Motion Playground</h1>
+<p class="lede">Move across the canvas and decide what mouseX means. The same input can become size, hue, speed, opacity, rotation, stroke weight, or y position.</p>
+<main class="grid"><section class="card"><canvas id="canvas" width="680" height="420"></canvas><div class="stats"><div class="stat"><small>mouseX</small><strong id="mouseRead">0</strong></div><div class="stat"><small>mapped</small><strong id="mapRead">0</strong></div><div class="stat"><small>output</small><strong id="outRead">size</strong></div></div></section>
+<aside class="card"><h2>Controls</h2><div class="row"><label>mouse controls</label><select id="mode"><option>size</option><option>hue</option><option>speed</option><option>opacity</option><option>rotation</option><option>stroke weight</option><option>y position</option></select><span></span></div><div class="row"><label>map from</label><input id="outMin" type="range" min="-200" max="360" value="20"><span id="minVal">20</span></div><div class="row"><label>map to</label><input id="outMax" type="range" min="-200" max="360" value="180"><span id="maxVal">180</span></div><p><button id="freeze">Freeze</button> <button id="trail" class="active">Trail On</button></p><p style="color:#6b6760">Magic moment: mouseX is just a number until map() gives it a job.</p></aside></main><pre id="code"></pre></div>
+<script>
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const mode=document.getElementById('mode'),outMin=document.getElementById('outMin'),outMax=document.getElementById('outMax');
+const minVal=document.getElementById('minVal'),maxVal=document.getElementById('maxVal'),mouseRead=document.getElementById('mouseRead'),mapRead=document.getElementById('mapRead'),outRead=document.getElementById('outRead'),code=document.getElementById('code');
+let mouseX=340, frozen=false, trail=true, angle=0, movingX=340;
+function map(v,a,b,c,d){return c+(d-c)*((v-a)/(b-a))}
+canvas.addEventListener('mousemove',e=>{if(frozen)return;const r=canvas.getBoundingClientRect();mouseX=(e.clientX-r.left)/r.width*canvas.width});
+document.getElementById('freeze').onclick=e=>{frozen=!frozen;e.currentTarget.classList.toggle('active',frozen);e.currentTarget.textContent=frozen?'Frozen':'Freeze'};
+document.getElementById('trail').onclick=e=>{trail=!trail;e.currentTarget.classList.toggle('active',trail);e.currentTarget.textContent=trail?'Trail On':'Trail Off'};
+[mode,outMin,outMax].forEach(el=>el.addEventListener('input',renderCode));
+function draw(){
+  const min=+outMin.value,max=+outMax.value,val=map(mouseX,0,canvas.width,min,max); angle+=0.03; movingX=(movingX+Math.max(1,Math.abs(val)*0.02))%canvas.width;
+  ctx.fillStyle=trail?'rgba(250,246,240,.22)':'#faf6f0';ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle='rgba(176,125,0,.25)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(mouseX,0);ctx.lineTo(mouseX,canvas.height);ctx.stroke();
+  let size=86,hue=205,alpha=.95,rot=0,sw=0,y=210,x=340;
+  if(mode.value==='size')size=val;if(mode.value==='hue')hue=((val%360)+360)%360;if(mode.value==='speed')x=movingX;if(mode.value==='opacity')alpha=Math.max(.05,Math.min(1,val/255));if(mode.value==='rotation')rot=val*Math.PI/180;if(mode.value==='stroke weight')sw=Math.max(0,val);if(mode.value==='y position')y=val;
+  ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.globalAlpha=alpha;ctx.fillStyle=`hsl(${hue},70%,55%)`;ctx.strokeStyle='#2c2a26';ctx.lineWidth=sw;ctx.beginPath();ctx.arc(0,0,Math.max(6,Math.abs(size)/2),0,Math.PI*2);ctx.fill();if(sw>0)ctx.stroke();ctx.restore();
+  mouseRead.textContent=Math.round(mouseX);mapRead.textContent=Math.round(val);outRead.textContent=mode.value;minVal.textContent=outMin.value;maxVal.textContent=outMax.value;requestAnimationFrame(draw)
+}
+function renderCode(){code.textContent=`function draw() {
+  background(245);
+
+  let value = map(mouseX, 0, width, ${outMin.value}, ${outMax.value});
+
+  // mouseX controls ${mode.value}
+  circle(width / 2, height / 2, value);
+}`;}
+renderCode();draw();
+</script><script src="../../p5-export-helper.js?v=20260505-workshop-export"></script></body></html>

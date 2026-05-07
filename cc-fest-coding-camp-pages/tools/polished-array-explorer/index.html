@@ -39,6 +39,20 @@
     canvas { display: block; width: 100%; height: auto; background: #fff; border: 2px solid var(--soft); border-radius: 14px; }
     code, pre { font-family: var(--mono); }
 
+    .page-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 2rem 0;
+      font-size: 13px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+    }
+    .page-topbar a {
+      text-decoration: none;
+      color: #5c5650;
+    }
+    .page-topbar a:hover { color: #c8391d; }
+
     .header {
       position: sticky;
       top: 0;
@@ -388,6 +402,9 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
 </head>
 <body>
+  <div class="page-topbar">
+    <a href="../../index.html">← Back to tool library</a>
+  </div>
   <header class="header">
     <p class="eyebrow">CC Fest Coding Camp · Session 3</p>
     <h1>Array Explorer</h1>

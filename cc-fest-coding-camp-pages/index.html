@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CC Fest Coding Camp: Creative Coding Tools for p5.js</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css?v=20260505-motion-copy">
+  <link rel="stylesheet" href="site.css?v=20260506-expanded-tools">
   <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/">
   <meta property="og:title" content="CC Fest Coding Camp: Creative Coding Tools for p5.js">
-  <meta property="og:description" content="31 workshop tools and 27 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:description" content="41 workshop tools and 30 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
   <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="CC Fest Coding Camp: Creative Coding Tools for p5.js">
-  <meta name="twitter:description" content="31 workshop tools and 27 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:description" content="41 workshop tools and 30 starter sketches for teaching p5.js and creative coding. Free, open, and remixable.">
   <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -40,7 +40,7 @@
         <div class="hero-text">
           <p class="eyebrow">CC Fest Coding Camp · Free · Open to everyone</p>
           <h1>Tools for Creative Coding.</h1>
-          <p class="lede">Hi, I'm Saber Khan. I run CC Fest Coding Camp, a free five-week program where educators, artists, students, and others learn <a href="https://p5js.org">p5.js</a> and creative coding together. I built these tools for our sessions. 31 workshop tools and 27 starter sketches. They're open. Use them, remix them, make them yours. If you find them useful please get in touch.</p>
+          <p class="lede">41 workshop tools and 30 starter sketches for teaching <a href="https://p5js.org">p5.js</a> and creative coding. Built by <a href="https://www.linkedin.com/in/edsaber/" target="_blank" rel="noopener">Saber Khan</a> for <a href="https://ccfest.rocks/coding-camp" target="_blank" rel="noopener">CC Fest Coding Camp</a>. Free, open, remixable.</p>
           <div class="hero-actions">
             <a class="button primary" href="#interactive-tools">Browse Tools</a>
             <a class="button secondary" href="#starter-sketches">Starter Sketches</a>
@@ -53,20 +53,20 @@
             <div class="poster-dot dot-a"></div>
             <div class="poster-dot dot-b"></div>
             <div class="poster-dot dot-c"></div>
-            <div class="poster-card card-a" data-token>x, y</div>
-            <div class="poster-card card-b" data-token>loop()</div>
-            <div class="poster-card card-c" data-token>remix ✦</div>
-            <div class="poster-card card-d" data-token>noise()</div>
-            <div class="poster-card card-e" data-token>p5.js</div>
-            <div class="poster-card card-f" data-token>draw()</div>
+            <div class="poster-card card-a" data-token data-draggable>mouseX</div>
+            <div class="poster-card card-b" data-token data-draggable>noise()</div>
+            <div class="poster-card card-c" data-token data-draggable>circle()</div>
+            <div class="poster-card card-d" data-token data-draggable>map()</div>
+            <div class="poster-card card-e" data-token data-draggable>draw()</div>
+            <div class="poster-card card-f" data-token data-draggable>fill()</div>
           </div>
           <aside class="hero-aside">
             <h2>Creative coding for all.</h2>
             <p class="aside-byline">— Saber Khan, CC Fest</p>
             <ul>
-              <li>Code can help you express your ideas.</li>
+              <li>You don't need to be a programmer.</li>
               <li>The code and the canvas are connected.</li>
-              <li>You can use the code in the tools and examples.</li>
+              <li>Change one thing. See what happens.</li>
               <li>Everything here is yours to remix.</li>
             </ul>
           </aside>
@@ -86,24 +86,62 @@
 
     <main>
 
-      <div class="camp-words" aria-hidden="true">
-        <span class="word">gather</span><span class="sep">·</span>
-        <span class="word">try</span><span class="sep">·</span>
-        <span class="word">change</span><span class="sep">·</span>
-        <span class="word">remix</span><span class="sep">·</span>
-        <span class="word">share</span>
-      </div>
-
-      <section class="overview panel" aria-label="Suggested learning sequence">
+<section class="overview panel" aria-label="Suggested learning sequence">
         <div class="section-label">The Camp Arc</div>
         <h2>Five sessions. One arc.</h2>
         <p>CC Fest Coding Camp runs five sessions over five weeks. The sequence moves from first marks to open studio. Each session builds on the last, but every tool and sketch also stands alone. Jump in anywhere.</p>
         <div class="sequence">
-          <div class="sequence-card"><strong>1 · Your Canvas, Your Voice</strong><span>Shapes, color, coordinates, identity</span></div>
-          <div class="sequence-card"><strong>2 · Things That Move, Things That Listen</strong><span>Variables, animation, events, map(), lerp()</span></div>
-          <div class="sequence-card"><strong>3 · Patterns, Systems, and What They Say</strong><span>Loops, noise, randomness, generative systems</span></div>
-          <div class="sequence-card"><strong>4 · Data as Material</strong><span>Arrays, mapping, visualization, data storytelling</span></div>
-          <div class="sequence-card"><strong>5 · Open Studio</strong><span>Remix, share, reflect, teach</span></div>
+          <div class="sequence-card">
+            <strong>1 · Your Canvas, Your Voice</strong>
+            <span>Make your first marks and find your canvas voice</span>
+            <div class="sequence-tools">
+              <a href="tools/coordinate-system-explorer/">Coordinates</a>
+              <a href="tools/shape-and-color-explorer/">Shape + Color</a>
+              <a href="tools/text-basics-studio/">Text</a>
+              <a href="tools/rgb-hsb-color-lab/">RGB / HSB</a>
+            </div>
+          </div>
+          <div class="sequence-card">
+            <strong>2 · Things That Move, Things That Listen</strong>
+            <span>Build things that move, react, and respond</span>
+            <div class="sequence-tools">
+              <a href="tools/animation-explorer/">Animation</a>
+              <a href="tools/framerate-visualizer/">frameRate()</a>
+              <a href="tools/map-explorer/">map()</a>
+              <a href="tools/lerp-explorer/">lerp()</a>
+              <a href="tools/if-else-decision-studio/">If / Else</a>
+            </div>
+          </div>
+          <div class="sequence-card">
+            <strong>3 · Patterns, Systems, and What They Say</strong>
+            <span>Let the code repeat, branch, and think for itself</span>
+            <div class="sequence-tools">
+              <a href="tools/for-loop-stepper/">For Loop</a>
+              <a href="tools/rows-and-columns/">Rows + Cols</a>
+              <a href="tools/function-builder/">Functions</a>
+              <a href="tools/noise-vs-random-explorer/">Noise</a>
+            </div>
+          </div>
+          <div class="sequence-card">
+            <strong>4 · Data as Material</strong>
+            <span>Turn numbers into pictures that mean something personal</span>
+            <div class="sequence-tools">
+              <a href="tools/data-story-planner/">Story Planner</a>
+              <a href="tools/data-mapper/">Data Mapper</a>
+              <a href="tools/csv-loadtable-data-explorer/">CSV / loadTable</a>
+            </div>
+          </div>
+          <div class="sequence-card">
+            <strong>5 · Open Studio</strong>
+            <span>Remix, share, reflect, teach</span>
+            <div class="sequence-tools">
+              <a href="tools/image-remix-studio/">Image Remix</a>
+              <a href="tools/sound-shape-visualizer/">Sound + Shape</a>
+              <a href="tools/postcard-studio/">Postcard</a>
+              <a href="tools/game-state-starter/">Game State</a>
+              <a href="tools/particle-system-seed/">Particles</a>
+            </div>
+          </div>
         </div>
         <p style="margin-top:18px;font-size:13px;color:var(--ink-light)">
           <a href="https://sustaining-boursin-d41.notion.site/3349950a7da981dd939ad16078343178" style="color:var(--accent)">Read the full cohort roadmap and session recaps →</a>
@@ -117,14 +155,24 @@
           <div class="gallery-header">
             <div class="gallery-header-copy">
               <div class="section-label bold-block">Workshop Tools</div>
-              <h2>31 workshop-ready tools for camp sessions</h2>
+              <h2>41 workshop-ready tools for camp sessions</h2>
               <p>Each tool focuses on one concept. Change a slider, see what happens. Use them for live demos, station rotations, or student-led exploration. Built for complete beginners and educators alike. <a href="https://sustaining-boursin-d41.notion.site/3339950a7da9819a9b73d83d97eaf2c2" style="color:var(--accent)">Teaching notes for each session →</a></p>
             </div>
-            <div class="gallery-count">31 tools</div>
+            <div class="gallery-count">41 tools</div>
           </div>
+          <div class="suit-filter-bar" role="group" aria-label="Filter by suit">
+            <button class="suit-btn active" data-filter="all">All</button>
+            <button class="suit-btn" data-filter="marks">✦ Marks</button>
+            <button class="suit-btn" data-filter="motion">◎ Motion</button>
+            <button class="suit-btn" data-filter="systems">⬡ Systems</button>
+            <button class="suit-btn" data-filter="data">▦ Data</button>
+            <button class="suit-btn" data-filter="open">☽ Open</button>
+          </div>
+          <p class="suit-legend">✦ Marks · drawing &amp; color &nbsp;·&nbsp; ◎ Motion · animation &amp; interaction &nbsp;·&nbsp; ⬡ Systems · loops &amp; generative &nbsp;·&nbsp; ▦ Data · visualization &amp; data &nbsp;·&nbsp; ☽ Open · images, sound, 3D</p>
+
           <div class="station-list">
 
-            <div class="station">
+            <div class="station" id="station-marks" data-suit="marks">
               <div class="station-header">
                 <span class="station-name">Draw + Color</span>
                 <p class="station-desc">First marks, coordinates, shape, and color. The tools you open on day one.</p>
@@ -184,10 +232,19 @@
                   <div class="tool-actions"><a class="button primary" href="tools/rgb-hsb-color-lab/">Launch Tool</a></div>
                 <div class="card-pip-br"><span class="pip-num">VI</span><span class="pip-sym">✦</span></div>
                 </article>
+                <article class="tool-card suit-marks">
+                  <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">✦</span></div>
+                  <div class="tool-meta"><span class="pill session">✦ Marks · VII</span><span class="pill type">Interactive</span></div>
+                  <h3>Arc Visualizer</h3>
+                  <p class="tool-description">Adjust start angle, stop angle, mode, and size to see how arc() draws part of a circle. A small tool for one surprisingly tricky shape.</p>
+                  <div class="tag-row"><span class="tag">arc()</span><span class="tag">angles</span><span class="tag">shapes</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/arc-visualizer/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">✦</span></div>
+                </article>
               </div>
             </div>
 
-            <div class="station">
+            <div class="station" id="station-motion" data-suit="motion">
               <div class="station-header">
                 <span class="station-name">Motion + Interaction</span>
                 <p class="station-desc">Things that move, react, and listen. Variables in time, events in space.</p>
@@ -256,10 +313,37 @@
                   <div class="tool-actions"><a class="button primary" href="tools/event-handler-studio/">Launch Tool</a></div>
                 <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">◎</span></div>
                 </article>
+                <article class="tool-card suit-motion">
+                  <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">◎</span></div>
+                  <div class="tool-meta"><span class="pill session">◎ Motion · VIII</span><span class="pill type">Interactive</span></div>
+                  <h3>draw() Loop Visualizer</h3>
+                  <p class="tool-description">Slow draw() down, step one frame, and watch setup happen once while draw keeps ticking. The sketch is redrawn, not just drawn.</p>
+                  <div class="tag-row"><span class="tag">draw()</span><span class="tag">frames</span><span class="tag">time</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/draw-loop-visualizer/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">◎</span></div>
+                </article>
+                <article class="tool-card suit-motion">
+                  <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">◎</span></div>
+                  <div class="tool-meta"><span class="pill session">◎ Motion · IX</span><span class="pill type">Interactive</span></div>
+                  <h3>Bounce Logic Explainer</h3>
+                  <p class="tool-description">Predict the next frame, see the ghost position cross the wall, then watch speedX flip sign. Bounce logic becomes inevitable.</p>
+                  <div class="tag-row"><span class="tag">if</span><span class="tag">speed</span><span class="tag">bounce</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/bounce-logic-explainer/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">◎</span></div>
+                </article>
+                <article class="tool-card suit-motion">
+                  <div class="card-pip"><span class="pip-num">X</span><span class="pip-sym">◎</span></div>
+                  <div class="tool-meta"><span class="pill session">◎ Motion · X</span><span class="pill type">Interactive</span></div>
+                  <h3>Motion Playground</h3>
+                  <p class="tool-description">Map mouseX to size, hue, speed, opacity, rotation, stroke weight, or y position. Same input, completely different meanings.</p>
+                  <div class="tag-row"><span class="tag">map()</span><span class="tag">mouseX</span><span class="tag">interaction</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/motion-playground/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">◎</span></div>
+                </article>
               </div>
             </div>
 
-            <div class="station">
+            <div class="station" id="station-systems" data-suit="systems">
               <div class="station-header">
                 <span class="station-name">Patterns + Systems</span>
                 <p class="station-desc">Loops, repetition, noise, and functions. Where code starts feeling like a system.</p>
@@ -328,10 +412,46 @@
                   <div class="tool-actions"><a class="button primary" href="tools/polished-array-explorer/">Launch Tool</a></div>
                 <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">⬡</span></div>
                 </article>
+                <article class="tool-card suit-systems">
+                  <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">⬡</span></div>
+                  <div class="tool-meta"><span class="pill session">⬡ Systems · VIII</span><span class="pill type">Interactive</span></div>
+                  <h3>Grid Maker</h3>
+                  <p class="tool-description">Trace a nested loop through rows and columns, change shape types, and watch structure become a grid before variation enters.</p>
+                  <div class="tag-row"><span class="tag">nested loops</span><span class="tag">grid</span><span class="tag">trace</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/grid-maker/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">⬡</span></div>
+                </article>
+                <article class="tool-card suit-systems">
+                  <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">⬡</span></div>
+                  <div class="tool-meta"><span class="pill session">⬡ Systems · IX</span><span class="pill type">Interactive</span></div>
+                  <h3>Pattern Logic Explorer</h3>
+                  <p class="tool-description">Click conditions like i === j or (row + col) % 2 === 0 and see which cells become true. The loop stays the same; the logic changes.</p>
+                  <div class="tag-row"><span class="tag">conditions</span><span class="tag">grid</span><span class="tag">logic</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/pattern-logic-explorer/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">⬡</span></div>
+                </article>
+                <article class="tool-card suit-systems">
+                  <div class="card-pip"><span class="pip-num">X</span><span class="pip-sym">⬡</span></div>
+                  <div class="tool-meta"><span class="pill session">⬡ Systems · X</span><span class="pill type">Interactive</span></div>
+                  <h3>Noise Lab</h3>
+                  <p class="tool-description">Change noise scale, speed, grid size, and mapping to see how smooth values move through space and time.</p>
+                  <div class="tag-row"><span class="tag">noise()</span><span class="tag">scale</span><span class="tag">time</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/noise-lab/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">⬡</span></div>
+                </article>
+                <article class="tool-card suit-systems">
+                  <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">⬡</span></div>
+                  <div class="tool-meta"><span class="pill session">⬡ Systems · XI</span><span class="pill type">Async Lab</span></div>
+                  <h3>Pattern Systems Lab</h3>
+                  <p class="tool-description">A four-mode async lab for Session 3: grid structure, logic, random variation, and connected noise variation in one place.</p>
+                  <div class="tag-row"><span class="tag">loops</span><span class="tag">systems</span><span class="tag">async</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/pattern-systems-lab/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">⬡</span></div>
+                </article>
               </div>
             </div>
 
-            <div class="station">
+            <div class="station" id="station-data" data-suit="data">
               <div class="station-header">
                 <span class="station-name">Stories + Data</span>
                 <p class="station-desc">Data as material. Plan it, map it, draw it. Numbers that mean something personal.</p>
@@ -373,10 +493,19 @@
                   <div class="tool-actions"><a class="button primary" href="tools/interactive-shape-drawing-app/">Launch Tool</a></div>
                 <div class="card-pip-br"><span class="pip-num">IV</span><span class="pip-sym">▦</span></div>
                 </article>
+                <article class="tool-card suit-data">
+                  <div class="card-pip"><span class="pip-num">V</span><span class="pip-sym">▦</span></div>
+                  <div class="tool-meta"><span class="pill session">▦ Data · V</span><span class="pill type">Extension</span></div>
+                  <h3>API / loadJSON() Data Explorer</h3>
+                  <p class="tool-description">Edit a tiny JSON response and draw values from it. A beginner-friendly bridge from arrays to data that arrives from outside the sketch.</p>
+                  <div class="tag-row"><span class="tag">loadJSON()</span><span class="tag">API</span><span class="tag">data</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/api-loadjson-data-explorer/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">V</span><span class="pip-sym">▦</span></div>
+                </article>
               </div>
             </div>
 
-            <div class="station">
+            <div class="station" id="station-open" data-suit="open">
               <div class="station-header">
                 <span class="station-name">Remix + Media</span>
                 <p class="station-desc">Images, sound, games, 3D. Where the canvas opens up and anything feels possible.</p>
@@ -436,21 +565,32 @@
                   <div class="tool-actions"><a class="button primary" href="tools/webgl-3d-workshop/">Launch Tool</a></div>
                 <div class="card-pip-br"><span class="pip-num">VI</span><span class="pip-sym">☽</span></div>
                 </article>
+                <article class="tool-card suit-open">
+                  <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">☽</span></div>
+                  <div class="tool-meta"><span class="pill session">☽ Open · VII</span><span class="pill type">Capstone</span></div>
+                  <h3>Remix Machine</h3>
+                  <p class="tool-description">Load a starter or paste a sketch, then apply remix cards: breathe, listen, multiply, shift palette, drift, mirror, and more.</p>
+                  <div class="tag-row"><span class="tag">remix</span><span class="tag">starter code</span><span class="tag">showcase</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/remix-machine/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">☽</span></div>
+                </article>
               </div>
             </div>
 
-            <div class="station">
+            <div class="station" id="station-support" data-suit="support">
               <div class="station-header">
                 <span class="station-name">Debugging + Confidence</span>
                 <p class="station-desc">Practice recovering from broken code. Debugging is not failure; debugging is the work.</p>
               </div>
               <div class="tool-grid">
-                <article class="tool-card">
-                  <div class="tool-meta"><span class="pill session">Support</span><span class="pill type">Practice Lab</span></div>
+                <article class="tool-card suit-support">
+                  <div class="card-pip"><span class="pip-num">I</span><span class="pip-sym">⊕</span></div>
+                  <div class="tool-meta"><span class="pill session">⊕ Support · I</span><span class="pill type">Practice Lab</span></div>
                   <h3>Debugging Playground</h3>
                   <p class="tool-description">Fix five small broken sketches: missing braces, misspelled variables, assignment bugs, loop mistakes, and behavior surprises. Build confidence on purpose.</p>
                   <div class="tag-row"><span class="tag">debugging</span><span class="tag">errors</span><span class="tag">confidence</span></div>
                   <div class="tool-actions"><a class="button primary" href="tools/debugging-playground/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">I</span><span class="pip-sym">⊕</span></div>
                 </article>
               </div>
             </div>
@@ -465,9 +605,36 @@
               <h2>Seeds for live coding, remixing, and making your own</h2>
               <p>These are intentionally lean sketch seeds — a working p5.js sketch in a live editor, ready to change. Use them for live coding demos, pair extensions, challenge prompts, or as a student's first personal project. Open one, change one thing, see what happens. <a href="https://sustaining-boursin-d41.notion.site/3349950a7da981dd939ad16078343178" style="color:var(--accent)">Async learners: the Cohort Roadmap has explicit self-directed paths →</a></p>
             </div>
-            <div class="gallery-count">27 sketches</div>
+            <div class="gallery-count">30 sketches</div>
           </div>
           <div class="tool-grid">
+            <article class="tool-card suit-marks">
+              <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
+              <div class="tool-meta"><span class="pill session">✦ Marks · IX</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Code Postcard from My World</h3>
+              <p class="tool-description">A tiny visual hello made from background, shapes, and color. A direct remixable version of the Session 1 live-coding postcard.</p>
+              <div class="tag-row"><span class="tag">shapes</span><span class="tag">color</span><span class="tag">identity</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/code-postcard-from-my-world/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
+            </article>
+            <article class="tool-card suit-data">
+              <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">▦</span></div>
+              <div class="tool-meta"><span class="pill session">▦ Data · XI</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>One Dataset, Three Views</h3>
+              <p class="tool-description">The same array becomes bars, circles, or a color field. Press 1, 2, or 3 and feel data visualization as a design decision.</p>
+              <div class="tag-row"><span class="tag">arrays</span><span class="tag">data</span><span class="tag">mapping</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/one-dataset-three-views/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">▦</span></div>
+            </article>
+            <article class="tool-card suit-data">
+              <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">▦</span></div>
+              <div class="tool-meta"><span class="pill session">▦ Data · XII</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Classroom Grid / Intentional Array Seed</h3>
+              <p class="tool-description">A nested-loop grid where each cell reads a value from an array. The bridge from pattern to data story.</p>
+              <div class="tag-row"><span class="tag">nested loops</span><span class="tag">arrays</span><span class="tag">systems</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/classroom-grid-array-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">▦</span></div>
+            </article>
             <article class="tool-card suit-marks">
               <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">✦</span></div>
               <div class="tool-meta"><span class="pill session">✦ Marks · VII</span><span class="pill seed">Starter Sketch</span></div>
@@ -717,7 +884,7 @@
     </main>
 
     <footer class="site-footer">
-      Built for <a href="https://ccfest.rocks">CC Fest Coding Camp</a> by <a href="https://www.linkedin.com/in/edsaber/">Saber Khan</a>. Free, open, and remixable, because creative coding belongs to everyone.
+      Built for <a href="https://ccfest.rocks/coding-camp" target="_blank" rel="noopener">CC Fest Coding Camp</a> by <a href="https://bsky.app/profile/saberkhan.bsky.social" target="_blank" rel="noopener">Saber Khan</a>. Free, open, and remixable, because creative coding belongs to everyone.
       <br>
       <span style="margin-top:8px;display:inline-block">
         <a href="https://sustaining-boursin-d41.notion.site/CC-Fest-Creative-Coding-for-Connection-Expression-and-Learning-2016-now-2c79950a7da980128738c06677fedcb8">About CC Fest</a>

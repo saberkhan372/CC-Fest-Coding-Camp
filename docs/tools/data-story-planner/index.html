@@ -129,6 +129,7 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',-apple-syste
 <div class="container">
   <div class="page-topbar">
     <a href="../../index.html">← Back to tool library</a>
+    <a href="https://www.notion.so/Tool-Data-Story-Planner-2dd63821df8f49479dbef26cfaa1b709?pvs=21" target="_blank" rel="noopener">Notion Notes</a>
   </div>
   <header class="header">
     <div class="stage-tag">Session 4 — Before You Code</div>
@@ -188,12 +189,12 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',-apple-syste
     </div>
 
     <div class="code-panel" style="margin-bottom:16px">
-      <button class="copy-btn" onclick="copyTextFrom('mapperOutput', this)">Copy</button>
+      <button class="copy-btn" onclick="copyTextFrom('mapperOutput', this)">Copy Data</button>
       <pre id="mapperOutput"></pre>
     </div>
 
     <div class="code-panel">
-      <button class="copy-btn" onclick="copyTextFrom('codeOutput', this)">Copy</button>
+      <button class="copy-btn" onclick="copyTextFrom('codeOutput', this)">Copy Code</button>
       <pre id="codeOutput"></pre>
     </div>
   </div>
@@ -684,10 +685,12 @@ function updateCode() {
 // --- Copy ---
 function copyTextFrom(id, btn) {
   const text = document.getElementById(id).textContent.replace(/^\/\/ Copy this line into Data Mapper\n/, "");
+  const label = btn.dataset.label || btn.textContent;
+  btn.dataset.label = label;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(() => {
       btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy', 1500);
+      setTimeout(() => btn.textContent = label, 1500);
     });
   } else {
     window.prompt('Copy:', text);

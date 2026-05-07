@@ -5,10 +5,10 @@
   const tokens = Array.from(poster.querySelectorAll("[data-token]"));
   const dots = Array.from(poster.querySelectorAll(".poster-dot"));
   const tokenSets = [
-    ["x, y", "loop()", "remix +", "noise()", "p5.js", "draw()"],
-    ["mouseX", "map()", "color", "random()", "click", "shape"],
-    ["text()", "lerp()", "array[]", "frame", "save()", "move"],
-    ["fill()", "if / else", "rotate()", "data", "play", "voice"]
+    ["mouseX", "noise()", "circle()", "map()", "draw()", "fill()"],
+    ["lerp()", "random()", "translate()", "push()", "rotate()", "text()"],
+    ["frameCount", "dist()", "arc()", "colorMode()", "sin()", "rect()"],
+    ["setup()", "background()", "noStroke()", "if / else", "for loop", "HSB"]
   ];
   const palettes = [
     ["#d83a24", "#f5a800", "#e97a5f", "#2d6a4f", "#211f1c", "#5c4084"],
@@ -69,12 +69,66 @@
     });
   };
 
+  // Draggable tokens
+  const draggableTokens = Array.from(poster.querySelectorAll("[data-draggable]"));
+  draggableTokens.forEach((token) => {
+    let dragging = false;
+    let startX = 0, startY = 0, origLeft = 0, origTop = 0;
+
+    token.addEventListener("pointerdown", (e) => {
+      e.stopPropagation();
+      dragging = true;
+      token.setPointerCapture(e.pointerId);
+      const rect = poster.getBoundingClientRect();
+      const tokRect = token.getBoundingClientRect();
+      startX = e.clientX;
+      startY = e.clientY;
+      origLeft = tokRect.left - rect.left;
+      origTop = tokRect.top - rect.top;
+      token.style.position = "absolute";
+      token.style.left = origLeft + "px";
+      token.style.top = origTop + "px";
+      token.style.zIndex = "10";
+      token.style.transition = "none";
+      token.style.animation = "none";
+      token.style.transform = "none";
+      token.style.cursor = "grabbing";
+    });
+
+    token.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      e.stopPropagation();
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const rect = poster.getBoundingClientRect();
+      const newLeft = Math.max(0, Math.min(rect.width - token.offsetWidth, origLeft + dx));
+      const newTop = Math.max(0, Math.min(rect.height - token.offsetHeight, origTop + dy));
+      token.style.left = newLeft + "px";
+      token.style.top = newTop + "px";
+    });
+
+    token.addEventListener("pointerup", (e) => {
+      if (!dragging) return;
+      dragging = false;
+      token.style.zIndex = "";
+      token.style.cursor = "";
+      token.style.transition = "";
+      token.style.animation = "";
+      token.style.transform = "";
+    });
+  });
+
+  // Parallax tilt (only when not dragging a token)
   poster.addEventListener("pointermove", (event) => {
+    if (event.target.hasAttribute("data-draggable")) return;
     setPush([...tokens, ...dots], poster.getBoundingClientRect(), event.clientX, event.clientY);
   });
 
   poster.addEventListener("pointerleave", resetPush);
-  poster.addEventListener("click", remixPoster);
+  poster.addEventListener("click", (e) => {
+    if (e.target.hasAttribute("data-draggable")) return;
+    remixPoster();
+  });
   poster.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
@@ -95,6 +149,16 @@
       const isOpen = container.classList.toggle("is-open");
       header.setAttribute("aria-expanded", String(isOpen));
       header.setAttribute("aria-label", `${isOpen ? "Hide" : "Show"} ${label}`);
+      if (isOpen) {
+        // Re-animate cards and fix preview canvas sizes (were 0 while display:none)
+        grid.querySelectorAll(".tool-card").forEach((card, i) => {
+          card.style.animationDelay = `${i * 0.07}s`;
+          card.style.animation = "none";
+          card.offsetHeight;
+          card.style.animation = "";
+        });
+        requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+      }
     };
 
     header.addEventListener("click", toggle);
@@ -120,6 +184,20 @@
       label: `${label} tools`,
       openByDefault: index === 0
     });
+
+    const previewCount = 3;
+    const remaining = grid.querySelectorAll(".tool-card").length - previewCount;
+    if (remaining > 0) {
+      const trigger = document.createElement("div");
+      trigger.className = "station-peek-trigger";
+      trigger.setAttribute("aria-hidden", "true");
+      const btn = document.createElement("span");
+      btn.className = "station-peek-btn";
+      btn.textContent = `Show ${remaining} more tool${remaining !== 1 ? "s" : ""} →`;
+      trigger.appendChild(btn);
+      grid.appendChild(trigger);
+      trigger.addEventListener("click", () => header.click());
+    }
   });
 
   const starterSection = document.querySelector("#starter-sketches");
@@ -135,4 +213,55 @@
       openByDefault: false
     });
   }
+})();
+
+// Core tool badges
+(function() {
+  const CORE = new Set([
+    "coordinate-system-explorer", "shape-and-color-explorer", "text-basics-studio", "rgb-hsb-color-lab",
+    "animation-explorer", "framerate-visualizer", "map-explorer", "lerp-explorer", "if-else-decision-studio",
+    "for-loop-stepper", "rows-and-columns", "function-builder", "noise-vs-random-explorer",
+    "data-story-planner", "data-mapper", "csv-loadtable-data-explorer",
+    "image-remix-studio", "sound-shape-visualizer", "postcard-studio", "game-state-starter", "particle-system-seed"
+  ]);
+  document.querySelectorAll(".tool-card").forEach(card => {
+    const link = card.querySelector(".tool-actions a");
+    if (!link) return;
+    const slug = link.getAttribute("href").replace(/^tools\/|\/$/g, "");
+    if (!CORE.has(slug)) return;
+    card.dataset.core = "";
+    const meta = card.querySelector(".tool-meta");
+    if (meta) {
+      const pill = document.createElement("span");
+      pill.className = "pill core";
+      pill.textContent = "Core";
+      meta.appendChild(pill);
+    }
+  });
+})();
+
+// Suit filter bar
+(function() {
+  const filterBar = document.querySelector(".suit-filter-bar");
+  if (!filterBar) return;
+
+  const stations = document.querySelectorAll("#interactive-tools .station");
+  const sketchCards = document.querySelectorAll("#starter-sketches .tool-card");
+
+  filterBar.addEventListener("click", function(e) {
+    const btn = e.target.closest(".suit-btn");
+    if (!btn) return;
+
+    const filter = btn.dataset.filter;
+    filterBar.querySelectorAll(".suit-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    if (filter === "all") {
+      stations.forEach(s => s.hidden = false);
+      sketchCards.forEach(c => c.hidden = false);
+    } else {
+      stations.forEach(s => { s.hidden = s.dataset.suit !== filter; });
+      sketchCards.forEach(c => { c.hidden = !c.classList.contains("suit-" + filter); });
+    }
+  });
 })();
