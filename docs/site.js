@@ -182,7 +182,7 @@
       header,
       grid,
       label: `${label} tools`,
-      openByDefault: index === 0
+      openByDefault: false
     });
 
     const previewCount = 3;
