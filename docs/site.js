@@ -290,12 +290,164 @@
     filterBar.querySelectorAll(".suit-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
 
+    // Reset pathway filter and search
+    document.querySelector(".pathway-filter-bar")?.querySelectorAll(".pathway-btn")
+      .forEach(b => b.classList.toggle("active", b.dataset.pathwayFilter === "all"));
+    const s = document.querySelector(".tool-search"); if (s) s.value = "";
+
     if (filter === "all") {
       stations.forEach(s => s.hidden = false);
       sketchCards.forEach(c => c.hidden = false);
     } else {
       stations.forEach(s => { s.hidden = s.dataset.suit !== filter; });
       sketchCards.forEach(c => { c.hidden = !c.classList.contains("suit-" + filter); });
+    }
+  });
+})();
+
+// Difficulty badges
+(function() {
+  const BEGINNER = new Set([
+    "coordinate-system-explorer","interactive-shape-explorer","shape-and-color-explorer",
+    "text-basics-studio","variable-playground","rgb-hsb-color-lab","arc-visualizer",
+    "animation-explorer","framerate-visualizer","map-explorer","if-else-decision-studio",
+    "for-loop-stepper","rows-and-columns","simple-array-explorer","debugging-playground",
+    "bounce-logic-explainer","draw-loop-visualizer","event-handler-studio","layering-visualizer",
+    "function-builder","data-story-planner","data-mapper",
+    "draw-your-name-seed","code-postcard-from-my-world","bouncing-ball-starter",
+    "click-to-create-shapes","color-from-position","framecount-animation-seed",
+    "nested-loop-array-grid","function-creature-stamp","simple-collision-game-seed",
+    "data-self-portrait-seed","noise-walker","lerp-follow-seed"
+  ]);
+  const EXTENSION = new Set([
+    "lerp-explorer","transformations-explorer","motion-playground","dist-map-lerp-chain",
+    "trails-ghosting-studio","assets-preload-helper","push-pop-scope-visualizer",
+    "modulo-pattern-explorer","noise-vs-random-explorer","grid-maker","pattern-logic-explorer",
+    "noise-lab","modulo-framecount-studio","object-lifecycle-visualizer","polished-array-explorer",
+    "csv-loadtable-data-explorer","hover-data-chart","api-loadjson-data-explorer",
+    "interactive-shape-drawing-app","string-text-manipulation-studio","collision-detection-explorer",
+    "game-state-studio","gravity-acceleration-playground","atan2-rotation-studio",
+    "sine-cosine-motion-explorer","array-objects-debugger","readable-code-coach",
+    "hsb-color-seed","mouse-trail-drawing-seed","keyboard-controlled-character",
+    "dist-proximity-seed","sine-cosine-motion-seed","gravity-bounce-seed","angle-to-mouse-seed",
+    "sine-oscillation-seed","circular-motion-orbit-seed","tiny-csv-portrait-seed",
+    "array-position-dot-field","random-poetry-generator","random-sentence-generator",
+    "one-dataset-three-views","classroom-grid-array-seed","particle-emitter-seed",
+    "hover-data-bar-chart-seed","easing-types-comparison"
+  ]);
+  const CAPSTONE = new Set([
+    "class-inheritance-explorer","class-builder","pattern-systems-lab","agents-rules-playground",
+    "sound-shape-visualizer","image-remix-studio","pixel-webcam-remix-studio","postcard-studio",
+    "webgl-3d-workshop","remix-machine","particle-system-seed","game-state-starter",
+    "state-machine-game-seed","wander-agent-seed","mini-generative-poster-seed",
+    "image-grid-remix-seed","sound-pulse-seed","generative-tile-pattern-seed",
+    "class-creature-stamp-seed","arrays-in-motion","text-as-visual-seed"
+  ]);
+  const LABELS = { beginner: "Beginner", extension: "Extension", capstone: "Capstone" };
+
+  document.querySelectorAll(".tool-card").forEach(card => {
+    const link = card.querySelector(".tool-actions a");
+    if (!link) return;
+    const slug = link.getAttribute("href").replace(/^tools\/|\/$/g, "");
+    let level = BEGINNER.has(slug) ? "beginner" : EXTENSION.has(slug) ? "extension" : CAPSTONE.has(slug) ? "capstone" : null;
+    if (!level) return;
+    card.dataset.difficulty = level;
+    const meta = card.querySelector(".tool-meta");
+    if (meta) {
+      const pill = document.createElement("span");
+      pill.className = "pill " + level;
+      pill.textContent = LABELS[level];
+      meta.appendChild(pill);
+    }
+  });
+})();
+
+// Pathway filter bar
+(function() {
+  const pathwayBar = document.querySelector(".pathway-filter-bar");
+  if (!pathwayBar) return;
+
+  const allCards = document.querySelectorAll(".tool-card");
+  const stations = document.querySelectorAll("#interactive-tools .station");
+  const sketchSection = document.querySelector("#starter-sketches");
+
+  pathwayBar.addEventListener("click", function(e) {
+    const btn = e.target.closest(".pathway-btn");
+    if (!btn) return;
+
+    const filter = btn.dataset.pathwayFilter;
+    pathwayBar.querySelectorAll(".pathway-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    // Reset suit filter and search
+    document.querySelector(".suit-filter-bar")?.querySelectorAll(".suit-btn")
+      .forEach(b => b.classList.toggle("active", b.dataset.filter === "all"));
+    const s = document.querySelector(".tool-search"); if (s) s.value = "";
+
+    if (filter === "all") {
+      allCards.forEach(c => c.hidden = false);
+      stations.forEach(s => s.hidden = false);
+      if (sketchSection) sketchSection.hidden = false;
+    } else {
+      allCards.forEach(c => {
+        const pathways = (c.dataset.pathway || "").split(" ");
+        c.hidden = !pathways.includes(filter);
+      });
+      stations.forEach(s => {
+        const visible = Array.from(s.querySelectorAll(".tool-card")).some(c => !c.hidden);
+        s.hidden = !visible;
+        if (!s.hidden) s.classList.add("is-open");
+      });
+      if (sketchSection) {
+        const visible = Array.from(sketchSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
+        sketchSection.hidden = !visible;
+        if (!sketchSection.hidden) sketchSection.classList.add("is-open");
+      }
+    }
+  });
+})();
+
+// Live search
+(function() {
+  const searchInput = document.querySelector(".tool-search");
+  if (!searchInput) return;
+
+  const allCards = document.querySelectorAll(".tool-card");
+  const stations = document.querySelectorAll("#interactive-tools .station");
+  const sketchSection = document.querySelector("#starter-sketches");
+
+  searchInput.addEventListener("input", function() {
+    const q = this.value.trim().toLowerCase();
+
+    // Reset both filter bars
+    document.querySelector(".suit-filter-bar")?.querySelectorAll(".suit-btn")
+      .forEach(b => b.classList.toggle("active", b.dataset.filter === "all"));
+    document.querySelector(".pathway-filter-bar")?.querySelectorAll(".pathway-btn")
+      .forEach(b => b.classList.toggle("active", b.dataset.pathwayFilter === "all"));
+
+    if (!q) {
+      allCards.forEach(c => c.hidden = false);
+      stations.forEach(s => s.hidden = false);
+      if (sketchSection) sketchSection.hidden = false;
+      return;
+    }
+
+    allCards.forEach(c => {
+      const title = c.querySelector("h3")?.textContent.toLowerCase() || "";
+      const desc  = c.querySelector(".tool-description")?.textContent.toLowerCase() || "";
+      const tags  = Array.from(c.querySelectorAll(".tag")).map(t => t.textContent.toLowerCase()).join(" ");
+      c.hidden = !(title.includes(q) || desc.includes(q) || tags.includes(q));
+    });
+
+    stations.forEach(s => {
+      const visible = Array.from(s.querySelectorAll(".tool-card")).some(c => !c.hidden);
+      s.hidden = !visible;
+      if (!s.hidden) s.classList.add("is-open");
+    });
+    if (sketchSection) {
+      const visible = Array.from(sketchSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
+      sketchSection.hidden = !visible;
+      if (!sketchSection.hidden) sketchSection.classList.add("is-open");
     }
   });
 })();

@@ -607,11 +607,63 @@ a{color:inherit}
 
 /* ─── TOOL STATIONS ─── */
 
+/* Search box */
+.tool-search-wrap{margin-bottom:14px}
+.tool-search{
+  width:100%;
+  max-width:520px;
+  padding:9px 16px;
+  border-radius:999px;
+  border:1.5px solid var(--line);
+  background:#fff;
+  font-family:"DM Sans",system-ui,sans-serif;
+  font-size:14px;
+  color:var(--ink);
+  outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.tool-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,57,29,.1)}
+.tool-search::placeholder{color:var(--ink-light)}
+.tool-search::-webkit-search-cancel-button{-webkit-appearance:none}
+
+/* Pathway filter bar */
+.pathway-filter-bar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:16px;
+}
+.pathway-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 13px;
+  border-radius:999px;
+  border:1.5px solid var(--line);
+  background:transparent;
+  color:var(--ink-light);
+  font-family:"DM Mono",ui-monospace,monospace;
+  font-size:11.5px;
+  font-weight:500;
+  letter-spacing:.02em;
+  cursor:pointer;
+  transition:border-color .15s,color .15s,background .15s;
+  white-space:nowrap;
+}
+.pathway-btn:hover{border-color:var(--ink-light);color:var(--ink)}
+.pathway-btn[data-pathway-filter="all"].active{border-color:var(--ink);color:var(--ink)}
+.pathway-btn.active{border-color:#3d5a80;color:#3d5a80;background:rgba(61,90,128,.07)}
+
+/* Pairs-with link */
+.pairs-link{font-size:12px;color:var(--ink-light);margin-top:2px;margin-bottom:6px}
+.pairs-link a{color:var(--accent);text-decoration:none;font-weight:600}
+.pairs-link a:hover{text-decoration:underline}
+
 .suit-filter-bar{
   display:flex;
   flex-wrap:wrap;
   gap:8px;
-  margin-bottom:28px;
+  margin-bottom:8px;
 }
 .suit-btn{
   display:inline-flex;
@@ -1045,6 +1097,9 @@ a{color:inherit}
   border-color:transparent;
   box-shadow:0 1px 4px rgba(200,57,29,.25);
 }
+.pill.beginner{background:rgba(45,106,79,.09);color:#2d6a4f;border-color:rgba(45,106,79,.35)}
+.pill.extension{background:rgba(176,125,0,.09);color:#8c6400;border-color:rgba(176,125,0,.35)}
+.pill.capstone{background:rgba(92,64,132,.09);color:#5c4084;border-color:rgba(92,64,132,.35)}
 
 .tool-card[data-core]{
   border-color:rgba(200,57,29,.15);
