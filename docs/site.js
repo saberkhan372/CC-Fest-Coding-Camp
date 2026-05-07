@@ -241,7 +241,9 @@
     "data-story-planner", "data-mapper", "csv-loadtable-data-explorer",
     "image-remix-studio", "sound-shape-visualizer", "postcard-studio", "game-state-starter", "particle-system-seed",
     "push-pop-scope-visualizer", "layering-visualizer", "trails-ghosting-studio", "dist-map-lerp-chain",
-    "assets-preload-helper", "modulo-framecount-studio", "array-objects-debugger", "class-builder"
+    "assets-preload-helper", "modulo-framecount-studio", "array-objects-debugger", "class-builder",
+    "gravity-acceleration-playground", "atan2-rotation-studio", "sine-cosine-motion-explorer",
+    "object-lifecycle-visualizer", "hover-data-chart"
   ]);
   document.querySelectorAll(".tool-card").forEach(card => {
     const link = card.querySelector(".tool-actions a");
