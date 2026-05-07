@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CC Fest Coding Camp: Creative Coding Tools for p5.js</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css?v=20260506-expanded-tools">
+  <link rel="stylesheet" href="site.css?v=20260506-debug-card-previews">
   <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/">
   <meta property="og:title" content="CC Fest Coding Camp: Creative Coding Tools for p5.js">
-  <meta property="og:description" content="41 workshop tools and 30 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:description" content="49 workshop tools and 30 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
   <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="CC Fest Coding Camp: Creative Coding Tools for p5.js">
-  <meta name="twitter:description" content="41 workshop tools and 30 starter sketches for teaching p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:description" content="49 workshop tools and 30 starter sketches for teaching p5.js and creative coding. Free, open, and remixable.">
   <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -40,7 +40,7 @@
         <div class="hero-text">
           <p class="eyebrow">CC Fest Coding Camp · Free · Open to everyone</p>
           <h1>Tools for Creative Coding.</h1>
-          <p class="lede">41 workshop tools and 30 starter sketches for teaching <a href="https://p5js.org">p5.js</a> and creative coding. Built by <a href="https://www.linkedin.com/in/edsaber/" target="_blank" rel="noopener">Saber Khan</a> for <a href="https://ccfest.rocks/coding-camp" target="_blank" rel="noopener">CC Fest Coding Camp</a>. Free, open, remixable.</p>
+          <p class="lede">49 workshop tools and 30 starter sketches for teaching <a href="https://p5js.org">p5.js</a> and creative coding. Built by <a href="https://www.linkedin.com/in/edsaber/" target="_blank" rel="noopener">Saber Khan</a> for <a href="https://ccfest.rocks/coding-camp" target="_blank" rel="noopener">CC Fest Coding Camp</a>. Free, open, remixable.</p>
           <div class="hero-actions">
             <a class="button primary" href="#interactive-tools">Browse Tools</a>
             <a class="button secondary" href="#starter-sketches">Starter Sketches</a>
@@ -155,10 +155,10 @@
           <div class="gallery-header">
             <div class="gallery-header-copy">
               <div class="section-label bold-block">Workshop Tools</div>
-              <h2>41 workshop-ready tools for camp sessions</h2>
+              <h2>49 workshop-ready tools for camp sessions</h2>
               <p>Each tool focuses on one concept. Change a slider, see what happens. Use them for live demos, station rotations, or student-led exploration. Built for complete beginners and educators alike. <a href="https://sustaining-boursin-d41.notion.site/3339950a7da9819a9b73d83d97eaf2c2" style="color:var(--accent)">Teaching notes for each session →</a></p>
             </div>
-            <div class="gallery-count">41 tools</div>
+            <div class="gallery-count">49 tools</div>
           </div>
           <div class="suit-filter-bar" role="group" aria-label="Filter by suit">
             <button class="suit-btn active" data-filter="all">All</button>
@@ -167,8 +167,9 @@
             <button class="suit-btn" data-filter="systems">⬡ Systems</button>
             <button class="suit-btn" data-filter="data">▦ Data</button>
             <button class="suit-btn" data-filter="open">☽ Open</button>
+            <button class="suit-btn" data-filter="support">⊕ Support</button>
           </div>
-          <p class="suit-legend">✦ Marks · drawing &amp; color &nbsp;·&nbsp; ◎ Motion · animation &amp; interaction &nbsp;·&nbsp; ⬡ Systems · loops &amp; generative &nbsp;·&nbsp; ▦ Data · visualization &amp; data &nbsp;·&nbsp; ☽ Open · images, sound, 3D</p>
+          <p class="suit-legend">✦ Marks · drawing &amp; color &nbsp;·&nbsp; ◎ Motion · animation &amp; interaction &nbsp;·&nbsp; ⬡ Systems · loops &amp; generative &nbsp;·&nbsp; ▦ Data · visualization &amp; data &nbsp;·&nbsp; ☽ Open · images, sound, 3D &nbsp;·&nbsp; ⊕ Support · debugging &amp; confidence</p>
 
           <div class="station-list">
 
@@ -247,7 +248,7 @@
                   <h3>Layering Visualizer</h3>
                   <p class="tool-description">In p5.js, shapes drawn later appear on top. Reorder layers with the arrows and watch the stacking change — then copy the generated draw() code.</p>
                   <div class="tag-row"><span class="tag">draw order</span><span class="tag">layers</span><span class="tag">painter's algorithm</span><span class="tag">overlap</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/layering-visualizer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/layering-visualizer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da9815880b4d714aa59c204" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">✦</span></div>
                 </article>
                 <article class="tool-card suit-marks">
@@ -256,7 +257,7 @@
                   <h3>push() / pop() Scope Visualizer</h3>
                   <p class="tool-description">See how push() and pop() create isolated "bubbles" of style and transformation. Toggle WITH/WITHOUT push/pop and step through calls to watch state leak — or not.</p>
                   <div class="tag-row"><span class="tag">push()</span><span class="tag">pop()</span><span class="tag">state</span><span class="tag">transforms</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/push-pop-scope-visualizer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/push-pop-scope-visualizer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981439ef8c5218aec3513" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
                 </article>
               </div>
@@ -364,7 +365,7 @@
                   <h3>dist() → map() → lerpColor() Chain</h3>
                   <p class="tool-description">See how three functions form a pipeline: distance becomes a normalized value, which becomes a color. Any quantity can flow through this chain.</p>
                   <div class="tag-row"><span class="tag">dist()</span><span class="tag">map()</span><span class="tag">lerpColor()</span><span class="tag">pipeline</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/dist-map-lerp-chain/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/dist-map-lerp-chain/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da98122b203fc49bd25ba49" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">◎</span></div>
                 </article>
                 <article class="tool-card suit-motion">
@@ -373,7 +374,7 @@
                   <h3>Trails / Ghosting Studio</h3>
                   <p class="tool-description">Control ghost trails with a semi-transparent background in draw(). Drag the alpha slider to make trails linger or vanish, then switch between Mouse, Bouncing Ball, and Orbital modes.</p>
                   <div class="tag-row"><span class="tag">trails</span><span class="tag">alpha</span><span class="tag">background()</span><span class="tag">motion</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/trails-ghosting-studio/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/trails-ghosting-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da98112854dfd3535e31d7c" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">◎</span></div>
                 </article>
                 <article class="tool-card suit-motion">
@@ -382,7 +383,7 @@
                   <h3>Assets + preload() Helper</h3>
                   <p class="tool-description">Preview an image URL at any position, size, and rotation. Adjust the sliders, then copy the ready-to-paste preload() and image() scaffold for your own sketch.</p>
                   <div class="tag-row"><span class="tag">preload()</span><span class="tag">image()</span><span class="tag">assets</span><span class="tag">scaffold</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/assets-preload-helper/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/assets-preload-helper/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981d0a591f91c786dafe6" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">XIII</span><span class="pip-sym">◎</span></div>
                 </article>
               </div>
@@ -499,7 +500,7 @@
                   <h3>Modulo + frameCount Studio</h3>
                   <p class="tool-description">Watch four patterns — Blink, Pulse, Cooldown Bar, and Grid Cycle — all driven by frameCount % N simultaneously. Change N and see timing relationships shift across patterns.</p>
                   <div class="tag-row"><span class="tag">modulo</span><span class="tag">frameCount</span><span class="tag">timing</span><span class="tag">patterns</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/modulo-framecount-studio/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/modulo-framecount-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981da933bd61ff2dd8393" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">⬡</span></div>
                 </article>
               </div>
@@ -634,7 +635,7 @@
                   <h3>Class Builder</h3>
                   <p class="tool-description">Fill in the form, check the methods you need, and watch a complete ES6 class generate live. Copy the scaffold directly into your sketch and start adding behavior.</p>
                   <div class="tag-row"><span class="tag">class</span><span class="tag">OOP</span><span class="tag">constructor</span><span class="tag">methods</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/class-builder/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/class-builder/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da98167b239f37de7f72ae8" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">☽</span></div>
                 </article>
               </div>
@@ -661,7 +662,7 @@
                   <h3>Array-of-Objects Debugger</h3>
                   <p class="tool-description">Watch 8 bouncing balls as live JavaScript objects. Click any ball to inspect its properties frame-by-frame, step through the loop visually, or pause time to read the state mid-flight.</p>
                   <div class="tag-row"><span class="tag">arrays</span><span class="tag">objects</span><span class="tag">debugging</span><span class="tag">for loop</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/array-objects-debugger/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/array-objects-debugger/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981c69cedc1b94da89d6e" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">II</span><span class="pip-sym">⊕</span></div>
                 </article>
               </div>
@@ -971,7 +972,7 @@
       </span>
     </footer>
   </div>
-  <script src="preview-sketches.js?v=20260505-artifact-media-state"></script>
-  <script src="site.js?v=20260506-three-card-notion"></script>
+  <script src="preview-sketches.js?v=20260506-debug-card-previews"></script>
+  <script src="site.js?v=20260506-debug-card-previews"></script>
 </body>
 </html>
