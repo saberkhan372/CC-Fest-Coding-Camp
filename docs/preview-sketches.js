@@ -7,11 +7,16 @@
     "variable-playground": { family: "variable", label: "Variables" },
     "rgb-hsb-color-lab": { family: "colorLab", label: "Color Lab" },
     "arc-visualizer": { family: "shapes", label: "Arc" },
+    "layering-visualizer": { family: "layering", label: "Layers" },
+    "push-pop-scope-visualizer": { family: "scope", label: "Scope" },
     "animation-explorer": { family: "bounce", label: "Motion" },
     "framerate-visualizer": { family: "frameRate", label: "FPS" },
     "draw-loop-visualizer": { family: "frameRate", label: "draw()" },
     "bounce-logic-explainer": { family: "bounce", label: "Bounce" },
     "motion-playground": { family: "mapping", label: "Motion Map" },
+    "dist-map-lerp-chain": { family: "distPipeline", label: "Pipeline" },
+    "trails-ghosting-studio": { family: "ghostTrail", label: "Trails" },
+    "assets-preload-helper": { family: "assetLoader", label: "Assets" },
     "transformations-explorer": { family: "transform", label: "Transforms" },
     "map-explorer": { family: "mapping", label: "Map" },
     "lerp-explorer": { family: "lerpSeed", label: "lerp()" },
@@ -25,6 +30,7 @@
     "pattern-logic-explorer": { family: "grid", label: "Logic" },
     "noise-lab": { family: "noiseRandom", label: "Noise Lab" },
     "pattern-systems-lab": { family: "grid", label: "Systems" },
+    "modulo-framecount-studio": { family: "moduloFrame", label: "Modulo Time" },
     "function-builder": { family: "function", label: "Functions" },
     "noise-vs-random-explorer": { family: "noiseRandom", label: "Noise" },
     "data-story-planner": { family: "planner", label: "Planning" },
@@ -40,7 +46,9 @@
     "pixel-webcam-remix-studio": { family: "pixels", label: "Pixels" },
     "postcard-studio": { family: "postcard", label: "Postcard" },
     "remix-machine": { family: "poster", label: "Remix" },
+    "class-builder": { family: "classBuilder", label: "Class" },
     "debugging-playground": { family: "function", label: "Debug" },
+    "array-objects-debugger": { family: "objectDebugger", label: "Object Debug" },
     "mouse-trail-drawing-seed": { family: "trailSeed", label: "Trail" },
     "draw-your-name-seed": { family: "nameSeed", label: "Name" },
     "code-postcard-from-my-world": { family: "postcard", label: "Postcard" },
@@ -252,6 +260,43 @@
         }
         break;
       }
+      case "layering": {
+        drawGrid(ctx, w, h, 22, "rgba(61,90,128,.06)");
+        const order = hover ? [2, 0, 1] : [0, 1, 2];
+        const layers = [
+          { x: w * 0.38, y: h * 0.48, r: 28, c: "rgba(61,90,128,.78)", kind: "circle" },
+          { x: w * 0.52, y: h * 0.44, r: 26, c: "rgba(224,122,95,.78)", kind: "square" },
+          { x: w * 0.48, y: h * 0.6, r: 30, c: "rgba(129,178,154,.78)", kind: "tri" }
+        ];
+        order.forEach((index, depth) => {
+          const layer = layers[index];
+          ctx.fillStyle = layer.c;
+          ctx.strokeStyle = `rgba(44,42,38,${0.08 + depth * 0.08})`;
+          ctx.lineWidth = 2;
+          if (layer.kind === "circle") {
+            ctx.beginPath();
+            ctx.arc(layer.x, layer.y, layer.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          } else if (layer.kind === "square") {
+            roundedRect(ctx, layer.x - layer.r, layer.y - layer.r, layer.r * 2, layer.r * 2, 12);
+            ctx.fill();
+            ctx.stroke();
+          } else {
+            ctx.beginPath();
+            ctx.moveTo(layer.x, layer.y - layer.r);
+            ctx.lineTo(layer.x + layer.r, layer.y + layer.r * 0.7);
+            ctx.lineTo(layer.x - layer.r, layer.y + layer.r * 0.7);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+          }
+        });
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText(hover ? "last drawn = front" : "draw order", 14, h - 12);
+        break;
+      }
       case "textBasics": {
         drawGrid(ctx, w, h, 24, "rgba(61,90,128,.08)");
         const x = 22 + px * (w - 44);
@@ -311,6 +356,35 @@
         }
         break;
       }
+      case "scope": {
+        const leak = hover || px > 0.62;
+        const cards = [
+          { label: "push()", x: 20, y: 26, c: "#3d5a80" },
+          { label: "draw", x: w * 0.38, y: h * 0.42, c: "#e07a5f" },
+          { label: "pop()", x: w - 74, y: h - 48, c: "#81b29a" }
+        ];
+        ctx.strokeStyle = leak ? "rgba(224,122,95,.55)" : "rgba(61,90,128,.26)";
+        ctx.setLineDash(leak ? [4, 5] : []);
+        ctx.lineWidth = 2;
+        roundedRect(ctx, 14, 14, w - 28, h - 28, 16);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        cards.forEach((card, i) => {
+          ctx.fillStyle = i === 1 && leak ? "#e07a5f" : card.c;
+          roundedRect(ctx, card.x, card.y, 54, 26, 9);
+          ctx.fill();
+          ctx.fillStyle = "#fff";
+          ctx.font = "700 9px DM Mono, monospace";
+          ctx.fillText(card.label, card.x + 8, card.y + 17);
+        });
+        ctx.fillStyle = leak ? "rgba(224,122,95,.18)" : "rgba(129,178,154,.18)";
+        roundedRect(ctx, w * 0.43, h * 0.5, 58, 34, 10);
+        ctx.fill();
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText(leak ? "state leaks" : "state scoped", 14, h - 12);
+        break;
+      }
       case "bounce": {
         ctx.fillStyle = "#fff";
         roundedRect(ctx, 16, 14, w - 32, h - 28, 14);
@@ -363,6 +437,27 @@
         ctx.fillText(`${fps} fps`, 18, 30);
         break;
       }
+      case "moduloFrame": {
+        const cycle = hover ? 8 : 12;
+        const frame = Math.floor(t * 18);
+        const remainder = frame % cycle;
+        ctx.fillStyle = "#fff";
+        roundedRect(ctx, 16, 14, w - 32, h - 28, 14);
+        ctx.fill();
+        for (let i = 0; i < cycle; i++) {
+          const angle = (i / cycle) * Math.PI * 2 - Math.PI / 2;
+          const x = w * 0.5 + Math.cos(angle) * 38;
+          const y = h * 0.54 + Math.sin(angle) * 38;
+          ctx.fillStyle = i === remainder ? "#e07a5f" : "rgba(61,90,128,.18)";
+          ctx.beginPath();
+          ctx.arc(x, y, i === remainder ? 8 : 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = "#3d5a80";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText(`frame % ${cycle} = ${remainder}`, 18, 28);
+        break;
+      }
       case "transform": {
         drawGrid(ctx, w, h, 22, "rgba(61,90,128,.06)");
         ctx.save();
@@ -400,6 +495,36 @@
         ctx.beginPath();
         ctx.arc(w * 0.68, h * 0.38, size, 0, Math.PI * 2);
         ctx.fill();
+        break;
+      }
+      case "distPipeline": {
+        const sourceX = 22 + px * (w - 44);
+        const sourceY = 20 + py * (h - 40);
+        const targetX = w * 0.68;
+        const targetY = h * 0.5;
+        const dx = sourceX - targetX;
+        const dy = sourceY - targetY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDist = Math.sqrt(w * w + h * h) * 0.55;
+        const amt = clamp(1 - dist / maxDist, 0, 1);
+        ctx.strokeStyle = "rgba(61,90,128,.22)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(sourceX, sourceY);
+        ctx.lineTo(targetX, targetY);
+        ctx.stroke();
+        const hue = 210 - amt * 185;
+        ctx.fillStyle = `hsl(${hue} 70% ${52 + amt * 8}%)`;
+        ctx.beginPath();
+        ctx.arc(targetX, targetY, 14 + amt * 24, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(sourceX, sourceY, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText(`amt ${amt.toFixed(2)}`, 14, h - 12);
         break;
       }
       case "threshold": {
@@ -609,6 +734,24 @@
         }
         break;
       }
+      case "ghostTrail": {
+        const alpha = hover ? 0.08 : 0.22;
+        ctx.fillStyle = `rgba(255,253,249,${alpha})`;
+        ctx.fillRect(0, 0, w, h);
+        for (let i = 0; i < 18; i++) {
+          const age = i / 17;
+          const x = 28 + age * (w - 56);
+          const y = h * 0.52 + Math.sin(t * 2.3 - age * 4.2) * (22 + py * 12);
+          ctx.fillStyle = `rgba(61,90,128,${0.08 + age * 0.48})`;
+          ctx.beginPath();
+          ctx.arc(x, y, 6 + age * 8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = "#e07a5f";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText(hover ? "alpha 8" : "alpha 22", 14, h - 12);
+        break;
+      }
       case "trailSeed": {
         const targetX = 24 + px * (w - 48);
         const targetY = 22 + py * (h - 44);
@@ -659,6 +802,58 @@
           roundedRect(ctx, node.x - 18 + dx, node.y - 14 + dy, 36, 28, 10);
           ctx.fill();
         });
+        break;
+      }
+      case "classBuilder": {
+        ctx.fillStyle = "#fff";
+        roundedRect(ctx, 18, 16, w - 36, h - 32, 14);
+        ctx.fill();
+        const methodOn = hover || Math.sin(t * 1.6) > -0.2;
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "800 12px DM Mono, monospace";
+        ctx.fillText("class Dot {", 30, 36);
+        ctx.font = "700 10px DM Mono, monospace";
+        const rows = ["constructor()", "update()", "display()"];
+        rows.forEach((row, i) => {
+          const y = 56 + i * 20;
+          ctx.fillStyle = i === 1 && methodOn ? "rgba(224,122,95,.16)" : "rgba(61,90,128,.08)";
+          roundedRect(ctx, 30, y - 12, w - 70, 17, 6);
+          ctx.fill();
+          ctx.fillStyle = i === 1 && methodOn ? "#c8391d" : "#3d5a80";
+          ctx.fillText(row, 38, y);
+        });
+        ctx.fillStyle = "#81b29a";
+        ctx.beginPath();
+        ctx.arc(w - 42, h - 34, 13 + Math.sin(t * 2) * 2, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+      }
+      case "objectDebugger": {
+        const selected = Math.floor((px * 8 + t * 0.4) % 8);
+        for (let i = 0; i < 8; i++) {
+          const col = i % 4;
+          const row = Math.floor(i / 4);
+          const x = 24 + col * ((w - 48) / 3);
+          const y = 28 + row * ((h - 62) / 1);
+          const bounce = Math.sin(t * 2 + i) * 6;
+          ctx.fillStyle = i === selected ? "#e07a5f" : "rgba(61,90,128,.72)";
+          ctx.beginPath();
+          ctx.arc(x, y + bounce, i === selected ? 11 : 8, 0, Math.PI * 2);
+          ctx.fill();
+          if (i === selected) {
+            ctx.strokeStyle = "rgba(224,122,95,.42)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(x, y + bounce, 17, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+        ctx.fillStyle = "rgba(255,255,255,.86)";
+        roundedRect(ctx, w - 98, h - 42, 82, 28, 8);
+        ctx.fill();
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText(`balls[${selected}]`, w - 88, h - 25);
         break;
       }
       case "stampSeed": {
@@ -773,6 +968,33 @@
         ctx.fillStyle = "rgba(255,255,255,.68)";
         ctx.fillRect(w * 0.68, 30, 8, h - 60);
         ctx.fillRect(w * 0.76, 30, 5, h - 60);
+        break;
+      }
+      case "assetLoader": {
+        ctx.fillStyle = "#fff";
+        roundedRect(ctx, 18, 16, w - 36, h - 32, 14);
+        ctx.fill();
+        ctx.save();
+        ctx.translate(42 + px * (w - 84), h * 0.52);
+        ctx.rotate((px - 0.5) * 0.7 + Math.sin(t) * 0.08);
+        const size = 30 + py * 22;
+        ctx.fillStyle = "#f2cc8f";
+        roundedRect(ctx, -size * 0.7, -size * 0.5, size * 1.4, size, 10);
+        ctx.fill();
+        ctx.fillStyle = "#3d5a80";
+        ctx.beginPath();
+        ctx.arc(-size * 0.25, -size * 0.08, 5, 0, Math.PI * 2);
+        ctx.arc(size * 0.25, -size * 0.08, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#2c2a26";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, size * 0.06, size * 0.24, 0, Math.PI);
+        ctx.stroke();
+        ctx.restore();
+        ctx.fillStyle = "#2c2a26";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText("preload() + image()", 18, h - 12);
         break;
       }
       case "pixels": {

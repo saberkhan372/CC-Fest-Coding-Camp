@@ -636,6 +636,7 @@ a{color:inherit}
 .suit-btn[data-filter="systems"].active,.suit-btn[data-filter="systems"]:hover{border-color:#2d6a4f;color:#2d6a4f;background:rgba(45,106,79,.07)}
 .suit-btn[data-filter="data"].active,.suit-btn[data-filter="data"]:hover{border-color:#1a5fa0;color:#1a5fa0;background:rgba(26,95,160,.07)}
 .suit-btn[data-filter="open"].active,.suit-btn[data-filter="open"]:hover{border-color:#5c4084;color:#5c4084;background:rgba(92,64,132,.07)}
+.suit-btn[data-filter="support"].active,.suit-btn[data-filter="support"]:hover{border-color:#6b6560;color:#6b6560;background:rgba(107,101,96,.07)}
 .suit-btn[data-filter="all"].active{border-color:var(--ink);color:var(--ink)}
 
 .suit-legend{
@@ -758,6 +759,10 @@ a{color:inherit}
 /* Solo station (only 1 card): don't create empty column gaps */
 .station[data-solo] .tool-grid{
   grid-template-columns:minmax(0,380px);
+}
+
+#station-support .tool-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
 }
 
 .station-peek-btn{
@@ -1132,6 +1137,7 @@ a{color:inherit}
   .gallery-section{padding:22px}
   .tool-grid,
   .sequence{grid-template-columns:1fr}
+  #station-support .tool-grid{grid-template-columns:1fr}
   .hero-steps{grid-template-columns:repeat(2,1fr)}
   .gallery-header,
   .site-topbar{display:block}
