@@ -71,8 +71,8 @@
             </ul>
           </aside>
           <aside class="hero-credit" aria-label="How these tools were made">
-            <h2>How these tools were made.</h2>
-            <p>These tools and sketches were made thanks to the help of LLMs, including Claude and ChatGPT, testing with my students and classes, and learning from members of the community, including Dan Shiffman, Lauren Lee McCarthy, Casey Reas, Kevin Workman, Patt Vira, Allison Parrish, Jeff Thompson, Tim Rodenbröker, p5.js and Processing Foundation materials, and the many people that have shared their teaching materials.</p>
+            <h2>How these tools were made. <button class="credits-toggle" aria-expanded="false" aria-controls="credits-body">See credits ↓</button></h2>
+            <p id="credits-body" hidden>These tools and sketches were made thanks to the help of LLMs, including Claude and ChatGPT, testing with my students and classes, and learning from members of the community, including Dan Shiffman, Lauren Lee McCarthy, Casey Reas, Kevin Workman, Patt Vira, Allison Parrish, Jeff Thompson, Tim Rodenbröker, p5.js and Processing Foundation materials, and the many people that have shared their teaching materials.</p>
           </aside>
         </div>
       </div>
@@ -609,33 +609,6 @@
           </div>
           <div class="tool-grid">
             <article class="tool-card suit-marks">
-              <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
-              <div class="tool-meta"><span class="pill session">✦ Marks · IX</span><span class="pill seed">Starter Sketch</span></div>
-              <h3>Code Postcard from My World</h3>
-              <p class="tool-description">A tiny visual hello made from background, shapes, and color. A direct remixable version of the Session 1 live-coding postcard.</p>
-              <div class="tag-row"><span class="tag">shapes</span><span class="tag">color</span><span class="tag">identity</span></div>
-              <div class="tool-actions"><a class="button primary" href="tools/code-postcard-from-my-world/">Open Sketch</a></div>
-            <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
-            </article>
-            <article class="tool-card suit-data">
-              <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">▦</span></div>
-              <div class="tool-meta"><span class="pill session">▦ Data · XI</span><span class="pill seed">Starter Sketch</span></div>
-              <h3>One Dataset, Three Views</h3>
-              <p class="tool-description">The same array becomes bars, circles, or a color field. Press 1, 2, or 3 and feel data visualization as a design decision.</p>
-              <div class="tag-row"><span class="tag">arrays</span><span class="tag">data</span><span class="tag">mapping</span></div>
-              <div class="tool-actions"><a class="button primary" href="tools/one-dataset-three-views/">Open Sketch</a></div>
-            <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">▦</span></div>
-            </article>
-            <article class="tool-card suit-data">
-              <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">▦</span></div>
-              <div class="tool-meta"><span class="pill session">▦ Data · XII</span><span class="pill seed">Starter Sketch</span></div>
-              <h3>Classroom Grid / Intentional Array Seed</h3>
-              <p class="tool-description">A nested-loop grid where each cell reads a value from an array. The bridge from pattern to data story.</p>
-              <div class="tag-row"><span class="tag">nested loops</span><span class="tag">arrays</span><span class="tag">systems</span></div>
-              <div class="tool-actions"><a class="button primary" href="tools/classroom-grid-array-seed/">Open Sketch</a></div>
-            <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">▦</span></div>
-            </article>
-            <article class="tool-card suit-marks">
               <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">✦</span></div>
               <div class="tool-meta"><span class="pill session">✦ Marks · VII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Draw Your Name / Initials Seed</h3>
@@ -652,6 +625,15 @@
               <div class="tag-row"><span class="tag">HSB</span><span class="tag">color</span><span class="tag">map()</span></div>
               <div class="tool-actions"><a class="button primary" href="tools/hsb-color-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">✦</span></div>
+            </article>
+            <article class="tool-card suit-marks">
+              <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
+              <div class="tool-meta"><span class="pill session">✦ Marks · IX</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Code Postcard from My World</h3>
+              <p class="tool-description">A tiny visual hello made from background, shapes, and color. A direct remixable version of the Session 1 live-coding postcard.</p>
+              <div class="tag-row"><span class="tag">shapes</span><span class="tag">color</span><span class="tag">identity</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/code-postcard-from-my-world/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
             </article>
             <article class="tool-card suit-motion">
               <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">◎</span></div>
@@ -877,6 +859,24 @@
               <div class="tag-row"><span class="tag">text</span><span class="tag">motion</span><span class="tag">arrays</span></div>
               <div class="tool-actions"><a class="button primary" href="tools/arrays-in-motion/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">▦</span></div>
+            </article>
+            <article class="tool-card suit-data">
+              <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">▦</span></div>
+              <div class="tool-meta"><span class="pill session">▦ Data · XI</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>One Dataset, Three Views</h3>
+              <p class="tool-description">The same array becomes bars, circles, or a color field. Press 1, 2, or 3 and feel data visualization as a design decision.</p>
+              <div class="tag-row"><span class="tag">arrays</span><span class="tag">data</span><span class="tag">mapping</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/one-dataset-three-views/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">▦</span></div>
+            </article>
+            <article class="tool-card suit-data">
+              <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">▦</span></div>
+              <div class="tool-meta"><span class="pill session">▦ Data · XII</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Classroom Grid / Intentional Array Seed</h3>
+              <p class="tool-description">A nested-loop grid where each cell reads a value from an array. The bridge from pattern to data story.</p>
+              <div class="tag-row"><span class="tag">nested loops</span><span class="tag">arrays</span><span class="tag">systems</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/classroom-grid-array-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">▦</span></div>
             </article>
           </div>
         </section>

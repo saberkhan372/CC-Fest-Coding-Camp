@@ -187,17 +187,20 @@
 
     const previewCount = 3;
     const remaining = grid.querySelectorAll(".tool-card").length - previewCount;
-    if (remaining > 0) {
-      const trigger = document.createElement("div");
-      trigger.className = "station-peek-trigger";
-      trigger.setAttribute("aria-hidden", "true");
-      const btn = document.createElement("span");
-      btn.className = "station-peek-btn";
-      btn.textContent = `Show ${remaining} more tool${remaining !== 1 ? "s" : ""} →`;
-      trigger.appendChild(btn);
-      grid.appendChild(trigger);
-      trigger.addEventListener("click", () => header.click());
+    if (remaining <= 0) {
+      // Solo station (≤3 cards): mark it so CSS can remove the column gap
+      station.setAttribute("data-solo", "");
+      return;
     }
+    const trigger = document.createElement("div");
+    trigger.className = "station-peek-trigger";
+    trigger.setAttribute("aria-hidden", "true");
+    const btn = document.createElement("span");
+    btn.className = "station-peek-btn";
+    btn.textContent = `Show ${remaining} more ${label} tool${remaining !== 1 ? "s" : ""} →`;
+    trigger.appendChild(btn);
+    grid.appendChild(trigger);
+    trigger.addEventListener("click", () => header.click());
   });
 
   const starterSection = document.querySelector("#starter-sketches");
@@ -212,6 +215,20 @@
       label: "starter sketches",
       openByDefault: false
     });
+    // Add peek trigger for starter sketches (same pattern as stations)
+    const sketchPreview = 3;
+    const sketchRemaining = starterGrid.querySelectorAll(".tool-card").length - sketchPreview;
+    if (sketchRemaining > 0) {
+      const trigger = document.createElement("div");
+      trigger.className = "station-peek-trigger";
+      trigger.setAttribute("aria-hidden", "true");
+      const btn = document.createElement("span");
+      btn.className = "station-peek-btn";
+      btn.textContent = `Show ${sketchRemaining} more starter sketch${sketchRemaining !== 1 ? "es" : ""} →`;
+      trigger.appendChild(btn);
+      starterGrid.appendChild(trigger);
+      trigger.addEventListener("click", () => starterHeader.click());
+    }
   }
 })();
 
@@ -237,6 +254,19 @@
       pill.textContent = "Core";
       meta.appendChild(pill);
     }
+  });
+})();
+
+// Credits toggle
+(function() {
+  const btn = document.querySelector(".credits-toggle");
+  const body = document.getElementById("credits-body");
+  if (!btn || !body) return;
+  btn.addEventListener("click", () => {
+    const expanded = btn.getAttribute("aria-expanded") === "true";
+    btn.setAttribute("aria-expanded", String(!expanded));
+    body.hidden = expanded;
+    btn.textContent = expanded ? "See credits ↓" : "Hide credits ↑";
   });
 })();
 

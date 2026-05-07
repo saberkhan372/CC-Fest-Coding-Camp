@@ -1798,7 +1798,7 @@ ${code}
 
         <header class="sketch-header">
           <div class="sketch-meta">
-            <span class="pill session">${seed.session}</span>
+            <span class="pill session">${({"Session 1":"✦ Marks · ","Session 2":"◎ Motion · ","Session 3":"⬡ Systems · ","Session 4":"▦ Data · ","Session 5":"☽ Open · "})[seed.session] || ""}${seed.session}</span>
             <span class="pill type">Starter Sketch</span>
           </div>
           <h1>${seed.title}</h1>
@@ -1824,6 +1824,7 @@ ${code}
                 <button class="edbtn edbtn-run" id="run-button" type="button">▶ Run</button>
                 <button class="edbtn edbtn-stop" id="stop-button" type="button">■ Stop</button>
                 <button class="edbtn edbtn-reset" id="reset-button" type="button">↺ Reset</button>
+                <button class="edbtn edbtn-copy" id="copy-code-button" type="button">⎘ Copy Code</button>
                 <button class="edbtn edbtn-p5" id="p5-export-button" type="button">↗ p5 Editor</button>
               </div>
             </div>
@@ -1881,6 +1882,7 @@ ${code}
     const runButton = document.getElementById("run-button");
     const stopButton = document.getElementById("stop-button");
     const resetButton = document.getElementById("reset-button");
+    const copyCodeButton = document.getElementById("copy-code-button");
     const p5ExportButton = document.getElementById("p5-export-button");
     const statusEl = document.getElementById("run-status");
     const liveBadge = document.getElementById("live-badge");
@@ -1926,6 +1928,18 @@ ${code}
       editor.value = initialCode;
       runCurrentCode();
     });
+    if (copyCodeButton) {
+      copyCodeButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(editor.value);
+          copyCodeButton.textContent = "✓ Copied";
+          setTimeout(() => { copyCodeButton.textContent = "⎘ Copy Code"; }, 1500);
+        } catch (e) {
+          editor.focus();
+          editor.select();
+        }
+      });
+    }
     p5ExportButton.addEventListener("click", exportToP5Editor);
 
     runCurrentCode();

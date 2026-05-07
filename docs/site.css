@@ -209,6 +209,25 @@ a{color:inherit}
   line-height:1.55;
 }
 
+.credits-toggle{
+  display:inline;
+  margin-left:6px;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid rgba(82,58,47,.2);
+  background:transparent;
+  color:var(--accent);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  vertical-align:middle;
+  white-space:nowrap;
+  line-height:1.6;
+}
+.credits-toggle:hover{
+  background:var(--cream);
+}
+
 .aside-byline{
   margin:0 0 12px;
   font-size:12px;
@@ -683,13 +702,14 @@ a{color:inherit}
   white-space:nowrap;
 }
 
-#starter-sketches.is-collapsible .gallery-header::after{
-  content:"Show sketches";
+/* Starter sketches: only show header button when open (peek trigger handles collapsed CTA) */
+#starter-sketches.is-collapsible.is-open .gallery-header::after{
+  content:"Hide sketches";
   margin-left:auto;
   padding:6px 10px;
   border-radius:999px;
-  background:var(--accent);
-  color:#fff;
+  background:var(--cream);
+  color:var(--accent);
   font-size:11px;
   font-weight:800;
   white-space:nowrap;
@@ -698,12 +718,6 @@ a{color:inherit}
 .station.is-collapsible.is-open .station-header,
 #starter-sketches.is-collapsible.is-open .gallery-header{
   margin-bottom:20px;
-}
-
-#starter-sketches.is-collapsible.is-open .gallery-header::after{
-  content:"Hide sketches";
-  background:var(--cream);
-  color:var(--accent);
 }
 
 /* Station collapsed: show first 3 cards as a peek, hide the rest */
@@ -736,8 +750,14 @@ a{color:inherit}
   border-style:solid;
 }
 
-.station.is-collapsible.is-open .station-peek-trigger{
+.station.is-collapsible.is-open .station-peek-trigger,
+#starter-sketches.is-collapsible.is-open .station-peek-trigger{
   display:none;
+}
+
+/* Solo station (only 1 card): don't create empty column gaps */
+.station[data-solo] .tool-grid{
+  grid-template-columns:minmax(0,380px);
 }
 
 .station-peek-btn{
