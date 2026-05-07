@@ -808,13 +808,9 @@ a{color:inherit}
   display:none;
 }
 
-/* Solo station (only 1 card): don't create empty column gaps */
-.station[data-solo] .tool-grid{
+/* Solo station (1 card): don't create empty column gaps */
+.station[data-solo]:not(#station-support) .tool-grid{
   grid-template-columns:minmax(0,380px);
-}
-
-#station-support .tool-grid{
-  grid-template-columns:repeat(2,minmax(0,1fr));
 }
 
 .station-peek-btn{
