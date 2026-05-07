@@ -239,7 +239,9 @@
     "animation-explorer", "framerate-visualizer", "map-explorer", "lerp-explorer", "if-else-decision-studio",
     "for-loop-stepper", "rows-and-columns", "function-builder", "noise-vs-random-explorer",
     "data-story-planner", "data-mapper", "csv-loadtable-data-explorer",
-    "image-remix-studio", "sound-shape-visualizer", "postcard-studio", "game-state-starter", "particle-system-seed"
+    "image-remix-studio", "sound-shape-visualizer", "postcard-studio", "game-state-starter", "particle-system-seed",
+    "push-pop-scope-visualizer", "layering-visualizer", "trails-ghosting-studio", "dist-map-lerp-chain",
+    "assets-preload-helper", "modulo-framecount-studio", "array-objects-debugger", "class-builder"
   ]);
   document.querySelectorAll(".tool-card").forEach(card => {
     const link = card.querySelector(".tool-actions a");

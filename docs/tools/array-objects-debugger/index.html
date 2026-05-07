@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Array-of-Objects Debugger - CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:24px;background:#faf6f0;color:#2c2a26;font-family:"DM Sans",system-ui,sans-serif;line-height:1.5}.wrap{max-width:1120px;margin:auto}.top{display:flex;justify-content:space-between;gap:16px;margin-bottom:22px}.top a{color:#6b6760;text-decoration:none}.tag{display:inline-block;padding:5px 10px;border-radius:6px;background:#edf1f5;color:#3d5a80;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase}h1{font-size:clamp(28px,5vw,50px);line-height:1;margin:10px 0 8px}.lede{max-width:780px;color:#6b6760}.chips{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 22px}.chips span{font:12px "DM Mono";background:#f0ebe3;border:1px solid #e5dfd5;border-radius:999px;padding:5px 9px}.grid{display:grid;grid-template-columns:minmax(420px,1.15fr) minmax(300px,.85fr);gap:18px}@media(max-width:900px){.grid{grid-template-columns:1fr}body{padding:17px}}.card{background:#fff;border:1px solid #e5dfd5;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}.head{padding:16px 18px;border-bottom:1px solid #f0ebe3}.head b{display:block}.head span{color:#6b6760;font-size:13px}.stage{padding:14px}canvas{display:block;width:100%;height:auto;border:1px solid #e5dfd5;border-radius:10px;background:#fff}.controls{padding:14px;display:grid;gap:12px}.group{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:12px}.group h2{margin:0 0 8px;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase;color:#3d5a80}.row{display:grid;grid-template-columns:88px 1fr 52px;gap:10px;align-items:center;margin:8px 0}.row label,.val{font:12px "DM Mono";color:#6b6760}.val{text-align:right;color:#2c2a26}input[type=range]{width:100%;accent-color:#e07a5f}.btns{display:flex;flex-wrap:wrap;gap:8px}button{border:1px solid #e5dfd5;border-radius:999px;background:#fff;padding:7px 12px;font:600 13px "DM Sans";color:#6b6760;cursor:pointer;transition:background .15s,color .15s}button:hover{background:#f0ebe3}button.active{background:#3d5a80;color:#fff;border-color:#3d5a80}button.danger{border-color:#e07a5f;color:#e07a5f}button.danger:hover{background:#e07a5f;color:#fff}.inspector{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:12px;font:13px "DM Mono"}.inspector-title{font:700 12px "DM Mono";letter-spacing:.06em;text-transform:uppercase;color:#3d5a80;margin-bottom:8px}.prop-table{width:100%;border-collapse:collapse}.prop-table td{padding:3px 0;vertical-align:top}.prop-table td:first-child{color:#6b6760;padding-right:12px;min-width:64px}.prop-table td:last-child{color:#2c2a26;font-weight:500}.prop-swatch{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:middle;border:1px solid #e5dfd5}.no-sel{color:#9e998f;font:13px "DM Mono";padding:10px 0}.loop-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.loop-sq{width:32px;height:32px;border-radius:6px;border:2px solid #e5dfd5;background:#faf6f0;display:flex;align-items:center;justify-content:center;font:11px "DM Mono";color:#6b6760;transition:background .1s,border-color .1s;position:relative}.loop-sq.active-ball{background:#3d5a80;color:#fff;border-color:#3d5a80}.loop-sq.selected-ball{border-color:#e07a5f;color:#e07a5f}.loop-sq.both{background:#3d5a80;color:#fff;border-color:#e07a5f}.code{margin-top:18px;background:#2c2a26;color:#f0ebe3;border-radius:14px;padding:16px;overflow:auto;font:13px/1.6 "DM Mono";white-space:pre}.note{margin-top:18px;background:#fff;border:1px solid #e5dfd5;border-radius:14px;padding:16px;color:#6b6760}.note b{color:#2c2a26}.notes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}@media(max-width:700px){.notes-grid{grid-template-columns:1fr}}.note-card{background:#fff;border:1px solid #e5dfd5;border-radius:14px;padding:16px}.note-card .label{font:700 10px "DM Mono";text-transform:uppercase;letter-spacing:.08em;color:#9e998f;margin-bottom:6px}.note-card p{margin:0;color:#6b6760;font-size:14px}.note-card p b{color:#2c2a26}
+  </style>
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+  <nav class="top"><a href="../../index.html">← Back to tool library</a><a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp" target="_blank" rel="noopener">CC Fest on GitHub</a></nav>
+  <span class="tag">⊕ Support · Debugging + Confidence</span>
+  <h1>Array-of-Objects Debugger</h1>
+  <p class="lede">Click any object to inspect its properties live. Watch x, y, vx, vy update each frame — and see the for loop step through each object in order.</p>
+  <div class="chips"><span>arrays</span><span>objects</span><span>classes</span><span>debug</span><span>inspect</span><span>for loop</span></div>
+  <main class="grid">
+    <section class="card">
+      <div class="head"><b>Ball Simulation</b><span id="stageDesc">8 bouncing objects — each a plain JS object with x, y, vx, vy, r, color.</span></div>
+      <div class="stage">
+        <canvas id="canvas" width="560" height="400"></canvas>
+      </div>
+    </section>
+    <aside class="card">
+      <div class="head"><b>Inspector + Controls</b><span>Click a ball to inspect its properties.</span></div>
+      <div class="controls">
+        <div class="group">
+          <h2>Selected Object</h2>
+          <div class="inspector" id="inspector">
+            <div class="no-sel">Click a ball to inspect it.</div>
+          </div>
+        </div>
+        <div class="group">
+          <h2>Loop Visualizer</h2>
+          <div style="font:12px 'DM Mono';color:#6b6760;margin-bottom:6px">Active index this frame:</div>
+          <div class="loop-row" id="loopRow"></div>
+          <div style="font:11px 'DM Mono';color:#9e998f;margin-top:6px">
+            <span style="display:inline-block;width:12px;height:12px;background:#3d5a80;border-radius:3px;vertical-align:middle;margin-right:4px"></span>processing now
+            <span style="display:inline-block;width:12px;height:12px;border:2px solid #e07a5f;border-radius:3px;vertical-align:middle;margin-left:10px;margin-right:4px"></span>selected
+          </div>
+        </div>
+        <div class="group">
+          <h2>Playback</h2>
+          <div class="btns">
+            <button id="btnPause">Pause</button>
+            <button id="btnStep" disabled>→ Next Frame</button>
+            <button id="btnStepMode">Step Mode: OFF</button>
+            <button id="btnReset" class="danger">Reset Positions</button>
+          </div>
+        </div>
+        <div class="group">
+          <h2>Speed</h2>
+          <div class="row">
+            <label>multiplier</label>
+            <input type="range" id="speed" min="0.1" max="3" step="0.05" value="1">
+            <span class="val" id="speedVal">1.0×</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+  <pre class="code" id="codeBlock"></pre>
+  <div class="notes-grid">
+    <div class="note-card"><div class="label">Try this</div><p>Click any ball. Watch <b>x</b> and <b>y</b> update each frame. Click a different one.</p></div>
+    <div class="note-card"><div class="label">Notice this</div><p>Every ball has the same properties but different values. The for loop calls <b>move()</b> and <b>display()</b> on each one in order — index 0 first, 7 last.</p></div>
+    <div class="note-card"><div class="label">Remix this</div><p>Turn on <b>Step Mode</b>. Press → one frame at a time and watch which ball in the loop row lights up.</p></div>
+  </div>
+</div>
+<script>
+const PALETTE = ['#3d5a80','#e07a5f','#81b29a','#f2cc8f','#9e998f','#6b6760','#c9ada7','#588157'];
+const W = 560, H = 400;
+const c = document.getElementById('canvas');
+const ctx = c.getContext('2d');
+
+let balls = [];
+let selectedIdx = -1;
+let paused = false;
+let stepMode = false;
+let stepPending = false;
+let speed = 1.0;
+let activeIdx = 0; // which ball index is being processed this "visual frame"
+let frameNum = 0;
+
+function rnd(a, b){ return a + Math.random()*(b-a); }
+
+function initBalls(){
+  balls = [];
+  for(let i=0;i<8;i++){
+    const r = Math.round(rnd(15,30));
+    balls.push({
+      id: i,
+      x: rnd(r+10, W-r-10),
+      y: rnd(r+10, H-r-10),
+      vx: (Math.random()<.5?1:-1)*rnd(1,2.5),
+      vy: (Math.random()<.5?1:-1)*rnd(1,2.5),
+      r: r,
+      color: PALETTE[i],
+      name: `balls[${i}]`
+    });
+  }
+}
+initBalls();
+
+function moveBall(b, spd){
+  b.x += b.vx * spd;
+  b.y += b.vy * spd;
+  if(b.x < b.r){ b.x = b.r; b.vx = Math.abs(b.vx); }
+  if(b.x > W-b.r){ b.x = W-b.r; b.vx = -Math.abs(b.vx); }
+  if(b.y < b.r){ b.y = b.r; b.vy = Math.abs(b.vy); }
+  if(b.y > H-b.r){ b.y = H-b.r; b.vy = -Math.abs(b.vy); }
+}
+
+function drawBall(b, isSelected, isActive){
+  ctx.save();
+  const hex = b.color;
+  // mute non-selected when something is selected
+  const muted = selectedIdx >= 0 && !isSelected && !isActive;
+  ctx.globalAlpha = muted ? 0.38 : 1.0;
+  ctx.beginPath();
+  ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+  ctx.fillStyle = hex;
+  ctx.fill();
+
+  if(isActive && !isSelected){
+    ctx.strokeStyle = '#3d5a80';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+  }
+
+  if(isSelected){
+    // bright ring
+    ctx.strokeStyle = '#e07a5f';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    // outer pulse ring
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r+7, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(224,122,95,0.35)';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    // label
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#2c2a26';
+    ctx.font = '600 12px DM Mono';
+    ctx.textAlign = 'center';
+    const ly = b.y - b.r - 10;
+    ctx.fillText(b.name, b.x, ly < 14 ? b.y + b.r + 18 : ly);
+  }
+  ctx.restore();
+}
+
+function renderInspector(){
+  const el = document.getElementById('inspector');
+  if(selectedIdx < 0){
+    el.innerHTML = '<div class="no-sel">Click a ball to inspect it.</div>';
+    return;
+  }
+  const b = balls[selectedIdx];
+  const swatch = `<span class="prop-swatch" style="background:${b.color}"></span>`;
+  el.innerHTML = `<div class="inspector-title">${b.name} — selected</div>
+<table class="prop-table">
+  <tr><td>x</td><td>${b.x.toFixed(1)}</td></tr>
+  <tr><td>y</td><td>${b.y.toFixed(1)}</td></tr>
+  <tr><td>vx</td><td>${b.vx.toFixed(2)}</td></tr>
+  <tr><td>vy</td><td>${b.vy.toFixed(2)}</td></tr>
+  <tr><td>r</td><td>${b.r}</td></tr>
+  <tr><td>color</td><td>${swatch}${b.color}</td></tr>
+</table>`;
+}
+
+function renderLoopRow(){
+  const row = document.getElementById('loopRow');
+  row.innerHTML = '';
+  for(let i=0;i<8;i++){
+    const sq = document.createElement('div');
+    sq.className = 'loop-sq';
+    if(i === activeIdx && i === selectedIdx) sq.classList.add('both');
+    else if(i === activeIdx) sq.classList.add('active-ball');
+    else if(i === selectedIdx) sq.classList.add('selected-ball');
+    sq.textContent = i;
+    row.appendChild(sq);
+  }
+}
+
+function doFrame(){
+  // move all balls
+  for(let i=0;i<balls.length;i++){
+    moveBall(balls[i], speed);
+  }
+  // visual active index sweeps through each frame
+  activeIdx = frameNum % 8;
+  frameNum++;
+}
+
+function render(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#fffdf9';
+  ctx.fillRect(0,0,W,H);
+
+  // subtle grid
+  ctx.strokeStyle = '#f0ebe3';
+  ctx.lineWidth = 1;
+  for(let x=40;x<W;x+=40){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for(let y=40;y<H;y+=40){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  for(let i=0;i<balls.length;i++){
+    drawBall(balls[i], i===selectedIdx, i===activeIdx);
+  }
+
+  renderInspector();
+  renderLoopRow();
+}
+
+function loop(){
+  if(!paused){
+    doFrame();
+    render();
+  } else if(stepPending){
+    stepPending = false;
+    doFrame();
+    render();
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+// Click detection
+c.addEventListener('click', e=>{
+  const rect = c.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * W / rect.width;
+  const my = (e.clientY - rect.top) * H / rect.height;
+  let best = -1, bestDist = Infinity;
+  for(let i=0;i<balls.length;i++){
+    const b = balls[i];
+    const d = Math.hypot(mx-b.x, my-b.y);
+    if(d < b.r && d < bestDist){ bestDist = d; best = i; }
+  }
+  selectedIdx = (best === selectedIdx) ? -1 : best;
+});
+
+// Buttons
+document.getElementById('btnPause').addEventListener('click', ()=>{
+  paused = !paused;
+  document.getElementById('btnPause').textContent = paused ? 'Resume' : 'Pause';
+  document.getElementById('btnPause').classList.toggle('active', paused);
+  document.getElementById('btnStep').disabled = !paused;
+});
+document.getElementById('btnStep').addEventListener('click', ()=>{ stepPending = true; });
+document.getElementById('btnStepMode').addEventListener('click', ()=>{
+  stepMode = !stepMode;
+  paused = stepMode;
+  document.getElementById('btnStepMode').textContent = 'Step Mode: ' + (stepMode ? 'ON' : 'OFF');
+  document.getElementById('btnStepMode').classList.toggle('active', stepMode);
+  document.getElementById('btnPause').textContent = paused ? 'Resume' : 'Pause';
+  document.getElementById('btnPause').classList.toggle('active', paused);
+  document.getElementById('btnStep').disabled = !paused;
+});
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  initBalls();
+  selectedIdx = -1;
+  frameNum = 0;
+  activeIdx = 0;
+  render();
+});
+document.getElementById('speed').addEventListener('input', e=>{
+  speed = Number(e.target.value);
+  document.getElementById('speedVal').textContent = speed.toFixed(1) + '×';
+});
+
+// Code output
+document.getElementById('codeBlock').textContent = `class Ball {
+  constructor(x, y, r, col) {
+    this.x = x;   this.y = y;
+    this.vx = random(-2, 2);
+    this.vy = random(-2, 2);
+    this.r = r;   this.col = col;
+  }
+
+  move() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < this.r || this.x > width - this.r) this.vx *= -1;
+    if (this.y < this.r || this.y > height - this.r) this.vy *= -1;
+  }
+
+  display() {
+    fill(this.col);
+    circle(this.x, this.y, this.r * 2);
+  }
+}
+
+let balls = [];
+
+function setup() {
+  createCanvas(560, 400);
+  for (let i = 0; i < 8; i++) {
+    balls.push(new Ball(random(width), random(height), random(15, 30), color(palette[i])));
+  }
+}
+
+function draw() {
+  background(250);
+  for (let b of balls) {   // ← loops through all objects
+    b.move();
+    b.display();
+  }
+}`;
+</script>
+<script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

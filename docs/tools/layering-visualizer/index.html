@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Layering Visualizer - CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:24px;background:#faf6f0;color:#2c2a26;font-family:"DM Sans",system-ui,sans-serif;line-height:1.5}.wrap{max-width:1120px;margin:auto}.top{display:flex;justify-content:space-between;gap:16px;margin-bottom:22px}.top a{color:#6b6760;text-decoration:none}.tag{display:inline-block;padding:5px 10px;border-radius:6px;background:#edf1f5;color:#3d5a80;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase}h1{font-size:clamp(28px,4.5vw,50px);line-height:1;margin:10px 0 8px}.lede{max-width:780px;color:#6b6760}.chips{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 22px}.chips span{font:12px "DM Mono";background:#f0ebe3;border:1px solid #e5dfd5;border-radius:999px;padding:5px 9px}.grid{display:grid;grid-template-columns:minmax(380px,1.05fr) minmax(300px,.95fr);gap:18px}@media(max-width:900px){.grid{grid-template-columns:1fr}body{padding:17px}}.card{background:#fff;border:1px solid #e5dfd5;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}.head{padding:16px 18px;border-bottom:1px solid #f0ebe3}.head b{display:block}.head span{color:#6b6760;font-size:13px}.stage{padding:14px}canvas{display:block;width:100%;height:auto;border:1px solid #e5dfd5;border-radius:10px;background:#fff}.controls{padding:14px;display:grid;gap:12px}.group{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:12px}.group h2{margin:0 0 8px;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase;color:#3d5a80}.orderHint{font:11px "DM Mono";color:#9e998f;margin-bottom:8px;display:flex;justify-content:space-between}.layerList{display:grid;gap:6px}.layerRow{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5dfd5;border-radius:8px;padding:7px 10px;transition:box-shadow .15s}.layerRow:first-child{border-color:#81b29a;box-shadow:0 0 0 1px rgba(129,178,154,.3)}.layerRow:last-child{border-color:#3d5a80;box-shadow:0 0 0 1px rgba(61,90,128,.25)}.layerSwatch{width:20px;height:20px;border-radius:4px;flex-shrink:0;border:1px solid rgba(0,0,0,.08)}.layerName{font:13px "DM Mono";flex:1;color:#2c2a26}.layerBadge{font:10px "DM Mono";color:#9e998f;padding:2px 6px;background:#f0ebe3;border-radius:4px;flex-shrink:0}.layerBtns{display:flex;gap:4px}.layerBtn{width:26px;height:26px;border:1px solid #e5dfd5;border-radius:6px;background:#fff;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;color:#6b6760;transition:background .1s;flex-shrink:0}.layerBtn:hover{background:#f0ebe3}.layerBtn:disabled{opacity:.3;cursor:default}.read{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}@media(max-width:620px){.read{grid-template-columns:1fr}}.read div{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:10px}.read small{display:block;font:10px "DM Mono";color:#9e998f;text-transform:uppercase;margin-bottom:3px}.read strong{font:14px "DM Mono";word-break:break-word}.code{margin-top:18px;background:#2c2a26;color:#f0ebe3;border-radius:14px;padding:16px;overflow:auto;font:13px/1.6 "DM Mono";white-space:pre}.lessons{display:grid;gap:12px;margin-top:18px}.lesson{background:#fff;border:1px solid #e5dfd5;border-radius:12px;padding:14px 16px;color:#6b6760;font-size:14px}.lesson b{color:#2c2a26;display:block;margin-bottom:4px}
+  </style>
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+  <nav class="top">
+    <a href="../../index.html">← Back to tool library</a>
+    <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+  </nav>
+  <span class="tag">✦ Marks · Draw + Color</span>
+  <h1>Layering Visualizer</h1>
+  <p class="lede">In p5.js, shapes drawn later appear on top. Reorder layers with the arrows and watch the stacking change — then copy the generated draw() code.</p>
+  <div class="chips">
+    <span>draw order</span><span>layers</span><span>painter's algorithm</span><span>shapes</span><span>overlap</span>
+  </div>
+  <main class="grid">
+    <section class="card">
+      <div class="head"><b>Canvas</b><span>Shapes are drawn in list order — bottom of list = drawn last = on top.</span></div>
+      <div class="stage">
+        <canvas id="canvas" width="500" height="400"></canvas>
+        <div class="read">
+          <div><small>Total layers</small><strong id="readTotal">5</strong></div>
+          <div><small>On top (front)</small><strong id="readTop">—</strong></div>
+          <div><small>On bottom (back)</small><strong id="readBottom">—</strong></div>
+        </div>
+      </div>
+    </section>
+    <aside class="card">
+      <div class="head"><b>Layer Order</b><span>Use ▲ ▼ to reorder. Position 1 = drawn first = behind all others.</span></div>
+      <div class="controls">
+        <div class="group">
+          <h2>Layers</h2>
+          <div class="orderHint">
+            <span>① drawn first → behind</span>
+            <span>drawn last → in front ⑤</span>
+          </div>
+          <div class="layerList" id="layerList"></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+  <pre class="code" id="code"></pre>
+  <div class="lessons">
+    <div class="lesson"><b>Try this:</b> Move "Blue rect" to the bottom. Notice it goes behind everything — even the sky background.</div>
+    <div class="lesson"><b>Notice this:</b> The draw() code order matches the visual stack. p5.js draws like a painter — each new shape goes on top of everything before it.</div>
+    <div class="lesson"><b>Remix this:</b> Move the background to position 2 or 3 instead of position 1. What happens to shapes "under" it?</div>
+  </div>
+</div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = 500, H = 400;
+
+// Shape definitions — order = draw order (index 0 = bottom/back, last = top/front)
+let shapes = [
+  { id: 0, name: "Sky bg",     type: "rect",    x:0,   y:0,   w:500, h:400, fill:"#d4e8f7" },
+  { id: 1, name: "Red circle", type: "circle",  x:200, y:200, r:100, fill:"#e07a5f" },
+  { id: 2, name: "Blue rect",  type: "rect",    x:120, y:120, w:180, h:140, fill:"#3d5a80" },
+  { id: 3, name: "Yellow oval",type: "ellipse", x:300, y:250, rx:90, ry:55, fill:"#f2cc8f" },
+  { id: 4, name: "Green dot",  type: "circle",  x:250, y:200, r:40,  fill:"#81b29a" },
+];
+
+function drawShape(s) {
+  ctx.fillStyle = s.fill;
+  ctx.strokeStyle = 'rgba(44,42,38,0.08)';
+  ctx.lineWidth = 1.5;
+  if (s.type === 'rect') {
+    ctx.fillRect(s.x, s.y, s.w, s.h);
+    if (s.w < W || s.h < H) ctx.strokeRect(s.x, s.y, s.w, s.h);
+  } else if (s.type === 'circle') {
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  } else if (s.type === 'ellipse') {
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y, s.rx, s.ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+  // Label
+  ctx.fillStyle = 'rgba(44,42,38,0.55)';
+  ctx.font = '600 11px DM Sans, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  let lx = s.x, ly = s.y;
+  if (s.type === 'rect') { lx = s.x + s.w/2; ly = s.y + s.h/2; }
+  ctx.fillText(s.name, lx, ly);
+  ctx.textBaseline = 'alphabetic';
+}
+
+function renderCanvas() {
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#fffdf9';
+  ctx.fillRect(0,0,W,H);
+  shapes.forEach(drawShape);
+}
+
+function renderLayerList() {
+  const list = document.getElementById('layerList');
+  list.innerHTML = '';
+  shapes.forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'layerRow';
+    const pos = i + 1;
+    let badge = '';
+    if (i === 0) badge = '<span class="layerBadge" style="color:#81b29a;background:#edf7f3">① back</span>';
+    else if (i === shapes.length - 1) badge = '<span class="layerBadge" style="color:#3d5a80;background:#edf1f5">⑤ front</span>';
+    else badge = `<span class="layerBadge">${pos}</span>`;
+
+    row.innerHTML = `
+      <div class="layerSwatch" style="background:${s.fill}"></div>
+      <span class="layerName">${s.name}</span>
+      ${badge}
+      <div class="layerBtns">
+        <button class="layerBtn" title="Move up (drawn later → closer to front)" ${i === shapes.length-1 ? 'disabled' : ''} data-dir="up" data-idx="${i}">▲</button>
+        <button class="layerBtn" title="Move down (drawn earlier → closer to back)" ${i === 0 ? 'disabled' : ''} data-dir="down" data-idx="${i}">▼</button>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+
+  // Readout
+  document.getElementById('readTotal').textContent = shapes.length;
+  document.getElementById('readTop').textContent = shapes[shapes.length-1].name;
+  document.getElementById('readBottom').textContent = shapes[0].name;
+
+  updateCode();
+}
+
+function shapeToP5(s, isFirst) {
+  let lines = [];
+  if (isFirst) lines.push(`  // ${s.name} (drawn first → behind everything)`);
+  else lines.push(`  // ${s.name}`);
+  lines.push(`  fill('${s.fill}'); noStroke();`);
+  if (s.type === 'rect') {
+    lines.push(`  rect(${s.x}, ${s.y}, ${s.w}, ${s.h});`);
+  } else if (s.type === 'circle') {
+    lines.push(`  circle(${s.x}, ${s.y}, ${s.r * 2});`);
+  } else if (s.type === 'ellipse') {
+    lines.push(`  ellipse(${s.x}, ${s.y}, ${s.rx * 2}, ${s.ry * 2});`);
+  }
+  return lines.join('\n');
+}
+
+function updateCode() {
+  const blocks = shapes.map((s, i) => shapeToP5(s, i === 0)).join('\n\n');
+  const code = `function draw() {\n  background(250);\n\n${blocks}\n}`;
+  document.getElementById('code').textContent = code;
+}
+
+// Event delegation for layer buttons
+document.getElementById('layerList').addEventListener('click', e => {
+  const btn = e.target.closest('.layerBtn');
+  if (!btn || btn.disabled) return;
+  const idx = parseInt(btn.dataset.idx);
+  const dir = btn.dataset.dir;
+  if (dir === 'up' && idx < shapes.length - 1) {
+    [shapes[idx], shapes[idx+1]] = [shapes[idx+1], shapes[idx]];
+  } else if (dir === 'down' && idx > 0) {
+    [shapes[idx], shapes[idx-1]] = [shapes[idx-1], shapes[idx]];
+  }
+  renderCanvas();
+  renderLayerList();
+});
+
+// Initial render
+renderCanvas();
+renderLayerList();
+</script>
+<script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

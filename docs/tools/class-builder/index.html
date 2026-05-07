@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Class Builder - CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:24px;background:#faf6f0;color:#2c2a26;font-family:"DM Sans",system-ui,sans-serif;line-height:1.5}.wrap{max-width:1120px;margin:auto}.top{display:flex;justify-content:space-between;gap:16px;margin-bottom:22px}.top a{color:#6b6760;text-decoration:none}.tag{display:inline-block;padding:5px 10px;border-radius:6px;background:#edf1f5;color:#3d5a80;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase}h1{font-size:clamp(28px,4vw,48px);line-height:1;margin:10px 0 8px}.lede{max-width:780px;color:#6b6760}.chips{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 22px}.chips span{font:12px "DM Mono";background:#f0ebe3;border:1px solid #e5dfd5;border-radius:999px;padding:5px 9px}.grid{display:grid;grid-template-columns:minmax(380px,1fr) minmax(340px,1.2fr);gap:18px}@media(max-width:900px){.grid{grid-template-columns:1fr}body{padding:17px}}.card{background:#fff;border:1px solid #e5dfd5;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}.head{padding:16px 18px;border-bottom:1px solid #f0ebe3}.head b{display:block}.head span{color:#6b6760;font-size:13px}.controls{padding:14px;display:grid;gap:14px}.group{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:12px}.group h2{margin:0 0 10px;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase;color:#3d5a80}input[type=text],input[type=number]{border:1px solid #e5dfd5;border-radius:6px;padding:7px 10px;font:14px "DM Mono";width:100%;background:#fff;color:#2c2a26}input[type=text]:focus,input[type=number]:focus{outline:2px solid #3d5a80;outline-offset:-1px}select{border:1px solid #e5dfd5;border-radius:6px;padding:7px 10px;font:13px "DM Mono";background:#fff;color:#2c2a26;cursor:pointer}select:focus{outline:2px solid #3d5a80;outline-offset:-1px}.prop-table{width:100%;border-collapse:collapse;margin-top:4px}.prop-table th{font:700 10px "DM Mono";letter-spacing:.06em;text-transform:uppercase;color:#9e998f;text-align:left;padding:4px 6px;border-bottom:1px solid #e5dfd5}.prop-table td{padding:5px 4px;vertical-align:top}.prop-row input[type=text]{padding:5px 7px;font-size:12px}.prop-row input[type=color]{width:36px;height:30px;padding:2px;border:1px solid #e5dfd5;border-radius:4px;cursor:pointer}.prop-row input[type=number]{padding:5px 7px;font-size:12px}.prop-row select{padding:5px 7px;font-size:12px}.del-btn{background:none;border:none;color:#9e998f;cursor:pointer;font-size:18px;padding:2px 6px;border-radius:4px;line-height:1}.del-btn:hover{color:#e07a5f;background:#fef3ef}.add-btn{margin-top:10px;border:1px dashed #9e998f;border-radius:8px;background:transparent;padding:8px 14px;font:600 12px "DM Sans";color:#6b6760;cursor:pointer;width:100%;transition:all .15s}.add-btn:hover{border-color:#3d5a80;color:#3d5a80;background:#edf1f5}.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.method-chip{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid #e5dfd5;border-radius:8px;cursor:pointer;transition:all .15s;background:#fff}.method-chip:hover{border-color:#3d5a80}.method-chip input[type=checkbox]{margin-top:2px;accent-color:#3d5a80;width:14px;height:14px;flex-shrink:0}.method-chip .mname{font:600 12px "DM Mono";color:#2c2a26;display:block}.method-chip .mdesc{font:11px "DM Sans";color:#9e998f;display:block;line-height:1.3}.method-chip.checked{border-color:#3d5a80;background:#edf1f5}.usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.usage-label{font:700 11px "DM Mono";color:#6b6760;letter-spacing:.04em;display:block;margin-bottom:4px}.copy-btn{display:block;width:100%;margin-top:14px;background:#3d5a80;color:#fff;border:none;border-radius:10px;padding:12px;font:700 14px "DM Sans";cursor:pointer;transition:all .15s}.copy-btn:hover{background:#2e4568}.copy-btn.copied{background:#81b29a}.code-panel{padding:14px;height:100%;display:flex;flex-direction:column}.code-scroll{flex:1;overflow:auto;background:#2c2a26;border-radius:12px;padding:16px;min-height:480px;max-height:700px}.code-scroll pre{margin:0;font:12.5px/1.65 "DM Mono";color:#f0ebe3;white-space:pre}.lesson-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}@media(max-width:700px){.lesson-cards{grid-template-columns:1fr}.method-grid{grid-template-columns:1fr}.usage-grid{grid-template-columns:1fr}}.lcard{background:#fff;border:1px solid #e5dfd5;border-radius:14px;padding:16px}.lcard .lc-label{font:700 10px "DM Mono";letter-spacing:.08em;text-transform:uppercase;color:#e07a5f;margin-bottom:6px}.lcard p{margin:0;font-size:13px;color:#6b6760;line-height:1.55}.td-name{width:28%}.td-type{width:20%}.td-default{width:38%}.td-del{width:14%;text-align:center}.color-pair{display:flex;gap:4px;align-items:center}.color-pair input[type=text]{flex:1}
+  </style>
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+  <nav class="top">
+    <a href="../../index.html">← Back to tool library</a>
+    <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+  </nav>
+  <span class="tag">☽ Open · Remix + Media</span>
+  <h1>Class Builder</h1>
+  <p class="lede">Design a p5.js class by choosing properties and behaviors. The code generates live — copy it straight into your sketch.</p>
+  <div class="chips"><span>class</span><span>constructor</span><span>objects</span><span>OOP</span><span>template</span><span>scaffold</span></div>
+
+  <main class="grid">
+    <!-- LEFT: Form -->
+    <section class="card">
+      <div class="head"><b>Class Designer</b><span>Build your class step by step.</span></div>
+      <div class="controls">
+
+        <!-- 1. Class Name -->
+        <div class="group">
+          <h2>Class Name</h2>
+          <input type="text" id="className" value="Dot" spellcheck="false" placeholder="e.g. Dot, Bubble, Star">
+        </div>
+
+        <!-- 2. Properties -->
+        <div class="group">
+          <h2>Constructor Properties</h2>
+          <table class="prop-table" id="propTable">
+            <thead>
+              <tr>
+                <th class="td-name">Name</th>
+                <th class="td-type">Type</th>
+                <th class="td-default">Default</th>
+                <th class="td-del"></th>
+              </tr>
+            </thead>
+            <tbody id="propBody"></tbody>
+          </table>
+          <button class="add-btn" id="addPropBtn">+ Add property</button>
+        </div>
+
+        <!-- 3. Methods -->
+        <div class="group">
+          <h2>Methods</h2>
+          <div class="method-grid" id="methodGrid"></div>
+        </div>
+
+        <!-- 4. Usage -->
+        <div class="group">
+          <h2>Usage Settings</h2>
+          <div class="usage-grid">
+            <div>
+              <label class="usage-label">Canvas Width</label>
+              <input type="number" id="canvasW" value="400" min="100" max="2000">
+            </div>
+            <div>
+              <label class="usage-label">Canvas Height</label>
+              <input type="number" id="canvasH" value="400" min="100" max="2000">
+            </div>
+            <div>
+              <label class="usage-label">Instances</label>
+              <input type="number" id="numInstances" value="10" min="1" max="200">
+            </div>
+            <div>
+              <label class="usage-label">Array Name</label>
+              <input type="text" id="arrayName" value="dots" spellcheck="false">
+            </div>
+          </div>
+        </div>
+
+        <button class="copy-btn" id="copyBtn">Copy Code</button>
+      </div>
+    </section>
+
+    <!-- RIGHT: Code Preview -->
+    <aside class="card">
+      <div class="head"><b>Live Code Preview</b><span>Updates instantly as you make changes.</span></div>
+      <div class="code-panel">
+        <div class="code-scroll"><pre id="codeOut"></pre></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Lesson Cards -->
+  <div class="lesson-cards">
+    <div class="lcard">
+      <div class="lc-label">Try this</div>
+      <p>Check <strong>move()</strong> and <strong>bounce()</strong>. Copy the code and paste it into the p5.js editor at editor.p5js.org.</p>
+    </div>
+    <div class="lcard">
+      <div class="lc-label">Notice this</div>
+      <p>Every method you add becomes a capability. The class is the blueprint — instances are the objects that use it.</p>
+    </div>
+    <div class="lcard">
+      <div class="lc-label">Remix this</div>
+      <p>Change the class name to <strong>Bubble</strong>, add a <strong>grow()</strong> method, and change the default color. Now paste into a new sketch.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let props = [
+  { name: 'x',   type: 'number', def: 'random(width)' },
+  { name: 'y',   type: 'number', def: 'random(height)' },
+  { name: 'r',   type: 'number', def: '20' },
+  { name: 'col', type: 'color',  def: 'color(61, 90, 128)' },
+];
+
+const METHODS = [
+  { id: 'display',      label: 'display()',      checked: true,  desc: 'Draw the shape on canvas' },
+  { id: 'move',         label: 'move()',          checked: true,  desc: 'Add velocity (vx, vy) to position' },
+  { id: 'bounce',       label: 'bounce()',        checked: false, desc: 'Flip velocity at canvas edges' },
+  { id: 'wrap',         label: 'wrap()',          checked: false, desc: 'Wrap position around canvas edges' },
+  { id: 'fade',         label: 'fade()',          checked: false, desc: 'Reduce opacity over a lifespan' },
+  { id: 'grow',         label: 'grow()',          checked: false, desc: 'Increase radius over time' },
+  { id: 'shrink',       label: 'shrink()',        checked: false, desc: 'Decrease radius, remove when tiny' },
+  { id: 'mouseAttract', label: 'mouseAttract()',  checked: false, desc: 'Drift toward mouseX, mouseY' },
+];
+
+let methodState = {};
+METHODS.forEach(m => { methodState[m.id] = m.checked; });
+
+// ── Render property rows ───────────────────────────────────────────────────
+function renderProps() {
+  const tbody = document.getElementById('propBody');
+  tbody.innerHTML = '';
+  props.forEach((p, i) => {
+    const tr = document.createElement('tr');
+    tr.className = 'prop-row';
+
+    // Name
+    const tdName = document.createElement('td');
+    tdName.className = 'td-name';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = p.name;
+    nameInput.spellcheck = false;
+    nameInput.placeholder = 'name';
+    nameInput.oninput = e => { props[i].name = e.target.value; updateCode(); };
+    tdName.appendChild(nameInput);
+
+    // Type
+    const tdType = document.createElement('td');
+    tdType.className = 'td-type';
+    const sel = document.createElement('select');
+    ['number','color','boolean','string'].forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = t;
+      if (t === p.type) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.onchange = e => { props[i].type = e.target.value; renderProps(); updateCode(); };
+    tdType.appendChild(sel);
+
+    // Default
+    const tdDef = document.createElement('td');
+    tdDef.className = 'td-default';
+    const pair = document.createElement('div');
+    pair.className = 'color-pair';
+    const defInput = document.createElement('input');
+    defInput.type = 'text';
+    defInput.value = p.def;
+    defInput.spellcheck = false;
+    defInput.placeholder = 'default';
+    defInput.oninput = e => { props[i].def = e.target.value; updateCode(); };
+    pair.appendChild(defInput);
+    if (p.type === 'color') {
+      const cp = document.createElement('input');
+      cp.type = 'color';
+      cp.value = '#3d5a80';
+      cp.title = 'Pick color';
+      cp.oninput = e => {
+        const hex = e.target.value;
+        const r = parseInt(hex.slice(1,3),16);
+        const g = parseInt(hex.slice(3,5),16);
+        const b = parseInt(hex.slice(5,7),16);
+        props[i].def = `color(${r}, ${g}, ${b})`;
+        defInput.value = props[i].def;
+        updateCode();
+      };
+      pair.appendChild(cp);
+    }
+    tdDef.appendChild(pair);
+
+    // Delete
+    const tdDel = document.createElement('td');
+    tdDel.className = 'td-del';
+    const delBtn = document.createElement('button');
+    delBtn.className = 'del-btn';
+    delBtn.innerHTML = '×';
+    delBtn.title = 'Remove property';
+    delBtn.onclick = () => { props.splice(i, 1); renderProps(); updateCode(); };
+    tdDel.appendChild(delBtn);
+
+    tr.appendChild(tdName);
+    tr.appendChild(tdType);
+    tr.appendChild(tdDef);
+    tr.appendChild(tdDel);
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('addPropBtn').onclick = () => {
+  props.push({ name: '', type: 'number', def: '' });
+  renderProps();
+  updateCode();
+  // Focus last name input
+  const inputs = document.querySelectorAll('#propBody .prop-row td:first-child input');
+  if (inputs.length) inputs[inputs.length - 1].focus();
+};
+
+// ── Render method chips ────────────────────────────────────────────────────
+function renderMethods() {
+  const grid = document.getElementById('methodGrid');
+  grid.innerHTML = '';
+  METHODS.forEach(m => {
+    const chip = document.createElement('label');
+    chip.className = 'method-chip' + (methodState[m.id] ? ' checked' : '');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = methodState[m.id];
+    cb.onchange = e => {
+      methodState[m.id] = e.target.checked;
+      chip.classList.toggle('checked', e.target.checked);
+      updateCode();
+    };
+    const txt = document.createElement('span');
+    txt.innerHTML = `<span class="mname">${m.label}</span><span class="mdesc">${m.desc}</span>`;
+    chip.appendChild(cb);
+    chip.appendChild(txt);
+    grid.appendChild(chip);
+  });
+}
+
+// ── Code generation ────────────────────────────────────────────────────────
+function getClassName() {
+  const v = document.getElementById('className').value.trim();
+  return v || 'MyClass';
+}
+function getCanvasW() { return parseInt(document.getElementById('canvasW').value) || 400; }
+function getCanvasH() { return parseInt(document.getElementById('canvasH').value) || 400; }
+function getNumInst() { return parseInt(document.getElementById('numInstances').value) || 10; }
+function getArrName() {
+  const v = document.getElementById('arrayName').value.trim();
+  return v || 'items';
+}
+
+function generateCode() {
+  const cls = getClassName();
+  const w = getCanvasW();
+  const h = getCanvasH();
+  const n = getNumInst();
+  const arr = getArrName();
+  const ms = methodState;
+
+  const hasMove = ms.move;
+  const hasFade = ms.fade;
+  const hasDisplay = ms.display;
+  const hasBounce = ms.bounce;
+  const hasWrap = ms.wrap;
+  const hasGrow = ms.grow;
+  const hasShrink = ms.shrink;
+  const hasMouseAttract = ms.mouseAttract;
+
+  const validProps = props.filter(p => p.name.trim());
+  const paramList = validProps.map(p => p.name.trim()).join(', ');
+
+  // ── Constructor body
+  let ctorBody = '';
+  validProps.forEach(p => {
+    ctorBody += `    this.${p.name.trim()} = ${p.name.trim()};\n`;
+  });
+  if (hasMove) {
+    ctorBody += `    this.vx = random(-2, 2);\n`;
+    ctorBody += `    this.vy = random(-2, 2);\n`;
+  }
+  if (hasFade) {
+    ctorBody += `    this.alpha = 255;\n`;
+    ctorBody += `    this.lifespan = random(100, 200);\n`;
+  }
+
+  // ── Methods
+  let methodsCode = '';
+
+  if (hasDisplay) {
+    const rProp = validProps.find(p => p.name.trim() === 'r');
+    const colProp = validProps.find(p => p.name.trim() === 'col');
+    const rRef = rProp ? 'this.r' : '20';
+    const colRef = colProp ? 'this.col' : 'color(100)';
+    if (hasFade) {
+      methodsCode += `\n  display() {\n    fill(red(${colRef}), green(${colRef}), blue(${colRef}), this.alpha);\n    noStroke();\n    circle(this.x, this.y, ${rRef} * 2);\n  }\n`;
+    } else {
+      methodsCode += `\n  display() {\n    fill(${colRef});\n    noStroke();\n    circle(this.x, this.y, ${rRef} * 2);\n  }\n`;
+    }
+  }
+
+  if (hasMove) {
+    methodsCode += `\n  move() {\n    this.x += this.vx;\n    this.y += this.vy;\n  }\n`;
+  }
+
+  if (hasBounce) {
+    const rProp = validProps.find(p => p.name.trim() === 'r');
+    const rRef = rProp ? 'this.r' : '20';
+    methodsCode += `\n  bounce() {\n    if (this.x < ${rRef} || this.x > width - ${rRef}) this.vx *= -1;\n    if (this.y < ${rRef} || this.y > height - ${rRef}) this.vy *= -1;\n  }\n`;
+  }
+
+  if (hasWrap) {
+    const rProp = validProps.find(p => p.name.trim() === 'r');
+    const rRef = rProp ? 'this.r' : '20';
+    methodsCode += `\n  wrap() {\n    if (this.x > width + ${rRef}) this.x = -${rRef};\n    if (this.x < -${rRef}) this.x = width + ${rRef};\n    if (this.y > height + ${rRef}) this.y = -${rRef};\n    if (this.y < -${rRef}) this.y = height + ${rRef};\n  }\n`;
+  }
+
+  if (hasFade) {
+    methodsCode += `\n  fade() {\n    this.alpha -= 255 / this.lifespan;\n  }\n`;
+  }
+
+  if (hasGrow) {
+    methodsCode += `\n  grow() {\n    this.r += 0.2;\n  }\n`;
+  }
+
+  if (hasShrink) {
+    const rProp = validProps.find(p => p.name.trim() === 'r');
+    if (rProp) {
+      methodsCode += `\n  shrink() {\n    this.r -= 0.15;\n  }\n`;
+    } else {
+      methodsCode += `\n  shrink() {\n    // add an 'r' property to use shrink\n  }\n`;
+    }
+  }
+
+  if (hasMouseAttract) {
+    methodsCode += `\n  mouseAttract() {\n    this.x = lerp(this.x, mouseX, 0.02);\n    this.y = lerp(this.y, mouseY, 0.02);\n  }\n`;
+  }
+
+  // ── Build constructor args for new instance
+  const newArgs = validProps.map(p => {
+    const def = p.def.trim();
+    return def || 'null';
+  }).join(', ');
+
+  // ── Draw loop method calls
+  const drawCalls = [];
+  const ordered = ['display','move','bounce','wrap','fade','grow','shrink','mouseAttract'];
+  ordered.forEach(id => {
+    if (ms[id]) {
+      if (id === 'shrink') {
+        const rProp = validProps.find(p => p.name.trim() === 'r');
+        if (rProp) {
+          drawCalls.push(`    d.shrink();`);
+        }
+      } else {
+        drawCalls.push(`    d.${id}();`);
+      }
+    }
+  });
+
+  // ── Remove shrink dead check note
+  let drawBlock = `  for (let d of ${arr}) {\n${drawCalls.join('\n')}${drawCalls.length ? '\n' : ''}  }`;
+  if (ms.shrink) {
+    const rProp = validProps.find(p => p.name.trim() === 'r');
+    if (rProp) {
+      drawBlock = `  ${arr} = ${arr}.filter(d => d.r > 0.5);\n  for (let d of ${arr}) {\n${drawCalls.join('\n')}${drawCalls.length ? '\n' : ''}  }`;
+    }
+  }
+
+  const code =
+`class ${cls} {
+  constructor(${paramList}) {
+${ctorBody}  }
+${methodsCode}}
+
+// ── Usage ──────────────────────────────────────────
+let ${arr} = [];
+
+function setup() {
+  createCanvas(${w}, ${h});
+  for (let i = 0; i < ${n}; i++) {
+    ${arr}.push(new ${cls}(${newArgs}));
+  }
+}
+
+function draw() {
+  background(250);
+${drawBlock}
+}`;
+
+  return code;
+}
+
+function updateCode() {
+  document.getElementById('codeOut').textContent = generateCode();
+}
+
+// ── Copy button ────────────────────────────────────────────────────────────
+document.getElementById('copyBtn').onclick = () => {
+  const code = generateCode();
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Code';
+      btn.classList.remove('copied');
+    }, 1800);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+};
+
+// ── Live update on all inputs ──────────────────────────────────────────────
+['className','canvasW','canvasH','numInstances','arrayName'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateCode);
+});
+
+// ── Init ───────────────────────────────────────────────────────────────────
+renderProps();
+renderMethods();
+updateCode();
+</script>
+<script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

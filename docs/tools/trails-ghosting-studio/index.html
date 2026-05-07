@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trails / Ghosting Studio - CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box} body{margin:0;padding:24px;background:#faf6f0;color:#2c2a26;font-family:"DM Sans",system-ui,sans-serif;line-height:1.5}.wrap{max-width:1120px;margin:auto}.top{display:flex;justify-content:space-between;gap:16px;margin-bottom:22px}.top a{color:#6b6760;text-decoration:none}.tag{display:inline-block;padding:5px 10px;border-radius:6px;background:#edf1f5;color:#3d5a80;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase}h1{font-size:clamp(28px,4.5vw,48px);line-height:1.05;margin:10px 0 8px}.lede{max-width:780px;color:#6b6760}.chips{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 22px}.chips span{font:12px "DM Mono";background:#f0ebe3;border:1px solid #e5dfd5;border-radius:999px;padding:5px 9px}.grid{display:grid;grid-template-columns:minmax(420px,1.15fr) minmax(300px,.85fr);gap:18px}@media(max-width:900px){.grid{grid-template-columns:1fr}body{padding:17px}}.card{background:#fff;border:1px solid #e5dfd5;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}.head{padding:16px 18px;border-bottom:1px solid #f0ebe3}.head b{display:block}.head span{color:#6b6760;font-size:13px}.stage{padding:14px}canvas{display:block;width:100%;height:auto;border:1px solid #e5dfd5;border-radius:10px;background:#fffdf9;cursor:crosshair}.controls{padding:14px;display:grid;gap:12px}.group{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:12px}.group h2{margin:0 0 8px;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase;color:#3d5a80}.row{display:grid;grid-template-columns:88px 1fr 52px;gap:10px;align-items:center;margin:8px 0}.row label,.val{font:12px "DM Mono";color:#6b6760}.val{text-align:right;color:#2c2a26}input[type=range]{width:100%;accent-color:#e07a5f}.btns{display:flex;flex-wrap:wrap;gap:8px}button{border:1px solid #e5dfd5;border-radius:999px;background:#fff;padding:8px 14px;font:600 13px "DM Sans";color:#6b6760;cursor:pointer;transition:all .15s}button:hover{border-color:#9e998f;color:#2c2a26}button.active{background:#3d5a80;color:#fff;border-color:#3d5a80}button.clear-btn{background:#faf6f0;border-color:#e5dfd5}.read{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}@media(max-width:620px){.read{grid-template-columns:1fr}}.read div{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:10px}.read small{display:block;font:10px "DM Mono";color:#9e998f;text-transform:uppercase}.read strong{font:13px "DM Mono";word-break:break-all}.code{margin-top:18px;background:#2c2a26;color:#f0ebe3;border-radius:14px;padding:18px 20px;overflow:auto;font:12.5px/1.7 "DM Mono";white-space:pre}.comment{color:#9e998f}.highlight{color:#f2cc8f}.accent{color:#81b29a}.lesson-cards{display:grid;gap:10px;margin-top:4px}.lesson-card{background:#fff;border:1px solid #e5dfd5;border-radius:10px;padding:12px}.lesson-card h3{margin:0 0 5px;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase}.lesson-card.try h3{color:#3d5a80}.lesson-card.notice h3{color:#e07a5f}.lesson-card.remix h3{color:#81b29a}.lesson-card p{margin:0;font-size:13px;color:#6b6760}
+  </style>
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+  <nav class="top"><a href="../../index.html">← Back to tool library</a><a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp" target="_blank" rel="noopener">CC Fest on GitHub</a></nav>
+  <span class="tag">◎ Motion · Move + Listen</span>
+  <h1>Trails / Ghosting Studio</h1>
+  <p class="lede">background() with an alpha value clears partially each frame, leaving ghost trails. Control the fade speed and see the p5.js code it generates.</p>
+  <div class="chips"><span>trails</span><span>alpha</span><span>background</span><span>motion</span><span>animation</span><span>ghosting</span></div>
+  <main class="grid">
+    <section class="card">
+      <div class="head"><b id="stageTitle">Mouse Follow Mode</b><span id="stageDesc">Move the mouse over the canvas to leave ghost trails.</span></div>
+      <div class="stage">
+        <canvas id="canvas" width="560" height="420"></canvas>
+        <div class="read">
+          <div><small>alpha</small><strong id="alphaRead">40</strong></div>
+          <div><small>effect</small><strong id="effectRead">motion blur</strong></div>
+          <div><small>mode</small><strong id="modeRead">Mouse Follow</strong></div>
+          <div><small>trail length</small><strong id="trailRead">~6 frames</strong></div>
+        </div>
+      </div>
+    </section>
+    <aside class="card">
+      <div class="head"><b>Controls</b><span>Adjust fade speed and switch motion modes.</span></div>
+      <div class="controls">
+        <div class="group">
+          <h2>Mode</h2>
+          <div class="btns">
+            <button class="active" data-mode="mouse">Mouse Follow</button>
+            <button data-mode="bounce">Bouncing Ball</button>
+            <button data-mode="orbital">Orbital</button>
+          </div>
+        </div>
+        <div class="group">
+          <h2>Parameters</h2>
+          <div class="row">
+            <label>Fade speed</label>
+            <input id="alphaSlider" type="range" min="5" max="255" value="40">
+            <span class="val" id="alphaVal">40</span>
+          </div>
+          <div class="row">
+            <label>Ball size</label>
+            <input id="sizeSlider" type="range" min="10" max="60" value="28">
+            <span class="val" id="sizeVal">28</span>
+          </div>
+        </div>
+        <div class="group">
+          <h2>Canvas</h2>
+          <div class="btns">
+            <button id="clearBtn" class="clear-btn">Clear canvas</button>
+          </div>
+        </div>
+        <div class="lesson-cards">
+          <div class="lesson-card try"><h3>Try this</h3><p>Set alpha to 15 and use Mouse Follow. Draw your name by moving the mouse slowly over the canvas.</p></div>
+          <div class="lesson-card notice"><h3>Notice this</h3><p>The lower the alpha, the longer the trail. Alpha 255 = full clear = no trail. Alpha 5 = barely clears = long ghost.</p></div>
+          <div class="lesson-card remix"><h3>Remix this</h3><p>Switch to Orbital mode and drop alpha to 20. Change the ball color halfway through the orbit.</p></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+  <pre class="code" id="codeBlock"></pre>
+</div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = 560, H = 420;
+
+let alpha = 40;
+let ballSize = 28;
+let mode = 'mouse';
+
+// Mouse follow state
+let mx = W / 2, my = H / 2;
+let bx = W / 2, by = H / 2;
+
+// Bounce state
+let bbx = W / 2, bby = H / 2;
+let vx = 2.8, vy = 1.9;
+
+// Orbital state
+let angle = 0;
+let orbitCX = W / 2, orbitCY = H / 2;
+let orbitR = 120;
+
+let needsClear = false;
+let frameCount = 0;
+
+canvas.addEventListener('pointermove', e => {
+  const rect = canvas.getBoundingClientRect();
+  mx = (e.clientX - rect.left) * W / rect.width;
+  my = (e.clientY - rect.top) * H / rect.height;
+});
+
+// Init canvas background
+ctx.fillStyle = '#fffdf9';
+ctx.fillRect(0, 0, W, H);
+
+function getEffect(a) {
+  if (a < 30) return 'afterimage';
+  if (a <= 80) return 'motion blur';
+  if (a <= 150) return 'short trail';
+  return 'barely visible';
+}
+
+function getTrailFrames(a) {
+  return Math.round(255 / a * 2.5);
+}
+
+function updateReadouts() {
+  document.getElementById('alphaRead').textContent = alpha;
+  document.getElementById('effectRead').textContent = getEffect(alpha);
+  document.getElementById('modeRead').textContent =
+    mode === 'mouse' ? 'Mouse Follow' : mode === 'bounce' ? 'Bouncing Ball' : 'Orbital';
+  const frames = getTrailFrames(alpha);
+  document.getElementById('trailRead').textContent = frames > 60 ? '60+ frames' : `~${frames} frames`;
+}
+
+function updateCode() {
+  const a = alpha;
+  const sz = ballSize;
+  let modeCode = '';
+  if (mode === 'mouse') {
+    modeCode = `  <span class="accent">x = lerp(x, mouseX, 0.08);\n  y = lerp(y, mouseY, 0.08);</span>`;
+  } else if (mode === 'bounce') {
+    modeCode = `  <span class="accent">x += vx;\n  y += vy;\n  if (x < 0 || x > width)  vx *= -1;\n  if (y < 0 || y > height) vy *= -1;</span>`;
+  } else {
+    modeCode = `  <span class="accent">angle += 0.03;\n  x = width/2  + cos(angle) * 120;\n  y = height/2 + sin(angle) * 120;</span>`;
+  }
+
+  document.getElementById('codeBlock').innerHTML =
+`<span class="comment">// Trails / Ghosting — background() with alpha</span>
+<span class="comment">// Mode: ${mode === 'mouse' ? 'Mouse Follow' : mode === 'bounce' ? 'Bouncing Ball' : 'Orbital'}</span>
+
+let x = 200, y = 200;${mode === 'bounce' ? '\nlet vx = 2.8, vy = 1.9;' : mode === 'orbital' ? '\nlet angle = 0;' : ''}
+
+function setup() {
+  createCanvas(560, 420);
+}
+
+function draw() {
+  <span class="highlight">background(250, ${a});</span>  <span class="comment">// ← alpha ${a} creates ghost trail</span>
+                   <span class="comment">// alpha 255 = full clear, no trail</span>
+                   <span class="comment">// alpha ${a} = ${getEffect(a)}</span>
+
+${modeCode}
+
+  fill(61, 90, 128);
+  noStroke();
+  circle(x, y, ${sz});
+}`;
+}
+
+function loop() {
+  frameCount++;
+
+  if (needsClear) {
+    ctx.fillStyle = '#fffdf9';
+    ctx.fillRect(0, 0, W, H);
+    needsClear = false;
+  } else {
+    // Ghost fade — the key trick
+    ctx.fillStyle = `rgba(255, 253, 249, ${alpha / 255})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Update and draw based on mode
+  if (mode === 'mouse') {
+    bx += (mx - bx) * 0.08;
+    by += (my - by) * 0.08;
+    drawBall(bx, by);
+  } else if (mode === 'bounce') {
+    bbx += vx;
+    bby += vy;
+    if (bbx < ballSize / 2 || bbx > W - ballSize / 2) vx *= -1;
+    if (bby < ballSize / 2 || bby > H - ballSize / 2) vy *= -1;
+    drawBall(bbx, bby);
+  } else {
+    angle += 0.025;
+    const ox = orbitCX + Math.cos(angle) * orbitR;
+    const oy = orbitCY + Math.sin(angle) * orbitR;
+
+    // Draw orbit guide (faint)
+    ctx.strokeStyle = 'rgba(61,90,128,0.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(orbitCX, orbitCY, orbitR, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Center dot
+    ctx.fillStyle = 'rgba(61,90,128,0.2)';
+    ctx.beginPath();
+    ctx.arc(orbitCX, orbitCY, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    drawBall(ox, oy);
+  }
+
+  updateReadouts();
+  requestAnimationFrame(loop);
+}
+
+function drawBall(x, y) {
+  // Shadow glow
+  ctx.shadowColor = 'rgba(61,90,128,0.3)';
+  ctx.shadowBlur = 12;
+  ctx.fillStyle = 'rgb(61,90,128)';
+  ctx.beginPath();
+  ctx.arc(x, y, ballSize / 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+}
+
+// Slider controls
+document.getElementById('alphaSlider').oninput = function () {
+  alpha = Number(this.value);
+  document.getElementById('alphaVal').textContent = alpha;
+  updateCode();
+};
+
+document.getElementById('sizeSlider').oninput = function () {
+  ballSize = Number(this.value);
+  document.getElementById('sizeVal').textContent = ballSize;
+  updateCode();
+};
+
+// Mode buttons
+document.querySelectorAll('[data-mode]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    mode = btn.dataset.mode;
+
+    // Reset positions
+    bx = W / 2; by = H / 2;
+    bbx = W / 2; bby = H / 3;
+    vx = 2.8; vy = 1.9;
+    angle = 0;
+    needsClear = true;
+
+    const titles = {
+      mouse: ['Mouse Follow Mode', 'Move the mouse over the canvas to leave ghost trails.'],
+      bounce: ['Bouncing Ball Mode', 'The trail reveals the trajectory of the bouncing ball.'],
+      orbital: ['Orbital Mode', 'Trails build up the orbit path over time.'],
+    };
+    document.getElementById('stageTitle').textContent = titles[mode][0];
+    document.getElementById('stageDesc').textContent = titles[mode][1];
+    updateCode();
+  };
+});
+
+document.getElementById('clearBtn').onclick = () => { needsClear = true; };
+
+updateCode();
+updateReadouts();
+loop();
+</script>
+<script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

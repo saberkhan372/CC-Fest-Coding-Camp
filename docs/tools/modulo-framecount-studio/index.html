@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modulo + frameCount Studio - CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:24px;background:#faf6f0;color:#2c2a26;font-family:"DM Sans",system-ui,sans-serif;line-height:1.5}.wrap{max-width:1120px;margin:auto}.top{display:flex;justify-content:space-between;gap:16px;margin-bottom:22px}.top a{color:#6b6760;text-decoration:none}.tag{display:inline-block;padding:5px 10px;border-radius:6px;background:#edf1f5;color:#3d5a80;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase}h1{font-size:clamp(28px,5vw,50px);line-height:1;margin:10px 0 8px}.lede{max-width:780px;color:#6b6760}.chips{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 22px}.chips span{font:12px "DM Mono";background:#f0ebe3;border:1px solid #e5dfd5;border-radius:999px;padding:5px 9px}.grid{display:grid;grid-template-columns:minmax(420px,1.15fr) minmax(300px,.85fr);gap:18px}@media(max-width:900px){.grid{grid-template-columns:1fr}body{padding:17px}}.card{background:#fff;border:1px solid #e5dfd5;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}.head{padding:16px 18px;border-bottom:1px solid #f0ebe3}.head b{display:block}.head span{color:#6b6760;font-size:13px}.stage{padding:14px}canvas{display:block;width:100%;height:auto;border:1px solid #e5dfd5;border-radius:10px;background:#fff}.controls{padding:14px;display:grid;gap:12px}.group{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:12px}.group h2{margin:0 0 8px;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase;color:#3d5a80}.row{display:grid;grid-template-columns:88px 1fr 52px;gap:10px;align-items:center;margin:8px 0}.row label,.val{font:12px "DM Mono";color:#6b6760}.val{text-align:right;color:#2c2a26}input[type=range]{width:100%;accent-color:#e07a5f}.btns{display:flex;flex-wrap:wrap;gap:8px}button{border:1px solid #e5dfd5;border-radius:999px;background:#fff;padding:7px 12px;font:600 13px "DM Sans";color:#6b6760;cursor:pointer;transition:background .15s,color .15s}button:hover{background:#f0ebe3}button.active{background:#3d5a80;color:#fff;border-color:#3d5a80}.read{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.read div{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:10px}.read small{display:block;font:10px "DM Mono";color:#9e998f;text-transform:uppercase}.read strong{font:700 18px "DM Mono";display:block;margin-top:3px}.fc-display{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:12px;text-align:center}.fc-display .label{font:700 10px "DM Mono";text-transform:uppercase;letter-spacing:.08em;color:#9e998f;margin-bottom:4px}.fc-display .big{font:700 32px "DM Mono";color:#3d5a80;line-height:1}.fc-display .eq{font:14px "DM Mono";color:#6b6760;margin-top:4px}.code{margin-top:18px;background:#2c2a26;color:#f0ebe3;border-radius:14px;padding:16px;overflow:auto;font:13px/1.6 "DM Mono";white-space:pre}.notes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}@media(max-width:700px){.notes-grid{grid-template-columns:1fr}}.note-card{background:#fff;border:1px solid #e5dfd5;border-radius:14px;padding:16px}.note-card .label{font:700 10px "DM Mono";text-transform:uppercase;letter-spacing:.08em;color:#9e998f;margin-bottom:6px}.note-card p{margin:0;color:#6b6760;font-size:14px}.note-card p b{color:#2c2a26}.mode-btns{display:flex;flex-wrap:wrap;gap:6px}
+  </style>
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+  <nav class="top"><a href="../../index.html">← Back to tool library</a><a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp" target="_blank" rel="noopener">CC Fest on GitHub</a></nav>
+  <span class="tag">⬡ Systems · Patterns + Systems</span>
+  <h1>Modulo + frameCount Studio</h1>
+  <p class="lede">frameCount % N creates rhythms: blink, pulse, cooldown, color cycles. Change N and see how the pattern's timing changes.</p>
+  <div class="chips"><span>modulo</span><span>frameCount</span><span>animation</span><span>rhythm</span><span>timing</span><span>patterns</span></div>
+  <main class="grid">
+    <section class="card">
+      <div class="head"><b id="stageTitle">All 4 Patterns</b><span id="stageDesc">Each quadrant uses frameCount % N in a different way.</span></div>
+      <div class="stage">
+        <canvas id="canvas" width="580" height="400"></canvas>
+        <div class="read">
+          <div><small>frameCount</small><strong id="readFC">0</strong></div>
+          <div><small>N</small><strong id="readN">30</strong></div>
+          <div><small>frameCount % N</small><strong id="readMod">0</strong></div>
+          <div><small>Cycle #</small><strong id="readCycle">0</strong></div>
+        </div>
+      </div>
+    </section>
+    <aside class="card">
+      <div class="head"><b>Controls</b><span>Adjust N and speed. Pause or step frame-by-frame.</span></div>
+      <div class="controls">
+        <div class="fc-display">
+          <div class="label">frameCount % N</div>
+          <div class="big" id="fcBig">0</div>
+          <div class="eq" id="fcEq">0 % 30 = 0</div>
+        </div>
+        <div class="group">
+          <h2>Parameters</h2>
+          <div class="row">
+            <label>N (frames)</label>
+            <input type="range" id="nSlider" min="5" max="120" step="1" value="30">
+            <span class="val" id="nVal">30</span>
+          </div>
+          <div class="row">
+            <label>speed</label>
+            <input type="range" id="speedSlider" min="0.5" max="4" step="0.1" value="1">
+            <span class="val" id="speedVal">1.0×</span>
+          </div>
+        </div>
+        <div class="group">
+          <h2>Playback</h2>
+          <div class="btns">
+            <button id="btnPause">Pause</button>
+            <button id="btnStep" disabled>→ Next Frame</button>
+          </div>
+        </div>
+        <div class="group">
+          <h2>View Mode</h2>
+          <div class="mode-btns">
+            <button class="active" data-mode="all">All 4</button>
+            <button data-mode="blink">Blink</button>
+            <button data-mode="pulse">Pulse</button>
+            <button data-mode="cooldown">Cooldown</button>
+            <button data-mode="grid">Grid Cycle</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+  <pre class="code" id="codeBlock"></pre>
+  <div class="notes-grid">
+    <div class="note-card"><div class="label">Try this</div><p>Set <b>N to 10</b> and watch the Blink. Then set N to 60. How does the rhythm feel different?</p></div>
+    <div class="note-card"><div class="label">Notice this</div><p><b>frameCount % N</b> always gives a number from 0 to N-1. When it hits 0, the cycle resets. That's the heartbeat of time-based animation.</p></div>
+    <div class="note-card"><div class="label">Remix this</div><p>Set speed to <b>0.5</b> for a slow pulse, then <b>3</b> for a frantic one. The visual is the same — only the tempo changed.</p></div>
+  </div>
+</div>
+<script>
+const CW = 580, CH = 400;
+const QW = CW/2, QH = CH/2; // 290 x 200 each quadrant
+const c = document.getElementById('canvas');
+const ctx = c.getContext('2d');
+
+let fc = 0;       // our frameCount
+let N = 30;
+let speedMult = 1.0;
+let paused = false;
+let stepPending = false;
+let viewMode = 'all';
+let accumulator = 0;
+
+// Colors
+const BLUE    = '#3d5a80';
+const ORANGE  = '#e07a5f';
+const GREEN   = '#81b29a';
+const YELLOW  = '#f2cc8f';
+const CREAM   = '#f0ebe3';
+const INK     = '#2c2a26';
+const INKLT   = '#6b6760';
+const DIV_LINE = '#e5dfd5';
+
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return [r,g,b];
+}
+
+// ── quadrant painters ──────────────────────────────────────────────────────
+
+function drawBlink(ox, oy, w, h, frac){
+  // frac = (fc % N) / N — 0..1
+  const on = frac < 0.5;
+  // background
+  ctx.fillStyle = '#fafaf8';
+  ctx.fillRect(ox, oy, w, h);
+  if(on){
+    ctx.fillStyle = BLUE;
+    ctx.beginPath();
+    ctx.arc(ox + w/2, oy + h/2, 44, 0, Math.PI*2);
+    ctx.fill();
+  } else {
+    ctx.strokeStyle = DIV_LINE;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(ox + w/2, oy + h/2, 44, 0, Math.PI*2);
+    ctx.stroke();
+  }
+  // label
+  ctx.fillStyle = INKLT;
+  ctx.font = '700 11px DM Mono';
+  ctx.textAlign = 'left';
+  ctx.fillText('Blink', ox+8, oy+16);
+  ctx.fillStyle = on ? GREEN : '#c9c5bf';
+  ctx.font = '10px DM Mono';
+  ctx.fillText(on ? 'ON' : 'OFF', ox+8, oy+h-8);
+}
+
+function drawPulse(ox, oy, w, h, frac){
+  ctx.fillStyle = '#fafaf8';
+  ctx.fillRect(ox, oy, w, h);
+  const r = 20 + 45 * frac;
+  ctx.fillStyle = ORANGE;
+  ctx.beginPath();
+  ctx.arc(ox + w/2, oy + h/2, r, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = INKLT;
+  ctx.font = '700 11px DM Mono';
+  ctx.textAlign = 'left';
+  ctx.fillText('Pulse', ox+8, oy+16);
+  ctx.fillStyle = INKLT;
+  ctx.font = '10px DM Mono';
+  ctx.fillText('r = ' + r.toFixed(1), ox+8, oy+h-8);
+}
+
+function drawCooldown(ox, oy, w, h, frac){
+  ctx.fillStyle = '#fafaf8';
+  ctx.fillRect(ox, oy, w, h);
+  const maxW = w - 40;
+  const barW = (1 - frac) * maxW;
+  // track
+  ctx.fillStyle = CREAM;
+  ctx.strokeStyle = DIV_LINE;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(ox+20, oy+h/2-14, maxW, 28, 7)
+                : ctx.rect(ox+20, oy+h/2-14, maxW, 28);
+  ctx.fill();
+  ctx.stroke();
+  // fill
+  if(barW > 1){
+    ctx.fillStyle = GREEN;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(ox+20, oy+h/2-14, barW, 28, 7)
+                  : ctx.rect(ox+20, oy+h/2-14, barW, 28);
+    ctx.fill();
+  }
+  ctx.fillStyle = INKLT;
+  ctx.font = '700 11px DM Mono';
+  ctx.textAlign = 'left';
+  ctx.fillText('Cooldown', ox+8, oy+16);
+  ctx.fillStyle = INKLT;
+  ctx.font = '10px DM Mono';
+  ctx.fillText(Math.round((1-frac)*100) + '%', ox+8, oy+h-8);
+}
+
+function drawGridCycle(ox, oy, w, h){
+  ctx.fillStyle = '#fafaf8';
+  ctx.fillRect(ox, oy, w, h);
+  const cols = 5, rows = 5;
+  const cell = 28;
+  const gw = cols*cell, gh = rows*cell;
+  const startX = ox + (w - gw)/2;
+  const startY = oy + (h - gh)/2 + 4;
+  for(let i=0;i<rows;i++){
+    for(let j=0;j<cols;j++){
+      const idx = i*cols + j;
+      const highlight = (idx + Math.floor(fc)) % N === 0;
+      ctx.fillStyle = highlight ? YELLOW : CREAM;
+      ctx.strokeStyle = DIV_LINE;
+      ctx.lineWidth = 1;
+      const rx = startX + j*cell + 2, ry = startY + i*cell + 2;
+      ctx.fillRect(rx, ry, cell-4, cell-4);
+      ctx.strokeRect(rx, ry, cell-4, cell-4);
+    }
+  }
+  ctx.fillStyle = INKLT;
+  ctx.font = '700 11px DM Mono';
+  ctx.textAlign = 'left';
+  ctx.fillText('Grid Cycle', ox+8, oy+16);
+}
+
+function drawDividers(){
+  ctx.strokeStyle = DIV_LINE;
+  ctx.lineWidth = 1.5;
+  // vertical
+  ctx.beginPath(); ctx.moveTo(QW, 0); ctx.lineTo(QW, CH); ctx.stroke();
+  // horizontal
+  ctx.beginPath(); ctx.moveTo(0, QH); ctx.lineTo(CW, QH); ctx.stroke();
+}
+
+function drawAll(){
+  const frac = (fc % N) / N;
+  drawBlink(0, 0, QW, QH, frac);
+  drawPulse(QW, 0, QW, QH, frac);
+  drawCooldown(0, QH, QW, QH, frac);
+  drawGridCycle(QW, QH, QW, QH);
+  drawDividers();
+}
+
+function drawSingle(mode){
+  const frac = (fc % N) / N;
+  ctx.fillStyle = '#fafaf8';
+  ctx.fillRect(0,0,CW,CH);
+  if(mode === 'blink') drawBlinkFull(frac);
+  else if(mode === 'pulse') drawPulseFull(frac);
+  else if(mode === 'cooldown') drawCooldownFull(frac);
+  else if(mode === 'grid') drawGridFull();
+}
+
+function drawBlinkFull(frac){
+  const on = frac < 0.5;
+  if(on){
+    ctx.fillStyle = BLUE;
+    ctx.beginPath();
+    ctx.arc(CW/2, CH/2, 90, 0, Math.PI*2);
+    ctx.fill();
+  } else {
+    ctx.strokeStyle = DIV_LINE;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(CW/2, CH/2, 90, 0, Math.PI*2);
+    ctx.stroke();
+  }
+  ctx.fillStyle = INKLT;
+  ctx.font = '700 13px DM Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(on ? 'frameCount % N < N/2  →  ON' : 'frameCount % N ≥ N/2  →  OFF', CW/2, CH-24);
+}
+
+function drawPulseFull(frac){
+  const r = 20 + 80 * frac;
+  ctx.fillStyle = ORANGE;
+  ctx.beginPath();
+  ctx.arc(CW/2, CH/2, r, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = INKLT;
+  ctx.font = '700 13px DM Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(`r = 20 + 80 × (frameCount % N) / N = ${r.toFixed(1)}`, CW/2, CH-24);
+}
+
+function drawCooldownFull(frac){
+  const maxW = CW - 100;
+  const barW = (1 - frac) * maxW;
+  ctx.fillStyle = CREAM;
+  ctx.strokeStyle = DIV_LINE;
+  ctx.lineWidth = 1;
+  ctx.fillRect(50, CH/2-26, maxW, 52);
+  ctx.strokeRect(50, CH/2-26, maxW, 52);
+  if(barW > 1){
+    ctx.fillStyle = GREEN;
+    ctx.fillRect(50, CH/2-26, barW, 52);
+  }
+  ctx.fillStyle = INKLT;
+  ctx.font = '700 13px DM Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(`pct = (N - frameCount % N) / N = ${((1-frac)*100).toFixed(1)}%`, CW/2, CH-24);
+}
+
+function drawGridFull(){
+  const cols = 8, rows = 5;
+  const cell = 48;
+  const gw = cols*cell, gh = rows*cell;
+  const sx = (CW - gw)/2, sy = (CH - gh)/2;
+  for(let i=0;i<rows;i++){
+    for(let j=0;j<cols;j++){
+      const idx = i*cols + j;
+      const highlight = (idx + Math.floor(fc)) % N === 0;
+      ctx.fillStyle = highlight ? YELLOW : CREAM;
+      ctx.strokeStyle = DIV_LINE;
+      ctx.lineWidth = 1;
+      ctx.fillRect(sx+j*cell+2, sy+i*cell+2, cell-4, cell-4);
+      ctx.strokeRect(sx+j*cell+2, sy+i*cell+2, cell-4, cell-4);
+    }
+  }
+  ctx.fillStyle = INKLT;
+  ctx.font = '700 13px DM Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(`(i×${cols} + j + frameCount) % N === 0  →  highlight`, CW/2, CH-16);
+}
+
+// ── render + update ─────────────────────────────────────────────────────────
+
+function updateReadouts(){
+  const mod = Math.floor(fc) % N;
+  const cycle = Math.floor(Math.floor(fc) / N);
+  document.getElementById('readFC').textContent = Math.floor(fc);
+  document.getElementById('readN').textContent = N;
+  document.getElementById('readMod').textContent = mod;
+  document.getElementById('readCycle').textContent = cycle;
+  document.getElementById('fcBig').textContent = mod;
+  document.getElementById('fcEq').textContent = `${Math.floor(fc)} % ${N} = ${mod}`;
+}
+
+function renderFrame(){
+  ctx.clearRect(0,0,CW,CH);
+  if(viewMode === 'all') drawAll();
+  else drawSingle(viewMode);
+  updateReadouts();
+  updateCode();
+}
+
+let lastTime = null;
+function loop(ts){
+  if(!lastTime) lastTime = ts;
+  const dt = (ts - lastTime) / 1000;
+  lastTime = ts;
+
+  if(!paused){
+    fc += speedMult * 60 * dt; // advance frameCount at ~60fps * speed
+    renderFrame();
+  } else if(stepPending){
+    stepPending = false;
+    fc += 1;
+    renderFrame();
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// ── controls ─────────────────────────────────────────────────────────────────
+
+document.getElementById('nSlider').addEventListener('input', e=>{
+  N = parseInt(e.target.value);
+  document.getElementById('nVal').textContent = N;
+  updateCode();
+});
+document.getElementById('speedSlider').addEventListener('input', e=>{
+  speedMult = parseFloat(e.target.value);
+  document.getElementById('speedVal').textContent = speedMult.toFixed(1) + '×';
+});
+document.getElementById('btnPause').addEventListener('click', ()=>{
+  paused = !paused;
+  document.getElementById('btnPause').textContent = paused ? 'Resume' : 'Pause';
+  document.getElementById('btnPause').classList.toggle('active', paused);
+  document.getElementById('btnStep').disabled = !paused;
+});
+document.getElementById('btnStep').addEventListener('click', ()=>{ stepPending = true; });
+
+document.querySelectorAll('[data-mode]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-mode]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    viewMode = btn.dataset.mode;
+    const titles = {all:'All 4 Patterns', blink:'Blink', pulse:'Pulse', cooldown:'Cooldown', grid:'Grid Cycle'};
+    const descs = {
+      all:'Each quadrant uses frameCount % N in a different way.',
+      blink:'Circle appears for first half of each N-frame cycle.',
+      pulse:'Size ramps from small to large over N frames, then resets.',
+      cooldown:'Bar drains over N frames — like a cooldown timer.',
+      grid:'Each cell highlights once per N-frame cycle, sweeping through.'
+    };
+    document.getElementById('stageTitle').textContent = titles[viewMode];
+    document.getElementById('stageDesc').textContent = descs[viewMode];
+    updateCode();
+  });
+});
+
+function updateCode(){
+  const n = N;
+  const codes = {
+    all:
+`let n = ${n}; // frames per cycle
+
+function draw() {
+  background(250);
+  // frameCount increments automatically in p5.js
+
+  // Blink: show for first half of cycle
+  if (frameCount % n < n / 2) {
+    fill(61, 90, 128);
+    circle(100, 100, 88);
+  }
+
+  // Pulse: size ramps up each cycle
+  let r = 20 + 25 * (frameCount % n) / n;
+  circle(300, 100, r * 2);
+
+  // Cooldown bar
+  let pct = (n - frameCount % n) / n;
+  fill(129, 178, 154);
+  rect(50, 280, 200 * pct, 30);
+
+  // Grid: sweep highlight
+  for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 5; j++) {
+      if ((i * 5 + j + frameCount) % n === 0) fill(242, 204, 143);
+      else fill(240, 235, 227);
+      rect(300 + j*28, 260 + i*28, 24, 24);
+    }
+  }
+}`,
+    blink:
+`let n = ${n};
+
+function draw() {
+  background(250);
+  // ON for first half, OFF for second half
+  if (frameCount % n < n / 2) {
+    fill(61, 90, 128);
+    circle(width/2, height/2, 180);
+  }
+}`,
+    pulse:
+`let n = ${n};
+
+function draw() {
+  background(250);
+  let r = 20 + 80 * (frameCount % n) / n;
+  fill(224, 122, 95);
+  circle(width/2, height/2, r * 2);
+}`,
+    cooldown:
+`let n = ${n};
+
+function draw() {
+  background(250);
+  let pct = (n - frameCount % n) / n;
+  fill(129, 178, 154);
+  rect(50, height/2 - 26, (width - 100) * pct, 52);
+}`,
+    grid:
+`let n = ${n};
+
+function draw() {
+  background(250);
+  for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 5; j++) {
+      if ((i * 5 + j + frameCount) % n === 0) fill(242, 204, 143);
+      else fill(240, 235, 227);
+      rect(80 + j*48, 60 + i*48, 44, 44);
+    }
+  }
+}`
+  };
+  document.getElementById('codeBlock').textContent = codes[viewMode] || codes.all;
+}
+
+updateCode();
+</script>
+<script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>
