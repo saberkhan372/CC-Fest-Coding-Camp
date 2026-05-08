@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events: Sketches Listen</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffaf2;
+      --ink: #222222;
+      --muted: #6b6258;
+      --line: #ded2c1;
+      --accent: #2563eb;
+      --mouse: #0891b2;
+      --click: #e11d48;
+      --key: #7c3aed;
+      --hold: #16a34a;
+      --state: #f59e0b;
+      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
+        var(--bg);
+    }
+
+    header {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 20px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 960px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 12px 20px 36px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .controls,
+    .workspace,
+    .side-panel {
+      background: rgba(255, 250, 242, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    .toggle-label,
+    .pill {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+      user-select: none;
+    }
+
+    button:hover,
+    .toggle-label:hover {
+      transform: translateY(-1px);
+      background: #fff7ed;
+    }
+
+    button.active {
+      color: white;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .toggle-label input {
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    .pill {
+      cursor: default;
+      background: #f8fafc;
+      color: var(--muted);
+      border-color: #e2e8f0;
+    }
+
+    .slider-wrap {
+      display: grid;
+      grid-template-columns: 112px minmax(150px, 1fr) 76px;
+      gap: 9px;
+      align-items: center;
+      min-width: min(390px, 100%);
+    }
+
+    label,
+    .value-label,
+    .preset-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .workspace {
+      position: relative;
+      height: 660px;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    #sketch-holder {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #sketch-holder canvas { display: block; }
+
+    .canvas-caption {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      right: 22px;
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      backdrop-filter: blur(8px);
+    }
+
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .card h2 { font-size: 1.15rem; }
+    .card h3 { font-size: 1rem; }
+
+    .card p,
+    .card li {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .card p { margin: 0 0 8px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .formula {
+      display: block;
+      margin: 8px 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .legend { display: grid; gap: 8px; }
+    .legend-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: center; font-size: 0.9rem; color: var(--muted); }
+    .swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); }
+    .swatch.mouse { background: var(--mouse); }
+    .swatch.click { background: var(--click); }
+    .swatch.key { background: var(--key); }
+    .swatch.hold { background: var(--hold); }
+    .swatch.state { background: var(--state); }
+
+    .code-card { display: none; }
+    .code-card.visible { display: block; }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      padding: 12px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .note { font-size: 0.86rem; color: var(--muted); }
+
+    @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
+    @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
+  </style>
+</head>
+<body>
+  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
+    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+  </div>
+  <header>
+    <h1>Events: Sketches Listen</h1>
+    <p class="subtitle">
+      A concept bridge for <strong>mouseX</strong>, <strong>mouseY</strong>, <strong>mousePressed()</strong>, <strong>keyPressed()</strong>, and <strong>keyIsDown()</strong>.
+      Some input is continuous. Some input happens as an event.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Explorer controls">
+      <div class="row">
+        <button id="mode-mouse" class="active">Mouse Position</button>
+        <button id="mode-click">Click Event</button>
+        <button id="mode-key">Key Event</button>
+        <button id="mode-hold">Held Keys</button>
+        <button id="mode-state">Input Changes State</button>
+        <button id="simulate-click-button">Simulate Click</button>
+        <button id="simulate-key-button">Simulate Key</button>
+        <button id="reset-button">Reset</button>
+        <span id="mode-pill" class="pill">mouseX and mouseY update continuously</span>
+      </div>
+
+      <div class="row">
+        <div class="slider-wrap">
+          <label for="speed-slider">Move speed</label>
+          <input id="speed-slider" type="range" min="1" max="10" value="4" step="1" />
+          <span id="speed-value" class="value-label">4</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="size-slider">Player size</label>
+          <input id="size-slider" type="range" min="20" max="90" value="48" step="1" />
+          <span id="size-value" class="value-label">48</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="trail-slider">Trail length</label>
+          <input id="trail-slider" type="range" min="0" max="80" value="30" step="1" />
+          <span id="trail-value" class="value-label">30</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="preset-label">Try on canvas:</span>
+        <span class="pill">move mouse</span>
+        <span class="pill">click</span>
+        <span class="pill">press any key</span>
+        <span class="pill">hold arrow keys or WASD</span>
+        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
+        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div id="sketch-holder"></div>
+      <div id="canvas-caption" class="canvas-caption">
+        mouseX and mouseY are always available in draw(). They update continuously as the mouse moves.
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <section class="card">
+        <h2 id="lesson-title">Continuous input updates every frame</h2>
+        <p id="lesson-text">
+          mouseX and mouseY are variables that p5.js updates automatically. draw() can use them every frame to make the sketch follow the pointer.
+        </p>
+        <span id="formula-box" class="formula">circle(mouseX, mouseY, 40);</span>
+      </section>
+
+      <section class="card">
+        <h3>Big idea</h3>
+        <p><strong>Continuous input:</strong> values available every frame, like mouseX.</p>
+        <p><strong>Event function:</strong> runs once when something happens, like mousePressed().</p>
+        <p><strong>Held input:</strong> checked every frame with keyIsDown().</p>
+      </section>
+
+      <section class="card">
+        <h3>Legend</h3>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch mouse"></span><span>continuous mouse input</span></div>
+          <div class="legend-item"><span class="swatch click"></span><span>click event</span></div>
+          <div class="legend-item"><span class="swatch key"></span><span>key event</span></div>
+          <div class="legend-item"><span class="swatch hold"></span><span>held key movement</span></div>
+          <div class="legend-item"><span class="swatch state"></span><span>input changes state</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Try this</h3>
+        <p id="question-text">Move the mouse across the canvas. Which numbers change every frame?</p>
+      </section>
+
+      <section id="code-card" class="card code-card">
+        <h3>p5.js connection</h3>
+        <pre><code id="code-box">function draw() {
+  circle(mouseX, mouseY, 40);
+}</code></pre>
+        <p class="note">
+          A common game pattern: use keyPressed() for one-time actions like jump or start, and keyIsDown() for continuous movement.
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const state = {
+      mode: "mouse",
+      speed: 4,
+      size: 48,
+      trailLength: 30,
+      showLabels: true,
+      showCode: false,
+      pointerX: 360,
+      pointerY: 250,
+      playerX: 360,
+      playerY: 260,
+      clickCount: 0,
+      lastClickX: 360,
+      lastClickY: 260,
+      lastKey: "none",
+      keyCount: 0,
+      sketchState: "calm",
+      trail: [],
+      clickBursts: []
+    };
+
+    const els = {};
+
+    function setupUI() {
+      els.modeMouse = document.querySelector("#mode-mouse");
+      els.modeClick = document.querySelector("#mode-click");
+      els.modeKey = document.querySelector("#mode-key");
+      els.modeHold = document.querySelector("#mode-hold");
+      els.modeState = document.querySelector("#mode-state");
+      els.simulateClickButton = document.querySelector("#simulate-click-button");
+      els.simulateKeyButton = document.querySelector("#simulate-key-button");
+      els.resetButton = document.querySelector("#reset-button");
+      els.modePill = document.querySelector("#mode-pill");
+      els.speedSlider = document.querySelector("#speed-slider");
+      els.sizeSlider = document.querySelector("#size-slider");
+      els.trailSlider = document.querySelector("#trail-slider");
+      els.speedValue = document.querySelector("#speed-value");
+      els.sizeValue = document.querySelector("#size-value");
+      els.trailValue = document.querySelector("#trail-value");
+      els.showLabels = document.querySelector("#show-labels");
+      els.showCode = document.querySelector("#show-code");
+      els.lessonTitle = document.querySelector("#lesson-title");
+      els.lessonText = document.querySelector("#lesson-text");
+      els.formulaBox = document.querySelector("#formula-box");
+      els.questionText = document.querySelector("#question-text");
+      els.caption = document.querySelector("#canvas-caption");
+      els.codeCard = document.querySelector("#code-card");
+      els.codeBox = document.querySelector("#code-box");
+
+      els.modeMouse.addEventListener("click", () => setMode("mouse"));
+      els.modeClick.addEventListener("click", () => setMode("click"));
+      els.modeKey.addEventListener("click", () => setMode("key"));
+      els.modeHold.addEventListener("click", () => setMode("hold"));
+      els.modeState.addEventListener("click", () => setMode("state"));
+
+      els.simulateClickButton.addEventListener("click", () => registerClick(state.pointerX, state.pointerY));
+      els.simulateKeyButton.addEventListener("click", () => registerKey("A"));
+
+      els.resetButton.addEventListener("click", () => {
+        state.playerX = 360;
+        state.playerY = 260;
+        state.clickCount = 0;
+        state.keyCount = 0;
+        state.lastKey = "none";
+        state.sketchState = "calm";
+        state.trail = [];
+        state.clickBursts = [];
+        updateUI();
+      });
+
+      els.speedSlider.addEventListener("input", () => { state.speed = Number(els.speedSlider.value); updateUI(); });
+      els.sizeSlider.addEventListener("input", () => { state.size = Number(els.sizeSlider.value); updateUI(); });
+      els.trailSlider.addEventListener("input", () => { state.trailLength = Number(els.trailSlider.value); updateUI(); });
+      els.showLabels.addEventListener("change", () => { state.showLabels = els.showLabels.checked; });
+      els.showCode.addEventListener("change", () => { state.showCode = els.showCode.checked; updateUI(); });
+
+      updateUI();
+    }
+
+    function setMode(mode) { state.mode = mode; updateUI(); }
+
+    function registerClick(x, y) {
+      state.clickCount += 1;
+      state.lastClickX = x;
+      state.lastClickY = y;
+      state.clickBursts.push({ x, y, age: 0 });
+      if (state.mode === "state") cycleSketchState();
+      updateUI();
+    }
+
+    function registerKey(k) {
+      state.keyCount += 1;
+      state.lastKey = k || "unknown";
+      if (state.mode === "state") cycleSketchState();
+      updateUI();
+    }
+
+    function cycleSketchState() {
+      const order = ["calm", "active", "surprised"];
+      const current = order.indexOf(state.sketchState);
+      state.sketchState = order[(current + 1) % order.length];
+    }
+
+    function updateUI() {
+      const buttons = [[els.modeMouse,"mouse"],[els.modeClick,"click"],[els.modeKey,"key"],[els.modeHold,"hold"],[els.modeState,"state"]];
+      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
+
+      els.speedSlider.value = state.speed;
+      els.sizeSlider.value = state.size;
+      els.trailSlider.value = state.trailLength;
+      els.speedValue.textContent = String(state.speed);
+      els.sizeValue.textContent = String(state.size);
+      els.trailValue.textContent = String(state.trailLength);
+      els.showLabels.checked = state.showLabels;
+      els.showCode.checked = state.showCode;
+      els.codeCard.classList.toggle("visible", state.showCode);
+
+      const lessons = {
+        mouse: {
+          pill: "mouseX and mouseY update continuously",
+          title: "Continuous input updates every frame",
+          text: "mouseX and mouseY are variables that p5.js updates automatically. draw() can use them every frame to make the sketch follow the pointer.",
+          formula: "circle(mouseX, mouseY, 40);",
+          question: "Move the mouse across the canvas. Which numbers change every frame?",
+          caption: "mouseX and mouseY are always available in draw(). They update continuously as the mouse moves.",
+          code: `function draw() {\n  background(240);\n  circle(mouseX, mouseY, ${state.size});\n}`
+        },
+        click: {
+          pill: "mousePressed() runs once per click",
+          title: "A click is an event",
+          text: "mousePressed() does not run every frame. It runs once when the mouse is pressed, which makes it useful for adding objects, changing states, or counting clicks.",
+          formula: "function mousePressed() {\n  clickCount++;\n}",
+          question: "Why does the click count change once instead of every frame?",
+          caption: "mousePressed() is an event function. It waits, then runs once when the click happens.",
+          code: `let clickCount = 0;\n\nfunction mousePressed() {\n  clickCount++;\n  lastClickX = mouseX;\n  lastClickY = mouseY;\n}`
+        },
+        key: {
+          pill: "keyPressed() runs once per key press",
+          title: "A key press is an event",
+          text: "keyPressed() runs once when a key is pressed. It is good for toggles, menus, jumping, resetting, or choosing modes.",
+          formula: "function keyPressed() {\n  lastKey = key;\n}",
+          question: "What kind of actions should happen once per key press?",
+          caption: "Press any key while the canvas is focused. keyPressed() remembers the latest key.",
+          code: `function keyPressed() {\n  if (key === "r") {\n    resetSketch();\n  }\n\n  if (key === " ") {\n    jump();\n  }\n}`
+        },
+        hold: {
+          pill: "keyIsDown() checks held keys every frame",
+          title: "Held keys are continuous input",
+          text: "keyIsDown() is checked inside draw(), so it can move something smoothly while a key is being held down.",
+          formula: "if (keyIsDown(LEFT_ARROW)) {\n  x -= speed;\n}",
+          question: "Why is keyIsDown() better than keyPressed() for smooth movement?",
+          caption: "Hold arrow keys or WASD. keyIsDown() keeps moving the player while the key is held.",
+          code: `function draw() {\n  if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {\n    x -= ${state.speed};\n  }\n  if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {\n    x += ${state.speed};\n  }\n}`
+        },
+        state: {
+          pill: "events often change state variables",
+          title: "Input can change the sketch state",
+          text: "Events are often used to update variables. A click or key press might switch modes, change colors, add a new object, or start a game.",
+          formula: `let mood = "${state.sketchState}";\n\nfunction mousePressed() {\n  mood = "active";\n}`,
+          question: "How could a click move a game from start to play?",
+          caption: "Clicks and key presses can change a state variable, and draw() responds to the new state.",
+          code: `let mood = "calm";\n\nfunction mousePressed() {\n  if (mood === "calm") {\n    mood = "active";\n  } else {\n    mood = "calm";\n  }\n}\n\nfunction draw() {\n  if (mood === "active") {\n    background(255, 220, 120);\n  }\n}`
+        }
+      };
+
+      const lesson = lessons[state.mode];
+      els.modePill.textContent = lesson.pill;
+      els.lessonTitle.textContent = lesson.title;
+      els.lessonText.textContent = lesson.text;
+      els.formulaBox.textContent = lesson.formula;
+      els.questionText.textContent = lesson.question;
+      els.caption.textContent = lesson.caption;
+      els.codeBox.textContent = lesson.code;
+    }
+
+    setupUI();
+
+    const sketch = (p) => {
+      let canvas, holder, previousWidth = 0, previousHeight = 0;
+
+      p.setup = () => {
+        holder = document.querySelector("#sketch-holder");
+        const rect = holder.getBoundingClientRect();
+        canvas = p.createCanvas(rect.width, rect.height);
+        canvas.parent("sketch-holder");
+        canvas.elt.setAttribute("role", "img");
+        canvas.elt.setAttribute("aria-label", "Interactive visualization of mouse and keyboard events in p5.js.");
+        canvas.elt.tabIndex = 0;
+        canvas.elt.addEventListener("click", () => canvas.elt.focus());
+        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+        p.textFont("Inter, system-ui, sans-serif");
+      };
+
+      p.windowResized = () => resizeToHolder();
+
+      p.mousePressed = () => {
+        if (!insideCanvas()) return;
+        canvas.elt.focus();
+        registerClick(p.mouseX, p.mouseY);
+        return false;
+      };
+
+      p.keyPressed = () => {
+        registerKey(p.key === " " ? "space" : p.key);
+        return false;
+      };
+
+      p.draw = () => {
+        resizeToHolder();
+        updatePointer();
+        updateHeldKeys();
+        p.background(255, 250, 242);
+        drawSubtleGrid();
+        drawPanelTitle();
+
+        if (state.mode === "mouse") drawMouseMode();
+        if (state.mode === "click") drawClickMode();
+        if (state.mode === "key") drawKeyMode();
+        if (state.mode === "hold") drawHoldMode();
+        if (state.mode === "state") drawStateMode();
+
+        drawReadoutCards();
+      };
+
+      function resizeToHolder() {
+        const rect = holder.getBoundingClientRect();
+        const w = Math.max(320, Math.floor(rect.width));
+        const h = Math.max(320, Math.floor(rect.height));
+        if (w !== previousWidth || h !== previousHeight) { p.resizeCanvas(w, h); previousWidth = w; previousHeight = h; }
+      }
+
+      function insideCanvas() {
+        return p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height;
+      }
+
+      function updatePointer() {
+        if (insideCanvas()) {
+          state.pointerX = p.mouseX;
+          state.pointerY = p.mouseY;
+          state.trail.push({ x: state.pointerX, y: state.pointerY });
+          while (state.trail.length > state.trailLength) state.trail.shift();
+        }
+      }
+
+      function updateHeldKeys() {
+        if (state.mode !== "hold") return;
+        let dx = 0;
+        let dy = 0;
+        if (p.keyIsDown(p.LEFT_ARROW) || p.keyIsDown(65)) dx -= state.speed;
+        if (p.keyIsDown(p.RIGHT_ARROW) || p.keyIsDown(68)) dx += state.speed;
+        if (p.keyIsDown(p.UP_ARROW) || p.keyIsDown(87)) dy -= state.speed;
+        if (p.keyIsDown(p.DOWN_ARROW) || p.keyIsDown(83)) dy += state.speed;
+        const s = getStage();
+        state.playerX = p.constrain(state.playerX + dx, s.x + state.size / 2 + 12, s.x + s.w - state.size / 2 - 12);
+        state.playerY = p.constrain(state.playerY + dy, s.y + state.size / 2 + 12, s.y + s.h - state.size / 2 - 12);
+      }
+
+      function drawSubtleGrid() {
+        p.push(); p.stroke(236,224,207); p.strokeWeight(1);
+        for (let x=0; x<p.width; x+=32) p.line(x,0,x,p.height);
+        for (let y=0; y<p.height; y+=32) p.line(0,y,p.width,y);
+        p.pop();
+      }
+
+      function drawPanelTitle() {
+        const titles = {
+          mouse:["Mouse Position","Continuous input values update every frame."],
+          click:["Click Event","mousePressed() runs once when a click happens."],
+          key:["Key Event","keyPressed() runs once when a key is pressed."],
+          hold:["Held Keys","keyIsDown() supports continuous movement."],
+          state:["Input Changes State","Events often update variables that draw() uses later."]
+        };
+        const [title, subtitle] = titles[state.mode];
+        p.push(); p.noStroke(); p.fill("#222"); p.textStyle(p.BOLD); p.textSize(22); p.text(title,24,38); p.textStyle(p.NORMAL); p.textSize(14); p.fill("#6b6258"); p.text(subtitle,24,62); p.pop();
+      }
+
+      function getStage() { return { x:p.width*0.08, y:p.height*0.15, w:p.width*0.84, h:p.height*0.50 }; }
+      function drawStage() { const s=getStage(); p.push(); p.noStroke(); p.fill(255,255,255,235); p.rect(s.x,s.y,s.w,s.h,24); p.pop(); return s; }
+
+      function drawMouseMode() {
+        const s = drawStage();
+        drawTrail("#0891b2");
+        p.push();
+        p.noStroke();
+        p.fill("#0891b2");
+        p.circle(state.pointerX, state.pointerY, state.size);
+        p.fill("#ffffff");
+        p.circle(state.pointerX, state.pointerY, 10);
+        if (state.showLabels) {
+          drawLabel(`mouseX = ${Math.round(state.pointerX)}`, s.x + 28, s.y + 42, "#0891b2", 14);
+          drawLabel(`mouseY = ${Math.round(state.pointerY)}`, s.x + 28, s.y + 70, "#0891b2", 14);
+          drawLabel("draw() uses these values every frame", state.pointerX + 24, state.pointerY - 12, "#6b6258", 13);
+        }
+        p.pop();
+      }
+
+      function drawClickMode() {
+        const s = drawStage();
+        drawClickBursts();
+        p.push();
+        p.noStroke();
+        p.fill("#e11d48");
+        p.circle(state.lastClickX, state.lastClickY, state.size);
+        p.fill("#ffffff");
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textSize(18);
+        p.text(state.clickCount, state.lastClickX, state.lastClickY);
+        if (state.showLabels) {
+          drawLabel("click on the canvas", s.x + 28, s.y + 42, "#e11d48", 14);
+          drawLabel(`clickCount = ${state.clickCount}`, s.x + 28, s.y + 70, "#e11d48", 14);
+          drawLabel("event ran here", state.lastClickX + 28, state.lastClickY - 12, "#e11d48", 13);
+        }
+        p.pop();
+      }
+
+      function drawKeyMode() {
+        const s = drawStage();
+        drawKeyboard(s.x + s.w * 0.23, s.y + s.h * 0.35, s.w * 0.54, s.h * 0.34);
+        p.push();
+        if (state.showLabels) {
+          drawLabel("press any key while canvas is focused", s.x + 28, s.y + 42, "#7c3aed", 14);
+          drawLabel(`lastKey = ${state.lastKey}`, s.x + 28, s.y + 70, "#7c3aed", 14);
+          drawLabel(`key presses = ${state.keyCount}`, s.x + 28, s.y + 98, "#7c3aed", 14);
+        }
+        p.pop();
+      }
+
+      function drawHoldMode() {
+        const s = drawStage();
+        drawHeldKeyPanel(s.x + 28, s.y + 34, 210, 150);
+        drawPlayer(state.playerX, state.playerY, "#16a34a");
+        if (state.showLabels) drawLabel("hold arrow keys or WASD", state.playerX + 28, state.playerY - 10, "#16a34a", 13);
+      }
+
+      function drawStateMode() {
+        const s = drawStage();
+        const colors = { calm:"#0891b2", active:"#f59e0b", surprised:"#e11d48" };
+        const color = colors[state.sketchState];
+        p.push();
+        p.noStroke();
+        p.fill(color);
+        p.circle(s.x + s.w * 0.62, s.y + s.h * 0.50, 150);
+        p.fill("#ffffff");
+        p.circle(s.x + s.w * 0.58, s.y + s.h * 0.45, 22);
+        p.circle(s.x + s.w * 0.66, s.y + s.h * 0.45, 22);
+        p.fill("#222222");
+        p.circle(s.x + s.w * 0.58, s.y + s.h * 0.45, 9);
+        p.circle(s.x + s.w * 0.66, s.y + s.h * 0.45, 9);
+        p.noFill();
+        p.stroke("#ffffff");
+        p.strokeWeight(4);
+        const mouthY = state.sketchState === "surprised" ? s.y + s.h * 0.56 : s.y + s.h * 0.58;
+        if (state.sketchState === "surprised") p.circle(s.x + s.w * 0.62, mouthY, 30);
+        else p.arc(s.x + s.w * 0.62, mouthY, 58, 36, 0, p.PI);
+        if (state.showLabels) {
+          drawLabel(`mood = "${state.sketchState}"`, s.x + 28, s.y + 46, color, 15);
+          drawLabel("click or press a key to change state", s.x + 28, s.y + 78, "#6b6258", 13);
+        }
+        p.pop();
+      }
+
+      function drawTrail(color) {
+        p.push();
+        p.noStroke();
+        for (let i = 0; i < state.trail.length; i++) {
+          const pt = state.trail[i];
+          const alpha = p.map(i, 0, Math.max(1, state.trail.length - 1), 25, 150);
+          p.fill(color + Math.round(alpha).toString(16).padStart(2, "0"));
+          p.circle(pt.x, pt.y, p.map(i, 0, Math.max(1, state.trail.length - 1), 8, state.size * 0.65));
+        }
+        p.pop();
+      }
+
+      function drawClickBursts() {
+        p.push();
+        for (const burst of state.clickBursts) {
+          const r = 24 + burst.age * 2.8;
+          const alpha = Math.max(0, 180 - burst.age * 5);
+          p.noFill();
+          p.stroke(225, 29, 72, alpha);
+          p.strokeWeight(3);
+          p.circle(burst.x, burst.y, r);
+          burst.age += 1;
+        }
+        state.clickBursts = state.clickBursts.filter(b => b.age < 36);
+        p.pop();
+      }
+
+      function drawKeyboard(x, y, w, h) {
+        p.push();
+        p.noStroke();
+        p.fill("#f5f3ff");
+        p.rect(x, y, w, h, 20);
+        p.stroke("#7c3aed");
+        p.strokeWeight(3);
+        p.noFill();
+        p.rect(x, y, w, h, 20);
+        const keyW = w / 8;
+        const labels = ["Q", "W", "E", "R", "A", "S", "D", "space"];
+        for (let i = 0; i < labels.length; i++) {
+          const kx = x + 18 + (i % 4) * (keyW * 1.55);
+          const ky = y + 32 + Math.floor(i / 4) * 58;
+          const active = labels[i].toLowerCase() === String(state.lastKey).toLowerCase();
+          p.noStroke();
+          p.fill(active ? "#7c3aed" : "#ffffff");
+          p.rect(kx, ky, keyW, 38, 10);
+          p.fill(active ? "#ffffff" : "#7c3aed");
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textStyle(p.BOLD);
+          p.textSize(labels[i] === "space" ? 11 : 16);
+          p.text(labels[i], kx + keyW / 2, ky + 19);
+        }
+        p.pop();
+      }
+
+      function drawHeldKeyPanel(x, y, w, h) {
+        const keys = [
+          { label:"↑ / W", down:p.keyIsDown(p.UP_ARROW)||p.keyIsDown(87) },
+          { label:"← / A", down:p.keyIsDown(p.LEFT_ARROW)||p.keyIsDown(65) },
+          { label:"↓ / S", down:p.keyIsDown(p.DOWN_ARROW)||p.keyIsDown(83) },
+          { label:"→ / D", down:p.keyIsDown(p.RIGHT_ARROW)||p.keyIsDown(68) }
+        ];
+        p.push();
+        p.noStroke();
+        p.fill(240,253,244,245);
+        p.rect(x,y,w,h,18);
+        p.stroke("#16a34a");
+        p.strokeWeight(2.5);
+        p.noFill();
+        p.rect(x,y,w,h,18);
+        p.noStroke();
+        p.fill("#16a34a");
+        p.textStyle(p.BOLD);
+        p.textSize(14);
+        p.text("keyIsDown()", x+16, y+26);
+        for (let i=0; i<keys.length; i++) {
+          const k = keys[i];
+          const ky = y+54+i*24;
+          p.fill(k.down ? "#16a34a" : "#d8cbbb");
+          p.circle(x+22, ky-4, 10);
+          p.fill("#334155");
+          p.textStyle(p.NORMAL);
+          p.textSize(12);
+          p.text(k.label, x+40, ky);
+        }
+        p.pop();
+      }
+
+      function drawPlayer(x, y, color) {
+        p.push();
+        p.noStroke();
+        p.fill(color);
+        p.circle(x, y, state.size);
+        p.fill("#ffffff");
+        p.circle(x + state.size * 0.10, y - state.size * 0.10, Math.max(8, state.size * 0.18));
+        p.fill("#222222");
+        p.circle(x + state.size * 0.14, y - state.size * 0.10, Math.max(4, state.size * 0.08));
+        p.pop();
+      }
+
+      function drawReadoutCards() {
+        const cards = [
+          { label:"mouse", value:`${Math.round(state.pointerX)}, ${Math.round(state.pointerY)}`, color:"#0891b2" },
+          { label:"clicks", value:state.clickCount, color:"#e11d48" },
+          { label:"last key", value:state.lastKey, color:"#7c3aed" }
+        ];
+        const cardW=Math.min(176,(p.width-70)/cards.length); const y=p.height-168; const x=28;
+        p.push();
+        for(let i=0;i<cards.length;i++){
+          const cx=x+i*(cardW+10);
+          p.noStroke(); p.fill(255,255,255,235); p.rect(cx,y,cardW,62,14);
+          p.fill(cards[i].color); p.textStyle(p.BOLD); p.textSize(13); p.text(cards[i].label,cx+12,y+22);
+          p.fill("#222"); p.textSize(16); p.text(String(cards[i].value),cx+12,y+48);
+        }
+        p.pop();
+      }
+
+      function drawLabel(text,x,y,color,size=13){
+        p.push(); p.textSize(size); p.textStyle(p.BOLD); const padX=7,padY=4,tw=p.textWidth(text);
+        p.noStroke(); p.fill(255,250,242,238); p.rect(x-padX,y-size-padY+3,tw+padX*2,size+padY*2,9);
+        p.fill(color); p.textAlign(p.LEFT,p.BASELINE); p.text(text,x,y); p.pop();
+      }
+    };
+
+    new p5(sketch);
+  </script>
+</body>
+</html>

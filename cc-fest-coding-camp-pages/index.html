@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CC Fest Coding Camp: Creative Coding Tools for p5.js</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css?v=20260506-expanded-tools">
+  <link rel="stylesheet" href="site.css?v=20260506-debug-card-previews">
   <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/">
   <meta property="og:title" content="CC Fest Coding Camp: Creative Coding Tools for p5.js">
-  <meta property="og:description" content="41 workshop tools and 30 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:description" content="60 workshop tools and 40 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
   <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="CC Fest Coding Camp: Creative Coding Tools for p5.js">
-  <meta name="twitter:description" content="41 workshop tools and 30 starter sketches for teaching p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:description" content="60 workshop tools and 40 starter sketches for teaching p5.js and creative coding. Free, open, and remixable.">
   <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -40,9 +40,10 @@
         <div class="hero-text">
           <p class="eyebrow">CC Fest Coding Camp · Free · Open to everyone</p>
           <h1>Tools for Creative Coding.</h1>
-          <p class="lede">41 workshop tools and 30 starter sketches for teaching <a href="https://p5js.org">p5.js</a> and creative coding. Built by <a href="https://www.linkedin.com/in/edsaber/" target="_blank" rel="noopener">Saber Khan</a> for <a href="https://ccfest.rocks/coding-camp" target="_blank" rel="noopener">CC Fest Coding Camp</a>. Free, open, remixable.</p>
+          <p class="lede">60 workshop tools and 40 starter sketches for teaching <a href="https://p5js.org">p5.js</a> and creative coding. Built by <a href="https://www.linkedin.com/in/edsaber/" target="_blank" rel="noopener">Saber Khan</a> for <a href="https://ccfest.rocks/coding-camp" target="_blank" rel="noopener">CC Fest Coding Camp</a>. Free, open, remixable.</p>
           <div class="hero-actions">
             <a class="button primary" href="#interactive-tools">Browse Tools</a>
+            <a class="button secondary" href="#concept-bridges">Concept Bridges</a>
             <a class="button secondary" href="#starter-sketches">Starter Sketches</a>
             <a class="button" href="https://sustaining-boursin-d41.notion.site/3369950a7da981169ceffb7d3dbd73e9">About the Camp →</a>
           </div>
@@ -71,8 +72,8 @@
             </ul>
           </aside>
           <aside class="hero-credit" aria-label="How these tools were made">
-            <h2>How these tools were made.</h2>
-            <p>These tools and sketches were made thanks to the help of LLMs, including Claude and ChatGPT, testing with my students and classes, and learning from members of the community, including Dan Shiffman, Lauren Lee McCarthy, Casey Reas, Kevin Workman, Patt Vira, Allison Parrish, Jeff Thompson, Tim Rodenbröker, p5.js and Processing Foundation materials, and the many people that have shared their teaching materials.</p>
+            <h2>How these tools were made. <button class="credits-toggle" aria-expanded="false" aria-controls="credits-body">See credits ↓</button></h2>
+            <p id="credits-body" hidden>These tools and sketches were made thanks to the help of LLMs, including Claude and ChatGPT, testing with my students and classes, and learning from members of the community, including Dan Shiffman, Lauren Lee McCarthy, Casey Reas, Kevin Workman, Patt Vira, Allison Parrish, Jeff Thompson, Tim Rodenbröker, p5.js and Processing Foundation materials, and the many people that have shared their teaching materials.</p>
           </aside>
         </div>
       </div>
@@ -151,14 +152,193 @@
       </section>
 
       <div class="gallery">
+        <section id="concept-bridges" class="gallery-section panel" aria-label="Concept bridges">
+          <div class="gallery-header">
+            <div class="gallery-header-copy">
+              <div class="section-label bold-block">Concept Bridges</div>
+              <h2>17 intuition builders for the ideas that make p5.js click</h2>
+              <p>These are not output tools and not starter sketches. They are experiential explanations: interactive bridges between a fuzzy idea and the p5.js function or programming pattern behind it. Open one when a concept feels slippery, then come back to the tools or sketches with stronger intuition.</p>
+            </div>
+            <div class="gallery-count">17 bridges</div>
+          </div>
+          <div class="station-list">
+            <div class="station">
+              <div class="station-header">
+                <span class="station-name">Visual + Trig Foundations</span>
+                <p class="station-desc">Color as feeling, and the geometry that turns circles into waves.</p>
+              </div>
+              <div class="tool-grid">
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Foundations</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Color: Numbers Become Feeling</h3>
+                  <p class="tool-description">A bridge for <code>fill()</code>, <code>stroke()</code>, grayscale, RGB, HSB, alpha, and <code>lerpColor()</code> so color stops feeling like raw numbers and starts feeling expressive.</p>
+                  <div class="tag-row"><span class="tag">color</span><span class="tag">HSB</span><span class="tag">lerpColor()</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/color-numbers-become-feeling/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Foundations</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Triangle to Circle to Wave Explorer</h3>
+                  <p class="tool-description">A bridge from right triangles to the unit circle to sine and cosine waves, making periodic motion and trig feel visual before they feel mathematical.</p>
+                  <div class="tag-row"><span class="tag">sin()</span><span class="tag">cos()</span><span class="tag">unit circle</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/triangle-circle-wave-explorer/">Open Bridge</a></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="station">
+              <div class="station-header">
+                <span class="station-name">p5.js Core</span>
+                <p class="station-desc">The core mental models for time, space, mapping, distance, and smooth change.</p>
+              </div>
+              <div class="tool-grid">
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>How p5.js Thinks About Time</h3>
+                  <p class="tool-description">A bridge for <code>setup()</code>, <code>draw()</code>, and <code>frameCount</code>, showing how p5.js keeps sketch time moving even when you do nothing.</p>
+                  <div class="tag-row"><span class="tag">setup()</span><span class="tag">draw()</span><span class="tag">frameCount</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/how-p5-thinks-about-time/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>World Coordinates vs Local Coordinates</h3>
+                  <p class="tool-description">A bridge for <code>translate()</code>, <code>rotate()</code>, <code>push()</code>, and <code>pop()</code>, clarifying the difference between moving the world and moving your local drawing space.</p>
+                  <div class="tag-row"><span class="tag">translate()</span><span class="tag">rotate()</span><span class="tag">push()/pop()</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/world-vs-local-coordinates/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>map() Range Translator</h3>
+                  <p class="tool-description">A bridge for <code>map()</code>, turning one range of values into another so mouse position, sensor input, and data can control size, color, and motion.</p>
+                  <div class="tag-row"><span class="tag">map()</span><span class="tag">ranges</span><span class="tag">translation</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/map-range-translator/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Distance Becomes Behavior</h3>
+                  <p class="tool-description">A bridge for <code>dist()</code>: “how close?” becomes a number, and that number becomes size, brightness, opacity, or any other behavior.</p>
+                  <div class="tag-row"><span class="tag">dist()</span><span class="tag">proximity</span><span class="tag">behavior</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/distance-becomes-behavior/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Noise: Smooth Randomness</h3>
+                  <p class="tool-description">A bridge for <code>noise()</code>, showing why <code>random()</code> jumps while noise flows, drifts, and feels more alive.</p>
+                  <div class="tag-row"><span class="tag">noise()</span><span class="tag">random()</span><span class="tag">motion</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/noise-smooth-randomness/">Open Bridge</a></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="station">
+              <div class="station-header">
+                <span class="station-name">Events + Interaction</span>
+                <p class="station-desc">The moment a sketch stops being a picture and starts listening back.</p>
+              </div>
+              <div class="tool-grid">
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Interaction</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Events: Sketches Listen</h3>
+                  <p class="tool-description">A bridge for <code>mouseX</code>, <code>mouseY</code>, <code>mousePressed()</code>, and <code>keyPressed()</code>, showing how a sketch can react to you in time.</p>
+                  <div class="tag-row"><span class="tag">mouse</span><span class="tag">keyboard</span><span class="tag">events</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/events-sketches-listen/">Open Bridge</a></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="station">
+              <div class="station-header">
+                <span class="station-name">Programming Fundamentals</span>
+                <p class="station-desc">The programming patterns that turn one drawing into many behaviors, systems, and reusable structures.</p>
+              </div>
+              <div class="tool-grid">
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Vectors: Arrows That Store Motion</h3>
+                  <p class="tool-description">A bridge for <code>createVector()</code>, position, velocity, acceleration, and steering. Motion becomes something you can store, add, and redirect.</p>
+                  <div class="tag-row"><span class="tag">vectors</span><span class="tag">velocity</span><span class="tag">acceleration</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/vectors-arrows-that-store-motion/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Modulo: Counting in Cycles</h3>
+                  <p class="tool-description">A bridge for the <code>%</code> operator, showing how remainders create loops, stripes, wrapping behavior, and repeating rhythm.</p>
+                  <div class="tag-row"><span class="tag">%</span><span class="tag">cycles</span><span class="tag">patterns</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/modulo-counting-in-cycles/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Arrays: One Thing to Many Things</h3>
+                  <p class="tool-description">A bridge for arrays, indexes, loops, and arrays of objects. One variable becomes many related values you can update together.</p>
+                  <div class="tag-row"><span class="tag">arrays</span><span class="tag">indexes</span><span class="tag">loops</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/arrays-one-thing-to-many-things/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Objects: Data + Behavior</h3>
+                  <p class="tool-description">A bridge for object literals, classes, properties, and methods. An object bundles what something knows with what it does.</p>
+                  <div class="tag-row"><span class="tag">objects</span><span class="tag">classes</span><span class="tag">methods</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/objects-data-plus-behavior/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Functions: Make Your Own Commands</h3>
+                  <p class="tool-description">A bridge for functions, parameters, arguments, and return values. Package an idea once, then call it again with different inputs.</p>
+                  <div class="tag-row"><span class="tag">functions</span><span class="tag">parameters</span><span class="tag">return</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/functions-make-your-own-commands/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Conditionals: Code Makes Choices</h3>
+                  <p class="tool-description">A bridge for <code>if</code>, <code>else if</code>, <code>else</code>, comparison operators, Booleans, and combining conditions into visible decisions.</p>
+                  <div class="tag-row"><span class="tag">if/else</span><span class="tag">booleans</span><span class="tag">logic</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/conditionals-code-makes-choices/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>State Machines: Sketches Have Modes</h3>
+                  <p class="tool-description">A bridge for state variables, start/play/win/lose screens, and mini-game flow. One sketch can have multiple worlds depending on the mode.</p>
+                  <div class="tag-row"><span class="tag">state</span><span class="tag">modes</span><span class="tag">game flow</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/state-machines-sketches-have-modes/">Open Bridge</a></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="station">
+              <div class="station-header">
+                <span class="station-name">Data + Media</span>
+                <p class="station-desc">How pictures, tables, and JSON become raw material for drawing and storytelling.</p>
+              </div>
+              <div class="tool-grid">
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Data + Media</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Pixels: Pictures Are Data</h3>
+                  <p class="tool-description">A bridge for images, RGB values, <code>get()</code>, <code>pixels[]</code>, <code>loadPixels()</code>, and video frames. Pictures become numbers you can manipulate.</p>
+                  <div class="tag-row"><span class="tag">pixels[]</span><span class="tag">RGB</span><span class="tag">images</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/pixels-pictures-are-data/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Data + Media</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Data In, Drawing Out</h3>
+                  <p class="tool-description">A bridge for <code>preload()</code>, <code>loadTable()</code>, <code>loadJSON()</code>, rows, columns, and how outside data turns into visual structure.</p>
+                  <div class="tag-row"><span class="tag">preload()</span><span class="tag">loadTable()</span><span class="tag">loadJSON()</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/data-in-drawing-out/">Open Bridge</a></div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="interactive-tools" class="gallery-section panel" aria-label="Interactive tools">
           <div class="gallery-header">
             <div class="gallery-header-copy">
               <div class="section-label bold-block">Workshop Tools</div>
-              <h2>41 workshop-ready tools for camp sessions</h2>
+              <h2>60 workshop-ready tools for camp sessions</h2>
               <p>Each tool focuses on one concept. Change a slider, see what happens. Use them for live demos, station rotations, or student-led exploration. Built for complete beginners and educators alike. <a href="https://sustaining-boursin-d41.notion.site/3339950a7da9819a9b73d83d97eaf2c2" style="color:var(--accent)">Teaching notes for each session →</a></p>
             </div>
-            <div class="gallery-count">41 tools</div>
+            <div class="gallery-count">60 tools</div>
+          </div>
+          <div class="tool-search-wrap">
+            <input class="tool-search" type="search" placeholder="Search by title, description, or tag — noise, array, text, game…" aria-label="Search tools" autocomplete="off" spellcheck="false">
           </div>
           <div class="suit-filter-bar" role="group" aria-label="Filter by suit">
             <button class="suit-btn active" data-filter="all">All</button>
@@ -167,8 +347,18 @@
             <button class="suit-btn" data-filter="systems">⬡ Systems</button>
             <button class="suit-btn" data-filter="data">▦ Data</button>
             <button class="suit-btn" data-filter="open">☽ Open</button>
+            <button class="suit-btn" data-filter="support">⊕ Support</button>
           </div>
-          <p class="suit-legend">✦ Marks · drawing &amp; color &nbsp;·&nbsp; ◎ Motion · animation &amp; interaction &nbsp;·&nbsp; ⬡ Systems · loops &amp; generative &nbsp;·&nbsp; ▦ Data · visualization &amp; data &nbsp;·&nbsp; ☽ Open · images, sound, 3D</p>
+          <div class="pathway-filter-bar" role="group" aria-label="Filter by learning pathway">
+            <button class="pathway-btn active" data-pathway-filter="all">All pathways</button>
+            <button class="pathway-btn" data-pathway-filter="first-time">First time with p5</button>
+            <button class="pathway-btn" data-pathway-filter="animation">I want animation</button>
+            <button class="pathway-btn" data-pathway-filter="data">I want data</button>
+            <button class="pathway-btn" data-pathway-filter="games">I want games</button>
+            <button class="pathway-btn" data-pathway-filter="stuck">I'm stuck</button>
+            <button class="pathway-btn" data-pathway-filter="final">Final project</button>
+          </div>
+          <p class="suit-legend">✦ Marks · drawing &amp; color &nbsp;·&nbsp; ◎ Motion · animation &amp; interaction &nbsp;·&nbsp; ⬡ Systems · loops &amp; generative &nbsp;·&nbsp; ▦ Data · visualization &amp; data &nbsp;·&nbsp; ☽ Open · images, sound, 3D &nbsp;·&nbsp; ⊕ Support · debugging &amp; confidence</p>
 
           <div class="station-list">
 
@@ -178,52 +368,52 @@
                 <p class="station-desc">First marks, coordinates, shape, and color. The tools you open on day one.</p>
               </div>
               <div class="tool-grid">
-                <article class="tool-card suit-marks">
+                <article class="tool-card suit-marks" data-pathway="first-time" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">I</span><span class="pip-sym">✦</span></div>
                   <div class="tool-meta"><span class="pill session">✦ Marks · I</span><span class="pill type">Interactive</span></div>
                   <h3>Coordinate System Explorer</h3>
                   <p class="tool-description">Click anywhere on the canvas and see the x/y coordinate. Once you're placing your own points, the grid stops feeling abstract.</p>
                   <div class="tag-row"><span class="tag">coordinates</span><span class="tag">canvas</span><span class="tag">shapes</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/coordinate-system-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/coordinate-system-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/8a36f1ef083e470791483a4feb44e6ed" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">I</span><span class="pip-sym">✦</span></div>
                 </article>
-                <article class="tool-card suit-marks">
+                <article class="tool-card suit-marks" data-pathway="first-time" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">II</span><span class="pip-sym">✦</span></div>
                   <div class="tool-meta"><span class="pill session">✦ Marks · II</span><span class="pill type">Interactive</span></div>
                   <h3>Interactive Shape Explorer</h3>
                   <p class="tool-description">Drag sliders and watch shapes transform in real time. When you change one number and the whole picture shifts, parameters stop being syntax and start being power.</p>
                   <div class="tag-row"><span class="tag">shapes</span><span class="tag">fill</span><span class="tag">stroke</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/interactive-shape-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/interactive-shape-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/9b94f78db48b4ed7b87fb5928b3a0bc5" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">II</span><span class="pip-sym">✦</span></div>
                 </article>
-                <article class="tool-card suit-marks">
+                <article class="tool-card suit-marks" data-pathway="first-time" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">III</span><span class="pip-sym">✦</span></div>
                   <div class="tool-meta"><span class="pill session">✦ Marks · III</span><span class="pill type">Interactive</span></div>
                   <h3>Shape + Color Explorer</h3>
                   <p class="tool-description">Mix color and shape controls while a live code preview updates below, the bridge between dragging a slider and writing fill(). A great first tool to open in camp.</p>
                   <div class="tag-row"><span class="tag">color</span><span class="tag">shapes</span><span class="tag">starter code</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/shape-and-color-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/shape-and-color-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/e290a2db9f9145b2ab29be60a1c38bdb" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">III</span><span class="pip-sym">✦</span></div>
                 </article>
-                <article class="tool-card suit-marks">
+                <article class="tool-card suit-marks" data-pathway="first-time final" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">IV</span><span class="pip-sym">✦</span></div>
                   <div class="tool-meta"><span class="pill session">✦ Marks · IV</span><span class="pill type">Interactive</span></div>
                   <h3>Text Basics Studio</h3>
                   <p class="tool-description">Type a name, word, or phrase and design it with x/y position, size, color, rotation, and alignment. A welcoming on-ramp for people who connect to language first.</p>
                   <div class="tag-row"><span class="tag">text()</span><span class="tag">identity</span><span class="tag">composition</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/text-basics-studio/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/text-basics-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da9810fb740e62b69497bae" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">IV</span><span class="pip-sym">✦</span></div>
                 </article>
-                <article class="tool-card suit-marks">
+                <article class="tool-card suit-marks" data-pathway="first-time animation" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">V</span><span class="pip-sym">✦</span></div>
                   <div class="tool-meta"><span class="pill session">✦ Marks · V</span><span class="pill type">Interactive</span></div>
                   <h3>Variable Playground</h3>
                   <p class="tool-description">Change one variable and watch position, size, and color all respond at once. A fast way to feel what it means for one number to control everything.</p>
                   <div class="tag-row"><span class="tag">variables</span><span class="tag">parameters</span><span class="tag">motion</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/variable-playground/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/variable-playground/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/f18f928cf6b44da5ac597155cbb5fed9" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">V</span><span class="pip-sym">✦</span></div>
                 </article>
-                <article class="tool-card suit-marks">
+                <article class="tool-card suit-marks" data-pathway="first-time final" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">VI</span><span class="pip-sym">✦</span></div>
                   <div class="tool-meta"><span class="pill session">✦ Marks · VI</span><span class="pill type">Interactive</span></div>
                   <h3>RGB / HSB Color Lab</h3>
@@ -232,14 +422,32 @@
                   <div class="tool-actions"><a class="button primary" href="tools/rgb-hsb-color-lab/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/Tool-Color-Explorer-RGB-vs-HSB-d233a15100964106b43c11671e2f25ee?pvs=21" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VI</span><span class="pip-sym">✦</span></div>
                 </article>
-                <article class="tool-card suit-marks">
+                <article class="tool-card suit-marks" data-pathway="first-time" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">✦</span></div>
                   <div class="tool-meta"><span class="pill session">✦ Marks · VII</span><span class="pill type">Interactive</span></div>
                   <h3>Arc Visualizer</h3>
                   <p class="tool-description">Adjust start angle, stop angle, mode, and size to see how arc() draws part of a circle. A small tool for one surprisingly tricky shape.</p>
                   <div class="tag-row"><span class="tag">arc()</span><span class="tag">angles</span><span class="tag">shapes</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/arc-visualizer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/arc-visualizer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981f88b2add647e5c2441" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">✦</span></div>
+                </article>
+                <article class="tool-card suit-marks" data-pathway="first-time" data-difficulty="beginner">
+                  <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">✦</span></div>
+                  <div class="tool-meta"><span class="pill session">✦ Marks · Draw + Color</span><span class="pill type">Interactive</span></div>
+                  <h3>Layering Visualizer</h3>
+                  <p class="tool-description">In p5.js, shapes drawn later appear on top. Reorder layers with the arrows and watch the stacking change — then copy the generated draw() code.</p>
+                  <div class="tag-row"><span class="tag">draw order</span><span class="tag">layers</span><span class="tag">painter's algorithm</span><span class="tag">overlap</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/layering-visualizer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da9815880b4d714aa59c204" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">✦</span></div>
+                </article>
+                <article class="tool-card suit-marks" data-pathway="first-time animation" data-difficulty="beginner">
+                  <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
+                  <div class="tool-meta"><span class="pill session">✦ Marks · Draw + Color</span><span class="pill type">Interactive</span></div>
+                  <h3>push() / pop() Scope Visualizer</h3>
+                  <p class="tool-description">See how push() and pop() create isolated "bubbles" of style and transformation. Toggle WITH/WITHOUT push/pop and step through calls to watch state leak — or not.</p>
+                  <div class="tag-row"><span class="tag">push()</span><span class="tag">pop()</span><span class="tag">state</span><span class="tag">transforms</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/push-pop-scope-visualizer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981439ef8c5218aec3513" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
                 </article>
               </div>
             </div>
@@ -250,43 +458,73 @@
                 <p class="station-desc">Things that move, react, and listen. Variables in time, events in space.</p>
               </div>
               <div class="tool-grid">
-                <article class="tool-card suit-motion">
+                <article class="tool-card suit-motion" data-pathway="first-time animation" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">I</span><span class="pip-sym">◎</span></div>
                   <div class="tool-meta"><span class="pill session">◎ Motion · I</span><span class="pill type">Interactive</span></div>
                   <h3>Animation Explorer</h3>
                   <p class="tool-description">Watch a ball speed up, slow down, and bounce edge-to-edge. The moment students see position updating every frame, motion stops being magic and becomes code.</p>
                   <div class="tag-row"><span class="tag">variables</span><span class="tag">motion</span><span class="tag">conditionals</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/animation-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/animation-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/737b045021594880ad59c7b0a4a9a647" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">I</span><span class="pip-sym">◎</span></div>
                 </article>
-                <article class="tool-card suit-motion">
+                <article class="tool-card suit-motion" data-pathway="animation" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">II</span><span class="pip-sym">◎</span></div>
                   <div class="tool-meta"><span class="pill session">◎ Motion · II</span><span class="pill type">Interactive</span></div>
                   <h3>frameRate() Visualizer</h3>
                   <p class="tool-description">Slow the sketch down, speed it up, and watch how drawings per second change motion. Animation is not continuous; it is repeated drawing.</p>
                   <div class="tag-row"><span class="tag">frameRate()</span><span class="tag">draw()</span><span class="tag">animation</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/framerate-visualizer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/framerate-visualizer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981ae8a85eba82dc51d8c" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">II</span><span class="pip-sym">◎</span></div>
                 </article>
-                <article class="tool-card suit-motion">
+                <article class="tool-card suit-motion" data-pathway="animation games final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XIV</span><span class="pip-sym">◎</span></div>
+                  <div class="tool-meta"><span class="pill session">◎ Motion · XIV</span><span class="pill type">Interactive</span></div>
+                  <h3>Gravity + Acceleration Playground</h3>
+                  <p class="tool-description">Adjust gravity, velocity, and damping while a bouncing ball exposes the position ← velocity ← acceleration chain. Vector overlays show the motion model live.</p>
+                  <div class="tag-row"><span class="tag">gravity</span><span class="tag">velocity</span><span class="tag">acceleration</span></div>
+                  <div class="pairs-link">→ <a href="tools/gravity-bounce-seed/">Gravity Bounce Seed</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/gravity-acceleration-playground/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981f891fbfea0e6fbc620" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">XIV</span><span class="pip-sym">◎</span></div>
+                </article>
+                <article class="tool-card suit-motion" data-pathway="animation games final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XV</span><span class="pip-sym">◎</span></div>
+                  <div class="tool-meta"><span class="pill session">◎ Motion · XV</span><span class="pill type">Interactive</span></div>
+                  <h3>Rotate-Around-Point / atan2 Studio</h3>
+                  <p class="tool-description">Make an arrow, eye, or ship point at the cursor. See atan2(), translate(), rotate(), push(), and pop() work together around one origin.</p>
+                  <div class="tag-row"><span class="tag">atan2()</span><span class="tag">rotate()</span><span class="tag">mouse</span></div>
+                  <div class="pairs-link">→ <a href="tools/angle-to-mouse-seed/">Angle-to-Mouse Seed</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/atan2-rotation-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981368319ebe9509502eb" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">XV</span><span class="pip-sym">◎</span></div>
+                </article>
+                <article class="tool-card suit-motion" data-pathway="animation final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XVI</span><span class="pip-sym">◎</span></div>
+                  <div class="tool-meta"><span class="pill session">◎ Motion · XVI</span><span class="pill type">Interactive</span></div>
+                  <h3>Sine + Cosine Motion Explorer</h3>
+                  <p class="tool-description">Connect the unit circle, a moving object, and a wave. Sliders for amplitude, frequency, and phase make sin() and cos() feel concrete.</p>
+                  <div class="tag-row"><span class="tag">sin()</span><span class="tag">cos()</span><span class="tag">waves</span></div>
+                  <div class="pairs-link">→ <a href="tools/sine-oscillation-seed/">Sine Oscillation Seed</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/sine-cosine-motion-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da9811bb7dccfba1643f861" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">XVI</span><span class="pip-sym">◎</span></div>
+                </article>
+                <article class="tool-card suit-motion" data-pathway="animation games" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">III</span><span class="pip-sym">◎</span></div>
                   <div class="tool-meta"><span class="pill session">◎ Motion · III</span><span class="pill type">Interactive</span></div>
                   <h3>Transformations Explorer</h3>
                   <p class="tool-description">Rotate, scale, and translate with sliders to build intuition for local coordinate systems, so when students write the code, they already know what to expect.</p>
                   <div class="tag-row"><span class="tag">transformations</span><span class="tag">rotation</span><span class="tag">scale</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/transformations-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/transformations-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/d9fdf6fb54a94fe899526dfcc968b321" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">III</span><span class="pip-sym">◎</span></div>
                 </article>
-                <article class="tool-card suit-motion">
+                <article class="tool-card suit-motion" data-pathway="first-time animation" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">IV</span><span class="pip-sym">◎</span></div>
                   <div class="tool-meta"><span class="pill session">◎ Motion · IV</span><span class="pill type">Interactive</span></div>
                   <h3>Map() Explorer</h3>
                   <p class="tool-description">map() is the Swiss Army knife of p5.js. Here you see it translate mouse position into color, size, and angle all at once. The most useful function in camp.</p>
                   <div class="tag-row"><span class="tag">map()</span><span class="tag">ranges</span><span class="tag">motion</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/map-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/map-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/a6f3d6a735c84332ae51b244a8eadb0e" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">IV</span><span class="pip-sym">◎</span></div>
                 </article>
-                <article class="tool-card suit-motion">
+                <article class="tool-card suit-motion" data-pathway="animation final" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">V</span><span class="pip-sym">◎</span></div>
                   <div class="tool-meta"><span class="pill session">◎ Motion · V</span><span class="pill type">Interactive</span></div>
                   <h3>lerp() Explorer</h3>
@@ -295,50 +533,86 @@
                   <div class="tool-actions"><a class="button primary" href="tools/lerp-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/Tool-lerp-Visualizer-e7252222c909469fa63cec06b20f2341?pvs=21" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">V</span><span class="pip-sym">◎</span></div>
                 </article>
-                <article class="tool-card suit-motion">
+                <article class="tool-card suit-motion" data-pathway="first-time animation games" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">VI</span><span class="pip-sym">◎</span></div>
                   <div class="tool-meta"><span class="pill session">◎ Motion · VI</span><span class="pill type">Interactive</span></div>
                   <h3>If / Else Decision Studio</h3>
                   <p class="tool-description">Drag the threshold slider and watch the sketch switch between outcomes. Conditionals make a lot more sense once you can see them flip.</p>
                   <div class="tag-row"><span class="tag">conditionals</span><span class="tag">logic</span><span class="tag">interaction</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/if-else-decision-studio/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/if-else-decision-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/9629277ec6d64c218b20b4dd0f68eff7" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VI</span><span class="pip-sym">◎</span></div>
                 </article>
-                <article class="tool-card suit-motion">
+                <article class="tool-card suit-motion" data-pathway="animation games" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">◎</span></div>
                   <div class="tool-meta"><span class="pill session">◎ Motion · VII</span><span class="pill type">Interactive</span></div>
                   <h3>Event Handler Studio</h3>
                   <p class="tool-description">Click, move, press, release, and watch the sketch respond to each input in its own way. Events stop being callbacks and start feeling like choreography.</p>
                   <div class="tag-row"><span class="tag">events</span><span class="tag">interaction</span><span class="tag">input</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/event-handler-studio/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/event-handler-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/5d70ff1ffc6a466fa773522826bb6493" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">◎</span></div>
                 </article>
-                <article class="tool-card suit-motion">
+                <article class="tool-card suit-motion" data-pathway="animation" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">◎</span></div>
                   <div class="tool-meta"><span class="pill session">◎ Motion · VIII</span><span class="pill type">Interactive</span></div>
                   <h3>draw() Loop Visualizer</h3>
                   <p class="tool-description">Slow draw() down, step one frame, and watch setup happen once while draw keeps ticking. The sketch is redrawn, not just drawn.</p>
                   <div class="tag-row"><span class="tag">draw()</span><span class="tag">frames</span><span class="tag">time</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/draw-loop-visualizer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/draw-loop-visualizer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981b79735e838e26cba6c" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">◎</span></div>
                 </article>
-                <article class="tool-card suit-motion">
+                <article class="tool-card suit-motion" data-pathway="animation games" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">◎</span></div>
                   <div class="tool-meta"><span class="pill session">◎ Motion · IX</span><span class="pill type">Interactive</span></div>
                   <h3>Bounce Logic Explainer</h3>
                   <p class="tool-description">Predict the next frame, see the ghost position cross the wall, then watch speedX flip sign. Bounce logic becomes inevitable.</p>
                   <div class="tag-row"><span class="tag">if</span><span class="tag">speed</span><span class="tag">bounce</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/bounce-logic-explainer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/bounce-logic-explainer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981d1ab55e513d4861349" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">◎</span></div>
                 </article>
-                <article class="tool-card suit-motion">
+                <article class="tool-card suit-motion" data-pathway="animation final" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">X</span><span class="pip-sym">◎</span></div>
                   <div class="tool-meta"><span class="pill session">◎ Motion · X</span><span class="pill type">Interactive</span></div>
                   <h3>Motion Playground</h3>
                   <p class="tool-description">Map mouseX to size, hue, speed, opacity, rotation, stroke weight, or y position. Same input, completely different meanings.</p>
                   <div class="tag-row"><span class="tag">map()</span><span class="tag">mouseX</span><span class="tag">interaction</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/motion-playground/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/motion-playground/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981da8d06dfbe6c90c535" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">◎</span></div>
+                </article>
+                <article class="tool-card suit-motion" data-pathway="animation final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">◎</span></div>
+                  <div class="tool-meta"><span class="pill session">◎ Motion · Move + Listen</span><span class="pill type">Interactive</span></div>
+                  <h3>dist() → map() → lerpColor() Chain</h3>
+                  <p class="tool-description">See how three functions form a pipeline: distance becomes a normalized value, which becomes a color. Any quantity can flow through this chain.</p>
+                  <div class="tag-row"><span class="tag">dist()</span><span class="tag">map()</span><span class="tag">lerpColor()</span><span class="tag">pipeline</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/dist-map-lerp-chain/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da98122b203fc49bd25ba49" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">◎</span></div>
+                </article>
+                <article class="tool-card suit-motion" data-pathway="animation final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">◎</span></div>
+                  <div class="tool-meta"><span class="pill session">◎ Motion · Move + Listen</span><span class="pill type">Interactive</span></div>
+                  <h3>Trails / Ghosting Studio</h3>
+                  <p class="tool-description">Control ghost trails with a semi-transparent background in draw(). Drag the alpha slider to make trails linger or vanish, then switch between Mouse, Bouncing Ball, and Orbital modes.</p>
+                  <div class="tag-row"><span class="tag">trails</span><span class="tag">alpha</span><span class="tag">background()</span><span class="tag">motion</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/trails-ghosting-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da98112854dfd3535e31d7c" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">◎</span></div>
+                </article>
+                <article class="tool-card suit-motion" data-pathway="final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XIII</span><span class="pip-sym">◎</span></div>
+                  <div class="tool-meta"><span class="pill session">◎ Motion · Move + Listen</span><span class="pill type">Interactive</span></div>
+                  <h3>Assets + preload() Helper</h3>
+                  <p class="tool-description">Preview an image URL at any position, size, and rotation. Adjust the sliders, then copy the ready-to-paste preload() and image() scaffold for your own sketch.</p>
+                  <div class="tag-row"><span class="tag">preload()</span><span class="tag">image()</span><span class="tag">assets</span><span class="tag">scaffold</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/assets-preload-helper/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981d0a591f91c786dafe6" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">XIII</span><span class="pip-sym">◎</span></div>
+                </article>
+                <article class="tool-card suit-motion" data-pathway="animation final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XVII</span><span class="pip-sym">◎</span></div>
+                  <div class="tool-meta"><span class="pill session">◎ Motion · XVII</span><span class="pill type">Interactive</span></div>
+                  <h3>Easing Types Comparison</h3>
+                  <p class="tool-description">Compare linear, ease-in, ease-out, ease-in-out, elastic, and bounce motion side by side. Same distance, different feeling.</p>
+                  <div class="tag-row"><span class="tag">easing</span><span class="tag">curves</span><span class="tag">motion design</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/easing-types-comparison/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da9817f9c20c5ca203a9dbf" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">XVII</span><span class="pip-sym">◎</span></div>
                 </article>
               </div>
             </div>
@@ -349,52 +623,62 @@
                 <p class="station-desc">Loops, repetition, noise, and functions. Where code starts feeling like a system.</p>
               </div>
               <div class="tool-grid">
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="first-time" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">I</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · I</span><span class="pill type">Interactive</span></div>
                   <h3>For Loop Stepper</h3>
                   <p class="tool-description">Press Next Step and watch i start, check, draw, increment, and stop. A bridge from "loops make patterns" to "I know why this made ten circles."</p>
                   <div class="tag-row"><span class="tag">for loops</span><span class="tag">i</span><span class="tag">step-through</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/for-loop-stepper/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/for-loop-stepper/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981bc8c3fe630e0bb90e6" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">I</span><span class="pip-sym">⬡</span></div>
                 </article>
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="first-time final" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">II</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · II</span><span class="pill type">Interactive</span></div>
                   <h3>Rows + Columns Pattern Maker</h3>
                   <p class="tool-description">Crank up rows and columns and watch a pattern explode across the canvas. Once it clicks, loops aren't just repetition anymore. They're creative power.</p>
                   <div class="tag-row"><span class="tag">loops</span><span class="tag">patterns</span><span class="tag">grid</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/rows-and-columns/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/rows-and-columns/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/036fcd306d1e4e6483a9e92dee23112b" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">II</span><span class="pip-sym">⬡</span></div>
                 </article>
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="first-time" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">III</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · III</span><span class="pill type">Interactive</span></div>
                   <h3>Array Explorer</h3>
                   <p class="tool-description">Add, remove, sort, and shuffle items while watching the visual update instantly. When the list changes and the picture changes, arrays become concrete and satisfying.</p>
                   <div class="tag-row"><span class="tag">arrays</span><span class="tag">sorting</span><span class="tag">visualization</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/simple-array-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/simple-array-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/a5ab09e8d8184b038f02262e19157be0" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">III</span><span class="pip-sym">⬡</span></div>
                 </article>
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="first-time final" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">IV</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · IV</span><span class="pill type">Interactive</span></div>
                   <h3>Function Builder</h3>
                   <p class="tool-description">Write one function, call it ten times with different arguments, and watch a system of unique-but-related shapes appear. Functions as tools, not just syntax.</p>
                   <div class="tag-row"><span class="tag">functions</span><span class="tag">reuse</span><span class="tag">abstraction</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/function-builder/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/function-builder/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/9ddb416c749f43939877815801ff0a8c" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">IV</span><span class="pip-sym">⬡</span></div>
                 </article>
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="animation games final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XIII</span><span class="pip-sym">⬡</span></div>
+                  <div class="tool-meta"><span class="pill session">⬡ Systems · XIII</span><span class="pill type">Interactive</span></div>
+                  <h3>Object Lifecycle Visualizer</h3>
+                  <p class="tool-description">Objects are born, age, fade, and splice out of the array. Spawn rate, lifespan, and array length make the lifecycle visible.</p>
+                  <div class="tag-row"><span class="tag">objects</span><span class="tag">lifespan</span><span class="tag">splice()</span></div>
+                  <div class="pairs-link">→ <a href="tools/particle-emitter-seed/">Particle Emitter Seed</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/object-lifecycle-visualizer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da9818db180ef951a52fd0a" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">XIII</span><span class="pip-sym">⬡</span></div>
+                </article>
+                <article class="tool-card suit-systems" data-pathway="animation final" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">V</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · V</span><span class="pill type">Interactive</span></div>
                   <h3>Modulo Pattern Explorer</h3>
                   <p class="tool-description">Change the cycle length and see counting become rhythm. Modulo turns loops into alternating colors, palette cycles, and checkerboards.</p>
                   <div class="tag-row"><span class="tag">modulo</span><span class="tag">cycles</span><span class="tag">patterns</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/modulo-pattern-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/modulo-pattern-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981c18b65cad0e92d9983" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">V</span><span class="pip-sym">⬡</span></div>
                 </article>
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="animation final" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">VI</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · VI</span><span class="pill type">Interactive</span></div>
                   <h3>Noise vs Random Explorer</h3>
@@ -403,16 +687,16 @@
                   <div class="tool-actions"><a class="button primary" href="tools/noise-vs-random-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/Tool-noise-vs-random-Explorer-877c7129cfce41ea977bb8dc3a358639?pvs=21" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VI</span><span class="pip-sym">⬡</span></div>
                 </article>
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="data final" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · VII</span><span class="pill type">Interactive</span></div>
                   <h3>Array Explorer: Values Become Visuals</h3>
                   <p class="tool-description">Load a dataset and watch it transform into bars, circles, or points, with summary stats and a code preview. A full data-viz workflow for educator demo days.</p>
                   <div class="tag-row"><span class="tag">arrays</span><span class="tag">data</span><span class="tag">statistics</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/polished-array-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/polished-array-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/cd01f49d28b042a2b91c957aea6b8060" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">⬡</span></div>
                 </article>
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="first-time animation" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · VIII</span><span class="pill type">Interactive</span></div>
                   <h3>Grid Maker</h3>
@@ -421,7 +705,7 @@
                   <div class="tool-actions"><a class="button primary" href="tools/grid-maker/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/Tool-Grid-Maker-Nested-Loops-7697fdb786094ba196b778ce65467742?pvs=21" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">⬡</span></div>
                 </article>
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="animation final" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · IX</span><span class="pill type">Interactive</span></div>
                   <h3>Pattern Logic Explorer</h3>
@@ -430,7 +714,7 @@
                   <div class="tool-actions"><a class="button primary" href="tools/pattern-logic-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/Pattern-Logic-Explorer-Drawing-with-Conditions-3569950a7da981c5b4c7fc1e874cfd4d?pvs=21" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">⬡</span></div>
                 </article>
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="animation final" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">X</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · X</span><span class="pill type">Interactive</span></div>
                   <h3>Noise Lab</h3>
@@ -439,7 +723,7 @@
                   <div class="tool-actions"><a class="button primary" href="tools/noise-lab/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/Noise-Lab-Space-Scale-and-Time-3549950a7da9812393f3c540c7c8d774?pvs=21" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">⬡</span></div>
                 </article>
-                <article class="tool-card suit-systems">
+                <article class="tool-card suit-systems" data-pathway="animation final" data-difficulty="capstone">
                   <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">⬡</span></div>
                   <div class="tool-meta"><span class="pill session">⬡ Systems · XI</span><span class="pill type">Async Lab</span></div>
                   <h3>Pattern Systems Lab</h3>
@@ -447,6 +731,24 @@
                   <div class="tag-row"><span class="tag">loops</span><span class="tag">systems</span><span class="tag">async</span></div>
                   <div class="tool-actions"><a class="button primary" href="tools/pattern-systems-lab/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/Pattern-Systems-Lab-Loops-Rules-and-Meaning-3569950a7da981f0b359fb4d16da9d4a?pvs=21" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">⬡</span></div>
+                </article>
+                <article class="tool-card suit-systems" data-pathway="animation final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">⬡</span></div>
+                  <div class="tool-meta"><span class="pill session">⬡ Systems · XII</span><span class="pill type">Interactive</span></div>
+                  <h3>Modulo + frameCount Studio</h3>
+                  <p class="tool-description">Watch four patterns — Blink, Pulse, Cooldown Bar, and Grid Cycle — all driven by frameCount % N simultaneously. Change N and see timing relationships shift across patterns.</p>
+                  <div class="tag-row"><span class="tag">modulo</span><span class="tag">frameCount</span><span class="tag">timing</span><span class="tag">patterns</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/modulo-framecount-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981da933bd61ff2dd8393" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">⬡</span></div>
+                </article>
+                <article class="tool-card suit-systems" data-pathway="final" data-difficulty="capstone">
+                  <div class="card-pip"><span class="pip-num">XIV</span><span class="pip-sym">⬡</span></div>
+                  <div class="tool-meta"><span class="pill session">⬡ Systems · XIV</span><span class="pill type">Advanced</span></div>
+                  <h3>Class Inheritance Explorer</h3>
+                  <p class="tool-description">See parent and child classes side by side, with inherited properties, overridden methods, and super() highlighted.</p>
+                  <div class="tag-row"><span class="tag">extends</span><span class="tag">super()</span><span class="tag">classes</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/class-inheritance-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da98175b255e8c8a540008d" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">XIV</span><span class="pip-sym">⬡</span></div>
                 </article>
               </div>
             </div>
@@ -457,7 +759,7 @@
                 <p class="station-desc">Data as material. Plan it, map it, draw it. Numbers that mean something personal.</p>
               </div>
               <div class="tool-grid">
-                <article class="tool-card suit-data">
+                <article class="tool-card suit-data" data-pathway="data final" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">I</span><span class="pip-sym">▦</span></div>
                   <div class="tool-meta"><span class="pill session">▦ Data · I</span><span class="pill type">Planning</span></div>
                   <h3>Data Story Planner</h3>
@@ -466,7 +768,7 @@
                   <div class="tool-actions"><a class="button primary" href="tools/data-story-planner/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/Tool-Data-Story-Planner-2dd63821df8f49479dbef26cfaa1b709?pvs=21" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">I</span><span class="pip-sym">▦</span></div>
                 </article>
-                <article class="tool-card suit-data">
+                <article class="tool-card suit-data" data-pathway="data final" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">II</span><span class="pip-sym">▦</span></div>
                   <div class="tool-meta"><span class="pill session">▦ Data · II</span><span class="pill type">Interactive</span></div>
                   <h3>Data Mapper</h3>
@@ -475,32 +777,51 @@
                   <div class="tool-actions"><a class="button primary" href="tools/data-mapper/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/Tool-Data-Mapper-7e37382695384e1d9d71e02594b6bca4?pvs=21" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">II</span><span class="pip-sym">▦</span></div>
                 </article>
-                <article class="tool-card suit-data">
+                <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">VI</span><span class="pip-sym">▦</span></div>
+                  <div class="tool-meta"><span class="pill session">▦ Data · VI</span><span class="pill type">Interactive</span></div>
+                  <h3>Hover-to-Reveal Interactive Data Chart</h3>
+                  <p class="tool-description">A small chart becomes an interface: hover a mark, highlight the nearest value, and reveal a tooltip with label and data.</p>
+                  <div class="tag-row"><span class="tag">data</span><span class="tag">hover</span><span class="tag">tooltip</span></div>
+                  <div class="pairs-link">→ <a href="tools/hover-data-bar-chart-seed/">Hover Data Bar Chart Seed</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/hover-data-chart/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981239b6cfd05c6e2f517" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">VI</span><span class="pip-sym">▦</span></div>
+                </article>
+                <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">III</span><span class="pip-sym">▦</span></div>
                   <div class="tool-meta"><span class="pill session">▦ Data · III</span><span class="pill type">Interactive</span></div>
                   <h3>CSV / loadTable() Data Explorer</h3>
                   <p class="tool-description">Edit a tiny CSV and map rows to bars, bubbles, or dots. A sketch that reads data from outside itself — that's the shift.</p>
                   <div class="tag-row"><span class="tag">CSV</span><span class="tag">loadTable()</span><span class="tag">rows + columns</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/csv-loadtable-data-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/csv-loadtable-data-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981119566e561b57bae5a" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">III</span><span class="pip-sym">▦</span></div>
                 </article>
-                <article class="tool-card suit-data">
+                <article class="tool-card suit-data" data-pathway="animation final" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">IV</span><span class="pip-sym">▦</span></div>
                   <div class="tool-meta"><span class="pill session">▦ Data · IV</span><span class="pill type">Interactive</span></div>
                   <h3>Object Shape Studio</h3>
                   <p class="tool-description">Create, move, and customize shape objects to feel how bundling data and behavior together keeps sketches clean, expressive, and easy to extend.</p>
                   <div class="tag-row"><span class="tag">objects</span><span class="tag">classes</span><span class="tag">reuse</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/interactive-shape-drawing-app/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/interactive-shape-drawing-app/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/e3b6d3eab950471c9a87ca50df89a51c" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">IV</span><span class="pip-sym">▦</span></div>
                 </article>
-                <article class="tool-card suit-data">
+                <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">V</span><span class="pip-sym">▦</span></div>
                   <div class="tool-meta"><span class="pill session">▦ Data · V</span><span class="pill type">Extension</span></div>
                   <h3>API / loadJSON() Data Explorer</h3>
                   <p class="tool-description">Edit a tiny JSON response and draw values from it. A beginner-friendly bridge from arrays to data that arrives from outside the sketch.</p>
                   <div class="tag-row"><span class="tag">loadJSON()</span><span class="tag">API</span><span class="tag">data</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/api-loadjson-data-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/api-loadjson-data-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da9812d95f2c8f557d0868d" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">V</span><span class="pip-sym">▦</span></div>
+                </article>
+                <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">▦</span></div>
+                  <div class="tool-meta"><span class="pill session">▦ Data · VII</span><span class="pill type">Interactive</span></div>
+                  <h3>String + Text Manipulation Studio</h3>
+                  <p class="tool-description">Treat language as data with split(), join(), slice(), replace(), and template literals. Text becomes material to transform.</p>
+                  <div class="tag-row"><span class="tag">strings</span><span class="tag">split()</span><span class="tag">generative text</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/string-text-manipulation-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981e2a480cc59120ec97a" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">▦</span></div>
                 </article>
               </div>
             </div>
@@ -511,43 +832,43 @@
                 <p class="station-desc">Images, sound, games, 3D. Where the canvas opens up and anything feels possible.</p>
               </div>
               <div class="tool-grid">
-                <article class="tool-card suit-open">
+                <article class="tool-card suit-open" data-pathway="games" data-difficulty="extension">
                   <div class="card-pip"><span class="pip-num">I</span><span class="pip-sym">☽</span></div>
                   <div class="tool-meta"><span class="pill session">☽ Open · I</span><span class="pill type">Interactive</span></div>
                   <h3>Collision Detection Explorer</h3>
                   <p class="tool-description">Drag two shapes until they touch and see the collision fire. Once you can see it happen, game logic makes immediate sense.</p>
                   <div class="tag-row"><span class="tag">collisions</span><span class="tag">conditionals</span><span class="tag">games</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/collision-detection-explorer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/collision-detection-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/674d161d6d6d4f2984cf4d4dff5020fb" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">I</span><span class="pip-sym">☽</span></div>
                 </article>
-                <article class="tool-card suit-open">
+                <article class="tool-card suit-open" data-pathway="final" data-difficulty="capstone">
                   <div class="card-pip"><span class="pip-num">II</span><span class="pip-sym">☽</span></div>
                   <div class="tool-meta"><span class="pill session">☽ Open · II</span><span class="pill type">Interactive</span></div>
                   <h3>Sound + Shape Visualizer</h3>
                   <p class="tool-description">Speak, clap, or play music and watch shapes pulse, grow, and respond. Audio as raw creative material, a natural fit for interdisciplinary and arts-integration sessions.</p>
                   <div class="tag-row"><span class="tag">sound</span><span class="tag">visualization</span><span class="tag">media</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/sound-shape-visualizer/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/sound-shape-visualizer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/4f91bb9268b74cfe94651faabed1ba71" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">II</span><span class="pip-sym">☽</span></div>
                 </article>
-                <article class="tool-card suit-open">
+                <article class="tool-card suit-open" data-pathway="final" data-difficulty="capstone">
                   <div class="card-pip"><span class="pip-num">III</span><span class="pip-sym">☽</span></div>
                   <div class="tool-meta"><span class="pill session">☽ Open · III</span><span class="pill type">Interactive</span></div>
                   <h3>Image Remix Studio</h3>
                   <p class="tool-description">Load an image and apply filters, tints, cropping, and transforms, a gateway to pixel data, visual identity, and what it means to remix found material.</p>
                   <div class="tag-row"><span class="tag">images</span><span class="tag">media</span><span class="tag">remix</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/image-remix-studio/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/image-remix-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/fb37d205301c489d948c237590cb1285" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">III</span><span class="pip-sym">☽</span></div>
                 </article>
-                <article class="tool-card suit-open">
+                <article class="tool-card suit-open" data-pathway="final" data-difficulty="capstone">
                   <div class="card-pip"><span class="pip-num">IV</span><span class="pip-sym">☽</span></div>
                   <div class="tool-meta"><span class="pill session">☽ Open · IV</span><span class="pill type">Interactive</span></div>
                   <h3>Pixel / Webcam Remix Studio</h3>
                   <p class="tool-description">Turn a sample image, upload, or webcam feed into mosaics and brightness maps. A picture that becomes data you can loop through.</p>
                   <div class="tag-row"><span class="tag">pixels</span><span class="tag">webcam</span><span class="tag">loops</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/pixel-webcam-remix-studio/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/pixel-webcam-remix-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981e39fcdde60a7b37ae1" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">IV</span><span class="pip-sym">☽</span></div>
                 </article>
-                <article class="tool-card suit-open">
+                <article class="tool-card suit-open" data-pathway="final" data-difficulty="capstone">
                   <div class="card-pip"><span class="pip-num">V</span><span class="pip-sym">☽</span></div>
                   <div class="tool-meta"><span class="pill session">☽ Open · V</span><span class="pill type">Interactive</span></div>
                   <h3>Postcard Studio</h3>
@@ -556,23 +877,50 @@
                   <div class="tool-actions"><a class="button primary" href="tools/postcard-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/Tool-Postcard-Studio-v3-d1f44c0b22f04e2083d621d02ad1cf2a?pvs=21" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">V</span><span class="pip-sym">☽</span></div>
                 </article>
-                <article class="tool-card suit-open">
+                <article class="tool-card suit-open" data-pathway="final" data-difficulty="capstone">
                   <div class="card-pip"><span class="pip-num">VI</span><span class="pip-sym">☽</span></div>
                   <div class="tool-meta"><span class="pill session">☽ Open · VI</span><span class="pill type">Advanced</span></div>
                   <h3>3D WebGL Playground</h3>
                   <p class="tool-description">Step into three dimensions with rotating boxes and spheres, a low-stakes playground for when flat canvases aren't enough and students want to go further.</p>
                   <div class="tag-row"><span class="tag">3D</span><span class="tag">WEBGL</span><span class="tag">transforms</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/webgl-3d-workshop/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/webgl-3d-workshop/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/1f746e3265044faa9b3299906a8ef04c" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VI</span><span class="pip-sym">☽</span></div>
                 </article>
-                <article class="tool-card suit-open">
+                <article class="tool-card suit-open" data-pathway="final" data-difficulty="capstone">
                   <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">☽</span></div>
                   <div class="tool-meta"><span class="pill session">☽ Open · VII</span><span class="pill type">Capstone</span></div>
                   <h3>Remix Machine</h3>
                   <p class="tool-description">Load a starter or paste a sketch, then apply remix cards: breathe, listen, multiply, shift palette, drift, mirror, and more.</p>
                   <div class="tag-row"><span class="tag">remix</span><span class="tag">starter code</span><span class="tag">showcase</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/remix-machine/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/remix-machine/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da9811e9fb8dc77483dcf24" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">☽</span></div>
+                </article>
+                <article class="tool-card suit-open" data-pathway="final" data-difficulty="capstone">
+                  <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">☽</span></div>
+                  <div class="tool-meta"><span class="pill session">☽ Open · VIII</span><span class="pill type">Interactive</span></div>
+                  <h3>Class Builder</h3>
+                  <p class="tool-description">Fill in the form, check the methods you need, and watch a complete ES6 class generate live. Copy the scaffold directly into your sketch and start adding behavior.</p>
+                  <div class="tag-row"><span class="tag">class</span><span class="tag">OOP</span><span class="tag">constructor</span><span class="tag">methods</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/class-builder/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da98167b239f37de7f72ae8" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">☽</span></div>
+                </article>
+                <article class="tool-card suit-open" data-pathway="games final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">☽</span></div>
+                  <div class="tool-meta"><span class="pill session">☽ Open · IX</span><span class="pill type">Interactive</span></div>
+                  <h3>Game State Studio</h3>
+                  <p class="tool-description">Click through start, play, pause, win, lose, and restart. The active state decides which screen and code block runs.</p>
+                  <div class="tag-row"><span class="tag">state</span><span class="tag">games</span><span class="tag">screens</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/game-state-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981f2bc67ea52da4322ce" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">☽</span></div>
+                </article>
+                <article class="tool-card suit-open" data-pathway="animation games final" data-difficulty="capstone">
+                  <div class="card-pip"><span class="pip-num">X</span><span class="pip-sym">☽</span></div>
+                  <div class="tool-meta"><span class="pill session">☽ Open · X</span><span class="pill type">Interactive</span></div>
+                  <h3>Agents + Rules Playground</h3>
+                  <p class="tool-description">Toggle simple rules like wander, seek, flee, and flock-ish. Many small local choices become a visible global pattern.</p>
+                  <div class="tag-row"><span class="tag">agents</span><span class="tag">rules</span><span class="tag">emergence</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/agents-rules-playground/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da98182addcd81280914aa4" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">☽</span></div>
                 </article>
               </div>
             </div>
@@ -583,14 +931,32 @@
                 <p class="station-desc">Practice recovering from broken code. Debugging is not failure; debugging is the work.</p>
               </div>
               <div class="tool-grid">
-                <article class="tool-card suit-support">
+                <article class="tool-card suit-support" data-pathway="stuck" data-difficulty="beginner">
                   <div class="card-pip"><span class="pip-num">I</span><span class="pip-sym">⊕</span></div>
                   <div class="tool-meta"><span class="pill session">⊕ Support · I</span><span class="pill type">Practice Lab</span></div>
                   <h3>Debugging Playground</h3>
                   <p class="tool-description">Fix five small broken sketches: missing braces, misspelled variables, assignment bugs, loop mistakes, and behavior surprises. Build confidence on purpose.</p>
                   <div class="tag-row"><span class="tag">debugging</span><span class="tag">errors</span><span class="tag">confidence</span></div>
-                  <div class="tool-actions"><a class="button primary" href="tools/debugging-playground/">Launch Tool</a></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/debugging-playground/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da9811db077eaf2c244fdb4" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">I</span><span class="pip-sym">⊕</span></div>
+                </article>
+                <article class="tool-card suit-support" data-pathway="stuck animation" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">II</span><span class="pip-sym">⊕</span></div>
+                  <div class="tool-meta"><span class="pill session">⊕ Support · II</span><span class="pill type">Interactive</span></div>
+                  <h3>Array-of-Objects Debugger</h3>
+                  <p class="tool-description">Watch 8 bouncing balls as live JavaScript objects. Click any ball to inspect its properties frame-by-frame, step through the loop visually, or pause time to read the state mid-flight.</p>
+                  <div class="tag-row"><span class="tag">arrays</span><span class="tag">objects</span><span class="tag">debugging</span><span class="tag">for loop</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/array-objects-debugger/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981c69cedc1b94da89d6e" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">II</span><span class="pip-sym">⊕</span></div>
+                </article>
+                <article class="tool-card suit-support" data-pathway="stuck" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">III</span><span class="pip-sym">⊕</span></div>
+                  <div class="tool-meta"><span class="pill session">⊕ Support · III</span><span class="pill type">Practice Lab</span></div>
+                  <h3>Readable Code Coach</h3>
+                  <p class="tool-description">Compare cryptic and readable sketches. Naming, comments, and structure become tools for debugging and remixing.</p>
+                  <div class="tag-row"><span class="tag">readability</span><span class="tag">debugging</span><span class="tag">comments</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/readable-code-coach/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981a09133e8a4f242b9b8" target="_blank" rel="noopener">Notion Notes</a></div>
+                <div class="card-pip-br"><span class="pip-num">III</span><span class="pip-sym">⊕</span></div>
                 </article>
               </div>
             </div>
@@ -605,37 +971,10 @@
               <h2>Seeds for live coding, remixing, and making your own</h2>
               <p>These are intentionally lean sketch seeds — a working p5.js sketch in a live editor, ready to change. Use them for live coding demos, pair extensions, challenge prompts, or as a student's first personal project. Open one, change one thing, see what happens. <a href="https://sustaining-boursin-d41.notion.site/3349950a7da981dd939ad16078343178" style="color:var(--accent)">Async learners: the Cohort Roadmap has explicit self-directed paths →</a></p>
             </div>
-            <div class="gallery-count">30 sketches</div>
+            <div class="gallery-count">40 sketches</div>
           </div>
           <div class="tool-grid">
-            <article class="tool-card suit-marks">
-              <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
-              <div class="tool-meta"><span class="pill session">✦ Marks · IX</span><span class="pill seed">Starter Sketch</span></div>
-              <h3>Code Postcard from My World</h3>
-              <p class="tool-description">A tiny visual hello made from background, shapes, and color. A direct remixable version of the Session 1 live-coding postcard.</p>
-              <div class="tag-row"><span class="tag">shapes</span><span class="tag">color</span><span class="tag">identity</span></div>
-              <div class="tool-actions"><a class="button primary" href="tools/code-postcard-from-my-world/">Open Sketch</a></div>
-            <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
-            </article>
-            <article class="tool-card suit-data">
-              <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">▦</span></div>
-              <div class="tool-meta"><span class="pill session">▦ Data · XI</span><span class="pill seed">Starter Sketch</span></div>
-              <h3>One Dataset, Three Views</h3>
-              <p class="tool-description">The same array becomes bars, circles, or a color field. Press 1, 2, or 3 and feel data visualization as a design decision.</p>
-              <div class="tag-row"><span class="tag">arrays</span><span class="tag">data</span><span class="tag">mapping</span></div>
-              <div class="tool-actions"><a class="button primary" href="tools/one-dataset-three-views/">Open Sketch</a></div>
-            <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">▦</span></div>
-            </article>
-            <article class="tool-card suit-data">
-              <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">▦</span></div>
-              <div class="tool-meta"><span class="pill session">▦ Data · XII</span><span class="pill seed">Starter Sketch</span></div>
-              <h3>Classroom Grid / Intentional Array Seed</h3>
-              <p class="tool-description">A nested-loop grid where each cell reads a value from an array. The bridge from pattern to data story.</p>
-              <div class="tag-row"><span class="tag">nested loops</span><span class="tag">arrays</span><span class="tag">systems</span></div>
-              <div class="tool-actions"><a class="button primary" href="tools/classroom-grid-array-seed/">Open Sketch</a></div>
-            <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">▦</span></div>
-            </article>
-            <article class="tool-card suit-marks">
+            <article class="tool-card suit-marks" data-pathway="first-time" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">✦</span></div>
               <div class="tool-meta"><span class="pill session">✦ Marks · VII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Draw Your Name / Initials Seed</h3>
@@ -644,7 +983,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/draw-your-name-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">✦</span></div>
             </article>
-            <article class="tool-card suit-marks">
+            <article class="tool-card suit-marks" data-pathway="first-time animation" data-difficulty="extension">
               <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">✦</span></div>
               <div class="tool-meta"><span class="pill session">✦ Marks · VIII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>HSB Color Expression Seed</h3>
@@ -653,7 +992,16 @@
               <div class="tool-actions"><a class="button primary" href="tools/hsb-color-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">✦</span></div>
             </article>
-            <article class="tool-card suit-motion">
+            <article class="tool-card suit-marks" data-pathway="first-time final" data-difficulty="beginner">
+              <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
+              <div class="tool-meta"><span class="pill session">✦ Marks · IX</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Code Postcard from My World</h3>
+              <p class="tool-description">A tiny visual hello made from background, shapes, and color. A direct remixable version of the Session 1 live-coding postcard.</p>
+              <div class="tag-row"><span class="tag">shapes</span><span class="tag">color</span><span class="tag">identity</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/code-postcard-from-my-world/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">✦</span></div>
+            </article>
+            <article class="tool-card suit-motion" data-pathway="animation" data-difficulty="extension">
               <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">◎</span></div>
               <div class="tool-meta"><span class="pill session">◎ Motion · VIII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Mouse Trail Drawing Seed</h3>
@@ -662,7 +1010,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/mouse-trail-drawing-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">◎</span></div>
             </article>
-            <article class="tool-card suit-motion">
+            <article class="tool-card suit-motion" data-pathway="first-time animation games" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">◎</span></div>
               <div class="tool-meta"><span class="pill session">◎ Motion · IX</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Bouncing Ball Starter</h3>
@@ -671,7 +1019,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/bouncing-ball-starter/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">◎</span></div>
             </article>
-            <article class="tool-card suit-motion">
+            <article class="tool-card suit-motion" data-pathway="first-time animation" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">X</span><span class="pip-sym">◎</span></div>
               <div class="tool-meta"><span class="pill session">◎ Motion · X</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Click-to-Create Shapes</h3>
@@ -680,7 +1028,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/click-to-create-shapes/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">◎</span></div>
             </article>
-            <article class="tool-card suit-motion">
+            <article class="tool-card suit-motion" data-pathway="first-time animation" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">◎</span></div>
               <div class="tool-meta"><span class="pill session">◎ Motion · XI</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Color From Position</h3>
@@ -689,7 +1037,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/color-from-position/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">◎</span></div>
             </article>
-            <article class="tool-card suit-motion">
+            <article class="tool-card suit-motion" data-pathway="animation" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">◎</span></div>
               <div class="tool-meta"><span class="pill session">◎ Motion · XII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>frameCount Animation Seed</h3>
@@ -698,7 +1046,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/framecount-animation-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">◎</span></div>
             </article>
-            <article class="tool-card suit-motion">
+            <article class="tool-card suit-motion" data-pathway="animation final" data-difficulty="extension">
               <div class="card-pip"><span class="pip-num">XIII</span><span class="pip-sym">◎</span></div>
               <div class="tool-meta"><span class="pill session">◎ Motion · XIII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Sine / Cosine Motion Seed</h3>
@@ -707,7 +1055,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/sine-cosine-motion-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">XIII</span><span class="pip-sym">◎</span></div>
             </article>
-            <article class="tool-card suit-motion">
+            <article class="tool-card suit-motion" data-pathway="animation" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">XIV</span><span class="pip-sym">◎</span></div>
               <div class="tool-meta"><span class="pill session">◎ Motion · XIV</span><span class="pill seed">Starter Sketch</span></div>
               <h3>lerp() Follow Seed</h3>
@@ -716,7 +1064,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/lerp-follow-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">XIV</span><span class="pip-sym">◎</span></div>
             </article>
-            <article class="tool-card suit-motion">
+            <article class="tool-card suit-motion" data-pathway="animation games" data-difficulty="extension">
               <div class="card-pip"><span class="pip-num">XV</span><span class="pip-sym">◎</span></div>
               <div class="tool-meta"><span class="pill session">◎ Motion · XV</span><span class="pill seed">Starter Sketch</span></div>
               <h3>dist() Proximity Seed</h3>
@@ -725,7 +1073,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/dist-proximity-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">XV</span><span class="pip-sym">◎</span></div>
             </article>
-            <article class="tool-card suit-systems">
+            <article class="tool-card suit-systems" data-pathway="animation final" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">⬡</span></div>
               <div class="tool-meta"><span class="pill session">⬡ Systems · VIII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Noise Walker</h3>
@@ -734,7 +1082,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/noise-walker/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">⬡</span></div>
             </article>
-            <article class="tool-card suit-systems">
+            <article class="tool-card suit-systems" data-pathway="first-time final" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">⬡</span></div>
               <div class="tool-meta"><span class="pill session">⬡ Systems · IX</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Function Creature Stamp</h3>
@@ -743,7 +1091,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/function-creature-stamp/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">⬡</span></div>
             </article>
-            <article class="tool-card suit-motion">
+            <article class="tool-card suit-motion" data-pathway="games" data-difficulty="extension">
               <div class="card-pip"><span class="pip-num">XVI</span><span class="pip-sym">◎</span></div>
               <div class="tool-meta"><span class="pill session">◎ Motion · XVI</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Keyboard-Controlled Character</h3>
@@ -752,7 +1100,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/keyboard-controlled-character/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">XVI</span><span class="pip-sym">◎</span></div>
             </article>
-            <article class="tool-card suit-open">
+            <article class="tool-card suit-open" data-pathway="games" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">☽</span></div>
               <div class="tool-meta"><span class="pill session">☽ Open · VII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Simple Collision Game Seed</h3>
@@ -761,7 +1109,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/simple-collision-game-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">☽</span></div>
             </article>
-            <article class="tool-card suit-data">
+            <article class="tool-card suit-data" data-pathway="data final" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">V</span><span class="pip-sym">▦</span></div>
               <div class="tool-meta"><span class="pill session">▦ Data · V</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Data Self-Portrait Seed</h3>
@@ -770,7 +1118,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/data-self-portrait-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">V</span><span class="pip-sym">▦</span></div>
             </article>
-            <article class="tool-card suit-data">
+            <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
               <div class="card-pip"><span class="pip-num">VI</span><span class="pip-sym">▦</span></div>
               <div class="tool-meta"><span class="pill session">▦ Data · VI</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Tiny CSV Portrait Seed</h3>
@@ -779,7 +1127,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/tiny-csv-portrait-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">VI</span><span class="pip-sym">▦</span></div>
             </article>
-            <article class="tool-card suit-data">
+            <article class="tool-card suit-data" data-pathway="final" data-difficulty="capstone">
               <div class="card-pip"><span class="pip-num">VII</span><span class="pip-sym">▦</span></div>
               <div class="tool-meta"><span class="pill session">▦ Data · VII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Image Grid Remix Seed</h3>
@@ -788,7 +1136,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/image-grid-remix-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">▦</span></div>
             </article>
-            <article class="tool-card suit-open">
+            <article class="tool-card suit-open" data-pathway="final" data-difficulty="capstone">
               <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">☽</span></div>
               <div class="tool-meta"><span class="pill session">☽ Open · VIII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Sound Pulse Seed</h3>
@@ -797,7 +1145,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/sound-pulse-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">☽</span></div>
             </article>
-            <article class="tool-card suit-open">
+            <article class="tool-card suit-open" data-pathway="final" data-difficulty="capstone">
               <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">☽</span></div>
               <div class="tool-meta"><span class="pill session">☽ Open · IX</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Mini Generative Poster Seed</h3>
@@ -806,7 +1154,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/mini-generative-poster-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">☽</span></div>
             </article>
-            <article class="tool-card suit-open">
+            <article class="tool-card suit-open" data-pathway="animation final" data-difficulty="capstone">
               <div class="card-pip"><span class="pip-num">X</span><span class="pip-sym">☽</span></div>
               <div class="tool-meta"><span class="pill session">☽ Open · X</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Particle System Seed</h3>
@@ -815,7 +1163,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/particle-system-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">☽</span></div>
             </article>
-            <article class="tool-card suit-open">
+            <article class="tool-card suit-open" data-pathway="games final" data-difficulty="capstone">
               <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">☽</span></div>
               <div class="tool-meta"><span class="pill session">☽ Open · XI</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Game State Starter</h3>
@@ -824,7 +1172,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/game-state-starter/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">☽</span></div>
             </article>
-            <article class="tool-card suit-systems">
+            <article class="tool-card suit-systems" data-pathway="animation final" data-difficulty="beginner">
               <div class="card-pip"><span class="pip-num">X</span><span class="pip-sym">⬡</span></div>
               <div class="tool-meta"><span class="pill session">⬡ Systems · X</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Nested Loop Pattern Studio</h3>
@@ -833,7 +1181,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/nested-loop-array-grid/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">⬡</span></div>
             </article>
-            <article class="tool-card suit-systems">
+            <article class="tool-card suit-systems" data-pathway="animation" data-difficulty="extension">
               <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">⬡</span></div>
               <div class="tool-meta"><span class="pill session">⬡ Systems · XI</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Dot Field Position Sketch</h3>
@@ -842,7 +1190,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/array-position-dot-field/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">⬡</span></div>
             </article>
-            <article class="tool-card suit-data">
+            <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
               <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">▦</span></div>
               <div class="tool-meta"><span class="pill session">▦ Data · VIII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Random Poetry Generator</h3>
@@ -851,7 +1199,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/random-poetry-generator/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">▦</span></div>
             </article>
-            <article class="tool-card suit-data">
+            <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
               <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">▦</span></div>
               <div class="tool-meta"><span class="pill session">▦ Data · IX</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Random Sentence Generator</h3>
@@ -860,7 +1208,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/random-sentence-generator/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">▦</span></div>
             </article>
-            <article class="tool-card suit-open">
+            <article class="tool-card suit-open" data-pathway="final" data-difficulty="capstone">
               <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">☽</span></div>
               <div class="tool-meta"><span class="pill session">☽ Open · XII</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Text as Visual Material</h3>
@@ -869,7 +1217,7 @@
               <div class="tool-actions"><a class="button primary" href="tools/text-as-visual-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">☽</span></div>
             </article>
-            <article class="tool-card suit-data">
+            <article class="tool-card suit-data" data-pathway="animation final" data-difficulty="capstone">
               <div class="card-pip"><span class="pip-num">X</span><span class="pip-sym">▦</span></div>
               <div class="tool-meta"><span class="pill session">▦ Data · X</span><span class="pill seed">Starter Sketch</span></div>
               <h3>Moving Sentence Machine</h3>
@@ -877,6 +1225,114 @@
               <div class="tag-row"><span class="tag">text</span><span class="tag">motion</span><span class="tag">arrays</span></div>
               <div class="tool-actions"><a class="button primary" href="tools/arrays-in-motion/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">▦</span></div>
+            </article>
+            <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">▦</span></div>
+              <div class="tool-meta"><span class="pill session">▦ Data · XI</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>One Dataset, Three Views</h3>
+              <p class="tool-description">The same array becomes bars, circles, or a color field. Press 1, 2, or 3 and feel data visualization as a design decision.</p>
+              <div class="tag-row"><span class="tag">arrays</span><span class="tag">data</span><span class="tag">mapping</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/one-dataset-three-views/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">▦</span></div>
+            </article>
+            <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">▦</span></div>
+              <div class="tool-meta"><span class="pill session">▦ Data · XII</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Classroom Grid / Intentional Array Seed</h3>
+              <p class="tool-description">A nested-loop grid where each cell reads a value from an array. The bridge from pattern to data story.</p>
+              <div class="tag-row"><span class="tag">nested loops</span><span class="tag">arrays</span><span class="tag">systems</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/classroom-grid-array-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">▦</span></div>
+            </article>
+            <article class="tool-card suit-motion" data-pathway="animation games final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XIV</span><span class="pip-sym">◎</span></div>
+              <div class="tool-meta"><span class="pill session">◎ Motion · XIV</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Gravity Bounce Seed</h3>
+              <p class="tool-description">A ball drops, accelerates, hits the floor, and bounces with damping. A tiny template for gravity worlds.</p>
+              <div class="tag-row"><span class="tag">gravity</span><span class="tag">velocity</span><span class="tag">bounce</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/gravity-bounce-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XIV</span><span class="pip-sym">◎</span></div>
+            </article>
+            <article class="tool-card suit-motion" data-pathway="animation games final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XV</span><span class="pip-sym">◎</span></div>
+              <div class="tool-meta"><span class="pill session">◎ Motion · XV</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Angle-to-Mouse Seed</h3>
+              <p class="tool-description">An arrow rotates to face the cursor with atan2(mouseY - y, mouseX - x). The most reusable game interaction pattern.</p>
+              <div class="tag-row"><span class="tag">atan2()</span><span class="tag">rotate()</span><span class="tag">mouse</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/angle-to-mouse-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XV</span><span class="pip-sym">◎</span></div>
+            </article>
+            <article class="tool-card suit-motion" data-pathway="animation final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XVI</span><span class="pip-sym">◎</span></div>
+              <div class="tool-meta"><span class="pill session">◎ Motion · XVI</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Sine Oscillation Seed</h3>
+              <p class="tool-description">A smooth up-and-down motion using sin(frameCount * speed) * amplitude. Change how far and how fast it floats.</p>
+              <div class="tag-row"><span class="tag">sin()</span><span class="tag">oscillation</span><span class="tag">amplitude</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/sine-oscillation-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XVI</span><span class="pip-sym">◎</span></div>
+            </article>
+            <article class="tool-card suit-open" data-pathway="animation games final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">☽</span></div>
+              <div class="tool-meta"><span class="pill session">☽ Open · IX</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Particle Emitter Seed</h3>
+              <p class="tool-description">Click or drag to emit particles with position, velocity, lifespan, and cleanup through splice().</p>
+              <div class="tag-row"><span class="tag">particles</span><span class="tag">lifespan</span><span class="tag">splice()</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/particle-emitter-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">☽</span></div>
+            </article>
+            <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XIII</span><span class="pip-sym">▦</span></div>
+              <div class="tool-meta"><span class="pill session">▦ Data · XIII</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Hover Data Bar Chart Seed</h3>
+              <p class="tool-description">A small hardcoded dataset becomes a bar chart with hover highlight and tooltip values.</p>
+              <div class="tag-row"><span class="tag">data</span><span class="tag">hover</span><span class="tag">tooltip</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/hover-data-bar-chart-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XIII</span><span class="pip-sym">▦</span></div>
+            </article>
+            <article class="tool-card suit-open" data-pathway="animation final" data-difficulty="capstone">
+              <div class="card-pip"><span class="pip-num">X</span><span class="pip-sym">☽</span></div>
+              <div class="tool-meta"><span class="pill session">☽ Open · X</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Wander Agent Seed</h3>
+              <p class="tool-description">One agent changes heading a little each frame. A gentle entry point to rules, vectors, and emergence.</p>
+              <div class="tag-row"><span class="tag">agents</span><span class="tag">wander</span><span class="tag">vectors</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/wander-agent-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">☽</span></div>
+            </article>
+            <article class="tool-card suit-open" data-pathway="games final" data-difficulty="capstone">
+              <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">☽</span></div>
+              <div class="tool-meta"><span class="pill session">☽ Open · XI</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>State Machine Game Seed</h3>
+              <p class="tool-description">A clean start → play → game over → restart structure using one gameState variable.</p>
+              <div class="tag-row"><span class="tag">gameState</span><span class="tag">switch</span><span class="tag">restart</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/state-machine-game-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">☽</span></div>
+            </article>
+            <article class="tool-card suit-motion" data-pathway="animation final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XVII</span><span class="pip-sym">◎</span></div>
+              <div class="tool-meta"><span class="pill session">◎ Motion · XVII</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Circular Motion / Orbit Seed</h3>
+              <p class="tool-description">A dot orbits a center point with x = cx + cos(angle) * r and y = cy + sin(angle) * r.</p>
+              <div class="tag-row"><span class="tag">cos()</span><span class="tag">sin()</span><span class="tag">orbit</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/circular-motion-orbit-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XVII</span><span class="pip-sym">◎</span></div>
+            </article>
+            <article class="tool-card suit-systems" data-pathway="final" data-difficulty="capstone">
+              <div class="card-pip"><span class="pip-num">XIII</span><span class="pip-sym">⬡</span></div>
+              <div class="tool-meta"><span class="pill session">⬡ Systems · XIII</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Generative Tile Pattern Seed</h3>
+              <p class="tool-description">Nested loops, modulo, noise, and HSB color mode combine into a responsive tiling pattern.</p>
+              <div class="tag-row"><span class="tag">loops</span><span class="tag">modulo</span><span class="tag">noise</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/generative-tile-pattern-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XIII</span><span class="pip-sym">⬡</span></div>
+            </article>
+            <article class="tool-card suit-systems" data-pathway="final" data-difficulty="capstone">
+              <div class="card-pip"><span class="pip-num">XIV</span><span class="pip-sym">⬡</span></div>
+              <div class="tool-meta"><span class="pill session">⬡ Systems · XIV</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Class Creature Stamp Seed</h3>
+              <p class="tool-description">A small Creature class creates stampable objects with position, color, draw(), and move() behavior.</p>
+              <div class="tag-row"><span class="tag">class</span><span class="tag">objects</span><span class="tag">stamp</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/class-creature-stamp-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XIV</span><span class="pip-sym">⬡</span></div>
             </article>
           </div>
         </section>
@@ -899,7 +1355,7 @@
       </span>
     </footer>
   </div>
-  <script src="preview-sketches.js?v=20260505-artifact-media-state"></script>
-  <script src="site.js?v=20260506-three-card-notion"></script>
+  <script src="preview-sketches.js?v=20260507-expanded-tools"></script>
+  <script src="site.js?v=20260506-debug-card-previews"></script>
 </body>
 </html>

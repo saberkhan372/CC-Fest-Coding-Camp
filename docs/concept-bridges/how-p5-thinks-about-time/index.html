@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How p5.js Thinks About Time</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffaf2;
+      --ink: #222222;
+      --muted: #6b6258;
+      --line: #ded2c1;
+      --accent: #2563eb;
+      --setup: #7c3aed;
+      --draw: #0891b2;
+      --frame: #e11d48;
+      --trail: #f59e0b;
+      --green: #16a34a;
+      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
+        var(--bg);
+    }
+
+    header {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 20px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 880px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 12px 20px 36px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .controls,
+    .workspace,
+    .side-panel {
+      background: rgba(255, 250, 242, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    .toggle-label,
+    .pill {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+      user-select: none;
+    }
+
+    button:hover,
+    .toggle-label:hover {
+      transform: translateY(-1px);
+      background: #fff7ed;
+    }
+
+    button.active {
+      color: white;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .toggle-label input {
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    .pill {
+      cursor: default;
+      background: #f8fafc;
+      color: var(--muted);
+      border-color: #e2e8f0;
+    }
+
+    .slider-wrap {
+      display: grid;
+      grid-template-columns: 112px minmax(160px, 1fr) 78px;
+      gap: 9px;
+      align-items: center;
+      min-width: min(460px, 100%);
+    }
+
+    label,
+    .value-label,
+    .preset-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .workspace {
+      position: relative;
+      height: 660px;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    #sketch-holder {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #sketch-holder canvas { display: block; }
+
+    .canvas-caption {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      right: 22px;
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      backdrop-filter: blur(8px);
+    }
+
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .card h2 { font-size: 1.15rem; }
+    .card h3 { font-size: 1rem; }
+
+    .card p,
+    .card li {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .card p { margin: 0 0 8px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .formula {
+      display: block;
+      margin: 8px 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: grid;
+      grid-template-columns: 16px 1fr;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .swatch.setup { background: var(--setup); }
+    .swatch.draw { background: var(--draw); }
+    .swatch.frame { background: var(--frame); }
+    .swatch.trail { background: var(--trail); }
+    .swatch.green { background: var(--green); }
+
+    .code-card { display: none; }
+    .code-card.visible { display: block; }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      padding: 12px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .note {
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; }
+      .workspace { height: 590px; }
+    }
+
+    @media (max-width: 600px) {
+      header, main {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .slider-wrap {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .workspace { height: 540px; }
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
+    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+  </div>
+  <header>
+    <h1>How p5.js Thinks About Time</h1>
+    <p class="subtitle">
+      A concept bridge for <strong>setup()</strong>, <strong>draw()</strong>, <strong>frameCount</strong>, <strong>frameRate()</strong>, and trails.
+      Animation is not continuous magic — it is repeated drawing.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Explorer controls">
+      <div class="row">
+        <button id="mode-setup" class="active">setup() vs draw()</button>
+        <button id="mode-loop">The Draw Loop</button>
+        <button id="mode-framecount">frameCount</button>
+        <button id="mode-framerate">frameRate()</button>
+        <button id="mode-trails">Trails</button>
+        <button id="play-button">⏸ Pause</button>
+        <button id="reset-button">Reset</button>
+        <span id="mode-pill" class="pill">setup once → draw again and again</span>
+      </div>
+
+      <div class="row">
+        <div class="slider-wrap">
+          <label for="fps-slider">Target FPS</label>
+          <input id="fps-slider" type="range" min="1" max="60" value="30" step="1" />
+          <span id="fps-value" class="value-label">30 fps</span>
+        </div>
+
+        <div class="slider-wrap">
+          <label for="fade-slider">Background fade</label>
+          <input id="fade-slider" type="range" min="0" max="255" value="255" step="1" />
+          <span id="fade-value" class="value-label">255</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="preset-label">Frame rate presets:</span>
+        <button class="fps-preset" data-fps="2">2 fps</button>
+        <button class="fps-preset" data-fps="12">12 fps</button>
+        <button class="fps-preset" data-fps="30">30 fps</button>
+        <button class="fps-preset" data-fps="60">60 fps</button>
+        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
+        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div id="sketch-holder"></div>
+      <div id="canvas-caption" class="canvas-caption">
+        setup() runs once. draw() runs over and over. That repetition creates animation.
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <section class="card">
+        <h2 id="lesson-title">setup() happens once. draw() repeats.</h2>
+        <p id="lesson-text">
+          p5.js starts with setup(), then enters the draw loop. Every time draw() runs, p5.js makes another frame.
+        </p>
+        <span id="formula-box" class="formula">setup() → draw() → draw() → draw() → ...</span>
+      </section>
+
+      <section class="card">
+        <h3>Big idea</h3>
+        <p><strong>Animation</strong> is repeated drawing.</p>
+        <p><strong>frameCount</strong> is how many drawings have happened.</p>
+        <p><strong>frameRate()</strong> controls how many drawings p5.js tries to make per second.</p>
+      </section>
+
+      <section class="card">
+        <h3>Legend</h3>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch setup"></span><span>setup(): happens once</span></div>
+          <div class="legend-item"><span class="swatch draw"></span><span>draw(): repeats</span></div>
+          <div class="legend-item"><span class="swatch frame"></span><span>frameCount: frame number</span></div>
+          <div class="legend-item"><span class="swatch trail"></span><span>old frames / trails</span></div>
+          <div class="legend-item"><span class="swatch green"></span><span>current frame / current time</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Try this</h3>
+        <p id="question-text">Pause the sketch. What changes? What stays the same?</p>
+      </section>
+
+      <section id="code-card" class="card code-card">
+        <h3>p5.js connection</h3>
+        <pre><code id="code-box">function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(240);
+  circle(frameCount % width, 200, 40);
+}</code></pre>
+        <p class="note">
+          p5.js will try to match the requested frameRate(), but actual performance depends on the browser, device, and sketch complexity.
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const state = {
+      mode: "setup",
+      running: true,
+      targetFPS: 30,
+      fade: 255,
+      showLabels: true,
+      showCode: false,
+      frameNumber: 0,
+      tick: 0,
+      ballX: 0,
+      trail: [],
+      setupPulse: 1,
+      drawPulse: 0
+    };
+
+    const els = {};
+
+    function setupUI() {
+      els.modeSetup = document.querySelector("#mode-setup");
+      els.modeLoop = document.querySelector("#mode-loop");
+      els.modeFramecount = document.querySelector("#mode-framecount");
+      els.modeFramerate = document.querySelector("#mode-framerate");
+      els.modeTrails = document.querySelector("#mode-trails");
+      els.playButton = document.querySelector("#play-button");
+      els.resetButton = document.querySelector("#reset-button");
+      els.modePill = document.querySelector("#mode-pill");
+      els.fpsSlider = document.querySelector("#fps-slider");
+      els.fpsValue = document.querySelector("#fps-value");
+      els.fadeSlider = document.querySelector("#fade-slider");
+      els.fadeValue = document.querySelector("#fade-value");
+      els.fpsPresets = Array.from(document.querySelectorAll(".fps-preset"));
+      els.showLabels = document.querySelector("#show-labels");
+      els.showCode = document.querySelector("#show-code");
+      els.lessonTitle = document.querySelector("#lesson-title");
+      els.lessonText = document.querySelector("#lesson-text");
+      els.formulaBox = document.querySelector("#formula-box");
+      els.questionText = document.querySelector("#question-text");
+      els.codeCard = document.querySelector("#code-card");
+      els.codeBox = document.querySelector("#code-box");
+      els.caption = document.querySelector("#canvas-caption");
+
+      els.modeSetup.addEventListener("click", () => setMode("setup"));
+      els.modeLoop.addEventListener("click", () => setMode("loop"));
+      els.modeFramecount.addEventListener("click", () => setMode("framecount"));
+      els.modeFramerate.addEventListener("click", () => setMode("framerate"));
+      els.modeTrails.addEventListener("click", () => setMode("trails"));
+
+      els.playButton.addEventListener("click", () => {
+        state.running = !state.running;
+        updateUI();
+      });
+
+      els.resetButton.addEventListener("click", () => resetSketchTime());
+
+      els.fpsSlider.addEventListener("input", () => {
+        state.targetFPS = Number(els.fpsSlider.value);
+        updateUI();
+      });
+
+      els.fadeSlider.addEventListener("input", () => {
+        state.fade = Number(els.fadeSlider.value);
+        updateUI();
+      });
+
+      els.fpsPresets.forEach((button) => {
+        button.addEventListener("click", () => {
+          state.targetFPS = Number(button.dataset.fps);
+          updateUI();
+        });
+      });
+
+      els.showLabels.addEventListener("change", () => {
+        state.showLabels = els.showLabels.checked;
+      });
+
+      els.showCode.addEventListener("change", () => {
+        state.showCode = els.showCode.checked;
+        updateUI();
+      });
+
+      updateUI();
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      if (mode === "trails" && state.fade === 255) state.fade = 26;
+      if (mode !== "trails" && state.fade < 90) state.fade = 255;
+      resetSketchTime(false);
+      updateUI();
+    }
+
+    function resetSketchTime(resetPulse = true) {
+      state.frameNumber = 0;
+      state.tick = 0;
+      state.ballX = 0;
+      state.trail = [];
+      if (resetPulse) {
+        state.setupPulse = 1;
+        state.drawPulse = 0;
+      }
+      updateUI();
+    }
+
+    function updateUI() {
+      const buttons = [
+        [els.modeSetup, "setup"],
+        [els.modeLoop, "loop"],
+        [els.modeFramecount, "framecount"],
+        [els.modeFramerate, "framerate"],
+        [els.modeTrails, "trails"]
+      ];
+
+      for (const [button, mode] of buttons) {
+        button.classList.toggle("active", state.mode === mode);
+      }
+
+      els.playButton.textContent = state.running ? "⏸ Pause" : "▶ Play";
+      els.fpsSlider.value = state.targetFPS;
+      els.fpsValue.textContent = `${state.targetFPS} fps`;
+      els.fadeSlider.value = state.fade;
+      els.fadeValue.textContent = String(state.fade);
+      els.showLabels.checked = state.showLabels;
+      els.showCode.checked = state.showCode;
+      els.codeCard.classList.toggle("visible", state.showCode);
+
+      const lessons = {
+        setup: {
+          pill: "setup once → draw again and again",
+          title: "setup() happens once. draw() repeats.",
+          text: "p5.js starts with setup(), then enters the draw loop. Every time draw() runs, p5.js makes another frame.",
+          formula: "setup() → draw() → draw() → draw() → ...",
+          question: "Why does setup() not need to repeat, but draw() does?",
+          caption: "setup() runs once. draw() runs over and over. That repetition creates animation.",
+          code: `function setup() {\n  createCanvas(400, 400);\n}\n\nfunction draw() {\n  background(240);\n  circle(x, 200, 40);\n  x = x + 2;\n}`
+        },
+        loop: {
+          pill: "draw() is a loop made of frames",
+          title: "The draw loop makes a flipbook.",
+          text: "Each run of draw() is one page in a fast flipbook. If something changes a little each time, the viewer sees motion.",
+          formula: "new frame = clear + draw current state + update values",
+          question: "What small change happens each frame to make the ball move?",
+          caption: "Each frame is a fresh drawing. Change a variable a little each frame and the drawing appears to move.",
+          code: `let x = 0;\n\nfunction draw() {\n  background(240);\n  circle(x, 200, 40);\n  x = x + 2;\n}`
+        },
+        framecount: {
+          pill: "frameCount counts repeated drawings",
+          title: "frameCount is the frame number.",
+          text: "frameCount starts at 0 and increases every time draw() runs. It is useful for timing, blinking, waves, and repeating patterns.",
+          formula: "frameCount = how many times draw() has run",
+          question: "How could you use frameCount to make something blink every 30 frames?",
+          caption: "frameCount is a clock made from drawings. It goes up by 1 every frame.",
+          code: `function draw() {\n  background(240);\n\n  let x = frameCount % width;\n  circle(x, 200, 40);\n}`
+        },
+        framerate: {
+          pill: "frameRate() sets the target speed",
+          title: "frameRate() changes the rhythm of drawing.",
+          text: "frameRate() tells p5.js how many frames to try to draw per second. Lower frame rates look choppy. Higher frame rates look smoother.",
+          formula: "frameRate(2), frameRate(12), frameRate(30), frameRate(60)",
+          question: "What feels different at 2 fps compared with 30 fps?",
+          caption: "frameRate() changes how many times draw() tries to run each second. Fewer frames means bigger visual jumps.",
+          code: `function setup() {\n  createCanvas(400, 400);\n  frameRate(12);\n}\n\nfunction draw() {\n  background(240);\n  circle(frameCount * 5 % width, 200, 40);\n}`
+        },
+        trails: {
+          pill: "trails come from not fully erasing",
+          title: "Trails are old frames that remain visible.",
+          text: "Usually background() clears the previous frame. If the background is transparent, older drawings fade slowly instead of disappearing instantly.",
+          formula: "background(255, 250, 242, alpha)",
+          question: "What happens when the background fade is low? What happens when it is 255?",
+          caption: "A trail appears when old frames are only partly erased. Lower background fade means longer memory.",
+          code: `function draw() {\n  background(255, 250, 242, 30);\n  circle(x, y, 30);\n\n  x = x + 2;\n}`
+        }
+      };
+
+      const lesson = lessons[state.mode];
+      els.modePill.textContent = lesson.pill;
+      els.lessonTitle.textContent = lesson.title;
+      els.lessonText.textContent = lesson.text;
+      els.formulaBox.textContent = lesson.formula;
+      els.questionText.textContent = lesson.question;
+      els.caption.textContent = lesson.caption;
+      els.codeBox.textContent = lesson.code;
+    }
+
+    setupUI();
+
+    const sketch = (p) => {
+      let canvas;
+      let holder;
+      let pg;
+      let previousWidth = 0;
+      let previousHeight = 0;
+      let lastStepTime = 0;
+
+      p.setup = () => {
+        holder = document.querySelector("#sketch-holder");
+        const rect = holder.getBoundingClientRect();
+        canvas = p.createCanvas(rect.width, rect.height);
+        canvas.parent("sketch-holder");
+        canvas.elt.setAttribute("role", "img");
+        canvas.elt.setAttribute("aria-label", "Interactive visualization of setup draw frameCount frameRate and trails in p5.js.");
+        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+        p.textFont("Inter, system-ui, sans-serif");
+        pg = p.createGraphics(p.width, p.height);
+        pg.pixelDensity(1);
+        clearGraphics();
+      };
+
+      p.windowResized = () => resizeToHolder();
+
+      p.draw = () => {
+        resizeToHolder();
+        const shouldStep = state.running && p.millis() - lastStepTime >= 1000 / state.targetFPS;
+        if (shouldStep) {
+          stepTime();
+          lastStepTime = p.millis();
+        }
+
+        drawScene(shouldStep);
+      };
+
+      function resizeToHolder() {
+        const rect = holder.getBoundingClientRect();
+        const w = Math.max(320, Math.floor(rect.width));
+        const h = Math.max(320, Math.floor(rect.height));
+        if (w !== previousWidth || h !== previousHeight) {
+          p.resizeCanvas(w, h);
+          pg = p.createGraphics(w, h);
+          pg.pixelDensity(1);
+          clearGraphics();
+          previousWidth = w;
+          previousHeight = h;
+        }
+      }
+
+      function clearGraphics() {
+        if (!pg) return;
+        pg.background(255, 250, 242);
+      }
+
+      function stepTime() {
+        state.frameNumber += 1;
+        state.tick += 1;
+        state.drawPulse = 1;
+        state.setupPulse = Math.max(0, state.setupPulse - 0.02);
+
+        const left = p.width * 0.13;
+        const right = p.width * 0.87;
+        const t = (state.tick % 240) / 240;
+        state.ballX = p.lerp(left, right, t);
+        const y = getBallY();
+
+        state.trail.push({ x: state.ballX, y, frame: state.frameNumber });
+        if (state.trail.length > 180) state.trail.shift();
+      }
+
+      function drawScene(shouldStep) {
+        if (state.mode === "trails") {
+          drawTrailGraphics(shouldStep);
+          p.image(pg, 0, 0);
+        } else {
+          p.background(255, 250, 242);
+          drawSubtleGrid();
+        }
+
+        if (state.mode === "setup") drawSetupMode();
+        if (state.mode === "loop") drawLoopMode();
+        if (state.mode === "framecount") drawFrameCountMode();
+        if (state.mode === "framerate") drawFrameRateMode();
+        if (state.mode === "trails") drawTrailsMode();
+
+        state.drawPulse = Math.max(0, state.drawPulse - 0.08);
+      }
+
+      function drawTrailGraphics(shouldStep) {
+        pg.push();
+        pg.noStroke();
+        pg.fill(255, 250, 242, state.fade);
+        pg.rect(0, 0, pg.width, pg.height);
+        if (shouldStep) {
+          const y = getBallY();
+          pg.noStroke();
+          pg.fill(225, 29, 72, 215);
+          pg.circle(state.ballX, y, 28);
+        }
+        pg.pop();
+      }
+
+      function getBallY() {
+        const centerY = p.height * 0.48;
+        return centerY + Math.sin(state.tick * 0.08) * 70;
+      }
+
+      function drawSubtleGrid() {
+        p.push();
+        p.stroke(236, 224, 207);
+        p.strokeWeight(1);
+        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
+        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
+        p.pop();
+      }
+
+      function drawPanelTitle(title, subtitle) {
+        p.push();
+        p.noStroke();
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(22);
+        p.text(title, 24, 38);
+        p.textStyle(p.NORMAL);
+        p.textSize(14);
+        p.fill("#6b6258");
+        p.text(subtitle, 24, 62);
+        p.pop();
+      }
+
+      function drawSetupMode() {
+        drawPanelTitle("setup() vs draw()", "setup() runs once. draw() runs repeatedly to create frames.");
+        const y = p.height * 0.35;
+        const x1 = p.width * 0.16;
+        const x2 = p.width * 0.42;
+        const x3 = p.width * 0.63;
+        const x4 = p.width * 0.80;
+
+        drawCodeBlock(x1, y, 160, 118, "setup()", "runs once", "#7c3aed", state.setupPulse);
+        drawArrow(x1 + 178, y + 59, x2 - 18, y + 59, "#8b7d6c");
+        drawCodeBlock(x2, y, 160, 118, "draw()", "frame 1", "#0891b2", state.drawPulse);
+        drawArrow(x2 + 178, y + 59, x3 - 18, y + 59, "#8b7d6c");
+        drawCodeBlock(x3, y, 160, 118, "draw()", "frame 2", "#0891b2", state.drawPulse);
+        drawArrow(x3 + 178, y + 59, x4 - 18, y + 59, "#8b7d6c");
+        drawCodeBlock(x4, y, 160, 118, "draw()", "frame 3...", "#0891b2", state.drawPulse);
+
+        drawStatusCards();
+      }
+
+      function drawLoopMode() {
+        drawPanelTitle("The Draw Loop", "A sketch becomes animated when each frame changes slightly.");
+        drawMotionStage();
+        drawFlipbookTimeline();
+        drawStatusCards();
+      }
+
+      function drawFrameCountMode() {
+        drawPanelTitle("frameCount", "frameCount is a built-in counter that increases every time draw() runs.");
+        drawFrameCounter();
+        drawFramePatternExamples();
+        drawStatusCards();
+      }
+
+      function drawFrameRateMode() {
+        drawPanelTitle("frameRate()", "Lower frame rates show fewer drawings per second. Higher frame rates look smoother.");
+        drawFrameRateComparison();
+        drawStatusCards();
+      }
+
+      function drawTrailsMode() {
+        drawSubtleGridOverlay();
+        drawPanelTitle("Trails", "Old frames remain visible when the background does not fully erase them.");
+        drawTrailExplanation();
+        drawStatusCards();
+      }
+
+      function drawMotionStage() {
+        const stageX = p.width * 0.09;
+        const stageY = p.height * 0.18;
+        const stageW = p.width * 0.82;
+        const stageH = p.height * 0.34;
+        const y = stageY + stageH / 2;
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 232);
+        p.rect(stageX, stageY, stageW, stageH, 24);
+        p.stroke("#d8cbbb");
+        p.strokeWeight(3);
+        p.line(stageX + 28, y, stageX + stageW - 28, y);
+        p.noStroke();
+        p.fill("#2563eb");
+        p.circle(state.ballX || stageX + 28, y, 46);
+        drawLabel("x changes a little each frame", stageX + 28, stageY + 36, "#2563eb", 14);
+        p.pop();
+      }
+
+      function drawFlipbookTimeline() {
+        const count = 12;
+        const gap = 8;
+        const w = Math.min(56, (p.width * 0.82 - gap * (count - 1)) / count);
+        const h = 70;
+        const startX = p.width * 0.09;
+        const y = p.height * 0.60;
+        const active = state.frameNumber % count;
+
+        p.push();
+        for (let i = 0; i < count; i++) {
+          const x = startX + i * (w + gap);
+          p.noStroke();
+          p.fill(i === active ? "#dbeafe" : "#ffffff");
+          p.rect(x, y, w, h, 12);
+          p.stroke(i === active ? "#2563eb" : "#ded2c1");
+          p.strokeWeight(2);
+          p.noFill();
+          p.rect(x, y, w, h, 12);
+          p.noStroke();
+          p.fill(i === active ? "#2563eb" : "#8b7d6c");
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textStyle(p.BOLD);
+          p.textSize(12);
+          p.text(`frame\n${i + 1}`, x + w / 2, y + h / 2);
+        }
+        if (state.showLabels) drawLabel("flipbook frames", startX, y - 18, "#6b6258", 13);
+        p.pop();
+      }
+
+      function drawFrameCounter() {
+        const cx = p.width * 0.5;
+        const cy = p.height * 0.27;
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(cx - 190, cy - 86, 380, 172, 24);
+        p.fill("#e11d48");
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textSize(24);
+        p.text("frameCount", cx, cy - 40);
+        p.fill("#222222");
+        p.textSize(58);
+        p.text(state.frameNumber, cx, cy + 22);
+        p.textStyle(p.NORMAL);
+        p.textSize(14);
+        p.fill("#6b6258");
+        p.text("+1 every time draw() runs", cx, cy + 70);
+        p.pop();
+      }
+
+      function drawFramePatternExamples() {
+        const x = p.width * 0.11;
+        const y = p.height * 0.52;
+        const w = p.width * 0.78;
+        const h = p.height * 0.20;
+        const blinkOn = state.frameNumber % 60 < 30;
+        const cycle = state.frameNumber % 120;
+        const dotX = x + 30 + (cycle / 119) * (w - 60);
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 232);
+        p.rect(x, y, w, h, 22);
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(16);
+        p.text("What can frameCount do?", x + 22, y + 32);
+
+        p.fill(blinkOn ? "#16a34a" : "#d8cbbb");
+        p.circle(x + 90, y + 92, 46);
+        drawLabel("blink with %", x + 48, y + 150, "#16a34a", 13);
+
+        p.stroke("#d8cbbb");
+        p.strokeWeight(5);
+        p.line(x + 210, y + 92, x + w - 48, y + 92);
+        p.noStroke();
+        p.fill("#e11d48");
+        p.circle(dotX, y + 92, 28);
+        drawLabel("repeat with frameCount % 120", x + 210, y + 150, "#e11d48", 13);
+        p.pop();
+      }
+
+      function drawFrameRateComparison() {
+        const x = p.width * 0.09;
+        const y = p.height * 0.18;
+        const w = p.width * 0.82;
+        const h = p.height * 0.34;
+        const currentX = x + 32 + ((state.tick % 240) / 240) * (w - 64);
+        const frameSpacing = p.map(state.targetFPS, 1, 60, 74, 12);
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 232);
+        p.rect(x, y, w, h, 24);
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(16);
+        p.text(`Target: ${state.targetFPS} drawings per second`, x + 24, y + 34);
+
+        p.stroke("#d8cbbb");
+        p.strokeWeight(4);
+        p.line(x + 32, y + h / 2, x + w - 32, y + h / 2);
+
+        p.noStroke();
+        p.fill("#dbeafe");
+        for (let px = x + 34; px < x + w - 32; px += frameSpacing) {
+          p.circle(px, y + h / 2, 14);
+        }
+
+        p.fill("#2563eb");
+        p.circle(currentX, y + h / 2, 46);
+        if (state.showLabels) {
+          drawLabel("more frames = smaller jumps", x + 24, y + h - 34, "#2563eb", 14);
+        }
+        p.pop();
+      }
+
+      function drawTrailExplanation() {
+        const x = p.width * 0.09;
+        const y = p.height * 0.60;
+        const w = p.width * 0.82;
+        const h = 92;
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 232);
+        p.rect(x, y, w, h, 20);
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(16);
+        p.text("Background fade controls memory", x + 22, y + 32);
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.fill("#6b6258");
+        p.text("255 clears the old frame almost completely. Lower values let old frames fade slowly.", x + 22, y + 58);
+        drawLabel(`background alpha = ${state.fade}`, x + w - 180, y + 58, "#f59e0b", 13);
+        p.pop();
+      }
+
+      function drawSubtleGridOverlay() {
+        p.push();
+        p.stroke(236, 224, 207, 120);
+        p.strokeWeight(1);
+        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
+        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
+        p.pop();
+      }
+
+      function drawStatusCards() {
+        const cards = [
+          { label: "draw() calls", value: state.frameNumber, color: "#0891b2" },
+          { label: "target FPS", value: state.targetFPS, color: "#2563eb" },
+          { label: "running?", value: state.running ? "yes" : "paused", color: state.running ? "#16a34a" : "#e11d48" }
+        ];
+        const cardW = Math.min(176, (p.width - 70) / cards.length);
+        const y = p.height - 168;
+        const x = 28;
+
+        p.push();
+        for (let i = 0; i < cards.length; i++) {
+          const cx = x + i * (cardW + 10);
+          p.noStroke();
+          p.fill(255, 255, 255, 235);
+          p.rect(cx, y, cardW, 62, 14);
+          p.fill(cards[i].color);
+          p.textStyle(p.BOLD);
+          p.textSize(13);
+          p.text(cards[i].label, cx + 12, y + 22);
+          p.fill("#222222");
+          p.textSize(20);
+          p.text(String(cards[i].value), cx + 12, y + 48);
+        }
+        p.pop();
+      }
+
+      function drawCodeBlock(x, y, w, h, title, subtitle, color, pulse) {
+        p.push();
+        const scale = 1 + pulse * 0.035;
+        p.translate(x + w / 2, y + h / 2);
+        p.scale(scale);
+        p.translate(-w / 2, -h / 2);
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(0, 0, w, h, 20);
+        p.stroke(color);
+        p.strokeWeight(2.5);
+        p.noFill();
+        p.rect(0, 0, w, h, 20);
+        p.noStroke();
+        p.fill(color);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textSize(22);
+        p.text(title, w / 2, h / 2 - 12);
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.fill("#6b6258");
+        p.text(subtitle, w / 2, h / 2 + 22);
+        p.pop();
+      }
+
+      function drawArrow(x1, y1, x2, y2, color) {
+        p.push();
+        p.stroke(color);
+        p.strokeWeight(2);
+        p.line(x1, y1, x2, y2);
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        p.noStroke();
+        p.fill(color);
+        p.push();
+        p.translate(x2, y2);
+        p.rotate(angle);
+        p.triangle(0, 0, -9, -5, -9, 5);
+        p.pop();
+        p.pop();
+      }
+
+      function drawLabel(text, x, y, color, size = 13) {
+        p.push();
+        p.textSize(size);
+        p.textStyle(p.BOLD);
+        const padX = 7;
+        const padY = 4;
+        const tw = p.textWidth(text);
+        p.noStroke();
+        p.fill(255, 250, 242, 238);
+        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
+        p.fill(color);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.text(text, x, y);
+        p.pop();
+      }
+    };
+
+    new p5(sketch);
+  </script>
+</body>
+</html>

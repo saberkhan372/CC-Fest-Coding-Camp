@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triangle to Circle to Wave Explorer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffaf2;
+      --ink: #222222;
+      --muted: #6b6258;
+      --line: #ded2c1;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --sin: #e11d48;
+      --sin-soft: #ffe4e6;
+      --cos: #0891b2;
+      --cos-soft: #cffafe;
+      --radius: #7c3aed;
+      --triangle: #f59e0b;
+      --green: #16a34a;
+      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
+        var(--bg);
+    }
+
+    header {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 20px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 840px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 12px 20px 36px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .workspace,
+    .side-panel,
+    .controls {
+      background: rgba(255, 250, 242, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .mode-row,
+    .control-row,
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    .toggle-label,
+    .pill {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
+      user-select: none;
+    }
+
+    button:hover,
+    .toggle-label:hover {
+      transform: translateY(-1px);
+      background: #fff7ed;
+    }
+
+    button.active {
+      color: white;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    button:disabled {
+      opacity: 0.36;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    button:disabled:hover {
+      background: white;
+      transform: none;
+    }
+
+    .pill {
+      cursor: default;
+      background: #f8fafc;
+      color: var(--muted);
+      border-color: #e2e8f0;
+    }
+
+    .pill strong {
+      color: var(--ink);
+    }
+
+    .toggle-label input {
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    .slider-wrap {
+      display: grid;
+      grid-template-columns: 72px minmax(160px, 1fr) 78px;
+      gap: 9px;
+      align-items: center;
+      min-width: min(460px, 100%);
+    }
+
+    .slider-wrap label,
+    .slider-value,
+    .preset-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .workspace {
+      position: relative;
+      height: 660px;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    #sketch-holder {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #sketch-holder canvas {
+      display: block;
+    }
+
+    .canvas-caption {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      right: 22px;
+      background: rgba(255, 250, 242, 0.93);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      backdrop-filter: blur(8px);
+    }
+
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+    }
+
+    .card p,
+    .card li {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .card p {
+      margin: 0 0 8px;
+    }
+
+    .card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .formula {
+      display: block;
+      margin: 8px 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: grid;
+      grid-template-columns: 16px 1fr;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .swatch.sin { background: var(--sin); }
+    .swatch.cos { background: var(--cos); }
+    .swatch.radius { background: var(--radius); }
+    .swatch.triangle { background: var(--triangle); }
+    .swatch.green { background: var(--green); }
+
+    .code-card {
+      display: none;
+    }
+
+    .code-card.visible {
+      display: block;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      padding: 12px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .note {
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .workspace {
+        height: 590px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      header,
+      main {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .slider-wrap {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .workspace {
+        height: 540px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
+    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+  </div>
+  <header>
+    <h1>Triangle → Circle → Wave</h1>
+    <p class="subtitle">
+      A beginner-friendly bridge from right triangles to the unit circle to sine and cosine waves.
+      Start with a simple 0°–90° triangle, then unlock the full circle and see how motion becomes a graph.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Explorer controls">
+      <div class="mode-row">
+        <button id="mode-triangle" class="active">1. Triangle</button>
+        <button id="mode-circle">2. Circle</button>
+        <button id="mode-wave">3. Wave</button>
+        <button id="mode-all">Summary View</button>
+        <button id="play-button">▶ Play</button>
+        <button id="reset-button">Reset Trace</button>
+        <span id="mode-pill" class="pill"><strong>Triangle mode:</strong> 0°–90°</span>
+      </div>
+
+      <div class="control-row">
+        <div class="slider-wrap">
+          <label for="angle-slider">Angle</label>
+          <input id="angle-slider" type="range" min="0" max="90" value="35" step="1" />
+          <span id="angle-value" class="slider-value">35°</span>
+        </div>
+
+        <div class="slider-wrap">
+          <label for="speed-slider">Speed</label>
+          <input id="speed-slider" type="range" min="0.2" max="4" value="1" step="0.1" />
+          <span id="speed-value" class="slider-value">1.0×</span>
+        </div>
+      </div>
+
+      <div class="preset-row">
+        <span class="preset-label">Presets:</span>
+        <button class="preset-button" data-angle="0">0°</button>
+        <button class="preset-button" data-angle="30">30°</button>
+        <button class="preset-button" data-angle="45">45°</button>
+        <button class="preset-button" data-angle="60">60°</button>
+        <button class="preset-button" data-angle="90">90°</button>
+        <button class="preset-button full-circle-only" data-angle="180">180°</button>
+        <button class="preset-button full-circle-only" data-angle="270">270°</button>
+        <button class="preset-button full-circle-only" data-angle="360">360°</button>
+      </div>
+
+      <div class="control-row">
+        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
+        <label class="toggle-label"><input id="show-formulas" type="checkbox" checked />Formulas</label>
+        <label class="toggle-label"><input id="show-sine" type="checkbox" checked />Sine / vertical</label>
+        <label class="toggle-label"><input id="show-cosine" type="checkbox" checked />Cosine / horizontal</label>
+        <label class="toggle-label"><input id="show-trace" type="checkbox" checked />Trace waves</label>
+        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div id="sketch-holder"></div>
+      <div id="canvas-caption" class="canvas-caption">
+        Move the angle from 0° to 90°. Cosine is the sideways part. Sine is the up/down part.
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <section class="card">
+        <h2 id="lesson-title">1. Start with a triangle</h2>
+        <p id="lesson-text">
+          In a right triangle, sine and cosine compare side lengths. This first view stays in the 0°–90° range so the sides are easy to see as positive lengths.
+        </p>
+        <span id="lesson-formula" class="formula">cos(θ) = adjacent / hypotenuse<br>sin(θ) = opposite / hypotenuse</span>
+      </section>
+
+      <section class="card">
+        <h3>Big idea</h3>
+        <p><strong>Cosine</strong> tells us how far sideways.</p>
+        <p><strong>Sine</strong> tells us how far up or down.</p>
+        <p><strong>A wave</strong> is what happens when we record one of those values over time.</p>
+      </section>
+
+      <section class="card">
+        <h3>Legend</h3>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch radius"></span><span>radius / hypotenuse</span></div>
+          <div class="legend-item"><span class="swatch cos"></span><span>cosine: horizontal amount</span></div>
+          <div class="legend-item"><span class="swatch sin"></span><span>sine: vertical amount</span></div>
+          <div class="legend-item"><span class="swatch triangle"></span><span>right triangle</span></div>
+          <div class="legend-item"><span class="swatch green"></span><span>recording line / current time</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Try this</h3>
+        <p id="question-text">As the angle grows from 0° to 90°, what happens to cosine? What happens to sine?</p>
+      </section>
+
+      <section id="code-card" class="card code-card">
+        <h3>p5.js connection</h3>
+        <pre><code>let angle = radians(degrees);
+let x = centerX + cos(angle) * radius;
+let y = centerY - sin(angle) * radius;</code></pre>
+        <p class="note">
+          In math, positive y goes up. In p5.js, positive y usually goes down, so this explorer subtracts sine to make the math view easier to read.
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const state = {
+      mode: "triangle",
+      angleDeg: 35,
+      playing: false,
+      speed: 1,
+      triangleDirection: 1,
+      showLabels: true,
+      showFormulas: true,
+      showSine: true,
+      showCosine: true,
+      showTrace: true,
+      showCode: false,
+      waveHistory: []
+    };
+
+    const els = {};
+
+    function setupUI() {
+      els.modeTriangle = document.querySelector("#mode-triangle");
+      els.modeCircle = document.querySelector("#mode-circle");
+      els.modeWave = document.querySelector("#mode-wave");
+      els.modeAll = document.querySelector("#mode-all");
+      els.playButton = document.querySelector("#play-button");
+      els.resetButton = document.querySelector("#reset-button");
+      els.modePill = document.querySelector("#mode-pill");
+      els.angleSlider = document.querySelector("#angle-slider");
+      els.angleValue = document.querySelector("#angle-value");
+      els.speedSlider = document.querySelector("#speed-slider");
+      els.speedValue = document.querySelector("#speed-value");
+      els.showLabels = document.querySelector("#show-labels");
+      els.showFormulas = document.querySelector("#show-formulas");
+      els.showSine = document.querySelector("#show-sine");
+      els.showCosine = document.querySelector("#show-cosine");
+      els.showTrace = document.querySelector("#show-trace");
+      els.showCode = document.querySelector("#show-code");
+      els.lessonTitle = document.querySelector("#lesson-title");
+      els.lessonText = document.querySelector("#lesson-text");
+      els.lessonFormula = document.querySelector("#lesson-formula");
+      els.questionText = document.querySelector("#question-text");
+      els.caption = document.querySelector("#canvas-caption");
+      els.codeCard = document.querySelector("#code-card");
+      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
+
+      els.modeTriangle.addEventListener("click", () => setMode("triangle"));
+      els.modeCircle.addEventListener("click", () => setMode("circle"));
+      els.modeWave.addEventListener("click", () => setMode("wave"));
+      els.modeAll.addEventListener("click", () => setMode("all"));
+
+      els.playButton.addEventListener("click", () => {
+        state.playing = !state.playing;
+        els.playButton.textContent = state.playing ? "⏸ Pause" : "▶ Play";
+      });
+
+      els.resetButton.addEventListener("click", () => {
+        state.waveHistory = [];
+      });
+
+      els.angleSlider.addEventListener("input", () => {
+        state.angleDeg = Number(els.angleSlider.value);
+        state.waveHistory = [];
+        updateUI();
+      });
+
+      els.speedSlider.addEventListener("input", () => {
+        state.speed = Number(els.speedSlider.value);
+        updateUI();
+      });
+
+      els.presetButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          if (button.disabled) return;
+          let angle = Number(button.dataset.angle);
+          if (angle === 360) angle = 0;
+          state.angleDeg = angle;
+          state.playing = false;
+          state.waveHistory = [];
+          els.playButton.textContent = "▶ Play";
+          updateUI();
+        });
+      });
+
+      els.showLabels.addEventListener("change", () => {
+        state.showLabels = els.showLabels.checked;
+      });
+
+      els.showFormulas.addEventListener("change", () => {
+        state.showFormulas = els.showFormulas.checked;
+        updateUI();
+      });
+
+      els.showSine.addEventListener("change", () => {
+        state.showSine = els.showSine.checked;
+      });
+
+      els.showCosine.addEventListener("change", () => {
+        state.showCosine = els.showCosine.checked;
+      });
+
+      els.showTrace.addEventListener("change", () => {
+        state.showTrace = els.showTrace.checked;
+      });
+
+      els.showCode.addEventListener("change", () => {
+        state.showCode = els.showCode.checked;
+        updateUI();
+      });
+
+      updateUI();
+    }
+
+    function setMode(mode) {
+      const previousMode = state.mode;
+      state.mode = mode;
+      state.waveHistory = [];
+
+      if (mode === "triangle") {
+        state.angleDeg = Math.min(Math.max(state.angleDeg, 0), 90);
+        state.showSine = true;
+        state.showCosine = true;
+      }
+
+      if (mode === "circle") {
+        state.showSine = true;
+        state.showCosine = true;
+      }
+
+      if (mode === "wave" && previousMode !== "wave") {
+        state.showSine = true;
+        state.showCosine = false;
+      }
+
+      if (mode === "all") {
+        state.showSine = true;
+        state.showCosine = true;
+      }
+
+      updateUI();
+    }
+
+    function getAngleMax() {
+      return state.mode === "triangle" ? 90 : 360;
+    }
+
+    function clampAngleForMode() {
+      const max = getAngleMax();
+      state.angleDeg = Math.max(0, Math.min(max, state.angleDeg));
+      if (state.mode !== "triangle" && state.angleDeg === 360) state.angleDeg = 0;
+    }
+
+    function updateUI() {
+      clampAngleForMode();
+
+      const modeButtons = [
+        [els.modeTriangle, "triangle"],
+        [els.modeCircle, "circle"],
+        [els.modeWave, "wave"],
+        [els.modeAll, "all"]
+      ];
+
+      for (const [button, mode] of modeButtons) {
+        button.classList.toggle("active", state.mode === mode);
+      }
+
+      const maxAngle = getAngleMax();
+      els.angleSlider.max = String(maxAngle);
+      els.angleSlider.value = state.angleDeg;
+      els.angleValue.textContent = `${Math.round(state.angleDeg)}°`;
+      els.speedValue.textContent = `${state.speed.toFixed(1)}×`;
+      els.lessonFormula.style.display = state.showFormulas ? "block" : "none";
+      els.codeCard.classList.toggle("visible", state.showCode);
+      els.showSine.checked = state.showSine;
+      els.showCosine.checked = state.showCosine;
+
+      els.presetButtons.forEach((button) => {
+        const angle = Number(button.dataset.angle);
+        button.disabled = state.mode === "triangle" && angle > 90;
+      });
+
+      const modePills = {
+        triangle: "<strong>Triangle mode:</strong> 0°–90° side lengths",
+        circle: "<strong>Circle mode:</strong> 0°–360° signed position",
+        wave: "<strong>Wave mode:</strong> recording over time",
+        all: "<strong>Summary view:</strong> all representations"
+      };
+      els.modePill.innerHTML = modePills[state.mode];
+
+      const lessons = {
+        triangle: {
+          title: "1. Start with a triangle",
+          text: "In a right triangle, sine and cosine compare side lengths. This first view stays in the 0°–90° range so the sides are easy to see as positive lengths.",
+          formula: "cos(θ) = adjacent / hypotenuse<br>sin(θ) = opposite / hypotenuse",
+          question: "As the angle grows from 0° to 90°, what happens to cosine? What happens to sine?",
+          caption: "Move the angle from 0° to 90°. Cosine is the sideways part. Sine is the up/down part."
+        },
+        circle: {
+          title: "2. Put the triangle inside a circle",
+          text: "The radius becomes the hypotenuse. When the radius is 1, the side ratios become coordinates: cosine is x and sine is y. Around the full circle, they can be positive or negative.",
+          formula: "x = cos(θ)<br>y = sin(θ)",
+          question: "At 0°, 90°, 180°, and 270°, where are sine and cosine largest, smallest, or zero?",
+          caption: "Now the triangle idea becomes signed position. Right is positive cosine, left is negative cosine, up is positive sine, and down is negative sine."
+        },
+        wave: {
+          title: "3. Record circular motion as a wave",
+          text: "A wave appears when we record one part of circular motion over time. Start with sine: the dot’s height becomes the red wave. Then turn on cosine to compare.",
+          formula: "sine wave = vertical position over time<br>cosine wave = horizontal position over time",
+          question: "Why does the sine wave start near 0 when the point begins on the right side of the circle?",
+          caption: "The green recording line marks the current moment. The red dot’s height on the circle becomes the red point on the sine wave."
+        },
+        all: {
+          title: "Summary: triangle, circle, and wave",
+          text: "These are three views of the same relationship: an angle creates a triangle, the triangle fits inside a circle, and circular motion can be recorded as waves.",
+          formula: "x = cos(θ) · radius<br>y = sin(θ) · radius",
+          question: "Which view helps you understand sine and cosine best: the triangle, the circle, or the wave? Why?",
+          caption: "All three views show the same idea: cosine is sideways, sine is up/down, and waves come from tracking circular motion over time."
+        }
+      };
+
+      const lesson = lessons[state.mode];
+      els.lessonTitle.textContent = lesson.title;
+      els.lessonText.textContent = lesson.text;
+      els.lessonFormula.innerHTML = lesson.formula;
+      els.questionText.textContent = lesson.question;
+      els.caption.textContent = lesson.caption;
+    }
+
+    setupUI();
+
+    const sketch = (p) => {
+      let canvas;
+      let holder;
+      let previousWidth = 0;
+      let previousHeight = 0;
+      let draggingAngle = false;
+
+      p.setup = () => {
+        holder = document.querySelector("#sketch-holder");
+        const rect = holder.getBoundingClientRect();
+        canvas = p.createCanvas(rect.width, rect.height);
+        canvas.parent("sketch-holder");
+        canvas.elt.setAttribute("role", "img");
+        canvas.elt.setAttribute("aria-label", "Interactive triangle, circle, and wave visualization for sine and cosine.");
+        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+        p.textFont("Inter, system-ui, sans-serif");
+      };
+
+      p.windowResized = () => {
+        resizeToHolder();
+      };
+
+      p.draw = () => {
+        resizeToHolder();
+        advanceAnimation();
+
+        p.background(255, 250, 242);
+        drawSubtleGrid();
+
+        if (state.mode === "triangle") {
+          drawTriangleOnly();
+        } else if (state.mode === "circle") {
+          drawCircleOnly();
+        } else if (state.mode === "wave") {
+          drawWaveMode();
+        } else {
+          drawAllTogether();
+        }
+      };
+
+      p.mousePressed = () => {
+        const hit = getActiveAngleHitZone();
+        const d = p.dist(p.mouseX, p.mouseY, hit.center.x, hit.center.y);
+        if (d < hit.radius) {
+          draggingAngle = true;
+          updateAngleFromMouse(hit.center);
+          state.playing = false;
+          els.playButton.textContent = "▶ Play";
+        }
+      };
+
+      p.mouseDragged = () => {
+        if (draggingAngle) {
+          const hit = getActiveAngleHitZone();
+          updateAngleFromMouse(hit.center);
+        }
+      };
+
+      p.mouseReleased = () => {
+        draggingAngle = false;
+      };
+
+      function resizeToHolder() {
+        const rect = holder.getBoundingClientRect();
+        const w = Math.max(320, Math.floor(rect.width));
+        const h = Math.max(320, Math.floor(rect.height));
+
+        if (w !== previousWidth || h !== previousHeight) {
+          p.resizeCanvas(w, h);
+          previousWidth = w;
+          previousHeight = h;
+        }
+      }
+
+      function advanceAnimation() {
+        if (!state.playing) return;
+
+        if (state.mode === "triangle") {
+          state.angleDeg += state.speed * 0.5 * state.triangleDirection;
+          if (state.angleDeg >= 90) {
+            state.angleDeg = 90;
+            state.triangleDirection = -1;
+          }
+          if (state.angleDeg <= 0) {
+            state.angleDeg = 0;
+            state.triangleDirection = 1;
+          }
+        } else {
+          state.angleDeg = (state.angleDeg + state.speed) % 360;
+        }
+
+        els.angleSlider.value = state.angleDeg;
+        els.angleValue.textContent = `${Math.round(state.angleDeg)}°`;
+      }
+
+      function updateAngleFromMouse(center) {
+        const dx = p.mouseX - center.x;
+        const dy = center.y - p.mouseY;
+        let deg = p.degrees(Math.atan2(dy, dx));
+        if (deg < 0) deg += 360;
+        if (state.mode === "triangle") deg = Math.max(0, Math.min(90, deg));
+        state.angleDeg = deg;
+        state.waveHistory = [];
+        updateUI();
+      }
+
+      function getCenters() {
+        const w = p.width;
+        const h = p.height;
+        const radius = Math.min(w, h) * (w < 700 ? 0.22 : 0.18);
+
+        if (state.mode === "all") {
+          return {
+            radius: Math.min(w, h) * 0.13,
+            triangle: { x: w * 0.18, y: h * 0.43 },
+            circle: { x: w * 0.50, y: h * 0.43 },
+            wave: { x: w * 0.69, y: h * 0.19, width: w * 0.27, height: h * 0.48 },
+            main: { x: w * 0.5, y: h * 0.42 }
+          };
+        }
+
+        return {
+          radius,
+          main: { x: w * 0.5, y: h * 0.45 },
+          triangle: { x: w * 0.5, y: h * 0.48 },
+          circle: { x: w * 0.5, y: h * 0.45 },
+          wave: { x: w * 0.16, y: h * 0.18, width: w * 0.70, height: h * 0.52 }
+        };
+      }
+
+      function getTriangleGeometry() {
+        const centers = getCenters();
+        const radius = state.mode === "all" ? centers.radius : centers.radius * 1.35;
+        const anchor = state.mode === "all" ? centers.triangle : centers.main;
+        const base = {
+          x: anchor.x - radius * 0.65,
+          y: anchor.y + radius * 0.45
+        };
+        const trig = getTrig(radius);
+        const point = { x: base.x + trig.adjacent, y: base.y - trig.opposite };
+        const foot = { x: point.x, y: base.y };
+        return { base, foot, point, radius, trig };
+      }
+
+      function getWaveCircleGeometry() {
+        const radius = Math.min(p.width, p.height) * 0.13;
+        const center = { x: p.width * 0.22, y: p.height * 0.42 };
+        const trig = getTrig(radius);
+        const point = { x: center.x + trig.adjacent, y: center.y - trig.opposite };
+        const foot = { x: point.x, y: center.y };
+        const graph = { x: p.width * 0.42, y: p.height * 0.20, width: p.width * 0.48, height: p.height * 0.45 };
+        return { center, radius, trig, point, foot, graph };
+      }
+
+      function getActiveAngleHitZone() {
+        const centers = getCenters();
+
+        if (state.mode === "triangle") {
+          const tri = getTriangleGeometry();
+          return { center: tri.base, radius: tri.radius * 1.2 };
+        }
+
+        if (state.mode === "wave") {
+          const wave = getWaveCircleGeometry();
+          return { center: wave.center, radius: wave.radius * 1.5 };
+        }
+
+        if (state.mode === "all") {
+          return { center: centers.circle, radius: centers.radius * 1.55 };
+        }
+
+        return { center: centers.main, radius: centers.radius * 1.5 };
+      }
+
+      function getTrig(radius) {
+        const theta = p.radians(state.angleDeg);
+        const cosValue = Math.cos(theta);
+        const sinValue = Math.sin(theta);
+        return {
+          theta,
+          cosValue,
+          sinValue,
+          adjacent: cosValue * radius,
+          opposite: sinValue * radius
+        };
+      }
+
+      function drawSubtleGrid() {
+        p.push();
+        p.stroke(236, 224, 207);
+        p.strokeWeight(1);
+        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
+        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
+        p.pop();
+      }
+
+      function drawTriangleOnly() {
+        const tri = getTriangleGeometry();
+
+        drawPanelTitle("Triangle View", "Sine and cosine begin as side ratios in a right triangle.", 24, 36);
+        drawTriangle(tri.base, tri.foot, tri.point, tri.radius, tri.trig, true);
+        drawAngleArc(tri.base, Math.max(46, tri.radius * 0.18), 0, state.angleDeg);
+        drawTriangleGuideText(tri.base, tri.radius);
+        drawValueCards([
+          { label: "angle", value: `${Math.round(state.angleDeg)}°`, color: "#2563eb" },
+          { label: "cos(θ)", value: tri.trig.cosValue.toFixed(2), color: "#0891b2" },
+          { label: "sin(θ)", value: tri.trig.sinValue.toFixed(2), color: "#e11d48" }
+        ], 28, p.height - 175);
+      }
+
+      function drawCircleOnly() {
+        const centers = getCenters();
+        const radius = centers.radius * 1.05;
+        const center = centers.main;
+        const trig = getTrig(radius);
+        const point = { x: center.x + trig.adjacent, y: center.y - trig.opposite };
+        const foot = { x: point.x, y: center.y };
+
+        drawPanelTitle("Circle View", "The right-triangle ratios become signed x/y positions.", 24, 36);
+        drawUnitCircle(center, radius, trig, point, foot, true, true);
+        drawValueCards([
+          { label: "x = cos(θ)", value: trig.cosValue.toFixed(2), color: "#0891b2" },
+          { label: "y = sin(θ)", value: trig.sinValue.toFixed(2), color: "#e11d48" },
+          { label: "radius", value: "1", color: "#7c3aed" }
+        ], 28, p.height - 175);
+      }
+
+      function drawWaveMode() {
+        const wave = getWaveCircleGeometry();
+
+        drawPanelTitle("Wave View", "Record the dot’s height or sideways position over time.", 24, 36);
+        drawUnitCircle(wave.center, wave.radius, wave.trig, wave.point, wave.foot, false, false);
+        drawWaveGraph(wave.graph, wave.trig, wave.radius);
+        drawConnectorLines(wave.point, wave.graph, wave.trig);
+      }
+
+      function drawAllTogether() {
+        const centers = getCenters();
+        const radius = centers.radius;
+        const trig = getTrig(radius);
+
+        drawPanelTitle("Summary View", "The triangle, circle, and wave are different views of the same angle.", 24, 36);
+
+        const base = { x: centers.triangle.x - radius * 0.65, y: centers.triangle.y + radius * 0.45 };
+        const triPoint = { x: base.x + trig.adjacent, y: base.y - trig.opposite };
+        const triFoot = { x: triPoint.x, y: base.y };
+        drawMiniHeading("Triangle", centers.triangle.x - radius * 1.2, centers.triangle.y - radius * 1.45);
+        drawTriangle(base, triFoot, triPoint, radius, trig, false);
+        drawAngleArc(base, Math.max(26, radius * 0.16), 0, Math.min(state.angleDeg, 90));
+
+        const center = centers.circle;
+        const point = { x: center.x + trig.adjacent, y: center.y - trig.opposite };
+        const foot = { x: point.x, y: center.y };
+        drawMiniHeading("Circle", center.x - radius * 1.2, center.y - radius * 1.45);
+        drawUnitCircle(center, radius, trig, point, foot, false, true);
+
+        drawMiniHeading("Wave", centers.wave.x, centers.wave.y - 26);
+        drawWaveGraph(centers.wave, trig, radius);
+      }
+
+      function drawTriangle(base, foot, point, radius, trig, largeLabels) {
+        p.push();
+        p.noStroke();
+        p.fill(245, 158, 11, 42);
+        p.triangle(base.x, base.y, foot.x, foot.y, point.x, point.y);
+
+        p.strokeCap(p.ROUND);
+
+        p.stroke("#7c3aed");
+        p.strokeWeight(5);
+        p.line(base.x, base.y, point.x, point.y);
+
+        if (state.showCosine) {
+          p.stroke("#0891b2");
+          p.strokeWeight(6);
+          p.line(base.x, base.y, foot.x, foot.y);
+        }
+
+        if (state.showSine) {
+          p.stroke("#e11d48");
+          p.strokeWeight(6);
+          p.line(foot.x, foot.y, point.x, point.y);
+        }
+
+        p.stroke("#222222");
+        p.strokeWeight(1.5);
+        p.noFill();
+        const s = 18;
+        p.line(foot.x - s, foot.y, foot.x - s, foot.y - s);
+        p.line(foot.x - s, foot.y - s, foot.x, foot.y - s);
+
+        p.noStroke();
+        p.fill("#222222");
+        p.circle(base.x, base.y, 8);
+        p.fill("#2563eb");
+        p.circle(point.x, point.y, 12);
+
+        if (state.showLabels) {
+          const labelSize = largeLabels ? 15 : 12;
+          drawLabel("radius / hypotenuse = 1", (base.x + point.x) / 2 - 20, (base.y + point.y) / 2 - 18, "#7c3aed", labelSize);
+          if (state.showCosine) drawLabel("adjacent = cos(θ)", (base.x + foot.x) / 2 - 28, base.y + 30, "#0891b2", labelSize);
+          if (state.showSine) drawLabel("opposite = sin(θ)", foot.x + 18, (foot.y + point.y) / 2, "#e11d48", labelSize);
+          drawLabel("θ", base.x + 36, base.y - 14, "#2563eb", labelSize + 2);
+        }
+        p.pop();
+      }
+
+      function drawTriangleGuideText(base, radius) {
+        p.push();
+        p.noStroke();
+        p.fill("#6b6258");
+        p.textSize(13);
+        p.text("Triangle mode stays in Quadrant I so the sides behave like ordinary positive lengths.", base.x - 20, base.y + radius * 0.45);
+        p.pop();
+      }
+
+      function drawUnitCircle(center, radius, trig, point, foot, largeLabels, showQuadrants) {
+        p.push();
+
+        p.noFill();
+        p.stroke("#c7b9a6");
+        p.strokeWeight(2);
+        p.circle(center.x, center.y, radius * 2);
+
+        p.stroke("#d6c7b6");
+        p.strokeWeight(1.5);
+        p.line(center.x - radius * 1.35, center.y, center.x + radius * 1.35, center.y);
+        p.line(center.x, center.y - radius * 1.35, center.x, center.y + radius * 1.35);
+
+        if (showQuadrants) drawQuadrantLabels(center, radius);
+        drawCardinalAngleLabels(center, radius);
+
+        p.noStroke();
+        p.fill("#f59e0b22");
+        p.triangle(center.x, center.y, foot.x, foot.y, point.x, point.y);
+
+        p.strokeCap(p.ROUND);
+
+        if (state.showCosine) {
+          p.stroke("#0891b2");
+          p.strokeWeight(5);
+          p.line(center.x, center.y, foot.x, foot.y);
+          p.stroke("#0891b255");
+          p.strokeWeight(2);
+          p.line(point.x, point.y, foot.x, foot.y);
+        }
+
+        if (state.showSine) {
+          p.stroke("#e11d48");
+          p.strokeWeight(5);
+          p.line(foot.x, foot.y, point.x, point.y);
+          p.stroke("#e11d4855");
+          p.strokeWeight(2);
+          p.line(center.x, center.y, foot.x, foot.y);
+        }
+
+        p.stroke("#7c3aed");
+        p.strokeWeight(5);
+        p.line(center.x, center.y, point.x, point.y);
+
+        drawAngleArc(center, Math.max(30, radius * 0.20), 0, state.angleDeg);
+
+        p.noStroke();
+        p.fill("#222222");
+        p.circle(center.x, center.y, 7);
+        p.fill("#2563eb");
+        p.circle(point.x, point.y, 13);
+
+        if (state.showLabels) {
+          const labelSize = largeLabels ? 15 : 12;
+          drawLabel("radius = 1", (center.x + point.x) / 2 + 8, (center.y + point.y) / 2 - 12, "#7c3aed", labelSize);
+          if (state.showCosine) drawLabel("x = cos(θ)", (center.x + foot.x) / 2 - 24, center.y + 30, "#0891b2", labelSize);
+          if (state.showSine) drawLabel("y = sin(θ)", foot.x + 14, (foot.y + point.y) / 2, "#e11d48", labelSize);
+          drawLabel(`θ = ${Math.round(state.angleDeg)}°`, center.x + 34, center.y - 16, "#2563eb", labelSize);
+          drawLabel(`(${trig.cosValue.toFixed(2)}, ${trig.sinValue.toFixed(2)})`, point.x + 12, point.y - 14, "#222222", labelSize);
+        }
+
+        p.pop();
+      }
+
+      function drawQuadrantLabels(center, radius) {
+        p.push();
+        p.noStroke();
+        p.textSize(12);
+        p.textStyle(p.BOLD);
+        drawLabel("+cos", center.x + radius * 0.62, center.y + 22, "#0891b2", 12);
+        drawLabel("−cos", center.x - radius * 0.96, center.y + 22, "#0891b2", 12);
+        drawLabel("+sin", center.x + 12, center.y - radius * 0.76, "#e11d48", 12);
+        drawLabel("−sin", center.x + 12, center.y + radius * 0.85, "#e11d48", 12);
+        p.pop();
+      }
+
+      function drawCardinalAngleLabels(center, radius) {
+        if (!state.showLabels) return;
+        p.push();
+        drawLabel("0°", center.x + radius + 12, center.y + 5, "#6b6258", 11);
+        drawLabel("90°", center.x - 12, center.y - radius - 12, "#6b6258", 11);
+        drawLabel("180°", center.x - radius - 48, center.y + 5, "#6b6258", 11);
+        drawLabel("270°", center.x - 16, center.y + radius + 24, "#6b6258", 11);
+        p.pop();
+      }
+
+      function drawWaveGraph(graph, trig, radius) {
+        const sample = {
+          angle: state.angleDeg,
+          sin: trig.sinValue,
+          cos: trig.cosValue
+        };
+
+        if (state.playing || state.waveHistory.length === 0) {
+          state.waveHistory.push(sample);
+          const maxPoints = 420;
+          if (state.waveHistory.length > maxPoints) state.waveHistory.shift();
+        }
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 232);
+        p.rect(graph.x, graph.y, graph.width, graph.height, 18);
+
+        p.stroke("#e6dac8");
+        p.strokeWeight(1);
+        for (let i = 0; i <= 4; i++) {
+          const y = p.map(i, 0, 4, graph.y, graph.y + graph.height);
+          p.line(graph.x + 12, y, graph.x + graph.width - 12, y);
+        }
+        for (let i = 0; i <= 8; i++) {
+          const x = p.map(i, 0, 8, graph.x + 12, graph.x + graph.width - 12);
+          p.line(x, graph.y + 10, x, graph.y + graph.height - 10);
+        }
+
+        const midY = graph.y + graph.height / 2;
+        p.stroke("#8b7d6c");
+        p.strokeWeight(1.5);
+        p.line(graph.x + 12, midY, graph.x + graph.width - 12, midY);
+
+        const amp = graph.height * 0.35;
+        const nowX = graph.x + graph.width - 24;
+        const sineY = midY - trig.sinValue * amp;
+        const cosY = midY - trig.cosValue * amp;
+
+        if (state.showTrace) {
+          if (state.showSine) drawWaveFromHistory(graph, "sin", "#e11d48", amp);
+          if (state.showCosine) drawWaveFromHistory(graph, "cos", "#0891b2", amp);
+        } else {
+          if (state.showSine) drawFullWave(graph, "sin", "#e11d48", amp);
+          if (state.showCosine) drawFullWave(graph, "cos", "#0891b2", amp);
+        }
+
+        drawRecordingLine(nowX, graph.y + 10, graph.y + graph.height - 10);
+
+        if (state.showSine) {
+          p.noStroke();
+          p.fill("#e11d48");
+          p.circle(nowX, sineY, 10);
+          if (state.showLabels) drawLabel("sin height", nowX - 66, sineY - 10, "#e11d48", 12);
+        }
+
+        if (state.showCosine) {
+          p.noStroke();
+          p.fill("#0891b2");
+          p.circle(nowX, cosY, 10);
+          if (state.showLabels) drawLabel("cos width", nowX - 70, cosY + 22, "#0891b2", 12);
+        }
+
+        if (state.showLabels) {
+          drawLabel("value", graph.x + 10, graph.y + 20, "#6b6258", 12);
+          drawLabel("time / angle", graph.x + graph.width - 94, graph.y + graph.height - 12, "#6b6258", 12);
+          drawLabel("1", graph.x + 16, graph.y + graph.height * 0.15, "#6b6258", 12);
+          drawLabel("0", graph.x + 16, midY - 6, "#6b6258", 12);
+          drawLabel("-1", graph.x + 16, graph.y + graph.height * 0.87, "#6b6258", 12);
+        }
+
+        p.pop();
+      }
+
+      function drawRecordingLine(x, y1, y2) {
+        p.push();
+        p.stroke("#16a34a");
+        p.strokeWeight(3);
+        p.line(x, y1, x, y2);
+        p.noStroke();
+        p.fill("#16a34a");
+        p.triangle(x - 6, y1 - 3, x + 6, y1 - 3, x, y1 - 13);
+        if (state.showLabels) drawLabel("now", x - 15, y1 - 20, "#16a34a", 12);
+        p.pop();
+      }
+
+      function drawWaveFromHistory(graph, key, color, amp) {
+        const points = state.waveHistory;
+        const midY = graph.y + graph.height / 2;
+        const left = graph.x + 52;
+        const right = graph.x + graph.width - 24;
+
+        if (points.length < 2) return;
+
+        p.push();
+        p.noFill();
+        p.stroke(color);
+        p.strokeWeight(3);
+        p.beginShape();
+        for (let i = 0; i < points.length; i++) {
+          const x = p.map(i, 0, Math.max(1, points.length - 1), left, right);
+          const y = midY - points[i][key] * amp;
+          p.vertex(x, y);
+        }
+        p.endShape();
+        p.pop();
+      }
+
+      function drawFullWave(graph, key, color, amp) {
+        const midY = graph.y + graph.height / 2;
+        const left = graph.x + 52;
+        const right = graph.x + graph.width - 24;
+        const cycles = 1.5;
+        const phase = p.radians(state.angleDeg);
+
+        p.push();
+        p.noFill();
+        p.stroke(color);
+        p.strokeWeight(3);
+        p.beginShape();
+        for (let i = 0; i <= 240; i++) {
+          const t = i / 240;
+          const x = p.lerp(left, right, t);
+          const angle = t * p.TWO_PI * cycles + phase;
+          const value = key === "sin" ? Math.sin(angle) : Math.cos(angle);
+          const y = midY - value * amp;
+          p.vertex(x, y);
+        }
+        p.endShape();
+        p.pop();
+      }
+
+      function drawConnectorLines(point, graph, trig) {
+        const midY = graph.y + graph.height / 2;
+        const amp = graph.height * 0.35;
+        const nowX = graph.x + graph.width - 24;
+
+        p.push();
+        p.drawingContext.setLineDash([6, 8]);
+        if (state.showSine) {
+          p.stroke("#e11d4888");
+          p.strokeWeight(2);
+          p.line(point.x, point.y, nowX, midY - trig.sinValue * amp);
+        }
+        if (state.showCosine) {
+          p.stroke("#0891b288");
+          p.strokeWeight(2);
+          p.line(point.x, point.y, nowX, midY - trig.cosValue * amp);
+        }
+        p.drawingContext.setLineDash([]);
+        p.pop();
+      }
+
+      function drawAngleArc(center, arcRadius, startDeg, endDeg) {
+        p.push();
+        p.noFill();
+        p.stroke("#2563eb");
+        p.strokeWeight(3);
+        const start = -p.radians(startDeg);
+        const end = -p.radians(endDeg);
+        p.arc(center.x, center.y, arcRadius * 2, arcRadius * 2, end, start);
+        p.pop();
+      }
+
+      function drawPanelTitle(title, subtitle, x, y) {
+        p.push();
+        p.noStroke();
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(22);
+        p.text(title, x, y);
+        p.textStyle(p.NORMAL);
+        p.textSize(14);
+        p.fill("#6b6258");
+        p.text(subtitle, x, y + 24);
+        p.pop();
+      }
+
+      function drawMiniHeading(text, x, y) {
+        p.push();
+        p.noStroke();
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(16);
+        p.text(text, x, y);
+        p.pop();
+      }
+
+      function drawLabel(text, x, y, color, size = 13) {
+        p.push();
+        p.textSize(size);
+        p.textStyle(p.BOLD);
+        const padX = 7;
+        const padY = 4;
+        const tw = p.textWidth(text);
+        p.noStroke();
+        p.fill(255, 250, 242, 238);
+        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
+        p.fill(color);
+        p.text(text, x, y);
+        p.pop();
+      }
+
+      function drawValueCards(items, x, y) {
+        const cardW = Math.min(176, (p.width - 60) / Math.max(1, items.length));
+        const cardH = 62;
+        p.push();
+        for (let i = 0; i < items.length; i++) {
+          const cx = x + i * (cardW + 10);
+          p.noStroke();
+          p.fill(255, 255, 255, 235);
+          p.rect(cx, y, cardW, cardH, 14);
+          p.fill(items[i].color);
+          p.textStyle(p.BOLD);
+          p.textSize(13);
+          p.text(items[i].label, cx + 12, y + 22);
+          p.fill("#222222");
+          p.textSize(20);
+          p.text(items[i].value, cx + 12, y + 48);
+        }
+        p.pop();
+      }
+    };
+
+    new p5(sketch);
+  </script>
+</body>
+</html>

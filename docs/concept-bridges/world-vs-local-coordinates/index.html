@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Coordinates vs Local Coordinates</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffaf2;
+      --ink: #222222;
+      --muted: #6b6258;
+      --line: #ded2c1;
+      --accent: #2563eb;
+      --world: #64748b;
+      --local: #7c3aed;
+      --xaxis: #0891b2;
+      --yaxis: #e11d48;
+      --shape: #f59e0b;
+      --green: #16a34a;
+      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
+        var(--bg);
+    }
+
+    header {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 20px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 900px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 12px 20px 36px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .controls,
+    .workspace,
+    .side-panel {
+      background: rgba(255, 250, 242, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    .toggle-label,
+    .pill {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+      user-select: none;
+    }
+
+    button:hover,
+    .toggle-label:hover {
+      transform: translateY(-1px);
+      background: #fff7ed;
+    }
+
+    button.active {
+      color: white;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .toggle-label input {
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    .pill {
+      cursor: default;
+      background: #f8fafc;
+      color: var(--muted);
+      border-color: #e2e8f0;
+    }
+
+    .slider-wrap {
+      display: grid;
+      grid-template-columns: 96px minmax(150px, 1fr) 72px;
+      gap: 9px;
+      align-items: center;
+      min-width: min(360px, 100%);
+    }
+
+    label,
+    .value-label,
+    .preset-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .workspace {
+      position: relative;
+      height: 660px;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    #sketch-holder {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #sketch-holder canvas { display: block; }
+
+    .canvas-caption {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      right: 22px;
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      backdrop-filter: blur(8px);
+    }
+
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .card h2 { font-size: 1.15rem; }
+    .card h3 { font-size: 1rem; }
+
+    .card p,
+    .card li {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .card p { margin: 0 0 8px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .formula {
+      display: block;
+      margin: 8px 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: grid;
+      grid-template-columns: 16px 1fr;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .swatch.world { background: var(--world); }
+    .swatch.local { background: var(--local); }
+    .swatch.xaxis { background: var(--xaxis); }
+    .swatch.yaxis { background: var(--yaxis); }
+    .swatch.shape { background: var(--shape); }
+    .swatch.green { background: var(--green); }
+
+    .code-card { display: none; }
+    .code-card.visible { display: block; }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      padding: 12px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .note {
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; }
+      .workspace { height: 590px; }
+    }
+
+    @media (max-width: 600px) {
+      header, main {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .slider-wrap {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .workspace { height: 540px; }
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
+    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+  </div>
+  <header>
+    <h1>World Coordinates vs Local Coordinates</h1>
+    <p class="subtitle">
+      A concept bridge for <strong>translate()</strong>, <strong>rotate()</strong>, <strong>push()</strong>, and <strong>pop()</strong>.
+      The key idea: transformations move and rotate the coordinate system, not just the shape.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Explorer controls">
+      <div class="row">
+        <button id="mode-world" class="active">World Grid</button>
+        <button id="mode-translate">translate()</button>
+        <button id="mode-rotate">rotate()</button>
+        <button id="mode-pushpop">push() / pop()</button>
+        <button id="mode-compose">Build a Creature</button>
+        <button id="reset-button">Reset</button>
+        <span id="mode-pill" class="pill">One canvas, one world grid</span>
+      </div>
+
+      <div class="row">
+        <div class="slider-wrap">
+          <label for="x-slider">translate x</label>
+          <input id="x-slider" type="range" min="-240" max="240" value="120" step="1" />
+          <span id="x-value" class="value-label">120</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="y-slider">translate y</label>
+          <input id="y-slider" type="range" min="-180" max="180" value="60" step="1" />
+          <span id="y-value" class="value-label">60</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="angle-slider">rotate</label>
+          <input id="angle-slider" type="range" min="-180" max="180" value="25" step="1" />
+          <span id="angle-value" class="value-label">25°</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="preset-label">Presets:</span>
+        <button class="preset-button" data-preset="center">center</button>
+        <button class="preset-button" data-preset="right">right</button>
+        <button class="preset-button" data-preset="corner">corner</button>
+        <button class="preset-button" data-preset="spin">45° rotate</button>
+        <label class="toggle-label"><input id="animate-angle" type="checkbox" />Animate rotation</label>
+        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
+        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div id="sketch-holder"></div>
+      <div id="canvas-caption" class="canvas-caption">
+        The world grid is the canvas’s original coordinate system. Shapes use world coordinates until we transform the coordinate system.
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <section class="card">
+        <h2 id="lesson-title">Start with the world grid</h2>
+        <p id="lesson-text">
+          The canvas begins with one coordinate system. x increases to the right. y increases downward. Shapes are placed using this world grid.
+        </p>
+        <span id="formula-box" class="formula">rect(300, 200, 80, 50)</span>
+      </section>
+
+      <section class="card">
+        <h3>Big idea</h3>
+        <p><strong>translate()</strong> moves the origin.</p>
+        <p><strong>rotate()</strong> rotates the local grid.</p>
+        <p><strong>push()</strong> saves the current coordinate system.</p>
+        <p><strong>pop()</strong> restores the previous coordinate system.</p>
+      </section>
+
+      <section class="card">
+        <h3>Legend</h3>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch world"></span><span>world coordinate grid</span></div>
+          <div class="legend-item"><span class="swatch local"></span><span>local transformed grid</span></div>
+          <div class="legend-item"><span class="swatch xaxis"></span><span>local x-axis</span></div>
+          <div class="legend-item"><span class="swatch yaxis"></span><span>local y-axis</span></div>
+          <div class="legend-item"><span class="swatch shape"></span><span>shape drawn in local space</span></div>
+          <div class="legend-item"><span class="swatch green"></span><span>saved/restored coordinate state</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Try this</h3>
+        <p id="question-text">Move the translate sliders. What happens to the origin point?</p>
+      </section>
+
+      <section id="code-card" class="card code-card">
+        <h3>p5.js connection</h3>
+        <pre><code id="code-box">rect(300, 200, 80, 50);</code></pre>
+        <p class="note">
+          A helpful habit: think “move the graph paper, then draw at simple coordinates.” That is why many transformed shapes are drawn around (0, 0).
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const state = {
+      mode: "world",
+      tx: 120,
+      ty: 60,
+      angle: 25,
+      animate: false,
+      showLabels: true,
+      showCode: false
+    };
+
+    const els = {};
+
+    function setupUI() {
+      els.modeWorld = document.querySelector("#mode-world");
+      els.modeTranslate = document.querySelector("#mode-translate");
+      els.modeRotate = document.querySelector("#mode-rotate");
+      els.modePushpop = document.querySelector("#mode-pushpop");
+      els.modeCompose = document.querySelector("#mode-compose");
+      els.resetButton = document.querySelector("#reset-button");
+      els.modePill = document.querySelector("#mode-pill");
+      els.xSlider = document.querySelector("#x-slider");
+      els.ySlider = document.querySelector("#y-slider");
+      els.angleSlider = document.querySelector("#angle-slider");
+      els.xValue = document.querySelector("#x-value");
+      els.yValue = document.querySelector("#y-value");
+      els.angleValue = document.querySelector("#angle-value");
+      els.animateAngle = document.querySelector("#animate-angle");
+      els.showLabels = document.querySelector("#show-labels");
+      els.showCode = document.querySelector("#show-code");
+      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
+      els.lessonTitle = document.querySelector("#lesson-title");
+      els.lessonText = document.querySelector("#lesson-text");
+      els.formulaBox = document.querySelector("#formula-box");
+      els.questionText = document.querySelector("#question-text");
+      els.caption = document.querySelector("#canvas-caption");
+      els.codeCard = document.querySelector("#code-card");
+      els.codeBox = document.querySelector("#code-box");
+
+      els.modeWorld.addEventListener("click", () => setMode("world"));
+      els.modeTranslate.addEventListener("click", () => setMode("translate"));
+      els.modeRotate.addEventListener("click", () => setMode("rotate"));
+      els.modePushpop.addEventListener("click", () => setMode("pushpop"));
+      els.modeCompose.addEventListener("click", () => setMode("compose"));
+
+      els.resetButton.addEventListener("click", () => {
+        state.tx = 120;
+        state.ty = 60;
+        state.angle = 25;
+        state.animate = false;
+        updateUI();
+      });
+
+      els.xSlider.addEventListener("input", () => {
+        state.tx = Number(els.xSlider.value);
+        updateUI();
+      });
+
+      els.ySlider.addEventListener("input", () => {
+        state.ty = Number(els.ySlider.value);
+        updateUI();
+      });
+
+      els.angleSlider.addEventListener("input", () => {
+        state.angle = Number(els.angleSlider.value);
+        updateUI();
+      });
+
+      els.animateAngle.addEventListener("change", () => {
+        state.animate = els.animateAngle.checked;
+      });
+
+      els.showLabels.addEventListener("change", () => {
+        state.showLabels = els.showLabels.checked;
+      });
+
+      els.showCode.addEventListener("change", () => {
+        state.showCode = els.showCode.checked;
+        updateUI();
+      });
+
+      els.presetButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const preset = button.dataset.preset;
+          if (preset === "center") {
+            state.tx = 0;
+            state.ty = 0;
+            state.angle = 0;
+          } else if (preset === "right") {
+            state.tx = 180;
+            state.ty = 0;
+            state.angle = 0;
+          } else if (preset === "corner") {
+            state.tx = -170;
+            state.ty = -110;
+            state.angle = 0;
+          } else if (preset === "spin") {
+            state.angle = 45;
+          }
+          updateUI();
+        });
+      });
+
+      updateUI();
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      updateUI();
+    }
+
+    function updateUI() {
+      const buttons = [
+        [els.modeWorld, "world"],
+        [els.modeTranslate, "translate"],
+        [els.modeRotate, "rotate"],
+        [els.modePushpop, "pushpop"],
+        [els.modeCompose, "compose"]
+      ];
+
+      for (const [button, mode] of buttons) {
+        button.classList.toggle("active", state.mode === mode);
+      }
+
+      els.xSlider.value = state.tx;
+      els.ySlider.value = state.ty;
+      els.angleSlider.value = state.angle;
+      els.xValue.textContent = String(Math.round(state.tx));
+      els.yValue.textContent = String(Math.round(state.ty));
+      els.angleValue.textContent = `${Math.round(state.angle)}°`;
+      els.animateAngle.checked = state.animate;
+      els.showLabels.checked = state.showLabels;
+      els.showCode.checked = state.showCode;
+      els.codeCard.classList.toggle("visible", state.showCode);
+
+      const lessons = {
+        world: {
+          pill: "One canvas, one world grid",
+          title: "Start with the world grid",
+          text: "The canvas begins with one coordinate system. x increases to the right. y increases downward. Shapes are placed using this world grid.",
+          formula: "rect(300, 200, 80, 50)",
+          question: "Where is the origin, (0, 0), on the canvas?",
+          caption: "The world grid is the canvas’s original coordinate system. Shapes use world coordinates until we transform the coordinate system.",
+          code: `function draw() {\n  background(240);\n  rect(300, 200, 80, 50);\n}`
+        },
+        translate: {
+          pill: "translate() moves the origin",
+          title: "translate() creates a local origin",
+          text: "translate(x, y) moves the coordinate system. After translating, drawing at (0, 0) means drawing at the new local origin.",
+          formula: `translate(${Math.round(state.tx)}, ${Math.round(state.ty)})\nrect(0, 0, 80, 50)`,
+          question: "Why is the rectangle drawn at (0, 0) but not located at the top-left of the canvas?",
+          caption: "translate() moves the graph paper. The shape can be drawn at simple local coordinates like (0, 0).",
+          code: `function draw() {\n  background(240);\n\n  translate(width / 2 + ${Math.round(state.tx)}, height / 2 + ${Math.round(state.ty)});\n  rect(0, 0, 80, 50);\n}`
+        },
+        rotate: {
+          pill: "rotate() spins the local grid",
+          title: "rotate() rotates the coordinate system",
+          text: "rotate(angle) spins the local grid around the current origin. The shape follows because its local x- and y-axes have changed.",
+          formula: `translate(...)\nrotate(${Math.round(state.angle)}°)\nrect(0, 0, 80, 50)`,
+          question: "Does rotate() rotate the rectangle by itself, or the local coordinate system it is drawn on?",
+          caption: "rotate() turns the local grid. The rectangle is still drawn the same way in local space, but local space is rotated.",
+          code: `function draw() {\n  background(240);\n\n  translate(width / 2 + ${Math.round(state.tx)}, height / 2 + ${Math.round(state.ty)});\n  rotate(radians(${Math.round(state.angle)}));\n  rect(0, 0, 80, 50);\n}`
+        },
+        pushpop: {
+          pill: "push() saves, pop() restores",
+          title: "push() and pop() protect the world",
+          text: "push() saves the current coordinate system. pop() restores it. This lets one shape have its own local grid without affecting everything after it.",
+          formula: "push() → translate() → rotate() → draw → pop()",
+          question: "Which shape is affected by translate() and rotate()? Which shape stays in the world grid?",
+          caption: "push() and pop() make transformations temporary. They keep one object’s local grid from leaking into the rest of the sketch.",
+          code: `function draw() {\n  background(240);\n\n  rect(40, 40, 80, 50); // world grid\n\n  push();\n  translate(width / 2 + ${Math.round(state.tx)}, height / 2 + ${Math.round(state.ty)});\n  rotate(radians(${Math.round(state.angle)}));\n  rect(0, 0, 80, 50); // local grid\n  pop();\n\n  rect(width - 120, 40, 80, 50); // world grid again\n}`
+        },
+        compose: {
+          pill: "Use local coordinates to build objects",
+          title: "Build with simple local coordinates",
+          text: "Once the local grid is placed and rotated, parts of a creature can be drawn near (0, 0). This makes complex objects easier to move and turn.",
+          formula: "translate(bodyX, bodyY)\nrotate(angle)\ndraw body parts around (0, 0)",
+          question: "Why is it easier to draw the creature around (0, 0) after using translate()?",
+          caption: "A local coordinate system lets you build an object around its own center, then move and rotate the whole object as one thing.",
+          code: `function draw() {\n  background(240);\n\n  push();\n  translate(width / 2 + ${Math.round(state.tx)}, height / 2 + ${Math.round(state.ty)});\n  rotate(radians(${Math.round(state.angle)}));\n\n  ellipse(0, 0, 120, 70);\n  circle(55, -20, 36);\n  line(-50, 0, -90, -30);\n  line(-50, 0, -90, 30);\n\n  pop();\n}`
+        }
+      };
+
+      const lesson = lessons[state.mode];
+      els.modePill.textContent = lesson.pill;
+      els.lessonTitle.textContent = lesson.title;
+      els.lessonText.textContent = lesson.text;
+      els.formulaBox.textContent = lesson.formula;
+      els.questionText.textContent = lesson.question;
+      els.caption.textContent = lesson.caption;
+      els.codeBox.textContent = lesson.code;
+    }
+
+    setupUI();
+
+    const sketch = (p) => {
+      let canvas;
+      let holder;
+      let previousWidth = 0;
+      let previousHeight = 0;
+
+      p.setup = () => {
+        holder = document.querySelector("#sketch-holder");
+        const rect = holder.getBoundingClientRect();
+        canvas = p.createCanvas(rect.width, rect.height);
+        canvas.parent("sketch-holder");
+        canvas.elt.setAttribute("role", "img");
+        canvas.elt.setAttribute("aria-label", "Interactive visualization of world coordinates, local coordinates, translate, rotate, push, and pop in p5.js.");
+        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+        p.textFont("Inter, system-ui, sans-serif");
+        p.rectMode(p.CENTER);
+      };
+
+      p.windowResized = () => resizeToHolder();
+
+      p.draw = () => {
+        resizeToHolder();
+        if (state.animate) {
+          state.angle += 0.7;
+          if (state.angle > 180) state.angle = -180;
+          els.angleSlider.value = state.angle;
+          els.angleValue.textContent = `${Math.round(state.angle)}°`;
+        }
+
+        p.background(255, 250, 242);
+        drawWorldGrid();
+        drawPanelTitle();
+
+        if (state.mode === "world") drawWorldMode();
+        if (state.mode === "translate") drawTranslateMode();
+        if (state.mode === "rotate") drawRotateMode();
+        if (state.mode === "pushpop") drawPushPopMode();
+        if (state.mode === "compose") drawComposeMode();
+      };
+
+      function resizeToHolder() {
+        const rect = holder.getBoundingClientRect();
+        const w = Math.max(320, Math.floor(rect.width));
+        const h = Math.max(320, Math.floor(rect.height));
+        if (w !== previousWidth || h !== previousHeight) {
+          p.resizeCanvas(w, h);
+          previousWidth = w;
+          previousHeight = h;
+        }
+      }
+
+      function getCanvasCenter() {
+        return { x: p.width / 2, y: p.height / 2 };
+      }
+
+      function getLocalOrigin() {
+        const c = getCanvasCenter();
+        return { x: c.x + state.tx, y: c.y + state.ty };
+      }
+
+      function drawWorldGrid() {
+        p.push();
+        p.stroke(236, 224, 207);
+        p.strokeWeight(1);
+        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
+        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
+
+        p.stroke("#64748b");
+        p.strokeWeight(2);
+        p.line(0, p.height / 2, p.width, p.height / 2);
+        p.line(p.width / 2, 0, p.width / 2, p.height);
+
+        p.noStroke();
+        p.fill("#64748b");
+        p.circle(p.width / 2, p.height / 2, 8);
+        if (state.showLabels) {
+          drawLabel("world center", p.width / 2 + 12, p.height / 2 - 10, "#64748b", 12);
+          drawLabel("world grid", 24, p.height - 94, "#64748b", 12);
+        }
+        p.pop();
+      }
+
+      function drawPanelTitle() {
+        const titles = {
+          world: ["World Grid", "The canvas starts with one coordinate system."],
+          translate: ["translate()", "Move the origin, then draw with local coordinates."],
+          rotate: ["rotate()", "Rotate the local grid around the current origin."],
+          pushpop: ["push() / pop()", "Save and restore coordinate systems."],
+          compose: ["Build a Creature", "Use local coordinates to make movable, rotatable objects."]
+        };
+        const [title, subtitle] = titles[state.mode];
+        p.push();
+        p.noStroke();
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(22);
+        p.text(title, 24, 38);
+        p.textStyle(p.NORMAL);
+        p.textSize(14);
+        p.fill("#6b6258");
+        p.text(subtitle, 24, 62);
+        p.pop();
+      }
+
+      function drawWorldMode() {
+        p.push();
+        p.rectMode(p.CENTER);
+        p.noStroke();
+        p.fill("#f59e0b");
+        p.rect(p.width * 0.64, p.height * 0.45, 100, 64, 14);
+        p.fill("#222222");
+        p.circle(p.width * 0.64, p.height * 0.45, 7);
+        if (state.showLabels) {
+          drawLabel("rect(x, y, w, h)", p.width * 0.64 - 56, p.height * 0.45 + 58, "#f59e0b", 14);
+          drawLabel("shape uses world coordinates", p.width * 0.45, p.height * 0.25, "#6b6258", 14);
+        }
+        drawMiniCoordinateReadout(p.width * 0.64, p.height * 0.45, "world position");
+        p.pop();
+      }
+
+      function drawTranslateMode() {
+        const origin = getLocalOrigin();
+        drawTranslationPath(origin);
+        drawLocalGrid(origin, 0);
+        drawLocalRectangle(origin, 0);
+        drawCoordinateCards();
+      }
+
+      function drawRotateMode() {
+        const origin = getLocalOrigin();
+        const angle = p.radians(state.angle);
+        drawTranslationPath(origin);
+        drawLocalGrid(origin, angle);
+        drawLocalRectangle(origin, angle);
+        drawRotationArc(origin, angle);
+        drawCoordinateCards();
+      }
+
+      function drawPushPopMode() {
+        const origin = getLocalOrigin();
+        const angle = p.radians(state.angle);
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 232);
+        p.rectMode(p.CORNER);
+        p.rect(p.width * 0.08, p.height * 0.18, p.width * 0.84, p.height * 0.50, 24);
+        p.pop();
+
+        drawWorldRectangle(p.width * 0.18, p.height * 0.32, "before push()", "#64748b");
+        drawTranslationPath(origin);
+        drawLocalGrid(origin, angle);
+        drawLocalRectangle(origin, angle);
+        drawWorldRectangle(p.width * 0.82, p.height * 0.32, "after pop()", "#64748b");
+        drawPushPopStack();
+      }
+
+      function drawComposeMode() {
+        const origin = getLocalOrigin();
+        const angle = p.radians(state.angle);
+        drawTranslationPath(origin);
+        drawLocalGrid(origin, angle);
+        drawCreature(origin, angle);
+        drawCreaturePartsLegend();
+      }
+
+      function drawTranslationPath(origin) {
+        const c = getCanvasCenter();
+        p.push();
+        p.stroke("#16a34a");
+        p.strokeWeight(3);
+        p.drawingContext.setLineDash([8, 8]);
+        p.line(c.x, c.y, origin.x, origin.y);
+        p.drawingContext.setLineDash([]);
+        p.noStroke();
+        p.fill("#16a34a");
+        p.circle(origin.x, origin.y, 12);
+        if (state.showLabels) {
+          drawLabel(`translate(${Math.round(state.tx)}, ${Math.round(state.ty)})`, (c.x + origin.x) / 2 - 68, (c.y + origin.y) / 2 - 12, "#16a34a", 13);
+          drawLabel("new local origin", origin.x + 14, origin.y - 12, "#16a34a", 13);
+        }
+        p.pop();
+      }
+
+      function drawLocalGrid(origin, angle) {
+        p.push();
+        p.translate(origin.x, origin.y);
+        p.rotate(angle);
+
+        p.stroke("#7c3aed22");
+        p.strokeWeight(1);
+        const span = 160;
+        for (let x = -span; x <= span; x += 24) p.line(x, -span, x, span);
+        for (let y = -span; y <= span; y += 24) p.line(-span, y, span, y);
+
+        p.stroke("#0891b2");
+        p.strokeWeight(4);
+        p.line(-span, 0, span, 0);
+        drawAxisArrow(span, 0, "#0891b2");
+
+        p.stroke("#e11d48");
+        p.strokeWeight(4);
+        p.line(0, -span, 0, span);
+        drawAxisArrow(0, span, "#e11d48");
+
+        p.noStroke();
+        p.fill("#7c3aed");
+        p.circle(0, 0, 10);
+
+        if (state.showLabels) {
+          drawLocalLabel("local x", span - 54, -10, "#0891b2", 12);
+          drawLocalLabel("local y", 12, span - 10, "#e11d48", 12);
+          drawLocalLabel("(0, 0)", 12, -12, "#7c3aed", 12);
+        }
+        p.pop();
+      }
+
+      function drawAxisArrow(x, y, color) {
+        p.push();
+        p.noStroke();
+        p.fill(color);
+        p.translate(x, y);
+        if (Math.abs(x) > Math.abs(y)) {
+          p.triangle(0, 0, -10, -6, -10, 6);
+        } else {
+          p.triangle(0, 0, -6, -10, 6, -10);
+        }
+        p.pop();
+      }
+
+      function drawLocalRectangle(origin, angle) {
+        p.push();
+        p.translate(origin.x, origin.y);
+        p.rotate(angle);
+        p.rectMode(p.CENTER);
+        p.noStroke();
+        p.fill("#f59e0b");
+        p.rect(0, 0, 110, 70, 14);
+        p.fill("#222222");
+        p.circle(0, 0, 7);
+        if (state.showLabels) {
+          drawLocalLabel("rect(0, 0, 110, 70)", -62, 58, "#f59e0b", 13);
+        }
+        p.pop();
+      }
+
+      function drawWorldRectangle(x, y, label, color) {
+        p.push();
+        p.rectMode(p.CENTER);
+        p.noStroke();
+        p.fill(100, 116, 139, 90);
+        p.rect(x, y, 96, 60, 12);
+        p.fill("#222222");
+        p.circle(x, y, 6);
+        if (state.showLabels) drawLabel(label, x - 43, y + 54, color, 12);
+        p.pop();
+      }
+
+      function drawRotationArc(origin, angle) {
+        p.push();
+        p.translate(origin.x, origin.y);
+        p.noFill();
+        p.stroke("#2563eb");
+        p.strokeWeight(3);
+        const r = 60;
+        if (angle >= 0) {
+          p.arc(0, 0, r * 2, r * 2, 0, angle);
+        } else {
+          p.arc(0, 0, r * 2, r * 2, angle, 0);
+        }
+        if (state.showLabels) drawLocalLabel(`rotate(${Math.round(state.angle)}°)`, r + 8, 8, "#2563eb", 13);
+        p.pop();
+      }
+
+      function drawPushPopStack() {
+        const x = p.width * 0.35;
+        const y = p.height * 0.70;
+        const w = p.width * 0.30;
+        const h = 92;
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rectMode(p.CORNER);
+        p.rect(x, y, w, h, 20);
+        p.fill("#16a34a");
+        p.textStyle(p.BOLD);
+        p.textSize(15);
+        p.text("Coordinate state", x + 18, y + 28);
+        p.fill("#6b6258");
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.text("push() saves the world grid", x + 18, y + 52);
+        p.text("pop() restores it afterward", x + 18, y + 72);
+        p.pop();
+      }
+
+      function drawCreature(origin, angle) {
+        p.push();
+        p.translate(origin.x, origin.y);
+        p.rotate(angle);
+        p.noStroke();
+
+        p.fill(245, 158, 11, 235);
+        p.ellipse(0, 0, 140, 82);
+
+        p.fill(255, 250, 242);
+        p.circle(54, -18, 34);
+        p.fill("#222222");
+        p.circle(60, -18, 10);
+
+        p.stroke("#7c3aed");
+        p.strokeWeight(5);
+        p.line(-60, -10, -100, -42);
+        p.line(-60, 10, -100, 42);
+
+        p.stroke("#0891b2");
+        p.strokeWeight(4);
+        p.line(-10, 38, -36, 70);
+        p.line(24, 36, 42, 70);
+
+        p.noStroke();
+        p.fill("#e11d48");
+        p.circle(78, 6, 12);
+
+        if (state.showLabels) {
+          drawLocalLabel("body at (0, 0)", -48, -60, "#f59e0b", 13);
+          drawLocalLabel("parts use simple local positions", -114, 98, "#7c3aed", 13);
+        }
+        p.pop();
+      }
+
+      function drawCreaturePartsLegend() {
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rectMode(p.CORNER);
+        p.rect(p.width * 0.08, p.height * 0.68, p.width * 0.84, 92, 20);
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(15);
+        p.text("Why this helps", p.width * 0.08 + 18, p.height * 0.68 + 28);
+        p.fill("#6b6258");
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.text("The creature is built around its own center. Move or rotate the local grid, and every body part follows.", p.width * 0.08 + 18, p.height * 0.68 + 54);
+        p.pop();
+      }
+
+      function drawCoordinateCards() {
+        const cards = [
+          { label: "world center", value: `(${Math.round(p.width / 2)}, ${Math.round(p.height / 2)})`, color: "#64748b" },
+          { label: "translate", value: `(${Math.round(state.tx)}, ${Math.round(state.ty)})`, color: "#16a34a" },
+          { label: "rotation", value: `${Math.round(state.angle)}°`, color: "#2563eb" }
+        ];
+        const cardW = Math.min(180, (p.width - 70) / cards.length);
+        const y = p.height - 168;
+        const x = 28;
+
+        p.push();
+        for (let i = 0; i < cards.length; i++) {
+          const cx = x + i * (cardW + 10);
+          p.noStroke();
+          p.fill(255, 255, 255, 235);
+          p.rectMode(p.CORNER);
+          p.rect(cx, y, cardW, 62, 14);
+          p.fill(cards[i].color);
+          p.textStyle(p.BOLD);
+          p.textSize(13);
+          p.text(cards[i].label, cx + 12, y + 22);
+          p.fill("#222222");
+          p.textSize(18);
+          p.text(cards[i].value, cx + 12, y + 48);
+        }
+        p.pop();
+      }
+
+      function drawMiniCoordinateReadout(x, y, title) {
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rectMode(p.CORNER);
+        p.rect(p.width * 0.10, p.height * 0.66, p.width * 0.80, 86, 20);
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(15);
+        p.text(title, p.width * 0.10 + 18, p.height * 0.66 + 28);
+        p.fill("#6b6258");
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.text(`This shape is placed directly on the world grid near (${Math.round(x)}, ${Math.round(y)}).`, p.width * 0.10 + 18, p.height * 0.66 + 54);
+        p.pop();
+      }
+
+      function drawLocalLabel(text, x, y, color, size = 13) {
+        p.push();
+        p.textSize(size);
+        p.textStyle(p.BOLD);
+        const padX = 7;
+        const padY = 4;
+        const tw = p.textWidth(text);
+        p.noStroke();
+        p.fill(255, 250, 242, 238);
+        p.rectMode(p.CORNER);
+        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
+        p.fill(color);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.text(text, x, y);
+        p.pop();
+      }
+
+      function drawLabel(text, x, y, color, size = 13) {
+        p.push();
+        p.textSize(size);
+        p.textStyle(p.BOLD);
+        const padX = 7;
+        const padY = 4;
+        const tw = p.textWidth(text);
+        p.noStroke();
+        p.fill(255, 250, 242, 238);
+        p.rectMode(p.CORNER);
+        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
+        p.fill(color);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.text(text, x, y);
+        p.pop();
+      }
+    };
+
+    new p5(sketch);
+  </script>
+</body>
+</html>

@@ -1087,6 +1087,12 @@ a{color:inherit}
   border-color:var(--purple);
 }
 
+.pill.bridge{
+  background:#fff;
+  color:var(--purple);
+  border-color:var(--purple);
+}
+
 .pill.core{
   background:linear-gradient(135deg,var(--accent),var(--gold));
   color:#fff;

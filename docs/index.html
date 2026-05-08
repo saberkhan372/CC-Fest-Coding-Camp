@@ -43,6 +43,7 @@
           <p class="lede">60 workshop tools and 40 starter sketches for teaching <a href="https://p5js.org">p5.js</a> and creative coding. Built by <a href="https://www.linkedin.com/in/edsaber/" target="_blank" rel="noopener">Saber Khan</a> for <a href="https://ccfest.rocks/coding-camp" target="_blank" rel="noopener">CC Fest Coding Camp</a>. Free, open, remixable.</p>
           <div class="hero-actions">
             <a class="button primary" href="#interactive-tools">Browse Tools</a>
+            <a class="button secondary" href="#concept-bridges">Concept Bridges</a>
             <a class="button secondary" href="#starter-sketches">Starter Sketches</a>
             <a class="button" href="https://sustaining-boursin-d41.notion.site/3369950a7da981169ceffb7d3dbd73e9">About the Camp →</a>
           </div>
@@ -151,6 +152,182 @@
       </section>
 
       <div class="gallery">
+        <section id="concept-bridges" class="gallery-section panel" aria-label="Concept bridges">
+          <div class="gallery-header">
+            <div class="gallery-header-copy">
+              <div class="section-label bold-block">Concept Bridges</div>
+              <h2>17 intuition builders for the ideas that make p5.js click</h2>
+              <p>These are not output tools and not starter sketches. They are experiential explanations: interactive bridges between a fuzzy idea and the p5.js function or programming pattern behind it. Open one when a concept feels slippery, then come back to the tools or sketches with stronger intuition.</p>
+            </div>
+            <div class="gallery-count">17 bridges</div>
+          </div>
+          <div class="station-list">
+            <div class="station">
+              <div class="station-header">
+                <span class="station-name">Visual + Trig Foundations</span>
+                <p class="station-desc">Color as feeling, and the geometry that turns circles into waves.</p>
+              </div>
+              <div class="tool-grid">
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Foundations</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Color: Numbers Become Feeling</h3>
+                  <p class="tool-description">A bridge for <code>fill()</code>, <code>stroke()</code>, grayscale, RGB, HSB, alpha, and <code>lerpColor()</code> so color stops feeling like raw numbers and starts feeling expressive.</p>
+                  <div class="tag-row"><span class="tag">color</span><span class="tag">HSB</span><span class="tag">lerpColor()</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/color-numbers-become-feeling/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Foundations</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Triangle to Circle to Wave Explorer</h3>
+                  <p class="tool-description">A bridge from right triangles to the unit circle to sine and cosine waves, making periodic motion and trig feel visual before they feel mathematical.</p>
+                  <div class="tag-row"><span class="tag">sin()</span><span class="tag">cos()</span><span class="tag">unit circle</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/triangle-circle-wave-explorer/">Open Bridge</a></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="station">
+              <div class="station-header">
+                <span class="station-name">p5.js Core</span>
+                <p class="station-desc">The core mental models for time, space, mapping, distance, and smooth change.</p>
+              </div>
+              <div class="tool-grid">
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>How p5.js Thinks About Time</h3>
+                  <p class="tool-description">A bridge for <code>setup()</code>, <code>draw()</code>, and <code>frameCount</code>, showing how p5.js keeps sketch time moving even when you do nothing.</p>
+                  <div class="tag-row"><span class="tag">setup()</span><span class="tag">draw()</span><span class="tag">frameCount</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/how-p5-thinks-about-time/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>World Coordinates vs Local Coordinates</h3>
+                  <p class="tool-description">A bridge for <code>translate()</code>, <code>rotate()</code>, <code>push()</code>, and <code>pop()</code>, clarifying the difference between moving the world and moving your local drawing space.</p>
+                  <div class="tag-row"><span class="tag">translate()</span><span class="tag">rotate()</span><span class="tag">push()/pop()</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/world-vs-local-coordinates/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>map() Range Translator</h3>
+                  <p class="tool-description">A bridge for <code>map()</code>, turning one range of values into another so mouse position, sensor input, and data can control size, color, and motion.</p>
+                  <div class="tag-row"><span class="tag">map()</span><span class="tag">ranges</span><span class="tag">translation</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/map-range-translator/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Distance Becomes Behavior</h3>
+                  <p class="tool-description">A bridge for <code>dist()</code>: “how close?” becomes a number, and that number becomes size, brightness, opacity, or any other behavior.</p>
+                  <div class="tag-row"><span class="tag">dist()</span><span class="tag">proximity</span><span class="tag">behavior</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/distance-becomes-behavior/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Noise: Smooth Randomness</h3>
+                  <p class="tool-description">A bridge for <code>noise()</code>, showing why <code>random()</code> jumps while noise flows, drifts, and feels more alive.</p>
+                  <div class="tag-row"><span class="tag">noise()</span><span class="tag">random()</span><span class="tag">motion</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/noise-smooth-randomness/">Open Bridge</a></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="station">
+              <div class="station-header">
+                <span class="station-name">Events + Interaction</span>
+                <p class="station-desc">The moment a sketch stops being a picture and starts listening back.</p>
+              </div>
+              <div class="tool-grid">
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Interaction</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Events: Sketches Listen</h3>
+                  <p class="tool-description">A bridge for <code>mouseX</code>, <code>mouseY</code>, <code>mousePressed()</code>, and <code>keyPressed()</code>, showing how a sketch can react to you in time.</p>
+                  <div class="tag-row"><span class="tag">mouse</span><span class="tag">keyboard</span><span class="tag">events</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/events-sketches-listen/">Open Bridge</a></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="station">
+              <div class="station-header">
+                <span class="station-name">Programming Fundamentals</span>
+                <p class="station-desc">The programming patterns that turn one drawing into many behaviors, systems, and reusable structures.</p>
+              </div>
+              <div class="tool-grid">
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Vectors: Arrows That Store Motion</h3>
+                  <p class="tool-description">A bridge for <code>createVector()</code>, position, velocity, acceleration, and steering. Motion becomes something you can store, add, and redirect.</p>
+                  <div class="tag-row"><span class="tag">vectors</span><span class="tag">velocity</span><span class="tag">acceleration</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/vectors-arrows-that-store-motion/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Modulo: Counting in Cycles</h3>
+                  <p class="tool-description">A bridge for the <code>%</code> operator, showing how remainders create loops, stripes, wrapping behavior, and repeating rhythm.</p>
+                  <div class="tag-row"><span class="tag">%</span><span class="tag">cycles</span><span class="tag">patterns</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/modulo-counting-in-cycles/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Arrays: One Thing to Many Things</h3>
+                  <p class="tool-description">A bridge for arrays, indexes, loops, and arrays of objects. One variable becomes many related values you can update together.</p>
+                  <div class="tag-row"><span class="tag">arrays</span><span class="tag">indexes</span><span class="tag">loops</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/arrays-one-thing-to-many-things/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Objects: Data + Behavior</h3>
+                  <p class="tool-description">A bridge for object literals, classes, properties, and methods. An object bundles what something knows with what it does.</p>
+                  <div class="tag-row"><span class="tag">objects</span><span class="tag">classes</span><span class="tag">methods</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/objects-data-plus-behavior/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Functions: Make Your Own Commands</h3>
+                  <p class="tool-description">A bridge for functions, parameters, arguments, and return values. Package an idea once, then call it again with different inputs.</p>
+                  <div class="tag-row"><span class="tag">functions</span><span class="tag">parameters</span><span class="tag">return</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/functions-make-your-own-commands/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Conditionals: Code Makes Choices</h3>
+                  <p class="tool-description">A bridge for <code>if</code>, <code>else if</code>, <code>else</code>, comparison operators, Booleans, and combining conditions into visible decisions.</p>
+                  <div class="tag-row"><span class="tag">if/else</span><span class="tag">booleans</span><span class="tag">logic</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/conditionals-code-makes-choices/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>State Machines: Sketches Have Modes</h3>
+                  <p class="tool-description">A bridge for state variables, start/play/win/lose screens, and mini-game flow. One sketch can have multiple worlds depending on the mode.</p>
+                  <div class="tag-row"><span class="tag">state</span><span class="tag">modes</span><span class="tag">game flow</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/state-machines-sketches-have-modes/">Open Bridge</a></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="station">
+              <div class="station-header">
+                <span class="station-name">Data + Media</span>
+                <p class="station-desc">How pictures, tables, and JSON become raw material for drawing and storytelling.</p>
+              </div>
+              <div class="tool-grid">
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Data + Media</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Pixels: Pictures Are Data</h3>
+                  <p class="tool-description">A bridge for images, RGB values, <code>get()</code>, <code>pixels[]</code>, <code>loadPixels()</code>, and video frames. Pictures become numbers you can manipulate.</p>
+                  <div class="tag-row"><span class="tag">pixels[]</span><span class="tag">RGB</span><span class="tag">images</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/pixels-pictures-are-data/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Data + Media</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Data In, Drawing Out</h3>
+                  <p class="tool-description">A bridge for <code>preload()</code>, <code>loadTable()</code>, <code>loadJSON()</code>, rows, columns, and how outside data turns into visual structure.</p>
+                  <div class="tag-row"><span class="tag">preload()</span><span class="tag">loadTable()</span><span class="tag">loadJSON()</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/data-in-drawing-out/">Open Bridge</a></div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="interactive-tools" class="gallery-section panel" aria-label="Interactive tools">
           <div class="gallery-header">
             <div class="gallery-header-copy">

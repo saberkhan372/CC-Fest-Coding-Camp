@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data In, Drawing Out</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffaf2;
+      --ink: #222222;
+      --muted: #6b6258;
+      --line: #ded2c1;
+      --accent: #2563eb;
+      --file: #7c3aed;
+      --row: #0891b2;
+      --column: #e11d48;
+      --value: #f59e0b;
+      --visual: #16a34a;
+      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
+        var(--bg);
+    }
+
+    header {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 20px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 960px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 12px 20px 36px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .controls,
+    .workspace,
+    .side-panel {
+      background: rgba(255, 250, 242, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    .toggle-label,
+    .pill {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+      user-select: none;
+    }
+
+    button:hover,
+    .toggle-label:hover {
+      transform: translateY(-1px);
+      background: #fff7ed;
+    }
+
+    button.active {
+      color: white;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .toggle-label input {
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    .pill {
+      cursor: default;
+      background: #f8fafc;
+      color: var(--muted);
+      border-color: #e2e8f0;
+    }
+
+    .slider-wrap {
+      display: grid;
+      grid-template-columns: 110px minmax(150px, 1fr) 78px;
+      gap: 9px;
+      align-items: center;
+      min-width: min(390px, 100%);
+    }
+
+    label,
+    .value-label,
+    .preset-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .workspace {
+      position: relative;
+      height: 660px;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    #sketch-holder {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #sketch-holder canvas { display: block; }
+
+    .canvas-caption {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      right: 22px;
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      backdrop-filter: blur(8px);
+    }
+
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .card h2 { font-size: 1.15rem; }
+    .card h3 { font-size: 1rem; }
+
+    .card p,
+    .card li {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .card p { margin: 0 0 8px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .formula {
+      display: block;
+      margin: 8px 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .legend { display: grid; gap: 8px; }
+    .legend-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: center; font-size: 0.9rem; color: var(--muted); }
+    .swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); }
+    .swatch.file { background: var(--file); }
+    .swatch.row { background: var(--row); }
+    .swatch.column { background: var(--column); }
+    .swatch.value { background: var(--value); }
+    .swatch.visual { background: var(--visual); }
+
+    .code-card { display: none; }
+    .code-card.visible { display: block; }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      padding: 12px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .note { font-size: 0.86rem; color: var(--muted); }
+
+    @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
+    @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
+  </style>
+</head>
+<body>
+  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
+    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+  </div>
+  <header>
+    <h1>Data In, Drawing Out</h1>
+    <p class="subtitle">
+      A concept bridge for <strong>preload()</strong>, <strong>loadTable()</strong>, <strong>loadJSON()</strong>, rows, columns, and data visualization.
+      A sketch can read data from outside the code and turn it into shapes.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Explorer controls">
+      <div class="row">
+        <button id="mode-file" class="active">External File</button>
+        <button id="mode-table">Table Rows</button>
+        <button id="mode-column">Columns</button>
+        <button id="mode-map">Map to Visuals</button>
+        <button id="mode-json">JSON Shape</button>
+        <button id="reset-button">Reset Data</button>
+        <span id="mode-pill" class="pill">data file → sketch</span>
+      </div>
+
+      <div class="row">
+        <div class="slider-wrap">
+          <label for="row-slider">Selected row</label>
+          <input id="row-slider" type="range" min="0" max="5" value="2" step="1" />
+          <span id="row-value" class="value-label">2</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="scale-slider">Visual scale</label>
+          <input id="scale-slider" type="range" min="0.5" max="2.0" value="1.0" step="0.1" />
+          <span id="scale-value" class="value-label">1.0×</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="sort-slider">Sort by</label>
+          <input id="sort-slider" type="range" min="0" max="2" value="0" step="1" />
+          <span id="sort-value" class="value-label">original</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="preset-label">Dataset:</span>
+        <button class="dataset-button" data-dataset="weather">weather</button>
+        <button class="dataset-button" data-dataset="colors">colors</button>
+        <button class="dataset-button" data-dataset="projects">projects</button>
+        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
+        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div id="sketch-holder"></div>
+      <div id="canvas-caption" class="canvas-caption">
+        preload() gets external data ready before setup() and draw() try to use it.
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <section class="card">
+        <h2 id="lesson-title">Data can come from outside the sketch</h2>
+        <p id="lesson-text">
+          Instead of typing every value directly into your code, p5.js can load a CSV table or JSON file. The sketch then uses that data to decide what to draw.
+        </p>
+        <span id="formula-box" class="formula">function preload() {
+  table = loadTable("data.csv", "csv", "header");
+}</span>
+      </section>
+
+      <section class="card">
+        <h3>Big idea</h3>
+        <p><strong>preload():</strong> load files before the sketch starts.</p>
+        <p><strong>Table:</strong> rows and columns, like a spreadsheet.</p>
+        <p><strong>JSON:</strong> named data inside objects and arrays.</p>
+        <p><strong>Visualization:</strong> map data values to visual properties.</p>
+      </section>
+
+      <section class="card">
+        <h3>Legend</h3>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch file"></span><span>external file</span></div>
+          <div class="legend-item"><span class="swatch row"></span><span>selected row / record</span></div>
+          <div class="legend-item"><span class="swatch column"></span><span>column / field name</span></div>
+          <div class="legend-item"><span class="swatch value"></span><span>data value</span></div>
+          <div class="legend-item"><span class="swatch visual"></span><span>visual result</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Try this</h3>
+        <p id="question-text">Change the selected row. Which values change, and which visual properties respond?</p>
+      </section>
+
+      <section id="code-card" class="card code-card">
+        <h3>p5.js connection</h3>
+        <pre><code id="code-box">function preload() {
+  table = loadTable("data.csv", "csv", "header");
+}</code></pre>
+        <p class="note">
+          This tool uses built-in sample data so it works as one file. In a real sketch, the same idea applies to CSV or JSON files in your project folder.
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const datasets = {
+      weather: {
+        name: "weather.csv",
+        columns: ["day", "temp", "rain", "wind"],
+        rows: [
+          { day: "Mon", temp: 68, rain: 10, wind: 4 },
+          { day: "Tue", temp: 72, rain: 0, wind: 7 },
+          { day: "Wed", temp: 61, rain: 45, wind: 11 },
+          { day: "Thu", temp: 66, rain: 20, wind: 5 },
+          { day: "Fri", temp: 78, rain: 0, wind: 9 },
+          { day: "Sat", temp: 83, rain: 0, wind: 3 }
+        ]
+      },
+      colors: {
+        name: "palette.csv",
+        columns: ["name", "red", "green", "blue"],
+        rows: [
+          { name: "sunset", red: 240, green: 94, blue: 72 },
+          { name: "ocean", red: 25, green: 130, blue: 196 },
+          { name: "moss", red: 65, green: 150, blue: 88 },
+          { name: "lavender", red: 142, green: 110, blue: 214 },
+          { name: "gold", red: 232, green: 175, blue: 64 },
+          { name: "night", red: 45, green: 58, blue: 92 }
+        ]
+      },
+      projects: {
+        name: "projects.json",
+        columns: ["title", "complexity", "joy", "polish"],
+        rows: [
+          { title: "Garden", complexity: 4, joy: 8, polish: 7 },
+          { title: "Robot", complexity: 7, joy: 6, polish: 5 },
+          { title: "City", complexity: 8, joy: 7, polish: 6 },
+          { title: "Game", complexity: 9, joy: 9, polish: 4 },
+          { title: "Poster", complexity: 5, joy: 8, polish: 9 },
+          { title: "Music", complexity: 6, joy: 10, polish: 6 }
+        ]
+      }
+    };
+
+    const state = {
+      mode: "file",
+      datasetKey: "weather",
+      selectedRow: 2,
+      visualScale: 1,
+      sortMode: 0,
+      showLabels: true,
+      showCode: false
+    };
+
+    const els = {};
+
+    function data() { return datasets[state.datasetKey]; }
+    function rows() {
+      const r = [...data().rows];
+      if (state.sortMode === 1) {
+        const numeric = data().columns.find(c => typeof r[0][c] === "number");
+        if (numeric) r.sort((a, b) => a[numeric] - b[numeric]);
+      }
+      if (state.sortMode === 2) {
+        const numeric = data().columns.find(c => typeof r[0][c] === "number");
+        if (numeric) r.sort((a, b) => b[numeric] - a[numeric]);
+      }
+      return r;
+    }
+    function selected() { return rows()[state.selectedRow]; }
+    function firstNumericColumn() { return data().columns.find(c => typeof data().rows[0][c] === "number"); }
+    function labelColumn() { return data().columns.find(c => typeof data().rows[0][c] === "string"); }
+
+    function setupUI() {
+      els.modeFile = document.querySelector("#mode-file");
+      els.modeTable = document.querySelector("#mode-table");
+      els.modeColumn = document.querySelector("#mode-column");
+      els.modeMap = document.querySelector("#mode-map");
+      els.modeJson = document.querySelector("#mode-json");
+      els.resetButton = document.querySelector("#reset-button");
+      els.modePill = document.querySelector("#mode-pill");
+      els.rowSlider = document.querySelector("#row-slider");
+      els.scaleSlider = document.querySelector("#scale-slider");
+      els.sortSlider = document.querySelector("#sort-slider");
+      els.rowValue = document.querySelector("#row-value");
+      els.scaleValue = document.querySelector("#scale-value");
+      els.sortValue = document.querySelector("#sort-value");
+      els.datasetButtons = Array.from(document.querySelectorAll(".dataset-button"));
+      els.showLabels = document.querySelector("#show-labels");
+      els.showCode = document.querySelector("#show-code");
+      els.lessonTitle = document.querySelector("#lesson-title");
+      els.lessonText = document.querySelector("#lesson-text");
+      els.formulaBox = document.querySelector("#formula-box");
+      els.questionText = document.querySelector("#question-text");
+      els.caption = document.querySelector("#canvas-caption");
+      els.codeCard = document.querySelector("#code-card");
+      els.codeBox = document.querySelector("#code-box");
+
+      els.modeFile.addEventListener("click", () => setMode("file"));
+      els.modeTable.addEventListener("click", () => setMode("table"));
+      els.modeColumn.addEventListener("click", () => setMode("column"));
+      els.modeMap.addEventListener("click", () => setMode("map"));
+      els.modeJson.addEventListener("click", () => setMode("json"));
+
+      els.rowSlider.addEventListener("input", () => { state.selectedRow = Number(els.rowSlider.value); updateUI(); });
+      els.scaleSlider.addEventListener("input", () => { state.visualScale = Number(els.scaleSlider.value); updateUI(); });
+      els.sortSlider.addEventListener("input", () => { state.sortMode = Number(els.sortSlider.value); updateUI(); });
+
+      els.datasetButtons.forEach(button => button.addEventListener("click", () => {
+        state.datasetKey = button.dataset.dataset;
+        state.selectedRow = Math.min(state.selectedRow, data().rows.length - 1);
+        if (state.datasetKey !== "projects" && state.mode === "json") state.mode = "table";
+        updateUI();
+      }));
+
+      els.resetButton.addEventListener("click", () => {
+        state.datasetKey = "weather";
+        state.selectedRow = 2;
+        state.visualScale = 1;
+        state.sortMode = 0;
+        updateUI();
+      });
+
+      els.showLabels.addEventListener("change", () => { state.showLabels = els.showLabels.checked; });
+      els.showCode.addEventListener("change", () => { state.showCode = els.showCode.checked; updateUI(); });
+
+      updateUI();
+    }
+
+    function setMode(mode) { state.mode = mode; updateUI(); }
+
+    function updateUI() {
+      const buttons = [[els.modeFile,"file"],[els.modeTable,"table"],[els.modeColumn,"column"],[els.modeMap,"map"],[els.modeJson,"json"]];
+      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
+      els.datasetButtons.forEach(button => button.classList.toggle("active", button.dataset.dataset === state.datasetKey));
+
+      els.rowSlider.max = String(data().rows.length - 1);
+      els.rowSlider.value = state.selectedRow;
+      els.scaleSlider.value = state.visualScale;
+      els.sortSlider.value = state.sortMode;
+      els.rowValue.textContent = String(state.selectedRow);
+      els.scaleValue.textContent = `${state.visualScale.toFixed(1)}×`;
+      els.sortValue.textContent = ["original", "low→high", "high→low"][state.sortMode];
+      els.showLabels.checked = state.showLabels;
+      els.showCode.checked = state.showCode;
+      els.codeCard.classList.toggle("visible", state.showCode);
+
+      const d = data();
+      const row = selected();
+      const num = firstNumericColumn();
+      const label = labelColumn();
+
+      const lessons = {
+        file: {
+          pill: "data file → sketch",
+          title: "Data can come from outside the sketch",
+          text: "Instead of typing every value directly into your code, p5.js can load a CSV table or JSON file. The sketch then uses that data to decide what to draw.",
+          formula: `function preload() {\n  table = loadTable("${d.name}", "csv", "header");\n}`,
+          question: "Why might it be useful to keep data outside the code?",
+          caption: "preload() gets external data ready before setup() and draw() try to use it.",
+          code: `let table;\n\nfunction preload() {\n  table = loadTable("${d.name}", "csv", "header");\n}`
+        },
+        table: {
+          pill: "table = rows + columns",
+          title: "A table is rows and columns",
+          text: "A CSV table is like a small spreadsheet. Each row is one record. Each column is one kind of information.",
+          formula: `row ${state.selectedRow}:\n${JSON.stringify(row, null, 2)}`,
+          question: "What does one row represent in this dataset?",
+          caption: "Rows are records. Columns are fields. The sketch can read either one.",
+          code: `let row = table.getRow(${state.selectedRow});\nlet ${label || "name"} = row.getString("${label || d.columns[0]}");\nlet ${num || "value"} = row.getNum("${num || d.columns[1]}");`
+        },
+        column: {
+          pill: "columns name each type of data",
+          title: "Columns tell the sketch what each value means",
+          text: "Column names are labels for the data. Instead of remembering column 2, you can ask for a named value like temp, rain, red, or complexity.",
+          formula: `columns:\n${d.columns.join("\n")}`,
+          question: "Which column should control size? Which column should control color?",
+          caption: "Column names help code ask for meaningful values instead of anonymous numbers.",
+          code: `for (let row of table.rows) {\n  let value = row.getNum("${num || d.columns[1]}");\n}`
+        },
+        map: {
+          pill: "data values become visual properties",
+          title: "Data becomes drawing through map()",
+          text: "A data value usually has to be translated into a visual range. map() can turn temperature into height, rain into opacity, or RGB values into color.",
+          formula: `let value = ${row[num]};\nlet h = map(value, minValue, maxValue, 20, 260);`,
+          question: "What visual property is controlled by the numeric data?",
+          caption: "Visualization is a translation: data value in, visual property out.",
+          code: `let value = row.getNum("${num}");\nlet h = map(value, minValue, maxValue, 20, 260);\nrect(x, baseline - h, barWidth, h);`
+        },
+        json: {
+          pill: "JSON stores nested objects and arrays",
+          title: "JSON can store objects and arrays",
+          text: "JSON is useful when data has structure: arrays of objects, nested properties, labels, settings, and more complex records.",
+          formula: `let data = {\n  projects: ${JSON.stringify(d.rows.slice(0,2), null, 2)}\n};`,
+          question: "How is JSON different from a flat table?",
+          caption: "JSON is shaped like JavaScript objects and arrays, so it can represent more nested data.",
+          code: `let data;\n\nfunction preload() {\n  data = loadJSON("projects.json");\n}\n\nfor (let project of data.projects) {\n  circle(x, y, project.complexity * 10);\n}`
+        }
+      };
+
+      const lesson = lessons[state.mode];
+      els.modePill.textContent = lesson.pill;
+      els.lessonTitle.textContent = lesson.title;
+      els.lessonText.textContent = lesson.text;
+      els.formulaBox.textContent = lesson.formula;
+      els.questionText.textContent = lesson.question;
+      els.caption.textContent = lesson.caption;
+      els.codeBox.textContent = lesson.code;
+    }
+
+    setupUI();
+
+    const sketch = (p) => {
+      let canvas, holder, previousWidth = 0, previousHeight = 0;
+      p.setup = () => {
+        holder = document.querySelector("#sketch-holder");
+        const rect = holder.getBoundingClientRect();
+        canvas = p.createCanvas(rect.width, rect.height);
+        canvas.parent("sketch-holder");
+        canvas.elt.setAttribute("role", "img");
+        canvas.elt.setAttribute("aria-label", "Interactive visualization of loading data and turning rows and columns into drawings in p5.js.");
+        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+        p.textFont("Inter, system-ui, sans-serif");
+      };
+      p.windowResized = () => resizeToHolder();
+      p.draw = () => {
+        resizeToHolder();
+        p.background(255, 250, 242);
+        drawSubtleGrid();
+        drawPanelTitle();
+        if (state.mode === "file") drawFileMode();
+        if (state.mode === "table") drawTableMode();
+        if (state.mode === "column") drawColumnMode();
+        if (state.mode === "map") drawMapMode();
+        if (state.mode === "json") drawJsonMode();
+        drawReadoutCards();
+      };
+
+      function resizeToHolder() {
+        const rect = holder.getBoundingClientRect();
+        const w = Math.max(320, Math.floor(rect.width));
+        const h = Math.max(320, Math.floor(rect.height));
+        if (w !== previousWidth || h !== previousHeight) { p.resizeCanvas(w, h); previousWidth = w; previousHeight = h; }
+      }
+
+      function drawSubtleGrid() {
+        p.push(); p.stroke(236,224,207); p.strokeWeight(1);
+        for (let x=0; x<p.width; x+=32) p.line(x,0,x,p.height);
+        for (let y=0; y<p.height; y+=32) p.line(0,y,p.width,y);
+        p.pop();
+      }
+
+      function drawPanelTitle() {
+        const titles = { file:["External File","Data can enter the sketch before drawing starts."], table:["Table Rows","A row is one record in the dataset."], column:["Columns","Columns name each kind of value."], map:["Map to Visuals","Numbers become heights, sizes, colors, and positions."], json:["JSON Shape","Objects and arrays can hold structured data."] };
+        const [title, subtitle] = titles[state.mode];
+        p.push(); p.noStroke(); p.fill("#222"); p.textStyle(p.BOLD); p.textSize(22); p.text(title,24,38); p.textStyle(p.NORMAL); p.textSize(14); p.fill("#6b6258"); p.text(subtitle,24,62); p.pop();
+      }
+
+      function getStage() { return { x:p.width*0.08, y:p.height*0.15, w:p.width*0.84, h:p.height*0.50 }; }
+      function drawStage() { const s=getStage(); p.push(); p.noStroke(); p.fill(255,255,255,235); p.rect(s.x,s.y,s.w,s.h,24); p.pop(); return s; }
+
+      function drawFileMode() {
+        const s = drawStage();
+        drawFileIcon(s.x + 60, s.y + 70, data().name);
+        drawArrow(s.x + 230, s.y + s.h*0.48, s.x + s.w*0.54, s.y + s.h*0.48, "#16a34a");
+        drawSketchBox(s.x + s.w*0.58, s.y + 58, s.w*0.32, s.h - 116);
+        if (state.showLabels) {
+          drawLabel("preload() loads before setup()", s.x + 48, s.y + s.h - 34, "#7c3aed", 14);
+          drawLabel("draw() can now use the data", s.x + s.w*0.58, s.y + s.h - 34, "#16a34a", 14);
+        }
+      }
+
+      function drawTableMode() {
+        const s = drawStage();
+        drawTable(s.x + 28, s.y + 36, s.w - 56, s.h - 72, true, false);
+      }
+
+      function drawColumnMode() {
+        const s = drawStage();
+        drawTable(s.x + 28, s.y + 36, s.w*0.56, s.h - 72, false, true);
+        drawColumnCards(s.x + s.w*0.66, s.y + 50, s.w*0.26, s.h - 100);
+      }
+
+      function drawMapMode() {
+        const s = drawStage();
+        drawBarChart(s.x + 40, s.y + 52, s.w - 80, s.h - 104);
+      }
+
+      function drawJsonMode() {
+        const s = drawStage();
+        drawJsonTree(s.x + 42, s.y + 44, s.w*0.44, s.h - 88);
+        drawJsonVisual(s.x + s.w*0.55, s.y + 44, s.w*0.38, s.h - 88);
+      }
+
+      function drawFileIcon(x, y, name) {
+        p.push(); p.noStroke(); p.fill("#f5f3ff"); p.rect(x,y,138,168,18); p.fill("#7c3aed"); p.triangle(x+98,y,x+138,y+40,x+98,y+40); p.stroke("#7c3aed"); p.strokeWeight(3); p.noFill(); p.rect(x,y,138,168,18); p.noStroke(); p.fill("#7c3aed"); p.textStyle(p.BOLD); p.textSize(15); p.text(name,x+16,y+84); p.fill("#6b6258"); p.textSize(12); p.text("external data",x+16,y+112); p.pop();
+      }
+
+      function drawSketchBox(x, y, w, h) {
+        p.push(); p.noStroke(); p.fill("#f0fdf4"); p.rect(x,y,w,h,20); p.stroke("#16a34a"); p.strokeWeight(3); p.noFill(); p.rect(x,y,w,h,20); p.noStroke(); p.fill("#16a34a"); p.textStyle(p.BOLD); p.textSize(18); p.text("p5.js sketch",x+20,y+34); p.fill("#334155"); p.textStyle(p.NORMAL); p.textSize(13); p.text("setup()",x+28,y+76); p.text("draw()",x+28,y+106); p.text("map data to shapes",x+28,y+136); p.pop();
+      }
+
+      function drawTable(x, y, w, h, highlightRow, highlightCols) {
+        const d=data(); const r=rows(); const cols=d.columns; const rowH=Math.min(38,(h-36)/(r.length+1)); const colW=w/cols.length;
+        p.push(); p.noStroke(); p.fill(255,250,242,245); p.rect(x,y,w,h,18);
+        for (let c=0;c<cols.length;c++) { p.fill(highlightCols ? "#ffe4e6" : "#f8fafc"); p.rect(x+c*colW,y,colW,rowH,8); p.fill("#e11d48"); p.textStyle(p.BOLD); p.textSize(12); p.text(cols[c],x+c*colW+10,y+24); }
+        for (let i=0;i<r.length;i++) {
+          const yy=y+(i+1)*rowH; const active=i===state.selectedRow;
+          p.fill(active&&highlightRow ? "#e0f2fe" : "#ffffff"); p.rect(x,yy,w,rowH,8);
+          p.stroke("#e6dac8"); p.strokeWeight(1); p.line(x,yy,x+w,yy); p.noStroke();
+          for (let c=0;c<cols.length;c++) { p.fill(active&&highlightRow ? "#0891b2" : "#334155"); p.textStyle(active&&highlightRow? p.BOLD : p.NORMAL); p.textSize(12); p.text(String(r[i][cols[c]]),x+c*colW+10,yy+24); }
+        }
+        if (state.showLabels && highlightRow) drawLabel(`selected row ${state.selectedRow}`,x+12,y+h-10,"#0891b2",13);
+        p.pop();
+      }
+
+      function drawColumnCards(x, y, w, h) {
+        const cols=data().columns; p.push(); p.noStroke(); p.fill(255,250,242,245); p.rect(x,y,w,h,18); p.fill("#e11d48"); p.textStyle(p.BOLD); p.textSize(15); p.text("columns",x+16,y+28);
+        for (let i=0;i<cols.length;i++) { const yy=y+62+i*42; p.fill("#ffe4e6"); p.rect(x+16,yy-22,w-32,30,10); p.fill("#334155"); p.textSize(13); p.text(cols[i],x+28,yy-2); }
+        p.pop();
+      }
+
+      function drawBarChart(x, y, w, h) {
+        const r=rows(); const num=firstNumericColumn(); const label=labelColumn(); const values=r.map(row=>row[num]); const min=Math.min(...values); const max=Math.max(...values); const baseline=y+h-36; const barW=(w-30)/r.length;
+        p.push(); p.noStroke(); p.fill(255,250,242,245); p.rect(x-18,y-30,w+36,h+48,20); p.stroke("#d8cbbb"); p.strokeWeight(2); p.line(x,baseline,x+w,baseline); p.noStroke();
+        for (let i=0;i<r.length;i++) { const row=r[i]; const val=row[num]; const bh=p.map(val,min,max,30,h-82)*state.visualScale; const bx=x+i*barW+8; const active=i===state.selectedRow; p.fill(active ? "#16a34a" : "#7c3aed"); p.rect(bx,baseline-bh,barW-16,bh,10,10,0,0); p.fill("#334155"); p.textSize(11); p.textAlign(p.CENTER,p.BASELINE); p.text(String(row[label]),bx+(barW-16)/2,baseline+18); if(active&&state.showLabels) drawLabel(`${num}: ${val}`,bx-8,baseline-bh-16,"#16a34a",13); }
+        p.textAlign(p.LEFT,p.BASELINE); if(state.showLabels) drawLabel(`${num} → bar height`,x+12,y+4,"#16a34a",14); p.pop();
+      }
+
+      function drawJsonTree(x, y, w, h) {
+        const r=data().rows; p.push(); p.noStroke(); p.fill("#f5f3ff"); p.rect(x,y,w,h,20); p.stroke("#7c3aed"); p.strokeWeight(3); p.noFill(); p.rect(x,y,w,h,20); p.noStroke(); p.fill("#7c3aed"); p.textStyle(p.BOLD); p.textSize(16); p.text("projects.json",x+18,y+30); p.fill("#334155"); p.textStyle(p.NORMAL); p.textSize(13); p.text("{",x+24,y+62); p.text("projects: [",x+40,y+88); for(let i=0;i<Math.min(4,r.length);i++){ const yy=y+118+i*36; p.fill(i===state.selectedRow?"#16a34a":"#334155"); p.text(`{ title: "${r[i].title}", ... }`,x+58,yy); } p.fill("#334155"); p.text("]",x+40,y+h-42); p.text("}",x+24,y+h-20); p.pop();
+      }
+
+      function drawJsonVisual(x, y, w, h) {
+        const r=rows(); p.push(); p.noStroke(); p.fill(255,250,242,245); p.rect(x,y,w,h,20); for(let i=0;i<r.length;i++){ const row=r[i]; const cx=x+40+(i%3)*(w-80)/2; const cy=y+58+Math.floor(i/3)*92; const size=row.complexity*7*state.visualScale; p.fill(i===state.selectedRow?"#16a34a":"#f59e0b"); p.circle(cx,cy,size); p.fill("#334155"); p.textSize(12); p.textAlign(p.CENTER,p.BASELINE); p.text(row.title,cx,cy+size/2+18); } p.textAlign(p.LEFT,p.BASELINE); if(state.showLabels) drawLabel("project.complexity → circle size",x+14,y+h-20,"#f59e0b",13); p.pop();
+      }
+
+      function drawArrow(x1,y1,x2,y2,color){ p.push(); p.stroke(color); p.strokeWeight(3); p.line(x1,y1,x2,y2); const angle=Math.atan2(y2-y1,x2-x1); p.noStroke(); p.fill(color); p.push(); p.translate(x2,y2); p.rotate(angle); p.triangle(0,0,-10,-6,-10,6); p.pop(); p.pop(); }
+
+      function drawReadoutCards(){ const row=selected(); const num=firstNumericColumn(); const label=labelColumn(); const cards=[{label:"file",value:data().name,color:"#7c3aed"},{label:"row",value:state.selectedRow,color:"#0891b2"},{label:num||"value",value:row[num]??row[label],color:"#f59e0b"}]; const cardW=Math.min(176,(p.width-70)/cards.length); const y=p.height-168; const x=28; p.push(); for(let i=0;i<cards.length;i++){ const cx=x+i*(cardW+10); p.noStroke(); p.fill(255,255,255,235); p.rect(cx,y,cardW,62,14); p.fill(cards[i].color); p.textStyle(p.BOLD); p.textSize(13); p.text(cards[i].label,cx+12,y+22); p.fill("#222"); p.textSize(16); p.text(String(cards[i].value),cx+12,y+48); } p.pop(); }
+
+      function drawLabel(text,x,y,color,size=13){ p.push(); p.textSize(size); p.textStyle(p.BOLD); const padX=7,padY=4,tw=p.textWidth(text); p.noStroke(); p.fill(255,250,242,238); p.rect(x-padX,y-size-padY+3,tw+padX*2,size+padY*2,9); p.fill(color); p.textAlign(p.LEFT,p.BASELINE); p.text(text,x,y); p.pop(); }
+    };
+
+    new p5(sketch);
+  </script>
+</body>
+</html>

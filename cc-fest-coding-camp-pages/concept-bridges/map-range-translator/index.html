@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>map() Range Translator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffaf2;
+      --ink: #222222;
+      --muted: #6b6258;
+      --line: #ded2c1;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --input: #7c3aed;
+      --output: #e11d48;
+      --machine: #0891b2;
+      --green: #16a34a;
+      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
+        var(--bg);
+    }
+
+    header {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 20px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 880px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 12px 20px 36px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .controls,
+    .workspace,
+    .side-panel {
+      background: rgba(255, 250, 242, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    .toggle-label,
+    .pill {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+      user-select: none;
+    }
+
+    button:hover,
+    .toggle-label:hover {
+      transform: translateY(-1px);
+      background: #fff7ed;
+    }
+
+    button.active {
+      color: white;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .toggle-label input {
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    .pill {
+      cursor: default;
+      background: #f8fafc;
+      color: var(--muted);
+      border-color: #e2e8f0;
+    }
+
+    .slider-wrap {
+      display: grid;
+      grid-template-columns: 120px minmax(160px, 1fr) 80px;
+      gap: 9px;
+      align-items: center;
+      min-width: min(490px, 100%);
+    }
+
+    .small-slider-wrap {
+      display: grid;
+      grid-template-columns: 88px minmax(120px, 1fr) 62px;
+      gap: 8px;
+      align-items: center;
+      min-width: 240px;
+    }
+
+    label,
+    .value-label,
+    .preset-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .workspace {
+      position: relative;
+      height: 660px;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    #sketch-holder {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #sketch-holder canvas { display: block; }
+
+    .canvas-caption {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      right: 22px;
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      backdrop-filter: blur(8px);
+    }
+
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .card h2 { font-size: 1.15rem; }
+    .card h3 { font-size: 1rem; }
+
+    .card p,
+    .card li {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .card p { margin: 0 0 8px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .formula {
+      display: block;
+      margin: 8px 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: grid;
+      grid-template-columns: 16px 1fr;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .swatch.input { background: var(--input); }
+    .swatch.output { background: var(--output); }
+    .swatch.machine { background: var(--machine); }
+    .swatch.green { background: var(--green); }
+
+    .code-card { display: none; }
+    .code-card.visible { display: block; }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      padding: 12px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .note {
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; }
+      .workspace { height: 590px; }
+    }
+
+    @media (max-width: 600px) {
+      header, main {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .slider-wrap,
+      .small-slider-wrap {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .workspace { height: 540px; }
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
+    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+  </div>
+  <header>
+    <h1>map() Range Translator</h1>
+    <p class="subtitle">
+      A beginner-friendly explanation of p5.js <strong>map()</strong>: a number from one range becomes a number in another range.
+      Use it to turn mouse position into size, color, height, transparency, speed, and more.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Explorer controls">
+      <div class="row">
+        <button id="mode-size" class="active">Size</button>
+        <button id="mode-color">Color</button>
+        <button id="mode-bar">Bar Height</button>
+        <button id="mode-opacity">Opacity</button>
+        <button id="mode-reverse">Reverse Range</button>
+        <span id="mode-pill" class="pill">Input world → output world</span>
+      </div>
+
+      <div class="row">
+        <div class="slider-wrap">
+          <label for="input-slider">Input value</label>
+          <input id="input-slider" type="range" min="0" max="100" value="35" step="1" />
+          <span id="input-value" class="value-label">35</span>
+        </div>
+
+        <label class="toggle-label"><input id="animate-input" type="checkbox" />Animate input</label>
+        <label class="toggle-label"><input id="show-formula" type="checkbox" checked />Show formula</label>
+        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+        <label class="toggle-label"><input id="clamp-output" type="checkbox" checked />Constrain output</label>
+      </div>
+
+      <div class="row">
+        <span class="preset-label">Input presets:</span>
+        <button class="preset-button" data-value="0">0</button>
+        <button class="preset-button" data-value="25">25</button>
+        <button class="preset-button" data-value="50">50</button>
+        <button class="preset-button" data-value="75">75</button>
+        <button class="preset-button" data-value="100">100</button>
+      </div>
+
+      <div class="row">
+        <div class="small-slider-wrap">
+          <label for="out-min-slider">Output min</label>
+          <input id="out-min-slider" type="range" min="0" max="200" value="20" step="1" />
+          <span id="out-min-value" class="value-label">20</span>
+        </div>
+        <div class="small-slider-wrap">
+          <label for="out-max-slider">Output max</label>
+          <input id="out-max-slider" type="range" min="0" max="240" value="140" step="1" />
+          <span id="out-max-value" class="value-label">140</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div id="sketch-holder"></div>
+      <div id="canvas-caption" class="canvas-caption">
+        map() translates a number from one range into a matching position in another range.
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <section class="card">
+        <h2 id="lesson-title">The big idea</h2>
+        <p id="lesson-text">
+          map() is a translator. It takes a number from an input world, figures out how far through that world it is, and places it in the same relative spot in an output world.
+        </p>
+        <span id="formula-box" class="formula">map(value, 0, 100, 20, 140)</span>
+      </section>
+
+      <section class="card">
+        <h3>Three-step mental model</h3>
+        <p><strong>1.</strong> Where is the input value between its minimum and maximum?</p>
+        <p><strong>2.</strong> Turn that into a percent of the way through.</p>
+        <p><strong>3.</strong> Put the output value the same percent through the output range.</p>
+      </section>
+
+      <section class="card">
+        <h3>Legend</h3>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch input"></span><span>input value</span></div>
+          <div class="legend-item"><span class="swatch output"></span><span>output value</span></div>
+          <div class="legend-item"><span class="swatch machine"></span><span>map() translator</span></div>
+          <div class="legend-item"><span class="swatch green"></span><span>same percent through the range</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Try this</h3>
+        <p id="question-text">Move the input to 50. Why does the output land halfway between the output minimum and maximum?</p>
+      </section>
+
+      <section id="code-card" class="card code-card">
+        <h3>p5.js connection</h3>
+        <pre><code id="code-box">let size = map(mouseX, 0, width, 20, 140);
+circle(width / 2, height / 2, size);</code></pre>
+        <p class="note">
+          p5.js map() does not automatically clamp values. This tool’s “Constrain output” checkbox shows the common pattern of using constrain() after map().
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const state = {
+      mode: "size",
+      input: 35,
+      inMin: 0,
+      inMax: 100,
+      outMin: 20,
+      outMax: 140,
+      animate: false,
+      animationDirection: 1,
+      showFormula: true,
+      showCode: false,
+      clamp: true
+    };
+
+    const els = {};
+
+    function setupUI() {
+      els.modeSize = document.querySelector("#mode-size");
+      els.modeColor = document.querySelector("#mode-color");
+      els.modeBar = document.querySelector("#mode-bar");
+      els.modeOpacity = document.querySelector("#mode-opacity");
+      els.modeReverse = document.querySelector("#mode-reverse");
+      els.modePill = document.querySelector("#mode-pill");
+      els.inputSlider = document.querySelector("#input-slider");
+      els.inputValue = document.querySelector("#input-value");
+      els.outMinSlider = document.querySelector("#out-min-slider");
+      els.outMinValue = document.querySelector("#out-min-value");
+      els.outMaxSlider = document.querySelector("#out-max-slider");
+      els.outMaxValue = document.querySelector("#out-max-value");
+      els.animateInput = document.querySelector("#animate-input");
+      els.showFormula = document.querySelector("#show-formula");
+      els.showCode = document.querySelector("#show-code");
+      els.clampOutput = document.querySelector("#clamp-output");
+      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
+      els.lessonTitle = document.querySelector("#lesson-title");
+      els.lessonText = document.querySelector("#lesson-text");
+      els.formulaBox = document.querySelector("#formula-box");
+      els.questionText = document.querySelector("#question-text");
+      els.codeCard = document.querySelector("#code-card");
+      els.codeBox = document.querySelector("#code-box");
+      els.caption = document.querySelector("#canvas-caption");
+
+      els.modeSize.addEventListener("click", () => setMode("size"));
+      els.modeColor.addEventListener("click", () => setMode("color"));
+      els.modeBar.addEventListener("click", () => setMode("bar"));
+      els.modeOpacity.addEventListener("click", () => setMode("opacity"));
+      els.modeReverse.addEventListener("click", () => setMode("reverse"));
+
+      els.inputSlider.addEventListener("input", () => {
+        state.input = Number(els.inputSlider.value);
+        state.animate = false;
+        els.animateInput.checked = false;
+        updateUI();
+      });
+
+      els.outMinSlider.addEventListener("input", () => {
+        state.outMin = Number(els.outMinSlider.value);
+        updateUI();
+      });
+
+      els.outMaxSlider.addEventListener("input", () => {
+        state.outMax = Number(els.outMaxSlider.value);
+        updateUI();
+      });
+
+      els.animateInput.addEventListener("change", () => {
+        state.animate = els.animateInput.checked;
+      });
+
+      els.showFormula.addEventListener("change", () => {
+        state.showFormula = els.showFormula.checked;
+        updateUI();
+      });
+
+      els.showCode.addEventListener("change", () => {
+        state.showCode = els.showCode.checked;
+        updateUI();
+      });
+
+      els.clampOutput.addEventListener("change", () => {
+        state.clamp = els.clampOutput.checked;
+        updateUI();
+      });
+
+      els.presetButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          state.input = Number(button.dataset.value);
+          state.animate = false;
+          els.animateInput.checked = false;
+          updateUI();
+        });
+      });
+
+      updateUI();
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+
+      if (mode === "size") {
+        state.outMin = 20;
+        state.outMax = 140;
+      } else if (mode === "color") {
+        state.outMin = 0;
+        state.outMax = 255;
+      } else if (mode === "bar") {
+        state.outMin = 30;
+        state.outMax = 260;
+      } else if (mode === "opacity") {
+        state.outMin = 20;
+        state.outMax = 255;
+      } else if (mode === "reverse") {
+        state.outMin = 200;
+        state.outMax = 20;
+      }
+
+      updateUI();
+    }
+
+    function getMappedValue() {
+      const t = (state.input - state.inMin) / (state.inMax - state.inMin);
+      let output = state.outMin + t * (state.outMax - state.outMin);
+      if (state.clamp) {
+        const low = Math.min(state.outMin, state.outMax);
+        const high = Math.max(state.outMin, state.outMax);
+        output = Math.min(high, Math.max(low, output));
+      }
+      return output;
+    }
+
+    function getPercent() {
+      return (state.input - state.inMin) / (state.inMax - state.inMin);
+    }
+
+    function updateUI() {
+      const modeButtons = [
+        [els.modeSize, "size"],
+        [els.modeColor, "color"],
+        [els.modeBar, "bar"],
+        [els.modeOpacity, "opacity"],
+        [els.modeReverse, "reverse"]
+      ];
+
+      for (const [button, mode] of modeButtons) {
+        button.classList.toggle("active", state.mode === mode);
+      }
+
+      els.inputSlider.value = state.input;
+      els.inputValue.textContent = String(Math.round(state.input));
+      els.outMinSlider.value = state.outMin;
+      els.outMinValue.textContent = String(Math.round(state.outMin));
+      els.outMaxSlider.value = state.outMax;
+      els.outMaxValue.textContent = String(Math.round(state.outMax));
+      els.formulaBox.style.display = state.showFormula ? "block" : "none";
+      els.codeCard.classList.toggle("visible", state.showCode);
+
+      const output = getMappedValue();
+      const percent = getPercent();
+      const percentText = `${Math.round(percent * 100)}%`;
+
+      const lessons = {
+        size: {
+          pill: "Input position → circle size",
+          title: "Input becomes size",
+          text: "map() can turn one kind of number into another. Here an input from 0 to 100 becomes a circle size.",
+          question: "What output size do you expect when the input is halfway through its range?",
+          code: `let size = map(mouseX, 0, width, ${state.outMin}, ${state.outMax});\ncircle(width / 2, height / 2, size);`,
+          caption: `The input is ${percentText} through its range, so the output is ${percentText} through the size range.`
+        },
+        color: {
+          pill: "Input position → color brightness",
+          title: "Input becomes color",
+          text: "Color channels are numbers too. Here the input becomes a brightness value from 0 to 255.",
+          question: "Why does the color get brighter as the input moves to the right?",
+          code: `let brightness = map(mouseX, 0, width, ${state.outMin}, ${state.outMax});\nfill(brightness);\ncircle(x, y, 100);`,
+          caption: `The output value is ${output.toFixed(1)}, which can be used as a color or brightness number.`
+        },
+        bar: {
+          pill: "Input position → bar height",
+          title: "Input becomes bar height",
+          text: "This is the core move in data visualization: a data value gets translated into a visual height.",
+          question: "How is this similar to making a chart from data?",
+          code: `let h = map(dataValue, 0, 100, ${state.outMin}, ${state.outMax});\nrect(x, baseline - h, barWidth, h);`,
+          caption: `A data-like input becomes a bar height. This is how numbers become graphics.`
+        },
+        opacity: {
+          pill: "Input position → transparency",
+          title: "Input becomes opacity",
+          text: "Alpha transparency is also just a number. map() can turn distance, sound, or mouse position into visibility.",
+          question: "What happens if the output range starts near 0 and ends near 255?",
+          code: `let alpha = map(mouseX, 0, width, ${state.outMin}, ${state.outMax});\nfill(225, 29, 72, alpha);\ncircle(x, y, 120);`,
+          caption: `The output controls transparency. Low values are faint; high values are more visible.`
+        },
+        reverse: {
+          pill: "Input position → reversed output",
+          title: "Reversing a relationship",
+          text: "The output range can go backward. As the input increases, the output can decrease.",
+          question: "Where is the output largest: when the input is small or when the input is large?",
+          code: `let size = map(mouseX, 0, width, ${state.outMin}, ${state.outMax});\ncircle(width / 2, height / 2, size);`,
+          caption: `The input moves forward, but the output range goes backward. This creates an inverse relationship.`
+        }
+      };
+
+      const lesson = lessons[state.mode];
+      els.modePill.textContent = lesson.pill;
+      els.lessonTitle.textContent = lesson.title;
+      els.lessonText.textContent = lesson.text;
+      els.questionText.textContent = lesson.question;
+      els.codeBox.textContent = lesson.code;
+      els.caption.textContent = lesson.caption;
+      els.formulaBox.innerHTML = `map(${Math.round(state.input)}, ${state.inMin}, ${state.inMax}, ${Math.round(state.outMin)}, ${Math.round(state.outMax)}) = ${output.toFixed(1)}<br>input is ${percentText} through → output is ${percentText} through`;
+    }
+
+    setupUI();
+
+    const sketch = (p) => {
+      let canvas;
+      let holder;
+      let previousWidth = 0;
+      let previousHeight = 0;
+
+      p.setup = () => {
+        holder = document.querySelector("#sketch-holder");
+        const rect = holder.getBoundingClientRect();
+        canvas = p.createCanvas(rect.width, rect.height);
+        canvas.parent("sketch-holder");
+        canvas.elt.setAttribute("role", "img");
+        canvas.elt.setAttribute("aria-label", "Interactive visualization of p5.js map function translating input ranges into output ranges.");
+        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+        p.textFont("Inter, system-ui, sans-serif");
+      };
+
+      p.windowResized = () => resizeToHolder();
+
+      p.draw = () => {
+        resizeToHolder();
+        advanceAnimation();
+
+        p.background(255, 250, 242);
+        drawSubtleGrid();
+        drawTitle();
+        drawRangeTranslator();
+        drawOutputDemo();
+      };
+
+      function resizeToHolder() {
+        const rect = holder.getBoundingClientRect();
+        const w = Math.max(320, Math.floor(rect.width));
+        const h = Math.max(320, Math.floor(rect.height));
+        if (w !== previousWidth || h !== previousHeight) {
+          p.resizeCanvas(w, h);
+          previousWidth = w;
+          previousHeight = h;
+        }
+      }
+
+      function advanceAnimation() {
+        if (!state.animate) return;
+        state.input += state.animationDirection * 0.65;
+        if (state.input >= state.inMax) {
+          state.input = state.inMax;
+          state.animationDirection = -1;
+        }
+        if (state.input <= state.inMin) {
+          state.input = state.inMin;
+          state.animationDirection = 1;
+        }
+        els.inputSlider.value = state.input;
+        updateUI();
+      }
+
+      function drawSubtleGrid() {
+        p.push();
+        p.stroke(236, 224, 207);
+        p.strokeWeight(1);
+        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
+        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
+        p.pop();
+      }
+
+      function drawTitle() {
+        p.push();
+        p.noStroke();
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(22);
+        p.text("Range Translator", 24, 38);
+        p.textStyle(p.NORMAL);
+        p.textSize(14);
+        p.fill("#6b6258");
+        p.text("A value keeps the same relative position as it moves from one range to another.", 24, 62);
+        p.pop();
+      }
+
+      function drawRangeTranslator() {
+        const margin = Math.max(38, p.width * 0.055);
+        const top = p.height * 0.18;
+        const rangeWidth = Math.min(330, p.width * 0.32);
+        const machineWidth = Math.min(190, p.width * 0.20);
+        const inputX = margin;
+        const machineX = inputX + rangeWidth + Math.max(24, p.width * 0.035);
+        const outputX = machineX + machineWidth + Math.max(24, p.width * 0.035);
+        const lineY = top + 86;
+        const output = getMappedValue();
+        const t = getPercent();
+
+        drawNumberLine({
+          x: inputX,
+          y: lineY,
+          w: rangeWidth,
+          min: state.inMin,
+          max: state.inMax,
+          value: state.input,
+          label: "Input range",
+          valueLabel: `input = ${Math.round(state.input)}`,
+          color: "#7c3aed",
+          t
+        });
+
+        drawMachine(machineX, top + 24, machineWidth, 124, t, output);
+
+        drawNumberLine({
+          x: outputX,
+          y: lineY,
+          w: rangeWidth,
+          min: state.outMin,
+          max: state.outMax,
+          value: output,
+          label: "Output range",
+          valueLabel: `output = ${output.toFixed(1)}`,
+          color: "#e11d48",
+          t
+        });
+
+        drawArrow(inputX + rangeWidth + 8, lineY, machineX - 10, lineY, "#8b7d6c");
+        drawArrow(machineX + machineWidth + 8, lineY, outputX - 10, lineY, "#8b7d6c");
+      }
+
+      function drawNumberLine({ x, y, w, min, max, value, label, valueLabel, color, t }) {
+        const markerX = x + t * w;
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 232);
+        p.rect(x - 18, y - 72, w + 36, 150, 18);
+
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(16);
+        p.text(label, x, y - 44);
+
+        p.stroke("#d8cbbb");
+        p.strokeWeight(8);
+        p.strokeCap(p.ROUND);
+        p.line(x, y, x + w, y);
+
+        p.stroke("#16a34a");
+        p.strokeWeight(8);
+        p.line(x, y, markerX, y);
+
+        p.stroke("#8b7d6c");
+        p.strokeWeight(2);
+        p.line(x, y - 10, x, y + 10);
+        p.line(x + w, y - 10, x + w, y + 10);
+
+        p.noStroke();
+        p.fill("#6b6258");
+        p.textSize(12);
+        p.textAlign(p.LEFT, p.TOP);
+        p.text(Math.round(min), x - 3, y + 18);
+        p.textAlign(p.RIGHT, p.TOP);
+        p.text(Math.round(max), x + w + 3, y + 18);
+
+        p.fill(color);
+        p.circle(markerX, y, 18);
+        drawLabel(valueLabel, markerX - 40, y - 26, color, 13);
+        p.pop();
+      }
+
+      function drawMachine(x, y, w, h, t, output) {
+        p.push();
+        p.noStroke();
+        p.fill(8, 145, 178, 38);
+        p.rect(x, y, w, h, 24);
+        p.stroke("#0891b2");
+        p.strokeWeight(2);
+        p.noFill();
+        p.rect(x, y, w, h, 24);
+
+        p.noStroke();
+        p.fill("#0891b2");
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textSize(22);
+        p.text("map()", x + w / 2, y + 34);
+
+        p.fill("#334155");
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.text("same percent", x + w / 2, y + 68);
+        p.text(`${Math.round(t * 100)}% through`, x + w / 2, y + 90);
+        p.text(`→ ${output.toFixed(1)}`, x + w / 2, y + 112);
+        p.pop();
+      }
+
+      function drawOutputDemo() {
+        const output = getMappedValue();
+        const panelX = p.width * 0.08;
+        const panelY = p.height * 0.48;
+        const panelW = p.width * 0.84;
+        const panelH = p.height * 0.34;
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 232);
+        p.rect(panelX, panelY, panelW, panelH, 22);
+
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(18);
+        p.text("What the output controls", panelX + 22, panelY + 34);
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.fill("#6b6258");
+        p.text("The mapped number can drive almost any visual property.", panelX + 22, panelY + 56);
+
+        if (state.mode === "size") drawSizeDemo(panelX, panelY, panelW, panelH, output);
+        if (state.mode === "color") drawColorDemo(panelX, panelY, panelW, panelH, output);
+        if (state.mode === "bar") drawBarDemo(panelX, panelY, panelW, panelH, output);
+        if (state.mode === "opacity") drawOpacityDemo(panelX, panelY, panelW, panelH, output);
+        if (state.mode === "reverse") drawReverseDemo(panelX, panelY, panelW, panelH, output);
+        p.pop();
+      }
+
+      function drawSizeDemo(x, y, w, h, output) {
+        const cx = x + w * 0.52;
+        const cy = y + h * 0.58;
+        p.push();
+        p.noStroke();
+        p.fill("#dbeafe");
+        p.circle(cx, cy, Math.max(160, output + 34));
+        p.fill("#2563eb");
+        p.circle(cx, cy, output);
+        drawLabel(`circle size = ${output.toFixed(1)}`, cx - 58, cy + output / 2 + 28, "#2563eb", 14);
+        p.pop();
+      }
+
+      function drawColorDemo(x, y, w, h, output) {
+        const cx = x + w * 0.52;
+        const cy = y + h * 0.58;
+        const brightness = Math.max(0, Math.min(255, output));
+        p.push();
+        p.noStroke();
+        p.fill(brightness);
+        p.circle(cx, cy, 150);
+        p.stroke("#222222");
+        p.strokeWeight(2);
+        p.noFill();
+        p.circle(cx, cy, 150);
+        drawLabel(`brightness = ${output.toFixed(1)}`, cx - 62, cy + 100, "#222222", 14);
+        p.pop();
+      }
+
+      function drawBarDemo(x, y, w, h, output) {
+        const baseline = y + h - 34;
+        const barX = x + w * 0.48;
+        const barW = 90;
+        const barH = Math.max(0, Math.min(h - 92, output));
+        p.push();
+        p.stroke("#d8cbbb");
+        p.strokeWeight(2);
+        p.line(x + 80, baseline, x + w - 80, baseline);
+        p.noStroke();
+        p.fill("#e11d48");
+        p.rect(barX, baseline - barH, barW, barH, 10, 10, 0, 0);
+        drawLabel(`bar height = ${output.toFixed(1)}`, barX - 26, baseline - barH - 18, "#e11d48", 14);
+        p.pop();
+      }
+
+      function drawOpacityDemo(x, y, w, h, output) {
+        const cx = x + w * 0.52;
+        const cy = y + h * 0.58;
+        const alpha = Math.max(0, Math.min(255, output));
+        p.push();
+        p.noStroke();
+        p.fill(225, 29, 72, alpha);
+        p.circle(cx, cy, 160);
+        p.noFill();
+        p.stroke("#e11d48");
+        p.strokeWeight(2);
+        p.circle(cx, cy, 160);
+        drawLabel(`alpha = ${output.toFixed(1)}`, cx - 42, cy + 105, "#e11d48", 14);
+        p.pop();
+      }
+
+      function drawReverseDemo(x, y, w, h, output) {
+        const cx = x + w * 0.52;
+        const cy = y + h * 0.58;
+        p.push();
+        p.noStroke();
+        p.fill("#cffafe");
+        p.circle(cx, cy, 220);
+        p.fill("#0891b2");
+        p.circle(cx, cy, Math.max(12, output));
+        drawLabel(`reversed size = ${output.toFixed(1)}`, cx - 68, cy + 130, "#0891b2", 14);
+        p.pop();
+      }
+
+      function drawArrow(x1, y1, x2, y2, color) {
+        p.push();
+        p.stroke(color);
+        p.strokeWeight(2);
+        p.line(x1, y1, x2, y2);
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        p.noStroke();
+        p.fill(color);
+        p.push();
+        p.translate(x2, y2);
+        p.rotate(angle);
+        p.triangle(0, 0, -9, -5, -9, 5);
+        p.pop();
+        p.pop();
+      }
+
+      function drawLabel(text, x, y, color, size = 13) {
+        p.push();
+        p.textSize(size);
+        p.textStyle(p.BOLD);
+        const padX = 7;
+        const padY = 4;
+        const tw = p.textWidth(text);
+        p.noStroke();
+        p.fill(255, 250, 242, 238);
+        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
+        p.fill(color);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.text(text, x, y);
+        p.pop();
+      }
+    };
+
+    new p5(sketch);
+  </script>
+</body>
+</html>

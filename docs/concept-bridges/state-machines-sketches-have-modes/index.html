@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>State Machines: Sketches Have Modes</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffaf2;
+      --ink: #222222;
+      --muted: #6b6258;
+      --line: #ded2c1;
+      --accent: #2563eb;
+      --start: #7c3aed;
+      --play: #0891b2;
+      --win: #16a34a;
+      --lose: #e11d48;
+      --transition: #f59e0b;
+      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
+        var(--bg);
+    }
+
+    header {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 20px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 960px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 12px 20px 36px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .controls,
+    .workspace,
+    .side-panel {
+      background: rgba(255, 250, 242, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    .toggle-label,
+    .pill {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+      user-select: none;
+    }
+
+    button:hover,
+    .toggle-label:hover {
+      transform: translateY(-1px);
+      background: #fff7ed;
+    }
+
+    button.active {
+      color: white;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .toggle-label input {
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    .pill {
+      cursor: default;
+      background: #f8fafc;
+      color: var(--muted);
+      border-color: #e2e8f0;
+    }
+
+    .slider-wrap {
+      display: grid;
+      grid-template-columns: 112px minmax(150px, 1fr) 76px;
+      gap: 9px;
+      align-items: center;
+      min-width: min(390px, 100%);
+    }
+
+    label,
+    .value-label,
+    .preset-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .workspace {
+      position: relative;
+      height: 660px;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    #sketch-holder {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #sketch-holder canvas { display: block; }
+
+    .canvas-caption {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      right: 22px;
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      backdrop-filter: blur(8px);
+    }
+
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .card h2 { font-size: 1.15rem; }
+    .card h3 { font-size: 1rem; }
+
+    .card p,
+    .card li {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .card p { margin: 0 0 8px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .formula {
+      display: block;
+      margin: 8px 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .legend { display: grid; gap: 8px; }
+    .legend-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: center; font-size: 0.9rem; color: var(--muted); }
+    .swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); }
+    .swatch.start { background: var(--start); }
+    .swatch.play { background: var(--play); }
+    .swatch.win { background: var(--win); }
+    .swatch.lose { background: var(--lose); }
+    .swatch.transition { background: var(--transition); }
+
+    .code-card { display: none; }
+    .code-card.visible { display: block; }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      padding: 12px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .note { font-size: 0.86rem; color: var(--muted); }
+
+    @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
+    @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
+  </style>
+</head>
+<body>
+  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
+    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+  </div>
+  <header>
+    <h1>State Machines: Sketches Have Modes</h1>
+    <p class="subtitle">
+      A concept bridge for <strong>state variables</strong>, start/play/win/lose screens, and complete mini-games.
+      A state machine helps a sketch know what mode it is in and what should happen next.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Explorer controls">
+      <div class="row">
+        <button id="mode-idea" class="active">State Idea</button>
+        <button id="mode-screens">Screens</button>
+        <button id="mode-transitions">Transitions</button>
+        <button id="mode-game">Mini Game</button>
+        <button id="mode-code">Code Structure</button>
+        <button id="start-button">Start</button>
+        <button id="win-button">Force Win</button>
+        <button id="lose-button">Force Lose</button>
+        <button id="reset-button">Reset</button>
+        <span id="mode-pill" class="pill">one state variable controls the sketch</span>
+      </div>
+
+      <div class="row">
+        <div class="slider-wrap">
+          <label for="score-slider">Score</label>
+          <input id="score-slider" type="range" min="0" max="10" value="0" step="1" />
+          <span id="score-value" class="value-label">0</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="time-slider">Time left</label>
+          <input id="time-slider" type="range" min="0" max="30" value="20" step="1" />
+          <span id="time-value" class="value-label">20</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="goal-slider">Goal</label>
+          <input id="goal-slider" type="range" min="1" max="10" value="5" step="1" />
+          <span id="goal-value" class="value-label">5</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="preset-label">Current state:</span>
+        <button class="state-button" data-state="start">start</button>
+        <button class="state-button" data-state="play">play</button>
+        <button class="state-button" data-state="win">win</button>
+        <button class="state-button" data-state="lose">lose</button>
+        <label class="toggle-label"><input id="auto-toggle" type="checkbox" checked />Auto transitions</label>
+        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
+        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div id="sketch-holder"></div>
+      <div id="canvas-caption" class="canvas-caption">
+        A state variable stores the current mode. The sketch draws and behaves differently depending on that state.
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <section class="card">
+        <h2 id="lesson-title">One variable controls the mode</h2>
+        <p id="lesson-text">
+          A state variable stores what mode the sketch is currently in. Common game states are start, play, win, and lose.
+        </p>
+        <span id="formula-box" class="formula">let gameState = "start";</span>
+      </section>
+
+      <section class="card">
+        <h3>Big idea</h3>
+        <p><strong>State:</strong> the current mode of the sketch.</p>
+        <p><strong>Screen:</strong> what gets drawn for a state.</p>
+        <p><strong>Transition:</strong> a rule that changes one state into another.</p>
+        <p><strong>State machine:</strong> the map of possible states and transitions.</p>
+      </section>
+
+      <section class="card">
+        <h3>Legend</h3>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch start"></span><span>start state</span></div>
+          <div class="legend-item"><span class="swatch play"></span><span>play state</span></div>
+          <div class="legend-item"><span class="swatch win"></span><span>win state</span></div>
+          <div class="legend-item"><span class="swatch lose"></span><span>lose state</span></div>
+          <div class="legend-item"><span class="swatch transition"></span><span>transition rule</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Try this</h3>
+        <p id="question-text">Press Start, then raise the score. What condition changes the game to the win state?</p>
+      </section>
+
+      <section id="code-card" class="card code-card">
+        <h3>p5.js connection</h3>
+        <pre><code id="code-box">let gameState = "start";</code></pre>
+        <p class="note">
+          State machines are useful for games, menus, slideshows, quizzes, simulations, and any sketch with more than one mode.
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const state = {
+      mode: "idea",
+      gameState: "start",
+      score: 0,
+      timeLeft: 20,
+      goal: 5,
+      auto: true,
+      showLabels: true,
+      showCode: false,
+      playerX: 300,
+      targetX: 520,
+      targetY: 250,
+      lastTick: 0
+    };
+
+    const els = {};
+
+    function setupUI() {
+      els.modeIdea = document.querySelector("#mode-idea");
+      els.modeScreens = document.querySelector("#mode-screens");
+      els.modeTransitions = document.querySelector("#mode-transitions");
+      els.modeGame = document.querySelector("#mode-game");
+      els.modeCode = document.querySelector("#mode-code");
+      els.startButton = document.querySelector("#start-button");
+      els.winButton = document.querySelector("#win-button");
+      els.loseButton = document.querySelector("#lose-button");
+      els.resetButton = document.querySelector("#reset-button");
+      els.modePill = document.querySelector("#mode-pill");
+      els.scoreSlider = document.querySelector("#score-slider");
+      els.timeSlider = document.querySelector("#time-slider");
+      els.goalSlider = document.querySelector("#goal-slider");
+      els.scoreValue = document.querySelector("#score-value");
+      els.timeValue = document.querySelector("#time-value");
+      els.goalValue = document.querySelector("#goal-value");
+      els.stateButtons = Array.from(document.querySelectorAll(".state-button"));
+      els.autoToggle = document.querySelector("#auto-toggle");
+      els.showLabels = document.querySelector("#show-labels");
+      els.showCode = document.querySelector("#show-code");
+      els.lessonTitle = document.querySelector("#lesson-title");
+      els.lessonText = document.querySelector("#lesson-text");
+      els.formulaBox = document.querySelector("#formula-box");
+      els.questionText = document.querySelector("#question-text");
+      els.caption = document.querySelector("#canvas-caption");
+      els.codeCard = document.querySelector("#code-card");
+      els.codeBox = document.querySelector("#code-box");
+
+      els.modeIdea.addEventListener("click", () => setMode("idea"));
+      els.modeScreens.addEventListener("click", () => setMode("screens"));
+      els.modeTransitions.addEventListener("click", () => setMode("transitions"));
+      els.modeGame.addEventListener("click", () => setMode("game"));
+      els.modeCode.addEventListener("click", () => setMode("code"));
+
+      els.startButton.addEventListener("click", () => startGame());
+      els.winButton.addEventListener("click", () => { state.gameState = "win"; updateUI(); });
+      els.loseButton.addEventListener("click", () => { state.gameState = "lose"; updateUI(); });
+      els.resetButton.addEventListener("click", () => resetGame());
+
+      els.scoreSlider.addEventListener("input", () => { state.score = Number(els.scoreSlider.value); applyAutoTransitions(); updateUI(); });
+      els.timeSlider.addEventListener("input", () => { state.timeLeft = Number(els.timeSlider.value); applyAutoTransitions(); updateUI(); });
+      els.goalSlider.addEventListener("input", () => { state.goal = Number(els.goalSlider.value); applyAutoTransitions(); updateUI(); });
+
+      els.stateButtons.forEach(button => button.addEventListener("click", () => { state.gameState = button.dataset.state; updateUI(); }));
+      els.autoToggle.addEventListener("change", () => { state.auto = els.autoToggle.checked; applyAutoTransitions(); updateUI(); });
+      els.showLabels.addEventListener("change", () => { state.showLabels = els.showLabels.checked; });
+      els.showCode.addEventListener("change", () => { state.showCode = els.showCode.checked; updateUI(); });
+
+      updateUI();
+    }
+
+    function setMode(mode) { state.mode = mode; updateUI(); }
+
+    function resetGame() {
+      state.gameState = "start";
+      state.score = 0;
+      state.timeLeft = 20;
+      state.goal = 5;
+      state.playerX = 300;
+      randomizeTarget();
+      updateUI();
+    }
+
+    function startGame() {
+      state.gameState = "play";
+      state.score = 0;
+      state.timeLeft = 20;
+      randomizeTarget();
+      updateUI();
+    }
+
+    function randomizeTarget() {
+      state.targetX = 130 + Math.random() * 540;
+      state.targetY = 140 + Math.random() * 230;
+    }
+
+    function applyAutoTransitions() {
+      if (!state.auto || state.gameState !== "play") return;
+      if (state.score >= state.goal) state.gameState = "win";
+      else if (state.timeLeft <= 0) state.gameState = "lose";
+    }
+
+    function stateColor(name) {
+      return { start: "#7c3aed", play: "#0891b2", win: "#16a34a", lose: "#e11d48" }[name] || "#64748b";
+    }
+
+    function updateUI() {
+      const buttons = [[els.modeIdea,"idea"],[els.modeScreens,"screens"],[els.modeTransitions,"transitions"],[els.modeGame,"game"],[els.modeCode,"code"]];
+      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
+      els.stateButtons.forEach(button => button.classList.toggle("active", button.dataset.state === state.gameState));
+
+      els.scoreSlider.value = state.score;
+      els.timeSlider.value = state.timeLeft;
+      els.goalSlider.value = state.goal;
+      els.scoreValue.textContent = String(state.score);
+      els.timeValue.textContent = String(state.timeLeft);
+      els.goalValue.textContent = String(state.goal);
+      els.autoToggle.checked = state.auto;
+      els.showLabels.checked = state.showLabels;
+      els.showCode.checked = state.showCode;
+      els.codeCard.classList.toggle("visible", state.showCode);
+
+      const lessons = {
+        idea: {
+          pill: "one state variable controls the sketch",
+          title: "One variable controls the mode",
+          text: "A state variable stores what mode the sketch is currently in. Common game states are start, play, win, and lose.",
+          formula: `let gameState = "${state.gameState}";`,
+          question: "What should the sketch draw when gameState is start? What should it draw when gameState is play?",
+          caption: "A state variable stores the current mode. The sketch draws and behaves differently depending on that state.",
+          code: `let gameState = "start";\n\nfunction draw() {\n  if (gameState === "start") {\n    drawStartScreen();\n  }\n}`
+        },
+        screens: {
+          pill: "each state has its own screen",
+          title: "Each state can draw a different screen",
+          text: "Instead of one draw() doing everything at once, the sketch chooses the screen that matches the current state.",
+          formula: `if (gameState === "start") drawStart();\nelse if (gameState === "play") drawPlay();\nelse if (gameState === "win") drawWin();\nelse if (gameState === "lose") drawLose();`,
+          question: "Which screen should be visible right now?",
+          caption: `The current state is ${state.gameState}, so the sketch should draw the ${state.gameState} screen.`,
+          code: `function draw() {\n  if (gameState === "start") {\n    drawStartScreen();\n  } else if (gameState === "play") {\n    drawGame();\n  } else if (gameState === "win") {\n    drawWinScreen();\n  } else if (gameState === "lose") {\n    drawLoseScreen();\n  }\n}`
+        },
+        transitions: {
+          pill: "transitions are rules that change state",
+          title: "Transitions change one state into another",
+          text: "A transition is a rule. A button press, score goal, timer, collision, or key press can change the state variable.",
+          formula: `if (score >= goal) gameState = "win";\nif (timeLeft <= 0) gameState = "lose";`,
+          question: "Which transition rule is closest to becoming true?",
+          caption: "A state machine is not just screens. It also includes rules for moving between screens.",
+          code: `if (gameState === "play") {\n  if (score >= goal) {\n    gameState = "win";\n  } else if (timeLeft <= 0) {\n    gameState = "lose";\n  }\n}`
+        },
+        game: {
+          pill: "a mini-game needs state",
+          title: "State makes a game feel complete",
+          text: "A game usually needs a start screen, a play mode, and an ending. State keeps those parts organized.",
+          formula: `click target → score++\nscore >= ${state.goal} → win\ntime <= 0 → lose`,
+          question: "Why would this feel less complete if it only had play mode?",
+          caption: "Click the target in play mode. Reaching the goal creates a win transition.",
+          code: `function mousePressed() {\n  if (gameState === "start") {\n    gameState = "play";\n  } else if (gameState === "play") {\n    if (dist(mouseX, mouseY, targetX, targetY) < 30) {\n      score++;\n    }\n  } else {\n    resetGame();\n  }\n}`
+        },
+        code: {
+          pill: "state structure keeps code organized",
+          title: "A state machine organizes draw()",
+          text: "The sketch becomes easier to read when each state has its own function and transitions are handled clearly.",
+          formula: `drawStartScreen()\ndrawGame()\ndrawWinScreen()\ndrawLoseScreen()\ncheckTransitions()`,
+          question: "Which functions would you write for your own game states?",
+          caption: "Good state code separates screens, gameplay, and transition rules.",
+          code: `let gameState = "start";\n\nfunction draw() {\n  if (gameState === "start") drawStartScreen();\n  else if (gameState === "play") drawGame();\n  else if (gameState === "win") drawWinScreen();\n  else if (gameState === "lose") drawLoseScreen();\n\n  checkTransitions();\n}\n\nfunction checkTransitions() {\n  if (gameState === "play" && score >= goal) gameState = "win";\n  if (gameState === "play" && timeLeft <= 0) gameState = "lose";\n}`
+        }
+      };
+
+      const lesson = lessons[state.mode];
+      els.modePill.textContent = lesson.pill;
+      els.lessonTitle.textContent = lesson.title;
+      els.lessonText.textContent = lesson.text;
+      els.formulaBox.textContent = lesson.formula;
+      els.questionText.textContent = lesson.question;
+      els.caption.textContent = lesson.caption;
+      els.codeBox.textContent = lesson.code;
+    }
+
+    setupUI();
+
+    const sketch = (p) => {
+      let canvas, holder, previousWidth = 0, previousHeight = 0;
+
+      p.setup = () => {
+        holder = document.querySelector("#sketch-holder");
+        const rect = holder.getBoundingClientRect();
+        canvas = p.createCanvas(rect.width, rect.height);
+        canvas.parent("sketch-holder");
+        canvas.elt.setAttribute("role", "img");
+        canvas.elt.setAttribute("aria-label", "Interactive visualization of state machines and game states in p5.js.");
+        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+        p.textFont("Inter, system-ui, sans-serif");
+      };
+
+      p.windowResized = () => resizeToHolder();
+
+      p.mousePressed = () => {
+        if (state.mode !== "game") return;
+        if (state.gameState === "start") startGame();
+        else if (state.gameState === "play") {
+          const d = p.dist(p.mouseX, p.mouseY, state.targetX, state.targetY);
+          if (d < 34) {
+            state.score += 1;
+            randomizeTarget();
+            applyAutoTransitions();
+            updateUI();
+          }
+        } else resetGame();
+      };
+
+      p.keyPressed = () => {
+        if (p.key === " " && state.gameState === "start") startGame();
+        if (p.key === "r" || p.key === "R") resetGame();
+      };
+
+      p.draw = () => {
+        resizeToHolder();
+        tickTimer();
+        p.background(255, 250, 242);
+        drawSubtleGrid();
+        drawPanelTitle();
+        if (state.mode === "idea") drawIdeaMode();
+        if (state.mode === "screens") drawScreensMode();
+        if (state.mode === "transitions") drawTransitionsMode();
+        if (state.mode === "game") drawGameMode();
+        if (state.mode === "code") drawCodeMode();
+        drawReadoutCards();
+      };
+
+      function resizeToHolder() {
+        const rect = holder.getBoundingClientRect();
+        const w = Math.max(320, Math.floor(rect.width));
+        const h = Math.max(320, Math.floor(rect.height));
+        if (w !== previousWidth || h !== previousHeight) { p.resizeCanvas(w, h); previousWidth = w; previousHeight = h; }
+      }
+
+      function tickTimer() {
+        if (state.mode !== "game" || state.gameState !== "play" || !state.auto) return;
+        if (p.millis() - state.lastTick > 1000) {
+          state.timeLeft = Math.max(0, state.timeLeft - 1);
+          state.lastTick = p.millis();
+          applyAutoTransitions();
+          updateUI();
+        }
+      }
+
+      function drawSubtleGrid() {
+        p.push(); p.stroke(236,224,207); p.strokeWeight(1);
+        for (let x=0; x<p.width; x+=32) p.line(x,0,x,p.height);
+        for (let y=0; y<p.height; y+=32) p.line(0,y,p.width,y);
+        p.pop();
+      }
+
+      function drawPanelTitle() {
+        const titles = { idea:["State Idea","One variable stores the current mode."], screens:["Screens","Each state draws a different screen."], transitions:["Transitions","Rules move the sketch from one state to another."], game:["Mini Game","Click the target to score before time runs out."], code:["Code Structure","Separate state screens into functions."] };
+        const [title, subtitle] = titles[state.mode];
+        p.push(); p.noStroke(); p.fill("#222"); p.textStyle(p.BOLD); p.textSize(22); p.text(title,24,38); p.textStyle(p.NORMAL); p.textSize(14); p.fill("#6b6258"); p.text(subtitle,24,62); p.pop();
+      }
+
+      function stage() { return { x:p.width*0.08, y:p.height*0.15, w:p.width*0.84, h:p.height*0.50 }; }
+      function drawStage() { const s=stage(); p.push(); p.noStroke(); p.fill(255,255,255,235); p.rect(s.x,s.y,s.w,s.h,24); p.pop(); return s; }
+
+      function drawIdeaMode() {
+        const s = drawStage();
+        const states = ["start", "play", "win", "lose"];
+        const cx = s.x + s.w * 0.5;
+        const cy = s.y + s.h * 0.48;
+        const radius = Math.min(s.w, s.h) * 0.28;
+        for (let i=0;i<states.length;i++) {
+          const a = -p.HALF_PI + i * p.TWO_PI / states.length;
+          const x = cx + Math.cos(a) * radius;
+          const y = cy + Math.sin(a) * radius;
+          drawStateNode(x, y, states[i], states[i] === state.gameState);
+        }
+        drawLabel(`gameState = "${state.gameState}"`, s.x + 28, s.y + 42, stateColor(state.gameState), 16);
+      }
+
+      function drawScreensMode() {
+        const s = drawStage();
+        const boxW = s.w * 0.39;
+        const boxH = s.h * 0.34;
+        const items = [
+          { name:"start", x:s.x+s.w*0.08, y:s.y+s.h*0.10 },
+          { name:"play", x:s.x+s.w*0.53, y:s.y+s.h*0.10 },
+          { name:"win", x:s.x+s.w*0.08, y:s.y+s.h*0.56 },
+          { name:"lose", x:s.x+s.w*0.53, y:s.y+s.h*0.56 }
+        ];
+        for (const item of items) drawScreenPreview(item.x, item.y, boxW, boxH, item.name, item.name === state.gameState);
+      }
+
+      function drawTransitionsMode() {
+        const s = drawStage();
+        const nodes = {
+          start: { x:s.x+s.w*0.18, y:s.y+s.h*0.50 },
+          play: { x:s.x+s.w*0.48, y:s.y+s.h*0.50 },
+          win: { x:s.x+s.w*0.78, y:s.y+s.h*0.28 },
+          lose: { x:s.x+s.w*0.78, y:s.y+s.h*0.70 }
+        };
+        drawTransitionArrow(nodes.start.x+58, nodes.start.y, nodes.play.x-58, nodes.play.y, "click start", "#f59e0b");
+        drawTransitionArrow(nodes.play.x+58, nodes.play.y-12, nodes.win.x-58, nodes.win.y, `score >= ${state.goal}`, state.score >= state.goal ? "#16a34a" : "#f59e0b");
+        drawTransitionArrow(nodes.play.x+58, nodes.play.y+12, nodes.lose.x-58, nodes.lose.y, "time <= 0", state.timeLeft <= 0 ? "#e11d48" : "#f59e0b");
+        for (const name of Object.keys(nodes)) drawStateNode(nodes[name].x, nodes[name].y, name, name === state.gameState);
+      }
+
+      function drawGameMode() {
+        const s = drawStage();
+        if (state.gameState === "start") drawGameScreen(s, "START", "Click inside the game or press Start", "#7c3aed");
+        else if (state.gameState === "play") drawPlayGame(s);
+        else if (state.gameState === "win") drawGameScreen(s, "YOU WIN", "Click to restart", "#16a34a");
+        else if (state.gameState === "lose") drawGameScreen(s, "TRY AGAIN", "Click to restart", "#e11d48");
+      }
+
+      function drawCodeMode() {
+        const s = drawStage();
+        const cards = [
+          { title:"draw()", text:"checks gameState", color:"#7c3aed", x:s.x+s.w*0.08, y:s.y+s.h*0.14 },
+          { title:"screen functions", text:"drawStart / drawGame / drawWin / drawLose", color:"#0891b2", x:s.x+s.w*0.38, y:s.y+s.h*0.14 },
+          { title:"transition rules", text:"score, timer, clicks, keys", color:"#f59e0b", x:s.x+s.w*0.68, y:s.y+s.h*0.14 }
+        ];
+        for (const card of cards) drawCodeCard(card.x, card.y, s.w*0.24, s.h*0.58, card.title, card.text, card.color);
+        drawLabel("Organized state code separates what to draw from when to change modes.", s.x+28, s.y+s.h-28, "#6b6258", 14);
+      }
+
+      function drawStateNode(x, y, name, active) {
+        p.push(); p.noStroke(); p.fill(active ? stateColor(name) : "#ffffff"); p.circle(x,y,active?100:84); p.stroke(stateColor(name)); p.strokeWeight(3); p.noFill(); p.circle(x,y,active?100:84); p.noStroke(); p.fill(active ? "#ffffff" : stateColor(name)); p.textAlign(p.CENTER,p.CENTER); p.textStyle(p.BOLD); p.textSize(17); p.text(name,x,y); p.pop();
+      }
+
+      function drawScreenPreview(x, y, w, h, name, active) {
+        p.push(); p.noStroke(); p.fill(active ? stateColor(name) : "#ffffff"); p.rect(x,y,w,h,18); p.stroke(stateColor(name)); p.strokeWeight(active?4:2); p.noFill(); p.rect(x,y,w,h,18); p.noStroke(); p.fill(active?"#ffffff":stateColor(name)); p.textAlign(p.CENTER,p.CENTER); p.textStyle(p.BOLD); p.textSize(20); p.text(name.toUpperCase(),x+w/2,y+h*0.40); p.textSize(12); p.text(active?"current screen":"possible screen",x+w/2,y+h*0.66); p.pop();
+      }
+
+      function drawTransitionArrow(x1, y1, x2, y2, label, color) {
+        p.push(); p.stroke(color); p.strokeWeight(3); p.line(x1,y1,x2,y2); const a=Math.atan2(y2-y1,x2-x1); p.noStroke(); p.fill(color); p.push(); p.translate(x2,y2); p.rotate(a); p.triangle(0,0,-10,-6,-10,6); p.pop(); drawLabel(label,(x1+x2)/2-35,(y1+y2)/2-10,color,12); p.pop();
+      }
+
+      function drawGameScreen(s, title, subtitle, color) {
+        p.push(); p.noStroke(); p.fill(color); p.rect(s.x+26,s.y+26,s.w-52,s.h-52,22); p.fill("#ffffff"); p.textAlign(p.CENTER,p.CENTER); p.textStyle(p.BOLD); p.textSize(44); p.text(title,s.x+s.w/2,s.y+s.h*0.42); p.textStyle(p.NORMAL); p.textSize(16); p.text(subtitle,s.x+s.w/2,s.y+s.h*0.60); p.pop();
+      }
+
+      function drawPlayGame(s) {
+        p.push(); p.noStroke(); p.fill("#e0f2fe"); p.rect(s.x+22,s.y+22,s.w-44,s.h-44,20); p.fill("#0891b2"); p.textStyle(p.BOLD); p.textSize(16); p.text(`Score: ${state.score} / ${state.goal}`,s.x+42,s.y+54); p.text(`Time: ${state.timeLeft}`,s.x+s.w-128,s.y+54);
+        p.fill("#f59e0b"); p.circle(state.targetX, state.targetY, 58); p.fill("#ffffff"); p.circle(state.targetX, state.targetY, 18); p.fill("#222222"); p.circle(state.targetX, state.targetY, 7);
+        if (state.showLabels) drawLabel("click target",state.targetX+34,state.targetY-10,"#f59e0b",13); p.pop();
+      }
+
+      function drawCodeCard(x, y, w, h, title, text, color) {
+        p.push(); p.noStroke(); p.fill(255,250,242,245); p.rect(x,y,w,h,18); p.stroke(color); p.strokeWeight(3); p.noFill(); p.rect(x,y,w,h,18); p.noStroke(); p.fill(color); p.textStyle(p.BOLD); p.textSize(16); p.text(title,x+16,y+28); p.fill("#334155"); p.textStyle(p.NORMAL); p.textSize(13); p.text(text,x+16,y+62,w-28,h-70); p.pop();
+      }
+
+      function drawReadoutCards() {
+        const cards=[{label:"state",value:state.gameState,color:stateColor(state.gameState)},{label:"score",value:`${state.score}/${state.goal}`,color:"#16a34a"},{label:"time",value:state.timeLeft,color:state.timeLeft<=0?"#e11d48":"#f59e0b"}];
+        const cardW=Math.min(176,(p.width-70)/cards.length); const y=p.height-168; const x=28; p.push(); for(let i=0;i<cards.length;i++){ const cx=x+i*(cardW+10); p.noStroke(); p.fill(255,255,255,235); p.rect(cx,y,cardW,62,14); p.fill(cards[i].color); p.textStyle(p.BOLD); p.textSize(13); p.text(cards[i].label,cx+12,y+22); p.fill("#222"); p.textSize(18); p.text(String(cards[i].value),cx+12,y+48); } p.pop();
+      }
+
+      function drawLabel(text,x,y,color,size=13){ p.push(); p.textSize(size); p.textStyle(p.BOLD); const padX=7,padY=4,tw=p.textWidth(text); p.noStroke(); p.fill(255,250,242,238); p.rect(x-padX,y-size-padY+3,tw+padX*2,size+padY*2,9); p.fill(color); p.textAlign(p.LEFT,p.BASELINE); p.text(text,x,y); p.pop(); }
+    };
+
+    new p5(sketch);
+  </script>
+</body>
+</html>

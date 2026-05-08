@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Objects: Data + Behavior</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffaf2;
+      --ink: #222222;
+      --muted: #6b6258;
+      --line: #ded2c1;
+      --accent: #2563eb;
+      --data: #0891b2;
+      --behavior: #e11d48;
+      --object: #f59e0b;
+      --class: #7c3aed;
+      --many: #16a34a;
+      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
+        var(--bg);
+    }
+
+    header {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 20px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 940px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 12px 20px 36px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .controls,
+    .workspace,
+    .side-panel {
+      background: rgba(255, 250, 242, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    .toggle-label,
+    .pill {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+      user-select: none;
+    }
+
+    button:hover,
+    .toggle-label:hover {
+      transform: translateY(-1px);
+      background: #fff7ed;
+    }
+
+    button.active {
+      color: white;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .toggle-label input {
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    .pill {
+      cursor: default;
+      background: #f8fafc;
+      color: var(--muted);
+      border-color: #e2e8f0;
+    }
+
+    .slider-wrap {
+      display: grid;
+      grid-template-columns: 96px minmax(150px, 1fr) 72px;
+      gap: 9px;
+      align-items: center;
+      min-width: min(380px, 100%);
+    }
+
+    label,
+    .value-label,
+    .preset-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .workspace {
+      position: relative;
+      height: 660px;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    #sketch-holder {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #sketch-holder canvas { display: block; }
+
+    .canvas-caption {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      right: 22px;
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      backdrop-filter: blur(8px);
+    }
+
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .card h2 { font-size: 1.15rem; }
+    .card h3 { font-size: 1rem; }
+
+    .card p,
+    .card li {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .card p { margin: 0 0 8px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .formula {
+      display: block;
+      margin: 8px 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: grid;
+      grid-template-columns: 16px 1fr;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .swatch.data { background: var(--data); }
+    .swatch.behavior { background: var(--behavior); }
+    .swatch.object { background: var(--object); }
+    .swatch.class { background: var(--class); }
+    .swatch.many { background: var(--many); }
+
+    .code-card { display: none; }
+    .code-card.visible { display: block; }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      padding: 12px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .note {
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; }
+      .workspace { height: 590px; }
+    }
+
+    @media (max-width: 600px) {
+      header, main { padding-left: 12px; padding-right: 12px; }
+      .slider-wrap { grid-template-columns: 1fr; gap: 4px; }
+      .workspace { height: 540px; }
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
+    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+  </div>
+  <header>
+    <h1>Objects: Data + Behavior</h1>
+    <p class="subtitle">
+      A concept bridge for object literals, classes, properties, and methods. An object bundles what something <strong>knows</strong> with what it <strong>does</strong>.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Explorer controls">
+      <div class="row">
+        <button id="mode-vars" class="active">Loose Variables</button>
+        <button id="mode-object">Object Literal</button>
+        <button id="mode-methods">Methods</button>
+        <button id="mode-class">Class Blueprint</button>
+        <button id="mode-many">Many Objects</button>
+        <button id="reset-button">Reset</button>
+        <span id="mode-pill" class="pill">loose variables describe one thing</span>
+      </div>
+
+      <div class="row">
+        <div class="slider-wrap">
+          <label for="size-slider">Size</label>
+          <input id="size-slider" type="range" min="30" max="130" value="72" step="1" />
+          <span id="size-value" class="value-label">72</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="speed-slider">Speed</label>
+          <input id="speed-slider" type="range" min="0" max="5" value="1.6" step="0.1" />
+          <span id="speed-value" class="value-label">1.6×</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="count-slider">Objects</label>
+          <input id="count-slider" type="range" min="1" max="12" value="5" step="1" />
+          <span id="count-value" class="value-label">5</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="preset-label">Actions:</span>
+        <button id="randomize-button">Randomize objects</button>
+        <button id="add-button">Add object</button>
+        <button id="remove-button">Remove object</button>
+        <label class="toggle-label"><input id="animate-toggle" type="checkbox" checked />Animate</label>
+        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
+        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div id="sketch-holder"></div>
+      <div id="canvas-caption" class="canvas-caption">
+        Loose variables can describe one thing, but an object bundles the related data together.
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <section class="card">
+        <h2 id="lesson-title">Loose variables describe one thing</h2>
+        <p id="lesson-text">
+          At first, it is common to store a shape's x, y, size, and speed in separate variables. That works, but the relationship between those variables is only in your head.
+        </p>
+        <span id="formula-box" class="formula">let x = 200;
+let y = 200;
+let size = 72;
+let speed = 1.6;</span>
+      </section>
+
+      <section class="card">
+        <h3>Big idea</h3>
+        <p><strong>Properties</strong> are what an object knows.</p>
+        <p><strong>Methods</strong> are what an object does.</p>
+        <p><strong>Classes</strong> are blueprints for making many similar objects.</p>
+      </section>
+
+      <section class="card">
+        <h3>Legend</h3>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch data"></span><span>data / properties</span></div>
+          <div class="legend-item"><span class="swatch behavior"></span><span>behavior / methods</span></div>
+          <div class="legend-item"><span class="swatch object"></span><span>one object instance</span></div>
+          <div class="legend-item"><span class="swatch class"></span><span>class blueprint</span></div>
+          <div class="legend-item"><span class="swatch many"></span><span>many objects</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Try this</h3>
+        <p id="question-text">Which variables belong together because they describe the same thing?</p>
+      </section>
+
+      <section id="code-card" class="card code-card">
+        <h3>p5.js connection</h3>
+        <pre><code id="code-box">let x = 200;
+let y = 200;
+let size = 72;
+let speed = 1.6;</code></pre>
+        <p class="note">
+          In JavaScript, object literals are a gentle first step. Classes become useful when you want a repeatable blueprint for many objects.
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const state = {
+      mode: "vars",
+      size: 72,
+      speed: 1.6,
+      count: 5,
+      animate: true,
+      showLabels: true,
+      showCode: false,
+      ball: { x: 260, y: 230, size: 72, speedX: 1.6, speedY: 1.1, hue: 35 },
+      balls: []
+    };
+
+    const els = {};
+
+    function setupUI() {
+      els.modeVars = document.querySelector("#mode-vars");
+      els.modeObject = document.querySelector("#mode-object");
+      els.modeMethods = document.querySelector("#mode-methods");
+      els.modeClass = document.querySelector("#mode-class");
+      els.modeMany = document.querySelector("#mode-many");
+      els.resetButton = document.querySelector("#reset-button");
+      els.randomizeButton = document.querySelector("#randomize-button");
+      els.addButton = document.querySelector("#add-button");
+      els.removeButton = document.querySelector("#remove-button");
+      els.modePill = document.querySelector("#mode-pill");
+      els.sizeSlider = document.querySelector("#size-slider");
+      els.speedSlider = document.querySelector("#speed-slider");
+      els.countSlider = document.querySelector("#count-slider");
+      els.sizeValue = document.querySelector("#size-value");
+      els.speedValue = document.querySelector("#speed-value");
+      els.countValue = document.querySelector("#count-value");
+      els.animateToggle = document.querySelector("#animate-toggle");
+      els.showLabels = document.querySelector("#show-labels");
+      els.showCode = document.querySelector("#show-code");
+      els.lessonTitle = document.querySelector("#lesson-title");
+      els.lessonText = document.querySelector("#lesson-text");
+      els.formulaBox = document.querySelector("#formula-box");
+      els.questionText = document.querySelector("#question-text");
+      els.caption = document.querySelector("#canvas-caption");
+      els.codeCard = document.querySelector("#code-card");
+      els.codeBox = document.querySelector("#code-box");
+
+      els.modeVars.addEventListener("click", () => setMode("vars"));
+      els.modeObject.addEventListener("click", () => setMode("object"));
+      els.modeMethods.addEventListener("click", () => setMode("methods"));
+      els.modeClass.addEventListener("click", () => setMode("class"));
+      els.modeMany.addEventListener("click", () => setMode("many"));
+
+      els.sizeSlider.addEventListener("input", () => {
+        state.size = Number(els.sizeSlider.value);
+        state.ball.size = state.size;
+        updateUI();
+      });
+
+      els.speedSlider.addEventListener("input", () => {
+        state.speed = Number(els.speedSlider.value);
+        state.ball.speedX = state.speed;
+        updateUI();
+      });
+
+      els.countSlider.addEventListener("input", () => {
+        state.count = Number(els.countSlider.value);
+        syncBallCount();
+        updateUI();
+      });
+
+      els.animateToggle.addEventListener("change", () => {
+        state.animate = els.animateToggle.checked;
+      });
+
+      els.showLabels.addEventListener("change", () => {
+        state.showLabels = els.showLabels.checked;
+      });
+
+      els.showCode.addEventListener("change", () => {
+        state.showCode = els.showCode.checked;
+        updateUI();
+      });
+
+      els.resetButton.addEventListener("click", () => {
+        resetSingleBall();
+        resetManyBalls();
+        updateUI();
+      });
+
+      els.randomizeButton.addEventListener("click", () => {
+        randomizeBalls();
+        updateUI();
+      });
+
+      els.addButton.addEventListener("click", () => {
+        state.count = Math.min(12, state.count + 1);
+        syncBallCount(true);
+        updateUI();
+      });
+
+      els.removeButton.addEventListener("click", () => {
+        state.count = Math.max(1, state.count - 1);
+        syncBallCount();
+        updateUI();
+      });
+
+      resetSingleBall();
+      resetManyBalls();
+      updateUI();
+    }
+
+    function resetSingleBall() {
+      state.ball = { x: 260, y: 230, size: state.size, speedX: state.speed, speedY: 1.1, hue: 35 };
+    }
+
+    function makeBall(i) {
+      return {
+        x: 90 + i * 72,
+        y: 190 + (i % 3) * 58,
+        size: 36 + (i % 5) * 10,
+        speedX: (0.7 + (i % 4) * 0.35) * (i % 2 === 0 ? 1 : -1),
+        speedY: (0.55 + (i % 3) * 0.25) * (i % 2 === 0 ? 1 : -1),
+        hue: i,
+        name: `ball${i}`
+      };
+    }
+
+    function resetManyBalls() {
+      state.balls = [];
+      for (let i = 0; i < state.count; i++) state.balls.push(makeBall(i));
+    }
+
+    function syncBallCount(addRandom = false) {
+      while (state.balls.length < state.count) {
+        const i = state.balls.length;
+        const ball = addRandom ? {
+          x: 90 + Math.random() * 560,
+          y: 120 + Math.random() * 260,
+          size: 32 + Math.random() * 62,
+          speedX: -2 + Math.random() * 4,
+          speedY: -1.6 + Math.random() * 3.2,
+          hue: i,
+          name: `ball${i}`
+        } : makeBall(i);
+        state.balls.push(ball);
+      }
+      state.balls.length = state.count;
+    }
+
+    function randomizeBalls() {
+      state.balls = [];
+      for (let i = 0; i < state.count; i++) {
+        state.balls.push({
+          x: 90 + Math.random() * 560,
+          y: 120 + Math.random() * 260,
+          size: 30 + Math.random() * 70,
+          speedX: -2.2 + Math.random() * 4.4,
+          speedY: -1.8 + Math.random() * 3.6,
+          hue: i,
+          name: `ball${i}`
+        });
+      }
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      updateUI();
+    }
+
+    function updateUI() {
+      const buttons = [
+        [els.modeVars, "vars"],
+        [els.modeObject, "object"],
+        [els.modeMethods, "methods"],
+        [els.modeClass, "class"],
+        [els.modeMany, "many"]
+      ];
+
+      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
+
+      els.sizeSlider.value = state.size;
+      els.speedSlider.value = state.speed;
+      els.countSlider.value = state.count;
+      els.sizeValue.textContent = String(Math.round(state.size));
+      els.speedValue.textContent = `${state.speed.toFixed(1)}×`;
+      els.countValue.textContent = String(state.count);
+      els.animateToggle.checked = state.animate;
+      els.showLabels.checked = state.showLabels;
+      els.showCode.checked = state.showCode;
+      els.codeCard.classList.toggle("visible", state.showCode);
+
+      const lessons = {
+        vars: {
+          pill: "loose variables describe one thing",
+          title: "Loose variables describe one thing",
+          text: "At first, it is common to store a shape's x, y, size, and speed in separate variables. That works, but the relationship between those variables is only in your head.",
+          formula: `let x = 200;\nlet y = 200;\nlet size = ${Math.round(state.size)};\nlet speed = ${state.speed.toFixed(1)};`,
+          question: "Which variables belong together because they describe the same thing?",
+          caption: "Loose variables can describe one thing, but an object bundles the related data together.",
+          code: `let x = 200;\nlet y = 200;\nlet size = ${Math.round(state.size)};\nlet speed = ${state.speed.toFixed(1)};\n\nfunction draw() {\n  circle(x, y, size);\n  x = x + speed;\n}`
+        },
+        object: {
+          pill: "an object bundles related data",
+          title: "An object keeps related data together",
+          text: "An object groups properties under one name. Instead of separate variables floating around, the ball carries its own x, y, size, and speed.",
+          formula: `let ball = {\n  x: 200,\n  y: 200,\n  size: ${Math.round(state.size)},\n  speedX: ${state.speed.toFixed(1)}\n};`,
+          question: "Why is ball.x clearer than a loose variable named x?",
+          caption: "The ball object knows its own position, size, and speed through properties.",
+          code: `let ball = {\n  x: 200,\n  y: 200,\n  size: ${Math.round(state.size)},\n  speedX: ${state.speed.toFixed(1)}\n};\n\nfunction draw() {\n  circle(ball.x, ball.y, ball.size);\n  ball.x += ball.speedX;\n}`
+        },
+        methods: {
+          pill: "methods attach behavior to data",
+          title: "Methods are what an object does",
+          text: "A method is a function that belongs to an object. Instead of the sketch doing everything to the ball, the ball can move itself and display itself.",
+          formula: `ball.move();\nball.display();`,
+          question: "What changes when move() and display() belong to the object?",
+          caption: "The object now has data and behavior: it knows its values and it knows what to do with them.",
+          code: `let ball = {\n  x: 200, y: 200, size: ${Math.round(state.size)}, speedX: ${state.speed.toFixed(1)},\n\n  move() {\n    this.x += this.speedX;\n  },\n\n  display() {\n    circle(this.x, this.y, this.size);\n  }\n};`
+        },
+        class: {
+          pill: "a class is a reusable blueprint",
+          title: "A class is a blueprint for objects",
+          text: "A class defines the structure and behavior for a type of thing. Each new Ball gets its own properties but shares the same methods.",
+          formula: `class Ball {\n  constructor(x, y, size) { ... }\n  move() { ... }\n  display() { ... }\n}`,
+          question: "How is a class different from one single object?",
+          caption: "The class is the recipe. Each object is one thing made from that recipe.",
+          code: `class Ball {\n  constructor(x, y, size) {\n    this.x = x;\n    this.y = y;\n    this.size = size;\n  }\n\n  move() {\n    this.x += 2;\n  }\n\n  display() {\n    circle(this.x, this.y, this.size);\n  }\n}`
+        },
+        many: {
+          pill: "many objects can share one blueprint",
+          title: "Many objects can share one blueprint",
+          text: "Once you have a class, you can create many objects. Each ball has its own data but uses the same move() and display() behavior.",
+          formula: `let balls = [];\nballs.push(new Ball(...));\n\nfor (let ball of balls) {\n  ball.move();\n  ball.display();\n}`,
+          question: "What is the same for every ball? What is different for each ball?",
+          caption: "Each ball has different data, but they all know how to move and display themselves.",
+          code: `let balls = [];\n\nfunction setup() {\n  for (let i = 0; i < ${state.count}; i++) {\n    balls.push(new Ball(random(width), random(height), random(30, 80)));\n  }\n}\n\nfunction draw() {\n  for (let ball of balls) {\n    ball.move();\n    ball.display();\n  }\n}`
+        }
+      };
+
+      const lesson = lessons[state.mode];
+      els.modePill.textContent = lesson.pill;
+      els.lessonTitle.textContent = lesson.title;
+      els.lessonText.textContent = lesson.text;
+      els.formulaBox.textContent = lesson.formula;
+      els.questionText.textContent = lesson.question;
+      els.caption.textContent = lesson.caption;
+      els.codeBox.textContent = lesson.code;
+    }
+
+    setupUI();
+
+    const sketch = (p) => {
+      let canvas;
+      let holder;
+      let previousWidth = 0;
+      let previousHeight = 0;
+
+      p.setup = () => {
+        holder = document.querySelector("#sketch-holder");
+        const rect = holder.getBoundingClientRect();
+        canvas = p.createCanvas(rect.width, rect.height);
+        canvas.parent("sketch-holder");
+        canvas.elt.setAttribute("role", "img");
+        canvas.elt.setAttribute("aria-label", "Interactive visualization of objects as data plus behavior in p5.js.");
+        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+        p.textFont("Inter, system-ui, sans-serif");
+      };
+
+      p.windowResized = () => resizeToHolder();
+
+      p.draw = () => {
+        resizeToHolder();
+        p.background(255, 250, 242);
+        drawSubtleGrid();
+        drawPanelTitle();
+        updateMotion();
+
+        if (state.mode === "vars") drawVarsMode();
+        if (state.mode === "object") drawObjectMode();
+        if (state.mode === "methods") drawMethodsMode();
+        if (state.mode === "class") drawClassMode();
+        if (state.mode === "many") drawManyMode();
+
+        drawReadoutCards();
+      };
+
+      function resizeToHolder() {
+        const rect = holder.getBoundingClientRect();
+        const w = Math.max(320, Math.floor(rect.width));
+        const h = Math.max(320, Math.floor(rect.height));
+        if (w !== previousWidth || h !== previousHeight) {
+          p.resizeCanvas(w, h);
+          previousWidth = w;
+          previousHeight = h;
+        }
+      }
+
+      function updateMotion() {
+        if (!state.animate) return;
+        const bounds = getStageBounds();
+        const b = state.ball;
+        b.x += b.speedX * state.speed;
+        b.y += b.speedY * state.speed;
+        if (b.x < bounds.x + b.size / 2 || b.x > bounds.x + bounds.w - b.size / 2) b.speedX *= -1;
+        if (b.y < bounds.y + b.size / 2 || b.y > bounds.y + bounds.h - b.size / 2) b.speedY *= -1;
+
+        for (const ball of state.balls) {
+          ball.x += ball.speedX * state.speed;
+          ball.y += ball.speedY * state.speed;
+          if (ball.x < bounds.x + ball.size / 2 || ball.x > bounds.x + bounds.w - ball.size / 2) ball.speedX *= -1;
+          if (ball.y < bounds.y + ball.size / 2 || ball.y > bounds.y + bounds.h - ball.size / 2) ball.speedY *= -1;
+        }
+      }
+
+      function getStageBounds() {
+        return { x: p.width * 0.08, y: p.height * 0.15, w: p.width * 0.84, h: p.height * 0.50 };
+      }
+
+      function drawSubtleGrid() {
+        p.push();
+        p.stroke(236, 224, 207);
+        p.strokeWeight(1);
+        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
+        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
+        p.pop();
+      }
+
+      function drawPanelTitle() {
+        const titles = {
+          vars: ["Loose Variables", "The data belongs together, but the code has not bundled it yet."],
+          object: ["Object Literal", "One object groups related properties under one name."],
+          methods: ["Methods", "Functions can belong to the object too."],
+          class: ["Class Blueprint", "A class describes how to make this kind of object."],
+          many: ["Many Objects", "Each instance has its own data and shared behavior."]
+        };
+        const [title, subtitle] = titles[state.mode];
+        p.push();
+        p.noStroke();
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(22);
+        p.text(title, 24, 38);
+        p.textStyle(p.NORMAL);
+        p.textSize(14);
+        p.fill("#6b6258");
+        p.text(subtitle, 24, 62);
+        p.pop();
+      }
+
+      function drawVarsMode() {
+        const bounds = getStageBounds();
+        drawStage(bounds);
+        drawBall(state.ball, "#0891b2");
+        drawLooseVariableCards(bounds.x + 22, bounds.y + 24);
+      }
+
+      function drawObjectMode() {
+        const bounds = getStageBounds();
+        drawStage(bounds);
+        drawBall(state.ball, "#f59e0b");
+        drawObjectCard(bounds.x + 22, bounds.y + 24, false);
+      }
+
+      function drawMethodsMode() {
+        const bounds = getStageBounds();
+        drawStage(bounds);
+        drawBall(state.ball, "#f59e0b");
+        drawObjectCard(bounds.x + 22, bounds.y + 24, true);
+        drawMethodArrows(bounds);
+      }
+
+      function drawClassMode() {
+        const bounds = getStageBounds();
+        drawStage(bounds);
+        drawClassBlueprint(bounds.x + 30, bounds.y + 36, bounds.w * 0.35, bounds.h - 72);
+        drawInstanceFromBlueprint(bounds.x + bounds.w * 0.60, bounds.y + bounds.h * 0.50);
+      }
+
+      function drawManyMode() {
+        const bounds = getStageBounds();
+        drawStage(bounds);
+        for (let i = 0; i < state.balls.length; i++) {
+          drawBall(state.balls[i], palette(i));
+          if (state.showLabels && i < 6) drawLabel(state.balls[i].name, state.balls[i].x - 22, state.balls[i].y + state.balls[i].size / 2 + 18, palette(i), 11);
+        }
+        if (state.showLabels) drawLabel(`${state.count} objects, same blueprint`, bounds.x + 24, bounds.y + 34, "#16a34a", 14);
+      }
+
+      function drawStage(bounds) {
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(bounds.x, bounds.y, bounds.w, bounds.h, 24);
+        p.stroke("#e6dac8");
+        p.strokeWeight(2);
+        p.noFill();
+        p.rect(bounds.x + 14, bounds.y + 14, bounds.w - 28, bounds.h - 28, 18);
+        p.pop();
+      }
+
+      function drawBall(ball, color) {
+        p.push();
+        p.noStroke();
+        p.fill(color);
+        p.circle(ball.x, ball.y, ball.size);
+        p.fill("#ffffff");
+        p.circle(ball.x + ball.size * 0.12, ball.y - ball.size * 0.12, Math.max(8, ball.size * 0.18));
+        p.fill("#222222");
+        p.circle(ball.x + ball.size * 0.16, ball.y - ball.size * 0.12, Math.max(4, ball.size * 0.08));
+        p.stroke("#222222");
+        p.strokeWeight(2);
+        p.noFill();
+        p.arc(ball.x, ball.y + ball.size * 0.08, ball.size * 0.30, ball.size * 0.22, 0, p.PI);
+        p.pop();
+      }
+
+      function drawLooseVariableCards(x, y) {
+        const rows = [
+          { name: "x", value: Math.round(state.ball.x), color: "#0891b2" },
+          { name: "y", value: Math.round(state.ball.y), color: "#0891b2" },
+          { name: "size", value: Math.round(state.ball.size), color: "#0891b2" },
+          { name: "speed", value: state.ball.speedX.toFixed(1), color: "#0891b2" }
+        ];
+        drawMiniTable(x, y, 150, rows, "loose variables", "#0891b2");
+        if (state.showLabels) drawLabel("These describe the same ball, but nothing groups them yet.", x + 176, y + 40, "#6b6258", 13);
+      }
+
+      function drawObjectCard(x, y, includeMethods) {
+        const rows = [
+          { name: "ball.x", value: Math.round(state.ball.x), color: "#0891b2" },
+          { name: "ball.y", value: Math.round(state.ball.y), color: "#0891b2" },
+          { name: "ball.size", value: Math.round(state.ball.size), color: "#0891b2" },
+          { name: "ball.speedX", value: state.ball.speedX.toFixed(1), color: "#0891b2" }
+        ];
+        if (includeMethods) {
+          rows.push({ name: "ball.move()", value: "does", color: "#e11d48" });
+          rows.push({ name: "ball.display()", value: "does", color: "#e11d48" });
+        }
+        drawMiniTable(x, y, includeMethods ? 190 : 170, rows, "ball object", "#f59e0b");
+        if (state.showLabels) {
+          const message = includeMethods ? "Properties + methods live together." : "Properties are bundled under one name.";
+          drawLabel(message, x + 216, y + 42, includeMethods ? "#e11d48" : "#f59e0b", 13);
+        }
+      }
+
+      function drawMiniTable(x, y, w, rows, title, color) {
+        const rowH = 26;
+        const h = 42 + rows.length * rowH;
+        p.push();
+        p.noStroke();
+        p.fill(255, 250, 242, 245);
+        p.rect(x, y, w, h, 16);
+        p.stroke(color);
+        p.strokeWeight(2);
+        p.noFill();
+        p.rect(x, y, w, h, 16);
+        p.noStroke();
+        p.fill(color);
+        p.textStyle(p.BOLD);
+        p.textSize(14);
+        p.text(title, x + 12, y + 24);
+        p.textSize(12);
+        for (let i = 0; i < rows.length; i++) {
+          const yy = y + 46 + i * rowH;
+          p.fill(rows[i].color);
+          p.text(rows[i].name, x + 12, yy);
+          p.fill("#222222");
+          p.textAlign(p.RIGHT, p.BASELINE);
+          p.text(String(rows[i].value), x + w - 12, yy);
+          p.textAlign(p.LEFT, p.BASELINE);
+        }
+        p.pop();
+      }
+
+      function drawMethodArrows(bounds) {
+        const bx = state.ball.x;
+        const by = state.ball.y;
+        p.push();
+        p.stroke("#e11d48");
+        p.strokeWeight(3);
+        p.drawingContext.setLineDash([8, 7]);
+        p.line(bounds.x + 220, bounds.y + 160, bx, by);
+        p.drawingContext.setLineDash([]);
+        if (state.showLabels) drawLabel("methods act on this object's data", bounds.x + 210, bounds.y + 150, "#e11d48", 13);
+        p.pop();
+      }
+
+      function drawClassBlueprint(x, y, w, h) {
+        p.push();
+        p.noStroke();
+        p.fill(245, 243, 255, 245);
+        p.rect(x, y, w, h, 20);
+        p.stroke("#7c3aed");
+        p.strokeWeight(3);
+        p.noFill();
+        p.rect(x, y, w, h, 20);
+        p.noStroke();
+        p.fill("#7c3aed");
+        p.textStyle(p.BOLD);
+        p.textSize(18);
+        p.text("class Ball", x + 20, y + 34);
+        p.fill("#334155");
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.text("constructor(x, y, size)", x + 20, y + 72);
+        p.text("this.x = x", x + 36, y + 100);
+        p.text("this.y = y", x + 36, y + 124);
+        p.text("this.size = size", x + 36, y + 148);
+        p.fill("#e11d48");
+        p.textStyle(p.BOLD);
+        p.text("move()", x + 20, y + 192);
+        p.text("display()", x + 20, y + 222);
+        if (state.showLabels) drawLabel("blueprint / recipe", x + 20, y + h - 22, "#7c3aed", 13);
+        p.pop();
+      }
+
+      function drawInstanceFromBlueprint(x, y) {
+        p.push();
+        drawBall({ x, y, size: state.size, speedX: state.speed, speedY: 1 }, "#f59e0b");
+        drawLabel("new Ball(...)", x - 44, y + state.size / 2 + 34, "#f59e0b", 15);
+        p.stroke("#16a34a");
+        p.strokeWeight(3);
+        p.line(x - 150, y, x - 70, y);
+        p.noStroke();
+        p.fill("#16a34a");
+        p.triangle(x - 70, y, x - 82, y - 7, x - 82, y + 7);
+        if (state.showLabels) drawLabel("class creates instance", x - 152, y - 18, "#16a34a", 13);
+        p.pop();
+      }
+
+      function drawReadoutCards() {
+        const cards = [
+          { label: "properties", value: state.mode === "vars" ? "loose" : "bundled", color: "#0891b2" },
+          { label: "methods", value: ["methods", "class", "many"].includes(state.mode) ? "yes" : "not yet", color: "#e11d48" },
+          { label: "objects", value: state.mode === "many" ? state.count : 1, color: "#16a34a" }
+        ];
+        const cardW = Math.min(176, (p.width - 70) / cards.length);
+        const y = p.height - 168;
+        const x = 28;
+
+        p.push();
+        for (let i = 0; i < cards.length; i++) {
+          const cx = x + i * (cardW + 10);
+          p.noStroke();
+          p.fill(255, 255, 255, 235);
+          p.rect(cx, y, cardW, 62, 14);
+          p.fill(cards[i].color);
+          p.textStyle(p.BOLD);
+          p.textSize(13);
+          p.text(cards[i].label, cx + 12, y + 22);
+          p.fill("#222222");
+          p.textSize(18);
+          p.text(String(cards[i].value), cx + 12, y + 48);
+        }
+        p.pop();
+      }
+
+      function palette(i) {
+        const colors = ["#f59e0b", "#7c3aed", "#0891b2", "#e11d48", "#16a34a", "#2563eb", "#9333ea", "#dc2626", "#0f766e", "#ca8a04", "#be123c", "#4f46e5"];
+        return colors[i % colors.length];
+      }
+
+      function drawLabel(text, x, y, color, size = 13) {
+        p.push();
+        p.textSize(size);
+        p.textStyle(p.BOLD);
+        const padX = 7;
+        const padY = 4;
+        const tw = p.textWidth(text);
+        p.noStroke();
+        p.fill(255, 250, 242, 238);
+        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
+        p.fill(color);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.text(text, x, y);
+        p.pop();
+      }
+    };
+
+    new p5(sketch);
+  </script>
+</body>
+</html>

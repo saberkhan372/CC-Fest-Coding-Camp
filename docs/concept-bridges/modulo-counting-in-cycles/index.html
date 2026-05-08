@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modulo: Counting in Cycles</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffaf2;
+      --ink: #222222;
+      --muted: #6b6258;
+      --line: #ded2c1;
+      --accent: #2563eb;
+      --mod: #7c3aed;
+      --count: #0891b2;
+      --remainder: #e11d48;
+      --cycle: #f59e0b;
+      --green: #16a34a;
+      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
+        var(--bg);
+    }
+
+    header {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 20px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 920px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 12px 20px 36px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .controls,
+    .workspace,
+    .side-panel {
+      background: rgba(255, 250, 242, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    .toggle-label,
+    .pill {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+      user-select: none;
+    }
+
+    button:hover,
+    .toggle-label:hover {
+      transform: translateY(-1px);
+      background: #fff7ed;
+    }
+
+    button.active {
+      color: white;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .toggle-label input {
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    .pill {
+      cursor: default;
+      background: #f8fafc;
+      color: var(--muted);
+      border-color: #e2e8f0;
+    }
+
+    .slider-wrap {
+      display: grid;
+      grid-template-columns: 100px minmax(150px, 1fr) 74px;
+      gap: 9px;
+      align-items: center;
+      min-width: min(380px, 100%);
+    }
+
+    label,
+    .value-label,
+    .preset-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .workspace {
+      position: relative;
+      height: 660px;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    #sketch-holder {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #sketch-holder canvas { display: block; }
+
+    .canvas-caption {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      right: 22px;
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      backdrop-filter: blur(8px);
+    }
+
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .card h2 { font-size: 1.15rem; }
+    .card h3 { font-size: 1rem; }
+
+    .card p,
+    .card li {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .card p { margin: 0 0 8px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .formula {
+      display: block;
+      margin: 8px 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: grid;
+      grid-template-columns: 16px 1fr;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .swatch.count { background: var(--count); }
+    .swatch.mod { background: var(--mod); }
+    .swatch.remainder { background: var(--remainder); }
+    .swatch.cycle { background: var(--cycle); }
+    .swatch.green { background: var(--green); }
+
+    .code-card { display: none; }
+    .code-card.visible { display: block; }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      padding: 12px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .note {
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; }
+      .workspace { height: 590px; }
+    }
+
+    @media (max-width: 600px) {
+      header, main {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .slider-wrap {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .workspace { height: 540px; }
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
+    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+  </div>
+  <header>
+    <h1>Modulo: Counting in Cycles</h1>
+    <p class="subtitle">
+      A concept bridge for the <strong>%</strong> operator. Modulo gives the remainder after division — and in creative coding,
+      remainders become cycles, rhythms, alternating colors, timers, and repeating patterns.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Explorer controls">
+      <div class="row">
+        <button id="mode-counting" class="active">Counting</button>
+        <button id="mode-wheel">Remainder Wheel</button>
+        <button id="mode-alternate">Alternate Colors</button>
+        <button id="mode-timing">Timing / Blink</button>
+        <button id="mode-grid">Pattern Grid</button>
+        <button id="play-button">⏸ Pause</button>
+        <button id="step-button">Step +1</button>
+        <button id="reset-button">Reset</button>
+        <span id="mode-pill" class="pill">count % cycleLength</span>
+      </div>
+
+      <div class="row">
+        <div class="slider-wrap">
+          <label for="count-slider">Count</label>
+          <input id="count-slider" type="range" min="0" max="120" value="0" step="1" />
+          <span id="count-value" class="value-label">0</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="mod-slider">Modulo by</label>
+          <input id="mod-slider" type="range" min="2" max="12" value="4" step="1" />
+          <span id="mod-value" class="value-label">4</span>
+        </div>
+        <div class="slider-wrap">
+          <label for="speed-slider">Speed</label>
+          <input id="speed-slider" type="range" min="1" max="20" value="5" step="1" />
+          <span id="speed-value" class="value-label">5 cps</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="preset-label">Modulo presets:</span>
+        <button class="mod-preset" data-mod="2">% 2</button>
+        <button class="mod-preset" data-mod="3">% 3</button>
+        <button class="mod-preset" data-mod="4">% 4</button>
+        <button class="mod-preset" data-mod="5">% 5</button>
+        <button class="mod-preset" data-mod="8">% 8</button>
+        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
+        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div id="sketch-holder"></div>
+      <div id="canvas-caption" class="canvas-caption">
+        Modulo turns ordinary counting into a repeating cycle: 0, 1, 2, 3, then back to 0.
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <section class="card">
+        <h2 id="lesson-title">Modulo turns counting into cycles</h2>
+        <p id="lesson-text">
+          The % operator gives the remainder after division. If you count with % 4, the result cycles through 0, 1, 2, 3, 0, 1, 2, 3...
+        </p>
+        <span id="formula-box" class="formula">0 % 4 = 0<br>1 % 4 = 1<br>2 % 4 = 2<br>3 % 4 = 3<br>4 % 4 = 0</span>
+      </section>
+
+      <section class="card">
+        <h3>Big idea</h3>
+        <p><strong>Counting</strong> keeps going up.</p>
+        <p><strong>Modulo</strong> wraps the count back into a smaller set of remainders.</p>
+        <p><strong>Remainders</strong> can control color, timing, animation, and pattern.</p>
+      </section>
+
+      <section class="card">
+        <h3>Legend</h3>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch count"></span><span>original count</span></div>
+          <div class="legend-item"><span class="swatch mod"></span><span>modulo / cycle length</span></div>
+          <div class="legend-item"><span class="swatch remainder"></span><span>remainder result</span></div>
+          <div class="legend-item"><span class="swatch cycle"></span><span>repeating pattern</span></div>
+          <div class="legend-item"><span class="swatch green"></span><span>current step / active moment</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Try this</h3>
+        <p id="question-text">Set modulo to 2. Why does the result only alternate between 0 and 1?</p>
+      </section>
+
+      <section id="code-card" class="card code-card">
+        <h3>p5.js connection</h3>
+        <pre><code id="code-box">let remainder = count % 4;</code></pre>
+        <p class="note">
+          In p5.js, <code>frameCount % n</code> is especially useful because frameCount is always increasing. Modulo turns that endless count into a repeating rhythm.
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const state = {
+      mode: "counting",
+      count: 0,
+      mod: 4,
+      speed: 5,
+      running: true,
+      showLabels: true,
+      showCode: false,
+      lastTick: 0
+    };
+
+    const els = {};
+
+    function setupUI() {
+      els.modeCounting = document.querySelector("#mode-counting");
+      els.modeWheel = document.querySelector("#mode-wheel");
+      els.modeAlternate = document.querySelector("#mode-alternate");
+      els.modeTiming = document.querySelector("#mode-timing");
+      els.modeGrid = document.querySelector("#mode-grid");
+      els.playButton = document.querySelector("#play-button");
+      els.stepButton = document.querySelector("#step-button");
+      els.resetButton = document.querySelector("#reset-button");
+      els.modePill = document.querySelector("#mode-pill");
+      els.countSlider = document.querySelector("#count-slider");
+      els.modSlider = document.querySelector("#mod-slider");
+      els.speedSlider = document.querySelector("#speed-slider");
+      els.countValue = document.querySelector("#count-value");
+      els.modValue = document.querySelector("#mod-value");
+      els.speedValue = document.querySelector("#speed-value");
+      els.modPresets = Array.from(document.querySelectorAll(".mod-preset"));
+      els.showLabels = document.querySelector("#show-labels");
+      els.showCode = document.querySelector("#show-code");
+      els.lessonTitle = document.querySelector("#lesson-title");
+      els.lessonText = document.querySelector("#lesson-text");
+      els.formulaBox = document.querySelector("#formula-box");
+      els.questionText = document.querySelector("#question-text");
+      els.caption = document.querySelector("#canvas-caption");
+      els.codeCard = document.querySelector("#code-card");
+      els.codeBox = document.querySelector("#code-box");
+
+      els.modeCounting.addEventListener("click", () => setMode("counting"));
+      els.modeWheel.addEventListener("click", () => setMode("wheel"));
+      els.modeAlternate.addEventListener("click", () => setMode("alternate"));
+      els.modeTiming.addEventListener("click", () => setMode("timing"));
+      els.modeGrid.addEventListener("click", () => setMode("grid"));
+
+      els.playButton.addEventListener("click", () => {
+        state.running = !state.running;
+        updateUI();
+      });
+
+      els.stepButton.addEventListener("click", () => {
+        state.running = false;
+        state.count = (state.count + 1) % 121;
+        updateUI();
+      });
+
+      els.resetButton.addEventListener("click", () => {
+        state.count = 0;
+        state.running = false;
+        updateUI();
+      });
+
+      els.countSlider.addEventListener("input", () => {
+        state.count = Number(els.countSlider.value);
+        state.running = false;
+        updateUI();
+      });
+
+      els.modSlider.addEventListener("input", () => {
+        state.mod = Number(els.modSlider.value);
+        updateUI();
+      });
+
+      els.speedSlider.addEventListener("input", () => {
+        state.speed = Number(els.speedSlider.value);
+        updateUI();
+      });
+
+      els.modPresets.forEach((button) => {
+        button.addEventListener("click", () => {
+          state.mod = Number(button.dataset.mod);
+          updateUI();
+        });
+      });
+
+      els.showLabels.addEventListener("change", () => {
+        state.showLabels = els.showLabels.checked;
+      });
+
+      els.showCode.addEventListener("change", () => {
+        state.showCode = els.showCode.checked;
+        updateUI();
+      });
+
+      updateUI();
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      updateUI();
+    }
+
+    function getRemainder() {
+      return state.count % state.mod;
+    }
+
+    function updateUI() {
+      const buttons = [
+        [els.modeCounting, "counting"],
+        [els.modeWheel, "wheel"],
+        [els.modeAlternate, "alternate"],
+        [els.modeTiming, "timing"],
+        [els.modeGrid, "grid"]
+      ];
+
+      for (const [button, mode] of buttons) {
+        button.classList.toggle("active", state.mode === mode);
+      }
+
+      els.playButton.textContent = state.running ? "⏸ Pause" : "▶ Play";
+      els.countSlider.value = state.count;
+      els.modSlider.value = state.mod;
+      els.speedSlider.value = state.speed;
+      els.countValue.textContent = String(state.count);
+      els.modValue.textContent = String(state.mod);
+      els.speedValue.textContent = `${state.speed} cps`;
+      els.showLabels.checked = state.showLabels;
+      els.showCode.checked = state.showCode;
+      els.codeCard.classList.toggle("visible", state.showCode);
+
+      const r = getRemainder();
+      const formulaLines = buildFormulaLines();
+      const lessons = {
+        counting: {
+          pill: "count % cycleLength",
+          title: "Modulo turns counting into cycles",
+          text: `The % operator gives the remainder after division. Count keeps increasing, but count % ${state.mod} always wraps back into 0 through ${state.mod - 1}.`,
+          formula: formulaLines,
+          question: "Set modulo to 2. Why does the result only alternate between 0 and 1?",
+          caption: `Current result: ${state.count} % ${state.mod} = ${r}. The count goes up, but the remainder cycles.`,
+          code: `let remainder = count % ${state.mod};\ntext(remainder, 20, 20);`
+        },
+        wheel: {
+          pill: "Remainders loop around a wheel",
+          title: "Modulo is a circular counter",
+          text: `A modulo ${state.mod} cycle has ${state.mod} possible positions. After remainder ${state.mod - 1}, it wraps back to 0.`,
+          formula: `${state.count} % ${state.mod} = ${r}`,
+          question: "Why does the marker jump from the last remainder back to 0?",
+          caption: "The remainder wheel shows modulo as a loop instead of a straight number line.",
+          code: `let remainder = frameCount % ${state.mod};\nlet angle = map(remainder, 0, ${state.mod}, 0, TWO_PI);`
+        },
+        alternate: {
+          pill: "Remainders choose visual states",
+          title: "Modulo can alternate colors",
+          text: `Use the remainder to choose between ${state.mod} possible states. With % 2, you get classic even/odd alternation.`,
+          formula: `if (i % ${state.mod} === ${r}) { highlight }`,
+          question: "How does % 2 help create a checkerboard or alternating stripe pattern?",
+          caption: "Each shape uses its index with modulo. The remainder decides its color or state.",
+          code: `for (let i = 0; i < 20; i++) {\n  if (i % ${state.mod} === 0) {\n    fill(225, 29, 72);\n  } else {\n    fill(8, 145, 178);\n  }\n  circle(i * 30, 200, 24);\n}`
+        },
+        timing: {
+          pill: "frameCount % n creates rhythm",
+          title: "Modulo can make timers and blinking",
+          text: `frameCount is always increasing. frameCount % ${state.mod * 15} turns it into a repeating timer.`,
+          formula: `frameCount % ${state.mod * 15}`,
+          question: "Why is frameCount useful with modulo for animation timing?",
+          caption: "Modulo turns endless frameCount into a repeating rhythm: blink, wait, repeat.",
+          code: `let timer = frameCount % ${state.mod * 15};\nif (timer < ${(state.mod * 15) / 2}) {\n  fill(225, 29, 72);\n} else {\n  fill(220);\n}`
+        },
+        grid: {
+          pill: "Modulo creates repeating patterns",
+          title: "Modulo can organize a grid pattern",
+          text: "In a grid, row and column numbers can be combined with modulo to make stripes, checkerboards, diagonals, and cycles.",
+          formula: `(row + col) % ${state.mod}`,
+          question: "What changes when the modulo number gets larger?",
+          caption: "Each cell calculates a remainder. The repeating remainders create the visual pattern.",
+          code: `for (let row = 0; row < rows; row++) {\n  for (let col = 0; col < cols; col++) {\n    let r = (row + col) % ${state.mod};\n    fill(colors[r]);\n    rect(col * size, row * size, size, size);\n  }\n}`
+        }
+      };
+
+      const lesson = lessons[state.mode];
+      els.modePill.textContent = lesson.pill;
+      els.lessonTitle.textContent = lesson.title;
+      els.lessonText.textContent = lesson.text;
+      els.formulaBox.innerHTML = lesson.formula;
+      els.questionText.textContent = lesson.question;
+      els.caption.textContent = lesson.caption;
+      els.codeBox.textContent = lesson.code;
+    }
+
+    function buildFormulaLines() {
+      const lines = [];
+      const start = Math.max(0, state.count - 2);
+      const end = Math.min(state.count + 4, start + 7);
+      for (let n = start; n <= end; n++) {
+        const result = n % state.mod;
+        const current = n === state.count ? " ← current" : "";
+        lines.push(`${n} % ${state.mod} = ${result}${current}`);
+      }
+      return lines.join("<br>");
+    }
+
+    setupUI();
+
+    const sketch = (p) => {
+      let canvas;
+      let holder;
+      let previousWidth = 0;
+      let previousHeight = 0;
+
+      p.setup = () => {
+        holder = document.querySelector("#sketch-holder");
+        const rect = holder.getBoundingClientRect();
+        canvas = p.createCanvas(rect.width, rect.height);
+        canvas.parent("sketch-holder");
+        canvas.elt.setAttribute("role", "img");
+        canvas.elt.setAttribute("aria-label", "Interactive visualization of modulo, remainders, cycles, patterns, and timing in p5.js.");
+        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+        p.textFont("Inter, system-ui, sans-serif");
+      };
+
+      p.windowResized = () => resizeToHolder();
+
+      p.draw = () => {
+        resizeToHolder();
+        advanceCount();
+        p.background(255, 250, 242);
+        drawSubtleGrid();
+        drawPanelTitle();
+
+        if (state.mode === "counting") drawCountingMode();
+        if (state.mode === "wheel") drawWheelMode();
+        if (state.mode === "alternate") drawAlternateMode();
+        if (state.mode === "timing") drawTimingMode();
+        if (state.mode === "grid") drawGridMode();
+
+        drawReadoutCards();
+      };
+
+      function resizeToHolder() {
+        const rect = holder.getBoundingClientRect();
+        const w = Math.max(320, Math.floor(rect.width));
+        const h = Math.max(320, Math.floor(rect.height));
+        if (w !== previousWidth || h !== previousHeight) {
+          p.resizeCanvas(w, h);
+          previousWidth = w;
+          previousHeight = h;
+        }
+      }
+
+      function advanceCount() {
+        if (!state.running) return;
+        const interval = 1000 / state.speed;
+        if (p.millis() - state.lastTick >= interval) {
+          state.count = (state.count + 1) % 121;
+          state.lastTick = p.millis();
+          els.countSlider.value = state.count;
+          updateUI();
+        }
+      }
+
+      function drawSubtleGrid() {
+        p.push();
+        p.stroke(236, 224, 207);
+        p.strokeWeight(1);
+        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
+        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
+        p.pop();
+      }
+
+      function drawPanelTitle() {
+        const titles = {
+          counting: ["Counting", "The count keeps increasing. The remainder loops."],
+          wheel: ["Remainder Wheel", "Modulo is a circular counter."],
+          alternate: ["Alternate Colors", "Remainders can choose visual states."],
+          timing: ["Timing / Blink", "frameCount % n creates rhythm."],
+          grid: ["Pattern Grid", "Remainders can organize repeating patterns."]
+        };
+        const [title, subtitle] = titles[state.mode];
+        p.push();
+        p.noStroke();
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(22);
+        p.text(title, 24, 38);
+        p.textStyle(p.NORMAL);
+        p.textSize(14);
+        p.fill("#6b6258");
+        p.text(subtitle, 24, 62);
+        p.pop();
+      }
+
+      function drawCountingMode() {
+        const x = p.width * 0.08;
+        const y = p.height * 0.17;
+        const w = p.width * 0.84;
+        const h = p.height * 0.42;
+        const r = getRemainder();
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(x, y, w, h, 24);
+
+        drawBigNumber(x + w * 0.27, y + h * 0.48, state.count, "count", "#0891b2");
+        drawOperator(x + w * 0.45, y + h * 0.48, "%");
+        drawBigNumber(x + w * 0.57, y + h * 0.48, state.mod, "modulo by", "#7c3aed");
+        drawOperator(x + w * 0.70, y + h * 0.48, "=");
+        drawBigNumber(x + w * 0.82, y + h * 0.48, r, "remainder", "#e11d48");
+
+        if (state.showLabels) {
+          drawLabel("The remainder must be less than the modulo number.", x + 24, y + h - 34, "#6b6258", 14);
+        }
+        p.pop();
+
+        drawSequenceStrip();
+      }
+
+      function drawWheelMode() {
+        const cx = p.width * 0.5;
+        const cy = p.height * 0.37;
+        const radius = Math.min(p.width, p.height) * 0.21;
+        const r = getRemainder();
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(p.width * 0.12, p.height * 0.13, p.width * 0.76, p.height * 0.50, 24);
+
+        p.noFill();
+        p.stroke("#d8cbbb");
+        p.strokeWeight(5);
+        p.circle(cx, cy, radius * 2);
+
+        for (let i = 0; i < state.mod; i++) {
+          const angle = -p.HALF_PI + i * p.TWO_PI / state.mod;
+          const x = cx + Math.cos(angle) * radius;
+          const y = cy + Math.sin(angle) * radius;
+          const active = i === r;
+          p.noStroke();
+          p.fill(active ? "#e11d48" : "#fff7ed");
+          p.circle(x, y, active ? 46 : 34);
+          p.fill(active ? "#ffffff" : "#6b6258");
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textStyle(p.BOLD);
+          p.textSize(active ? 19 : 14);
+          p.text(i, x, y);
+        }
+
+        const activeAngle = -p.HALF_PI + r * p.TWO_PI / state.mod;
+        p.stroke("#16a34a");
+        p.strokeWeight(4);
+        p.line(cx, cy, cx + Math.cos(activeAngle) * radius, cy + Math.sin(activeAngle) * radius);
+        p.noStroke();
+        p.fill("#222222");
+        p.circle(cx, cy, 8);
+
+        if (state.showLabels) {
+          drawLabel(`${state.count} % ${state.mod} = ${r}`, cx - 52, cy + radius + 56, "#e11d48", 16);
+          drawLabel("after the last remainder, return to 0", cx - 110, cy - radius - 34, "#6b6258", 13);
+        }
+        p.pop();
+      }
+
+      function drawAlternateMode() {
+        const x = p.width * 0.08;
+        const y = p.height * 0.18;
+        const w = p.width * 0.84;
+        const h = p.height * 0.42;
+        const current = getRemainder();
+        const count = 28;
+        const gap = 8;
+        const dotSize = Math.min(34, (w - 70 - gap * (count - 1)) / count);
+        const startX = x + 35;
+        const dotY = y + h * 0.50;
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(x, y, w, h, 24);
+
+        for (let i = 0; i < count; i++) {
+          const rem = i % state.mod;
+          const isCurrent = rem === current;
+          const dx = startX + i * (dotSize + gap);
+          const hueColor = palette(rem);
+          p.fill(hueColor);
+          p.circle(dx, dotY, isCurrent ? dotSize * 1.35 : dotSize);
+          if (state.showLabels && i < 12) {
+            p.fill("#6b6258");
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textSize(10);
+            p.text(rem, dx, dotY + 34);
+          }
+        }
+
+        if (state.showLabels) {
+          drawLabel(`highlight remainder ${current}`, x + 24, y + 42, "#e11d48", 14);
+          drawLabel("index % modulo chooses a repeating state", x + 24, y + h - 34, "#6b6258", 14);
+        }
+        p.pop();
+      }
+
+      function drawTimingMode() {
+        const x = p.width * 0.08;
+        const y = p.height * 0.17;
+        const w = p.width * 0.84;
+        const h = p.height * 0.44;
+        const cycleLength = state.mod * 15;
+        const timer = state.count % cycleLength;
+        const on = timer < cycleLength / 2;
+        const progress = timer / cycleLength;
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(x, y, w, h, 24);
+
+        const cx = x + w * 0.28;
+        const cy = y + h * 0.52;
+        p.fill(on ? "#e11d48" : "#d8cbbb");
+        p.circle(cx, cy, 150);
+        p.fill(on ? "#ffffff" : "#6b6258");
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textSize(24);
+        p.text(on ? "ON" : "OFF", cx, cy);
+
+        const barX = x + w * 0.50;
+        const barY = y + h * 0.42;
+        const barW = w * 0.38;
+        const barH = 34;
+        p.fill("#e6dac8");
+        p.rect(barX, barY, barW, barH, 999);
+        p.fill("#16a34a");
+        p.rect(barX, barY, barW * progress, barH, 999);
+        p.fill("#222222");
+        p.textAlign(p.LEFT, p.CENTER);
+        p.textSize(16);
+        p.text(`timer = ${timer}`, barX, barY - 28);
+        p.text(`frameCount % ${cycleLength}`, barX, barY + 72);
+
+        if (state.showLabels) {
+          drawLabel("first half of cycle: ON", cx - 74, cy + 106, "#e11d48", 13);
+          drawLabel("then it wraps and repeats", barX + 10, barY + 118, "#16a34a", 13);
+        }
+        p.pop();
+      }
+
+      function drawGridMode() {
+        const x = p.width * 0.11;
+        const y = p.height * 0.15;
+        const maxW = p.width * 0.78;
+        const maxH = p.height * 0.50;
+        const cols = 14;
+        const rows = 8;
+        const size = Math.min(maxW / cols, maxH / rows);
+        const startX = x + (maxW - cols * size) / 2;
+        const startY = y + (maxH - rows * size) / 2;
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(p.width * 0.08, p.height * 0.12, p.width * 0.84, p.height * 0.55, 24);
+
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const rem = (row + col + getRemainder()) % state.mod;
+            p.fill(palette(rem));
+            p.rect(startX + col * size, startY + row * size, size - 2, size - 2, 8);
+            if (state.showLabels && size > 34) {
+              p.fill("#ffffff");
+              p.textAlign(p.CENTER, p.CENTER);
+              p.textStyle(p.BOLD);
+              p.textSize(11);
+              p.text(rem, startX + col * size + size / 2, startY + row * size + size / 2);
+            }
+          }
+        }
+
+        if (state.showLabels) {
+          drawLabel(`(row + col + remainder) % ${state.mod}`, startX, startY + rows * size + 30, "#7c3aed", 14);
+        }
+        p.pop();
+      }
+
+      function drawSequenceStrip() {
+        const x = p.width * 0.08;
+        const y = p.height * 0.64;
+        const w = p.width * 0.84;
+        const h = 82;
+        const visible = 16;
+        const start = Math.max(0, state.count - 5);
+        const cellW = w / visible;
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(x, y, w, h, 20);
+        for (let i = 0; i < visible; i++) {
+          const n = start + i;
+          const rem = n % state.mod;
+          const cx = x + i * cellW + cellW / 2;
+          const active = n === state.count;
+          p.fill(active ? "#e11d48" : palette(rem));
+          p.circle(cx, y + 36, active ? 34 : 26);
+          p.fill("#222222");
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textStyle(p.BOLD);
+          p.textSize(11);
+          p.text(n, cx, y + 13);
+          p.fill("#ffffff");
+          p.textSize(12);
+          p.text(rem, cx, y + 36);
+        }
+        if (state.showLabels) drawLabel("top number = count, circle number = remainder", x + 18, y + 72, "#6b6258", 13);
+        p.pop();
+      }
+
+      function drawReadoutCards() {
+        const r = getRemainder();
+        const cards = [
+          { label: "count", value: state.count, color: "#0891b2" },
+          { label: "modulo", value: `% ${state.mod}`, color: "#7c3aed" },
+          { label: "remainder", value: r, color: "#e11d48" }
+        ];
+        const cardW = Math.min(176, (p.width - 70) / cards.length);
+        const y = p.height - 168;
+        const x = 28;
+
+        p.push();
+        for (let i = 0; i < cards.length; i++) {
+          const cx = x + i * (cardW + 10);
+          p.noStroke();
+          p.fill(255, 255, 255, 235);
+          p.rect(cx, y, cardW, 62, 14);
+          p.fill(cards[i].color);
+          p.textStyle(p.BOLD);
+          p.textSize(13);
+          p.text(cards[i].label, cx + 12, y + 22);
+          p.fill("#222222");
+          p.textSize(20);
+          p.text(String(cards[i].value), cx + 12, y + 48);
+        }
+        p.pop();
+      }
+
+      function drawBigNumber(x, y, value, label, color) {
+        p.push();
+        p.noStroke();
+        p.fill(color);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textSize(64);
+        p.text(value, x, y);
+        p.textSize(13);
+        p.text(label, x, y + 58);
+        p.pop();
+      }
+
+      function drawOperator(x, y, value) {
+        p.push();
+        p.noStroke();
+        p.fill("#6b6258");
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textSize(44);
+        p.text(value, x, y);
+        p.pop();
+      }
+
+      function palette(index) {
+        const colors = [
+          "#7c3aed", "#0891b2", "#e11d48", "#f59e0b",
+          "#16a34a", "#2563eb", "#9333ea", "#dc2626",
+          "#0f766e", "#ca8a04", "#be123c", "#4f46e5"
+        ];
+        return colors[index % colors.length];
+      }
+
+      function drawLabel(text, x, y, color, size = 13) {
+        p.push();
+        p.textSize(size);
+        p.textStyle(p.BOLD);
+        const padX = 7;
+        const padY = 4;
+        const tw = p.textWidth(text);
+        p.noStroke();
+        p.fill(255, 250, 242, 238);
+        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
+        p.fill(color);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.text(text, x, y);
+        p.pop();
+      }
+    };
+
+    new p5(sketch);
+  </script>
+</body>
+</html>
