@@ -272,26 +272,43 @@ function updateVariableDisplay() {
 function updateCodePreview() {
   const code = `let duration = ${duration};
 let elapsed = 0;
-let x = 30;
 
-// Easing functions
 function easeIn(t)    { return t * t; }
 function easeOut(t)   { return t * (2 - t); }
-function easeInOut(t) {
-  return t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+function setup() {
+  createCanvas(500, 400);
 }
 
 function draw() {
-  elapsed++;
+  background(244, 239, 230);
+  elapsed = (elapsed + 1) % (duration + 60);
   let t = constrain(elapsed / duration, 0, 1);
+  let lerpX = 30;
 
-  // Pick one:
-  // x = map(t, 0, 1, 30, 370);           // linear
-  // x = map(easeIn(t), 0, 1, 30, 370);   // ease-in
-  // x = map(easeOut(t), 0, 1, 30, 370);  // ease-out
-  x = lerp(x, 370, ${lerpAmt.toFixed(2)});  // lerp
+  noStroke();
+  let labels = ["linear", "ease-in", "ease-out", "ease-in-out", "lerp"];
+  let easeFns = [t, easeIn(t), easeOut(t), easeInOut(t), null];
+  let spacing = height / (labels.length + 1);
 
-  circle(x, height/2, 22);
+  for (let i = 0; i < labels.length; i++) {
+    let y = (i + 1) * spacing;
+    let x = i < 4
+      ? map(easeFns[i], 0, 1, 30, width - 30)
+      : lerp(lerpX = lerp(lerpX, width - 30, ${lerpAmt.toFixed(2)}), lerpX, 0);
+
+    fill(200, 220, 210);
+    rect(30, y - 1, width - 60, 2, 2);
+
+    fill(61, 90, 128);
+    circle(x, y, 22);
+
+    fill(44, 42, 38);
+    textAlign(LEFT, CENTER);
+    textSize(11);
+    text(labels[i], 35, y - 16);
+  }
 }`;
   document.getElementById("code-preview").textContent = code;
 }

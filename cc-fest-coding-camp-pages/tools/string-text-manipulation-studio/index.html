@@ -274,27 +274,45 @@ function updateVariableDisplay() {
 }
 
 function updateCodePreview() {
+  const upper = inputText.toUpperCase();
+  const words = inputText.split(" ");
+  const dashed = words.join("-");
+  const sliced = inputText.slice(sliceStart, sliceEnd);
+  const reversed = inputText.split(" ").reverse().join(" ");
   const code = `let str = "${inputText}";
 
-// toUpperCase
-let upper = str.toUpperCase();
-// → "${inputText.toUpperCase()}"
+function setup() {
+  createCanvas(500, 400);
+  noLoop();
+}
 
-// split on spaces → array of words
-let words = str.split(" ");
-// → [${inputText.split(" ").map(w => `"${w}"`).join(", ")}]
+function draw() {
+  background(244, 239, 230);
+  textFont("monospace");
+  textSize(13);
+  fill(44, 42, 38);
 
-// join with dash
-let dashed = words.join("-");
-// → "${inputText.split(" ").join("-")}"
+  let lines = [
+    ["original",    str],
+    ["toUpperCase", str.toUpperCase()],
+    ["split+join-", str.split(" ").join("-")],
+    ["slice(${sliceStart},${sliceEnd})", str.slice(${sliceStart}, ${sliceEnd})],
+    ["reversed",    str.split(" ").reverse().join(" ")]
+  ];
 
-// slice characters ${sliceStart} to ${sliceEnd}
-let sliced = str.slice(${sliceStart}, ${sliceEnd});
-// → "${inputText.slice(sliceStart, sliceEnd)}"
-
-// reverse word order
-let rev = words.reverse().join(" ");
-// → "${inputText.split(" ").reverse().join(" ")}"`;
+  for (let i = 0; i < lines.length; i++) {
+    let y = 60 + i * 64;
+    fill(180, 200, 190);
+    noStroke();
+    rect(20, y - 18, width - 40, 48, 8);
+    fill(80, 100, 90);
+    textSize(11);
+    text(lines[i][0], 32, y);
+    fill(30, 50, 40);
+    textSize(15);
+    text(lines[i][1], 32, y + 22);
+  }
+}`;
   document.getElementById("code-preview").textContent = code;
 }
 

@@ -277,28 +277,31 @@ function updateVariableDisplay() {
 }
 
 function updateCodePreview() {
-  const code = `let x = width / 2;
-let y = height / 2;
+  const code = `let x, y;
 let speedX = ${speedX.toFixed(1)};
 let speedY = ${speedY.toFixed(1)};
 let ballSize = ${ballSize};
 let showPath = ${showPath};
 let paused = ${paused};
 
+function setup() {
+  createCanvas(400, 400);
+  x = width / 2;
+  y = height / 2;
+}
+
 function draw() {
   if (paused) return;
+  background(244, 239, 230);
 
   x += speedX;
   y += speedY;
 
-  if (x < 0 || x > width) {
-    speedX *= -1;
-  }
+  if (x < 0 || x > width) speedX *= -1;
+  if (y < 0 || y > height) speedY *= -1;
 
-  if (y < 0 || y > height) {
-    speedY *= -1;
-  }
-
+  fill(224, 122, 95);
+  noStroke();
   circle(x, y, ballSize);
 }`;
 

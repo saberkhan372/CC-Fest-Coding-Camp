@@ -373,42 +373,73 @@ function updateVariableDisplay() {
 function updateCodePreview() {
   const code = `class Animal {
   constructor(x, y, name) {
-    this.x = x; this.y = y;
+    this.x = x;
+    this.y = y;
     this.name = name;
     this.vx = random(-1, 1);
     this.vy = random(-1, 1);
   }
 
-  // Shared method
   move() {
     this.x += this.vx;
     this.y += this.vy;
+    if (this.x < 0 || this.x > width)  this.vx *= -1;
+    if (this.y < 0 || this.y > height) this.vy *= -1;
   }
 
-  speak() {
-    return this.name + " makes a sound";
+  display() {
+    fill(180);
+    noStroke();
+    circle(this.x, this.y, 28);
+    fill(44, 42, 38);
+    textAlign(CENTER, CENTER);
+    textSize(10);
+    text(this.name, this.x, this.y);
   }
 }
 
 class Dog extends Animal {
-  constructor(x, y) {
-    super(x, y, "Dog"); // calls Animal()
+  constructor(x, y) { super(x, y, "Dog"); }
+
+  display() {
+    fill(224, 122, 95);
+    noStroke();
+    circle(this.x, this.y, 32);
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(10);
+    text("Dog", this.x, this.y);
   }
-
-  // Override speak
-  speak() { return "Woof!"; }
-
-  // Unique method
-  fetch() { /* only Dogs fetch */ }
 }
 
 class Cat extends Animal {
-  constructor(x, y) {
-    super(x, y, "Cat");
-  }
+  constructor(x, y) { super(x, y, "Cat"); }
 
-  speak() { return "Meow!"; }
-  purr()  { /* only Cats purr */ }
+  display() {
+    fill(61, 90, 128);
+    noStroke();
+    circle(this.x, this.y, 28);
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(10);
+    text("Cat", this.x, this.y);
+  }
+}
+
+let animals = [];
+
+function setup() {
+  createCanvas(500, 400);
+  for (let i = 0; i < 3; i++) animals.push(new Dog(random(width), random(height)));
+  for (let i = 0; i < 3; i++) animals.push(new Cat(random(width), random(height)));
+}
+
+function draw() {
+  background(244, 239, 230);
+  for (let a of animals) {
+    a.move();
+    a.display();
+  }
 }`;
   document.getElementById("code-preview").textContent = code;
 }

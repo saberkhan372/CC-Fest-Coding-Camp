@@ -298,7 +298,9 @@ function updateVariableDisplay() {
 }
 
 function updateCodePreview() {
-  const code = `class Agent {
+  const code = `let agents = [];
+
+class Agent {
   constructor() {
     this.x = random(width);
     this.y = random(height);
@@ -308,7 +310,7 @@ function updateCodePreview() {
   }
 
   update() {
-    // Rule 1: Wander (random angle drift)
+    // Rule 1: Wander
     this.angle += random(-${wanderStr.toFixed(2)}, ${wanderStr.toFixed(2)}) * TWO_PI;
     this.vx += cos(this.angle) * 0.08;
     this.vy += sin(this.angle) * 0.08;
@@ -316,16 +318,39 @@ function updateCodePreview() {
     // Rule 2: Seek mouse
     let dx = mouseX - this.x;
     let dy = mouseY - this.y;
-    let d = dist(0, 0, dx, dy);
+    let d = max(dist(0, 0, dx, dy), 1);
     this.vx += (dx / d) * ${seekStr.toFixed(3)};
     this.vy += (dy / d) * ${seekStr.toFixed(3)};
 
     // Rule 3: Avoid edges
-    if (this.x < 40) this.vx += ${edgeStr.toFixed(2)} * 0.05;
-    if (this.x > width - 40) this.vx -= ${edgeStr.toFixed(2)} * 0.05;
+    if (this.x < 40)          this.vx += ${edgeStr.toFixed(2)} * 0.05;
+    if (this.x > width - 40)  this.vx -= ${edgeStr.toFixed(2)} * 0.05;
+    if (this.y < 40)          this.vy += ${edgeStr.toFixed(2)} * 0.05;
+    if (this.y > height - 40) this.vy -= ${edgeStr.toFixed(2)} * 0.05;
 
+    this.vx = constrain(this.vx, -3, 3);
+    this.vy = constrain(this.vy, -3, 3);
     this.x += this.vx;
     this.y += this.vy;
+  }
+
+  display() {
+    fill(61, 90, 128, 180);
+    noStroke();
+    circle(this.x, this.y, 12);
+  }
+}
+
+function setup() {
+  createCanvas(500, 400);
+  for (let i = 0; i < 20; i++) agents.push(new Agent());
+}
+
+function draw() {
+  background(244, 239, 230, 40);
+  for (let a of agents) {
+    a.update();
+    a.display();
   }
 }`;
   document.getElementById("code-preview").textContent = code;

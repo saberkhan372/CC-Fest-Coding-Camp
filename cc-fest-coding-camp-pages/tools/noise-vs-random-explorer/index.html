@@ -773,17 +773,24 @@
       lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> x = <span class="num">0</span>; x < width; x += <span class="num">8</span>) {`);
       lines.push(`    <span class="kw">let</span> randomY = <span class="fn">random</span>(<span class="num">80</span>, <span class="num">230</span>);`);
       lines.push(`    <span class="kw">let</span> noiseY = <span class="fn">map</span>(<span class="hi"><span class="fn">noise</span>(x * <span class="num">${(state.scale * 0.003).toFixed(3)}</span> + t)</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">80</span>, <span class="num">230</span>);`);
+      lines.push(`    <span class="fn">fill</span>(<span class="num">200</span>, <span class="num">80</span>, <span class="num">80</span>); <span class="fn">circle</span>(x, randomY, <span class="num">6</span>);`);
+      lines.push(`    <span class="fn">fill</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>); <span class="fn">circle</span>(x, noiseY, <span class="num">6</span>);`);
       lines.push(`  }`);
     } else if (state.mode === 'terrain') {
       lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> x = <span class="num">0</span>; x < width; x += <span class="num">12</span>) {`);
       lines.push(`    <span class="kw">let</span> randomHeight = <span class="fn">random</span>(<span class="num">80</span>, <span class="num">250</span>);`);
       lines.push(`    <span class="kw">let</span> noiseHeight = <span class="fn">map</span>(<span class="hi"><span class="fn">noise</span>(x * <span class="num">${(state.scale * 0.004).toFixed(3)}</span> + t)</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">80</span>, <span class="num">250</span>);`);
+      lines.push(`    <span class="fn">fill</span>(<span class="num">200</span>, <span class="num">80</span>, <span class="num">80</span>); <span class="fn">rect</span>(x, height - randomHeight, <span class="num">10</span>, randomHeight);`);
+      lines.push(`    <span class="fn">fill</span>(<span class="num">61</span>, <span class="num">90</span>, <span class="num">128</span>); <span class="fn">rect</span>(x, height - noiseHeight, <span class="num">10</span>, noiseHeight);`);
       lines.push(`  }`);
     } else {
       lines.push(`  <span class="kw">for</span> (<span class="kw">let</span> row = <span class="num">0</span>; row < <span class="num">8</span>; row++) {`);
       lines.push(`    <span class="kw">for</span> (<span class="kw">let</span> col = <span class="num">0</span>; col < <span class="num">12</span>; col++) {`);
+      lines.push(`      <span class="kw">let</span> x = <span class="num">30</span> + col * <span class="num">36</span>, y = <span class="num">30</span> + row * <span class="num">36</span>;`);
       lines.push(`      <span class="kw">let</span> randomBrightness = <span class="fn">random</span>(<span class="num">40</span>, <span class="num">240</span>);`);
       lines.push(`      <span class="kw">let</span> noiseBrightness = <span class="fn">map</span>(<span class="hi"><span class="fn">noise</span>(col * <span class="num">0.2</span>, row * <span class="num">0.2</span>, t)</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">40</span>, <span class="num">240</span>);`);
+      lines.push(`      <span class="fn">fill</span>(randomBrightness, <span class="num">80</span>, <span class="num">80</span>); <span class="fn">circle</span>(x - <span class="num">9</span>, y, <span class="num">14</span>);`);
+      lines.push(`      <span class="fn">fill</span>(<span class="num">61</span>, <span class="num">90</span>, noiseBrightness); <span class="fn">circle</span>(x + <span class="num">9</span>, y, <span class="num">14</span>);`);
       lines.push(`    }`);
       lines.push(`  }`);
     }
@@ -798,14 +805,14 @@
     }
 
     if (state.mode === 'waves') {
-      return `// Noise vs Random Explorer starter code\nlet t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  background(250, 246, 240);\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  for (let x = 0; x < width; x += 8) {\n    let randomY = random(80, 230);\n    let noiseY = map(noise(x * ${(state.scale * 0.003).toFixed(3)} + t), 0, 1, 80, 230);\n  }\n}`;
+      return `let t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n  noStroke();\n}\n\nfunction draw() {\n  background(250, 246, 240);\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  for (let x = 0; x < width; x += 8) {\n    let randomY = random(80, 230);\n    let noiseY = map(noise(x * ${(state.scale * 0.003).toFixed(3)} + t), 0, 1, 80, 230);\n    fill(200, 80, 80); circle(x, randomY, 6);\n    fill(61, 90, 128); circle(x, noiseY, 6);\n  }\n}`;
     }
 
     if (state.mode === 'terrain') {
-      return `// Noise vs Random Explorer starter code\nlet t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  background(250, 246, 240);\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  for (let x = 0; x < width; x += 12) {\n    let randomHeight = random(80, 250);\n    let noiseHeight = map(noise(x * ${(state.scale * 0.004).toFixed(3)} + t), 0, 1, 80, 250);\n  }\n}`;
+      return `let t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n  noStroke();\n}\n\nfunction draw() {\n  background(250, 246, 240);\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  for (let x = 0; x < width; x += 12) {\n    let randomHeight = random(80, 250);\n    let noiseHeight = map(noise(x * ${(state.scale * 0.004).toFixed(3)} + t), 0, 1, 80, 250);\n    fill(200, 80, 80); rect(x, height - randomHeight, 10, randomHeight);\n    fill(61, 90, 128); rect(x, height - noiseHeight, 10, noiseHeight);\n  }\n}`;
     }
 
-    return `// Noise vs Random Explorer starter code\nlet t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  background(250, 246, 240);\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  for (let row = 0; row < 8; row++) {\n    for (let col = 0; col < 12; col++) {\n      let randomBrightness = random(40, 240);\n      let noiseBrightness = map(noise(col * 0.2, row * 0.2, t), 0, 1, 40, 240);\n    }\n  }\n}`;
+    return `let t = 0;\n\nfunction setup() {\n  createCanvas(400, 300);\n  noStroke();\n}\n\nfunction draw() {\n  background(250, 246, 240);\n  t += ${(state.speed * 0.0015).toFixed(4)};\n\n  for (let row = 0; row < 8; row++) {\n    for (let col = 0; col < 12; col++) {\n      let x = 30 + col * 36, y = 30 + row * 36;\n      let randomBrightness = random(40, 240);\n      let noiseBrightness = map(noise(col * 0.2, row * 0.2, t), 0, 1, 40, 240);\n      fill(randomBrightness, 80, 80); circle(x - 9, y, 14);\n      fill(61, 90, noiseBrightness); circle(x + 9, y, 14);\n    }\n  }\n}`;
   }
 
   function copyCode(button) {

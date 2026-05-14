@@ -301,9 +301,21 @@ class Particle {
     this.age++;
   }
 
+  display() {
+    let alpha = map(this.age, 0, this.maxAge, 255, 0);
+    fill(224, 122, 95, alpha);
+    noStroke();
+    let sz = map(this.age, 0, this.maxAge, 16, 4);
+    circle(this.x, this.y, sz);
+  }
+
   isAlive() {
     return this.age < this.maxAge;
   }
+}
+
+function setup() {
+  createCanvas(500, 400);
 }
 
 function mousePressed() {
@@ -317,10 +329,9 @@ function draw() {
 
   for (let p of particles) {
     p.update();
-    // p.display() ...
+    p.display();
   }
 
-  // Remove dead particles
   particles = particles.filter(p => p.isAlive());
 }`;
   document.getElementById("code-preview").textContent = code;
