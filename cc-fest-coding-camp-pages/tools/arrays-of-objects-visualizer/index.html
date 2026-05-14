@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arrays of Objects Visualizer — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/arrays-of-objects-visualizer/">
+  <meta property="og:title" content="Arrays of Objects Visualizer — CC Fest Coding Camp">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Arrays of Objects Visualizer — CC Fest Coding Camp">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 3 / 4</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Arrays of Objects Visualizer</h1>
+      <p class="tool-subtitle">See the conceptual ladder: one variable → array → array of objects → class. Each step manages more things with less code.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">arrays</span>
+        <span class="tool-tag">objects</span>
+        <span class="tool-tag">classes</span>
+        <span class="tool-tag">for loop</span>
+        <span class="tool-tag">OOP</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>The canvas shows animated balls at the current ladder step. Move through steps to see code and canvas change together.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>Code changes completely as you move between ladder steps.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Loading...</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>The Ladder</h2>
+                <p>Each step manages more objects with less duplicated code.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div style="display:grid;gap:6px;">
+                <button class="button primary" id="step1btn" onclick="setStep(1)">1 — One Variable</button>
+                <button class="button ghost"   id="step2btn" onclick="setStep(2)">2 — Many Variables</button>
+                <button class="button ghost"   id="step3btn" onclick="setStep(3)">3 — Array of Values</button>
+                <button class="button ghost"   id="step4btn" onclick="setStep(4)">4 — Array + Loop</button>
+                <button class="button ghost"   id="step5btn" onclick="setStep(5)">5 — Array of Objects</button>
+                <button class="button ghost"   id="step6btn" onclick="setStep(6)">6 — Class</button>
+              </div>
+
+              <div class="control">
+                <label for="ballCount">Ball Count <span id="ballCountValue">6</span></label>
+                <input id="ballCount" type="range" min="1" max="20" value="6" step="1" oninput="updateBallCount(this.value)">
+              </div>
+
+              <div class="button-row">
+                <button class="button ghost" onclick="addBall()">Add Ball</button>
+                <button class="button ghost" onclick="removeBall()">Remove Ball</button>
+              </div>
+
+              <div id="step-description" style="font-size:0.88rem;color:#555;line-height:1.5;padding:10px;background:#f8f4ee;border-radius:10px;"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div><h2>Sketch State</h2></div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div><h2>Try / Notice / Remix</h2></div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Move from Step 1 to Step 6 watching both the code and the canvas. At each step more balls appear but the code gets shorter, not longer.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>At Step 5, each ball has its own <code>x</code>, <code>y</code>, <code>speed</code>, and <code>color</code> stored as object properties. At Step 6, the class packages that together as a reusable template.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Add a <code>size</code> property to the class. Give each ball a unique size in the constructor. Add collision: if two balls overlap, reverse their speeds.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Arrays of Objects Visualizer · Session 3/4 · The conceptual ladder from one variable to classes</footer>
+  </div>
+
+  <script>
+let currentStep = 1;
+let ballCount = 6;
+
+// Ball data for step 5/6
+let balls = [];
+
+function makeBall(i, total) {
+  return {
+    x: 40 + Math.random() * 320,
+    y: 40 + Math.random() * 320,
+    vx: (Math.random() - 0.5) * 3,
+    vy: (Math.random() - 0.5) * 3,
+    r: Math.floor(Math.random() * 180),
+    g: Math.floor(Math.random() * 180),
+    b: Math.floor(80 + Math.random() * 175),
+    size: 20 + Math.random() * 20
+  };
+}
+
+function rebuildBalls() {
+  balls = Array.from({length: ballCount}, (_, i) => makeBall(i, ballCount));
+}
+
+function addBall() {
+  if (ballCount < 20) {
+    ballCount++;
+    document.getElementById("ballCount").value = ballCount;
+    document.getElementById("ballCountValue").textContent = ballCount;
+    balls.push(makeBall(balls.length, ballCount));
+    updateCodePreview();
+    updateVariableDisplay();
+  }
+}
+
+function removeBall() {
+  if (ballCount > 1) {
+    ballCount--;
+    document.getElementById("ballCount").value = ballCount;
+    document.getElementById("ballCountValue").textContent = ballCount;
+    balls.pop();
+    updateCodePreview();
+    updateVariableDisplay();
+  }
+}
+
+function updateBallCount(v) {
+  ballCount = Number(v);
+  document.getElementById("ballCountValue").textContent = ballCount;
+  rebuildBalls();
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+const descriptions = {
+  1: "One variable = one ball. To add a second ball, you'd need to copy every line. This doesn't scale.",
+  2: "Many variables: x1, y1, x2, y2... Each ball needs its own set. Adding a 5th ball means 5 more variables.",
+  3: "Array of x values: xs = []. Now many balls share one structure, but they all have the same properties.",
+  4: "Array + for loop: one loop handles all balls. Add more values to the array — the loop adapts automatically.",
+  5: "Array of objects: each ball is an {x, y, vx, speed, color} bundle. Properties travel together.",
+  6: "Class: a reusable template. new Ball() creates any number of independent instances. This is the full OOP pattern."
+};
+
+function setStep(step) {
+  currentStep = step;
+  for (let i = 1; i <= 6; i++) {
+    document.getElementById(`step${i}btn`).className = i === step ? "button primary" : "button ghost";
+  }
+  document.getElementById("step-description").textContent = descriptions[step];
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function updateVariableDisplay() {
+  const variables = [
+    ["step", currentStep + " / 6"],
+    ["ballCount", ballCount],
+    ["pattern", ["", "One Var", "Many Vars", "Array", "Array+Loop", "Array of Obj", "Class"][currentStep]],
+  ];
+  document.getElementById("variables").innerHTML = variables
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
+}
+
+function updateCodePreview() {
+  const codes = {
+    1: `// Step 1: One variable = one ball
+let x = 200;
+let y = 200;
+let vx = 2;
+let vy = 1.5;
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(244, 239, 230);
+  x += vx;
+  y += vy;
+  if (x < 0 || x > width)  vx *= -1;
+  if (y < 0 || y > height) vy *= -1;
+  fill(61, 90, 128);
+  noStroke();
+  circle(x, y, 30);
+}`,
+    2: `// Step 2: Many variables — doesn't scale!
+let x1=80,  y1=100, vx1=2,  vy1=1.5;
+let x2=200, y2=200, vx2=-1, vy2=2;
+let x3=320, y3=300, vx3=1,  vy3=-1;
+// ...need more? copy everything again
+
+function draw() {
+  x1 += vx1; y1 += vy1;
+  if (x1<0||x1>width)  vx1*=-1;
+  if (y1<0||y1>height) vy1*=-1;
+  circle(x1, y1, 30);
+
+  x2 += vx2; y2 += vy2;
+  // ...repeat for every ball
+}`,
+    3: `// Step 3: Array of x values — cleaner but
+// all balls share the same properties
+let xs = [80, 160, 240, 320];
+let ys = [100, 200, 150, 250];
+
+function draw() {
+  background(244, 239, 230);
+  for (let i = 0; i < xs.length; i++) {
+    fill(61, 90, 128);
+    noStroke();
+    circle(xs[i], ys[i], 30);
+  }
+}`,
+    4: `// Step 4: Array + for loop
+// One loop handles ALL balls automatically
+let xs  = [80, 140, 200, 260, 320];
+let vxs = [2, -1, 1.5, -2, 1];
+
+function draw() {
+  background(244, 239, 230);
+  for (let i = 0; i < xs.length; i++) {
+    xs[i] += vxs[i];
+    if (xs[i] < 0 || xs[i] > width) {
+      vxs[i] *= -1;
+    }
+    fill(61, 90, 128);
+    noStroke();
+    circle(xs[i], 200, 30);
+  }
+  // Add more values to xs/vxs — loop adapts
+}`,
+    5: `// Step 5: Array of objects
+// Each ball bundles all its own properties
+let balls = [];
+
+function setup() {
+  createCanvas(400, 400);
+  for (let i = 0; i < ${ballCount}; i++) {
+    balls.push({
+      x: random(width),
+      y: random(height),
+      vx: random(-2, 2),
+      vy: random(-2, 2),
+      r: random(40, 220),
+      g: random(80, 180),
+      b: random(80, 200)
+    });
+  }
+}
+
+function draw() {
+  background(244, 239, 230);
+  for (let b of balls) {
+    b.x += b.vx;
+    b.y += b.vy;
+    if (b.x < 0 || b.x > width)  b.vx *= -1;
+    if (b.y < 0 || b.y > height) b.vy *= -1;
+    fill(b.r, b.g, b.b);
+    noStroke();
+    circle(b.x, b.y, 30);
+  }
+}`,
+    6: `// Step 6: Class — reusable template
+// new Ball() creates independent instances
+class Ball {
+  constructor() {
+    this.x = random(width);
+    this.y = random(height);
+    this.vx = random(-2, 2);
+    this.vy = random(-2, 2);
+    this.col = color(random(40,220),
+                     random(80,180),
+                     random(80,200));
+    this.size = random(20, 40);
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > width)  this.vx *= -1;
+    if (this.y < 0 || this.y > height) this.vy *= -1;
+  }
+
+  display() {
+    fill(this.col);
+    noStroke();
+    circle(this.x, this.y, this.size);
+  }
+}
+
+let balls = [];
+
+function setup() {
+  createCanvas(400, 400);
+  for (let i = 0; i < ${ballCount}; i++) {
+    balls.push(new Ball());
+  }
+}
+
+function draw() {
+  background(244, 239, 230);
+  for (let b of balls) {
+    b.update();
+    b.display();
+  }
+}`
+  };
+
+  document.getElementById("code-preview").textContent = codes[currentStep] || "";
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+
+// Single variable for step 1/2
+let s1 = { x: 200, y: 200, vx: 2, vy: 1.5 };
+let s2 = [
+  { x: 80,  y: 100, vx: 2,   vy: 1.5 },
+  { x: 200, y: 200, vx: -1,  vy: 2   },
+  { x: 320, y: 300, vx: 1,   vy: -1  }
+];
+
+new p5(function(p) {
+  p.setup = function() {
+    const canvas = p.createCanvas(400, 400);
+    canvas.parent("canvas-container");
+    rebuildBalls();
+    setStep(1);
+  };
+
+  p.draw = function() {
+    p.background(244, 239, 230);
+
+    const step = currentStep;
+
+    if (step === 1) {
+      s1.x += s1.vx; s1.y += s1.vy;
+      if (s1.x < 15 || s1.x > p.width - 15)  s1.vx *= -1;
+      if (s1.y < 15 || s1.y > p.height - 15) s1.vy *= -1;
+      p.fill(61, 90, 128); p.noStroke();
+      p.circle(s1.x, s1.y, 30);
+      p.fill(80); p.textSize(11); p.textAlign(p.LEFT);
+      p.text(`x = ${Math.round(s1.x)}, y = ${Math.round(s1.y)}`, 10, 18);
+
+    } else if (step === 2) {
+      for (let b of s2) {
+        b.x += b.vx; b.y += b.vy;
+        if (b.x < 15 || b.x > p.width - 15)  b.vx *= -1;
+        if (b.y < 15 || b.y > p.height - 15) b.vy *= -1;
+        p.fill(61, 90, 128); p.noStroke(); p.circle(b.x, b.y, 30);
+      }
+      p.fill(80); p.textSize(11); p.textAlign(p.LEFT);
+      p.text("x1, y1, x2, y2, x3, y3 — 6 separate variables", 10, 18);
+
+    } else if (step === 3) {
+      // Static dots — no movement to show the "no velocity" limitation
+      const xs = [60, 140, 220, 300, 380];
+      const ys = [80, 200, 320, 120, 260];
+      for (let i = 0; i < Math.min(xs.length, ballCount); i++) {
+        p.fill(61, 90, 128, 180); p.noStroke();
+        p.circle(xs[i % xs.length], ys[i % ys.length], 30);
+      }
+      p.fill(80); p.textSize(11); p.textAlign(p.LEFT);
+      p.text("xs[] and ys[] — shared structure, same properties", 10, 18);
+
+    } else if (step === 4) {
+      // Simple horizontal bounce using xs[]
+      if (!p._s4) {
+        p._s4 = Array.from({length: ballCount}, (_, i) => ({
+          x: 30 + Math.random() * 340,
+          vx: (Math.random() < 0.5 ? 1 : -1) * (1 + Math.random() * 2),
+          y: 60 + (i / (ballCount - 1 || 1)) * 300
+        }));
+      }
+      while (p._s4.length < ballCount) {
+        p._s4.push({ x: p.random(p.width), vx: p.random(-2, 2), y: p.random(p.height) });
+      }
+      p._s4.length = ballCount;
+      for (let b of p._s4) {
+        b.x += b.vx;
+        if (b.x < 15 || b.x > p.width - 15) b.vx *= -1;
+        p.fill(61, 90, 128); p.noStroke(); p.circle(b.x, b.y, 28);
+      }
+      p.fill(80); p.textSize(11); p.textAlign(p.LEFT);
+      p.text("xs[] + vxs[] — one loop handles all " + ballCount + " balls", 10, 18);
+
+    } else if (step === 5 || step === 6) {
+      while (balls.length < ballCount) balls.push(makeBall(balls.length, ballCount));
+      balls.length = ballCount;
+
+      for (let b of balls) {
+        b.x += b.vx; b.y += b.vy;
+        if (b.x < b.size/2 || b.x > p.width - b.size/2)  b.vx *= -1;
+        if (b.y < b.size/2 || b.y > p.height - b.size/2) b.vy *= -1;
+        p.fill(b.r, b.g, b.b, 210); p.noStroke();
+        p.circle(b.x, b.y, b.size);
+      }
+      p.fill(80); p.textSize(11); p.textAlign(p.LEFT);
+      const label = step === 5 ? "Array of objects — each ball owns its own properties" : "Class — new Ball() creates independent instances";
+      p.text(label, 10, 18);
+    }
+
+    // Step label
+    p.noStroke();
+    p.fill(200, 190, 175);
+    p.textSize(60);
+    p.textAlign(p.RIGHT, p.BOTTOM);
+    p.text(step, p.width - 12, p.height - 8);
+  };
+});
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

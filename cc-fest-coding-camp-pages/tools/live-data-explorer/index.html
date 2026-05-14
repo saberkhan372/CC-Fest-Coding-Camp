@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Data Explorer — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/live-data-explorer/">
+  <meta property="og:title" content="Live Data Explorer — CC Fest Coding Camp">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Live Data Explorer — CC Fest Coding Camp">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 4</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Live Data Explorer</h1>
+      <p class="tool-subtitle">Load JSON from a URL with loadJSON(), loop through the data, and map one field to a visual property. Includes a live ISS position fetch and mock data fallback.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">loadJSON()</span>
+        <span class="tool-tag">preload()</span>
+        <span class="tool-tag">JSON</span>
+        <span class="tool-tag">API</span>
+        <span class="tool-tag">data</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>The canvas maps a data field to a visual shape. Switch between the ISS API and mock data below.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>The preload() + loadJSON() pattern — same structure for any JSON source.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Code will appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Fetch live data or explore mock data.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="button-row">
+                <button class="button primary" onclick="fetchISSData()">Fetch ISS Position</button>
+                <button class="button ghost" onclick="useMockData()">Use Mock Data</button>
+              </div>
+              <div id="data-status" style="font-size:0.85rem;color:#888;">Press a button to load data.</div>
+
+              <div class="control">
+                <label>Visual Field</label>
+                <div class="button-row">
+                  <button class="button primary" id="fieldLat" onclick="setField('latitude')">Latitude</button>
+                  <button class="button ghost" id="fieldLon" onclick="setField('longitude')">Longitude</button>
+                  <button class="button ghost" id="fieldTS" onclick="setField('timestamp')">Timestamp</button>
+                </div>
+              </div>
+
+              <div class="control">
+                <label>Visual Mode</label>
+                <div class="button-row">
+                  <button class="button primary" id="modeBar" onclick="setMode('bar')">Bar</button>
+                  <button class="button ghost" id="modeCircle" onclick="setMode('circle')">Circle</button>
+                  <button class="button ghost" id="modeText" onclick="setMode('text')">Text</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Raw Data</h2>
+                <p>The JSON fields currently loaded.</p>
+              </div>
+            </div>
+            <div id="data-display" style="font-family:DM Mono,monospace;font-size:0.8rem;line-height:1.6;color:#555;min-height:60px;">
+              No data loaded yet.
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+              </div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Click "Fetch ISS Position" several times. The ISS moves at ~7.7 km/s — watch the latitude and longitude values change each time.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>CORS blocks direct API calls in many browsers. The mock data shows the exact same code pattern — swap the URL to go live when running on a server.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Replace the ISS API with Open Meteo (free weather, no auth), or use a hardcoded array of objects and loop through it — the mapping code is identical.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Live Data Explorer · Session 4 · loadJSON(), preload(), and mapping data to visuals</footer>
+  </div>
+
+  <script>
+let currentData = null;
+let visualField = 'latitude';
+let visualMode = 'bar';
+let dataSource = 'none';
+
+// Mock ISS-style data for CORS fallback
+const mockData = {
+  message: "success",
+  timestamp: 1715000000,
+  iss_position: {
+    latitude: "23.4521",
+    longitude: "-118.7832"
+  }
+};
+
+const mockDataset = [
+  { label: "Sample A", latitude: 23.45, longitude: -118.78, timestamp: 1715000000 },
+  { label: "Sample B", latitude: -12.30, longitude: 45.20, timestamp: 1715000060 },
+  { label: "Sample C", latitude: 51.87, longitude: -3.50, timestamp: 1715000120 },
+  { label: "Sample D", latitude: -34.60, longitude: 150.90, timestamp: 1715000180 },
+  { label: "Sample E", latitude: 70.12, longitude: 25.33, timestamp: 1715000240 }
+];
+
+function fetchISSData() {
+  document.getElementById("data-status").textContent = "Fetching from Open Notify API...";
+  fetch("https://api.open-notify.org/iss-now.json")
+    .then(r => r.json())
+    .then(data => {
+      currentData = {
+        label: "ISS (live)",
+        latitude: parseFloat(data.iss_position.latitude),
+        longitude: parseFloat(data.iss_position.longitude),
+        timestamp: data.timestamp
+      };
+      dataSource = 'live';
+      document.getElementById("data-status").textContent = "Live ISS data loaded!";
+      updateDataDisplay();
+      updateCodePreview();
+      updateVariableDisplay();
+    })
+    .catch(() => {
+      // CORS fallback — use mock
+      currentData = {
+        label: "ISS (mock fallback)",
+        latitude: parseFloat(mockData.iss_position.latitude),
+        longitude: parseFloat(mockData.iss_position.longitude),
+        timestamp: mockData.timestamp
+      };
+      dataSource = 'mock-fallback';
+      document.getElementById("data-status").textContent = "CORS blocked live fetch — showing mock data (same pattern).";
+      updateDataDisplay();
+      updateCodePreview();
+      updateVariableDisplay();
+    });
+}
+
+function useMockData() {
+  dataSource = 'mock';
+  document.getElementById("data-status").textContent = "Mock dataset loaded — 5 samples.";
+  currentData = mockDataset[0];
+  updateDataDisplay();
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function setField(field) {
+  visualField = field;
+  ["fieldLat","fieldLon","fieldTS"].forEach(id => document.getElementById(id).className = "button ghost");
+  if (field === 'latitude') document.getElementById("fieldLat").className = "button primary";
+  if (field === 'longitude') document.getElementById("fieldLon").className = "button primary";
+  if (field === 'timestamp') document.getElementById("fieldTS").className = "button primary";
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function setMode(mode) {
+  visualMode = mode;
+  ["modeBar","modeCircle","modeText"].forEach(id => document.getElementById(id).className = "button ghost");
+  document.getElementById("mode" + mode.charAt(0).toUpperCase() + mode.slice(1)).className = "button primary";
+  updateCodePreview();
+}
+
+function updateDataDisplay() {
+  if (!currentData) return;
+  const data = dataSource === 'mock' ? mockDataset : [currentData];
+  document.getElementById("data-display").innerHTML = data.map(d =>
+    `<div style="margin-bottom:4px;">{<br>
+    &nbsp;&nbsp;<strong>latitude</strong>: ${d.latitude},<br>
+    &nbsp;&nbsp;<strong>longitude</strong>: ${d.longitude},<br>
+    &nbsp;&nbsp;<strong>timestamp</strong>: ${d.timestamp}<br>
+    }</div>`
+  ).join("<hr style='border:none;border-top:1px solid #eee;margin:4px 0'>");
+}
+
+function updateVariableDisplay() {
+  const val = currentData ? currentData[visualField] : null;
+  const variables = [
+    ["dataSource", dataSource],
+    ["visualField", visualField],
+    ["fieldValue", val !== null ? Number(val).toFixed(2) : "null"],
+    ["visualMode", visualMode],
+    ["dataLoaded", currentData !== null],
+  ];
+  document.getElementById("variables").innerHTML = variables
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
+}
+
+function updateCodePreview() {
+  const dataArr = dataSource === 'mock' ? 'mockDataset' : 'data';
+  const code = `// Hardcoded JSON (same pattern as loadJSON)
+let data = [
+  { latitude: 23.45, longitude: -118.78 },
+  { latitude: -12.30, longitude:   45.20 },
+  { latitude:  51.87, longitude:   -3.50 }
+];
+
+// In p5.js with a real URL:
+let liveData;
+function preload() {
+  liveData = loadJSON(
+    "https://api.open-notify.org/iss-now.json"
+  );
+}
+
+function setup() {
+  createCanvas(400, 300);
+  noLoop();
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // Map one field to a visual property
+  for (let i = 0; i < data.length; i++) {
+    let val = data[i].${visualField};
+    let barH = map(val, -180, 180, 10, 280);
+
+${visualMode === 'bar' ? `    fill(61, 90, 128);
+    rect(30 + i * 70, height - barH, 50, barH);` :
+      visualMode === 'circle' ? `    fill(224, 122, 95);
+    circle(60 + i * 70, height / 2, map(val, -90, 90, 10, 80));` :
+        `    fill(44, 42, 38);
+    textSize(14);
+    text(val.toFixed(1), 30 + i * 70, height / 2);`}
+  }
+}`;
+  document.getElementById("code-preview").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+
+new p5(function(p) {
+  p.setup = function() {
+    const canvas = p.createCanvas(400, 300);
+    canvas.parent("canvas-container");
+    updateCodePreview();
+    updateVariableDisplay();
+  };
+
+  p.draw = function() {
+    p.background(244, 239, 230);
+
+    const dataset = dataSource === 'mock' ? mockDataset : (currentData ? [currentData] : []);
+
+    if (dataset.length === 0) {
+      p.fill(160);
+      p.noStroke();
+      p.textSize(16);
+      p.textAlign(p.CENTER, p.CENTER);
+      p.text("Press a button above to load data.", p.width/2, p.height/2);
+      return;
+    }
+
+    const fieldMin = visualField === 'latitude' ? -90 : visualField === 'longitude' ? -180 : 1714000000;
+    const fieldMax = visualField === 'latitude' ? 90 : visualField === 'longitude' ? 180 : 1716000000;
+
+    const cols = dataset.length;
+    const colW = Math.floor((p.width - 60) / cols);
+
+    for (let i = 0; i < cols; i++) {
+      const val = Number(dataset[i][visualField]);
+      const mapped = p.map(val, fieldMin, fieldMax, 10, 220);
+
+      p.noStroke();
+      if (visualMode === 'bar') {
+        p.fill(61, 90, 128, 220);
+        p.rect(30 + i * colW, p.height - 40 - mapped, colW - 8, mapped, 4, 4, 0, 0);
+        p.fill(100, 130, 160);
+        p.textSize(10);
+        p.textAlign(p.CENTER);
+        p.text(val.toFixed(1), 30 + i * colW + (colW-8)/2, p.height - 44 - mapped);
+        p.fill(80);
+        p.textSize(9);
+        p.text(dataset[i].label || ("S" + (i+1)), 30 + i * colW + (colW-8)/2, p.height - 24);
+      } else if (visualMode === 'circle') {
+        const d = p.map(val, fieldMin, fieldMax, 15, 90);
+        p.fill(224, 122, 95, 200);
+        p.circle(30 + i * colW + (colW-8)/2, p.height/2, Math.abs(d));
+        p.fill(80);
+        p.textSize(10);
+        p.textAlign(p.CENTER);
+        p.text(val.toFixed(1), 30 + i * colW + (colW-8)/2, p.height - 20);
+      } else {
+        p.fill(44, 42, 38);
+        p.textSize(13);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text(val.toFixed(2), 30 + i * colW + (colW-8)/2, p.height/2 - 10);
+        p.fill(100);
+        p.textSize(10);
+        p.text(dataset[i].label || ("S" + (i+1)), 30 + i * colW + (colW-8)/2, p.height/2 + 12);
+      }
+    }
+
+    // Axis line for bar mode
+    if (visualMode === 'bar') {
+      p.stroke(180);
+      p.strokeWeight(1);
+      p.line(20, p.height - 40, p.width - 20, p.height - 40);
+    }
+
+    p.noStroke();
+    p.fill(120);
+    p.textSize(11);
+    p.textAlign(p.LEFT);
+    p.text("Field: " + visualField + "  |  Mode: " + visualMode, 12, 16);
+  };
+});
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

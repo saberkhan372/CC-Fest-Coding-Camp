@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bar Chart Studio — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/bar-chart-studio/">
+  <meta property="og:title" content="Bar Chart Studio — CC Fest Coding Camp">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bar Chart Studio — CC Fest Coding Camp">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 4</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Bar Chart Studio</h1>
+      <p class="tool-subtitle">Build a bar chart from two parallel arrays — names and values — and watch data become visual bars with labels. The exact Session 4 Saber-family demo pattern.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">arrays</span>
+        <span class="tool-tag">loops</span>
+        <span class="tool-tag">rect()</span>
+        <span class="tool-tag">data visualization</span>
+        <span class="tool-tag">map()</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Edit names and values below. The chart updates live — <code>names[i]</code> labels each bar, <code>values[i]</code> controls its height.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>Two parallel arrays + one for loop = bar chart. This is the core Session 4 pattern.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Loading...</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Change names, values, colors, and orientation.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div style="display:grid;gap:8px;">
+                <label style="font-weight:600;font-size:0.9rem;">Names & Values</label>
+                <div id="data-inputs"></div>
+              </div>
+
+              <div class="control">
+                <label for="barColor">Bar Color</label>
+                <input id="barColor" type="color" value="#3d5a80" oninput="updateSketch()">
+              </div>
+
+              <div class="control">
+                <label>Orientation</label>
+                <div class="button-row">
+                  <button class="button primary" id="orientV" onclick="setOrientation('vertical')">Vertical</button>
+                  <button class="button ghost" id="orientH" onclick="setOrientation('horizontal')">Horizontal</button>
+                </div>
+              </div>
+
+              <div class="control">
+                <label>Show Values Above Bars</label>
+                <div class="button-row">
+                  <button class="button primary" id="showValOn" onclick="setShowValues(true)">On</button>
+                  <button class="button ghost" id="showValOff" onclick="setShowValues(false)">Off</button>
+                </div>
+              </div>
+
+              <div class="button-row">
+                <button class="button ghost" onclick="resetChart()">Reset to Saber Family</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>The two arrays live in memory right now.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Change "Saber" to your name and adjust the values to represent something from your own life — favorite colors ranked, hours of sleep, or weekly steps.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p><code>values[i]</code> controls the bar height, <code>names[i]</code> controls the label. The index <code>i</code> connects them — that's the entire parallel arrays pattern.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Add a <code>colors[]</code> array — one hex per bar — and use it inside the loop. Or animate bars growing from 0 using <code>frameCount</code>.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Bar Chart Studio · Session 4 · Parallel arrays, loops, and data visualization</footer>
+  </div>
+
+  <script>
+let names = ["Saber", "Lucia", "Megna", "Anaya"];
+let values = [42, 38, 8, 5];
+let barColorHex = "#3d5a80";
+let orientation = 'vertical';
+let showValues = true;
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return {r, g, b};
+}
+
+function buildInputs() {
+  const container = document.getElementById("data-inputs");
+  container.innerHTML = "";
+  for (let i = 0; i < 4; i++) {
+    const row = document.createElement("div");
+    row.style.cssText = "display:grid;grid-template-columns:1fr 80px;gap:8px;align-items:center;margin-bottom:6px;";
+    row.innerHTML = `
+      <input type="text" value="${names[i]}" data-index="${i}" data-type="name"
+        style="padding:6px 8px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;"
+        oninput="updateName(${i}, this.value)">
+      <input type="range" min="0" max="100" value="${values[i]}" data-index="${i}" data-type="value"
+        style="width:100%;" oninput="updateValue(${i}, this.value)" title="${values[i]}">
+    `;
+    container.appendChild(row);
+
+    // value label row
+    const labelRow = document.createElement("div");
+    labelRow.style.cssText = "text-align:right;font-size:0.8rem;color:#888;margin-bottom:4px;font-family:DM Mono,monospace;";
+    labelRow.id = `val-label-${i}`;
+    labelRow.textContent = `values[${i}] = ${values[i]}`;
+    container.appendChild(labelRow);
+  }
+}
+
+function updateName(i, v) {
+  names[i] = v || ("Item " + (i+1));
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function updateValue(i, v) {
+  values[i] = Number(v);
+  document.getElementById(`val-label-${i}`).textContent = `values[${i}] = ${values[i]}`;
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function setOrientation(o) {
+  orientation = o;
+  document.getElementById("orientV").className = o === 'vertical' ? "button primary" : "button ghost";
+  document.getElementById("orientH").className = o === 'horizontal' ? "button primary" : "button ghost";
+  updateCodePreview();
+}
+
+function setShowValues(v) {
+  showValues = v;
+  document.getElementById("showValOn").className = v ? "button primary" : "button ghost";
+  document.getElementById("showValOff").className = !v ? "button primary" : "button ghost";
+  updateCodePreview();
+}
+
+function resetChart() {
+  names = ["Saber", "Lucia", "Megna", "Anaya"];
+  values = [42, 38, 8, 5];
+  barColorHex = "#3d5a80";
+  document.getElementById("barColor").value = barColorHex;
+  buildInputs();
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function updateVariableDisplay() {
+  const variables = [
+    ["names", "[" + names.map(n => `"${n}"`).join(", ") + "]"],
+    ["values", "[" + values.join(", ") + "]"],
+    ["orientation", orientation],
+    ["barColor", barColorHex],
+  ];
+  document.getElementById("variables").innerHTML = variables
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code style="font-size:0.78rem">${value}</code></div>`)
+    .join("");
+}
+
+function updateCodePreview() {
+  const c = hexToRgb(barColorHex);
+  const code = `// Two parallel arrays — the core pattern
+let names  = [${names.map(n => `"${n}"`).join(", ")}];
+let values = [${values.join(", ")}];
+
+function setup() {
+  createCanvas(400, 360);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  let barW = width / names.length;
+  let maxVal = max(values); // find tallest bar
+
+  for (let i = 0; i < names.length; i++) {
+    // map value to bar height
+    let h = map(values[i], 0, maxVal, 0, 280);
+
+${orientation === 'vertical' ? `    // vertical bar
+    fill(${c.r}, ${c.g}, ${c.b});
+    noStroke();
+    rect(i * barW + 10, height - 40 - h,
+         barW - 20, h);
+
+    // label below baseline
+    fill(60);
+    textSize(13);
+    textAlign(CENTER);
+    text(names[i], i * barW + barW / 2, height - 20);
+${showValues ? `\n    // value above bar\n    text(values[i], i * barW + barW / 2, height - 44 - h);` : ""}` :
+`    // horizontal bar
+    fill(${c.r}, ${c.g}, ${c.b});
+    noStroke();
+    rect(80, i * barW + 10, h, barW - 20);
+
+    // label to left
+    fill(60);
+    textSize(13);
+    textAlign(RIGHT, CENTER);
+    text(names[i], 74, i * barW + barW / 2);
+${showValues ? `\n    // value at end of bar\n    textAlign(LEFT, CENTER);\n    text(values[i], 86 + h, i * barW + barW / 2);` : ""}`}
+  }
+
+  // baseline
+  stroke(180);
+  strokeWeight(1);
+${orientation === 'vertical' ? `  line(0, height - 40, width, height - 40);` : `  line(80, 0, 80, height);`}
+}`;
+  document.getElementById("code-preview").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+
+new p5(function(p) {
+  p.setup = function() {
+    const canvas = p.createCanvas(400, 360);
+    canvas.parent("canvas-container");
+    buildInputs();
+    updateCodePreview();
+    updateVariableDisplay();
+  };
+
+  p.draw = function() {
+    const c = hexToRgb(document.getElementById("barColor").value);
+    p.background(244, 239, 230);
+
+    const maxVal = Math.max(...values);
+    const n = names.length;
+
+    if (orientation === 'vertical') {
+      const barW = (p.width - 40) / n;
+      const baseline = p.height - 40;
+      const maxH = 270;
+
+      for (let i = 0; i < n; i++) {
+        const h = p.map(values[i], 0, Math.max(maxVal, 1), 0, maxH);
+        p.fill(c.r, c.g, c.b, 220);
+        p.noStroke();
+        p.rect(20 + i * barW + 4, baseline - h, barW - 8, h, 4, 4, 0, 0);
+
+        p.fill(50);
+        p.textSize(12);
+        p.textAlign(p.CENTER);
+        p.text(names[i], 20 + i * barW + barW/2, baseline + 18);
+
+        if (showValues) {
+          p.fill(80);
+          p.textSize(11);
+          p.text(values[i], 20 + i * barW + barW/2, baseline - h - 6);
+        }
+      }
+
+      p.stroke(170);
+      p.strokeWeight(1);
+      p.line(16, baseline, p.width - 16, baseline);
+
+    } else {
+      const barH = (p.height - 40) / n;
+      const maxW = p.width - 110;
+      const left = 90;
+
+      for (let i = 0; i < n; i++) {
+        const w = p.map(values[i], 0, Math.max(maxVal, 1), 0, maxW);
+        p.fill(c.r, c.g, c.b, 220);
+        p.noStroke();
+        p.rect(left, 20 + i * barH + 4, w, barH - 8, 0, 4, 4, 0);
+
+        p.fill(50);
+        p.textSize(12);
+        p.textAlign(p.RIGHT, p.CENTER);
+        p.text(names[i], left - 6, 20 + i * barH + barH/2);
+
+        if (showValues) {
+          p.fill(80);
+          p.textSize(11);
+          p.textAlign(p.LEFT, p.CENTER);
+          p.text(values[i], left + w + 6, 20 + i * barH + barH/2);
+        }
+      }
+
+      p.stroke(170);
+      p.strokeWeight(1);
+      p.line(left, 16, left, p.height - 16);
+    }
+  };
+});
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

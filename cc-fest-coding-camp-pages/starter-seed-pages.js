@@ -2100,6 +2100,205 @@ function draw() {
   pop();
 }`
     },
+    "parallel-arrays-bar-chart-seed": {
+      title: "Parallel Arrays Bar Chart Seed",
+      session: "Session 4",
+      subtitle: "Two arrays, one loop, one bar chart. The exact structure from Session 4: names[i] labels each bar, values[i] sets the height.",
+      tags: ["arrays", "for loop", "rect()", "data"],
+      liveSeed: "Change the names and values to your own data. Try your class, your week, your mood scores.",
+      tryText: "Change 'Saber' to your name and change the ages to something from your own life.",
+      noticeText: "names[i] and values[i] share the same index i — that connection is how parallel arrays work.",
+      remixText: "Use colors[], add a title with text(), make bars horizontal, or animate them growing from 0.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Parallel arrays and bar charts",
+      code: `// Two parallel arrays — names and values
+let names  = ["Saber", "Lucia", "Megna", "Anaya"];
+let values = [42, 38, 8, 5];
+
+function setup() {
+  createCanvas(400, 400);
+  textAlign(CENTER);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  let barW = width / names.length;
+  let maxVal = max(values);
+
+  for (let i = 0; i < names.length; i++) {
+    // values[i] sets the height
+    let h = map(values[i], 0, maxVal, 0, 300);
+
+    // draw the bar
+    fill(61, 90, 128);
+    noStroke();
+    rect(i * barW + 8, height - 40 - h, barW - 16, h, 4, 4, 0, 0);
+
+    // names[i] labels the bar
+    fill(60);
+    textSize(13);
+    text(names[i], i * barW + barW / 2, height - 20);
+
+    // value above bar
+    fill(100);
+    textSize(11);
+    text(values[i], i * barW + barW / 2, height - 44 - h);
+  }
+
+  // baseline
+  stroke(180);
+  strokeWeight(1);
+  line(0, height - 40, width, height - 40);
+}`
+    },
+    "font-loader-seed": {
+      title: "Font Loader Seed",
+      session: "Session 4",
+      subtitle: "Load a custom font with preload() and display it in a sketch. The declare → load → use pattern applies to fonts, images, and sounds.",
+      tags: ["preload()", "loadFont()", "textFont()", "assets"],
+      liveSeed: "The font loads before setup() runs. Change the font URL, size, or the text displayed.",
+      tryText: "Replace the font URL with a different Google Fonts .ttf link. Find one at fonts.google.com.",
+      noticeText: "preload() runs before setup() and draw(). Any asset loaded there is always ready when the sketch starts.",
+      remixText: "Add a second font, animate the text size, or build a poster with multiple text styles.",
+      footer: "CC Fest Coding Camp · Starter Sketch · preload(), loadFont(), and the declare/load/use pattern",
+      code: `// STEP 1 — DECLARE (outside everything)
+let myFont;
+
+// STEP 2 — LOAD (inside preload)
+function preload() {
+  // Press Start 2P — a free pixel font from Google Fonts
+  myFont = loadFont(
+    "https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2"
+  );
+}
+
+// STEP 3 — USE (inside setup or draw)
+function setup() {
+  createCanvas(400, 300);
+  textFont(myFont);
+  textAlign(CENTER, CENTER);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // Large display text
+  fill(61, 90, 128);
+  noStroke();
+  textSize(28);
+  text("Hello!", width / 2, height / 2 - 30);
+
+  // Smaller subtitle
+  textSize(12);
+  fill(120);
+  text("Custom font loaded with preload()", width / 2, height / 2 + 20);
+
+  // The pattern works the same for images and sounds:
+  // let img;
+  // function preload() { img = loadImage("url"); }
+  // function draw()    { image(img, 0, 0); }
+}`
+    },
+    "image-loader-seed": {
+      title: "Image Loader Seed",
+      session: "Session 4",
+      subtitle: "Load an image with preload() and display it in a sketch. The same declare → load → use pattern from the font loader, applied to images.",
+      tags: ["preload()", "loadImage()", "image()", "assets"],
+      liveSeed: "The image loads before setup() runs. Try tinting it, resizing it, or drawing shapes over it.",
+      tryText: "Add tint(255, 0, 0) before image() to make the image red. Then try tint(255, 255, 0, 180) for a semi-transparent yellow.",
+      noticeText: "image() uses the same x, y, width, height logic as rect(). You can position and resize any image.",
+      remixText: "Load two images, overlay them, apply filters with filter(), or use get() to sample pixel colors.",
+      footer: "CC Fest Coding Camp · Starter Sketch · preload(), loadImage(), and the declare/load/use pattern",
+      code: `// STEP 1 — DECLARE
+let img;
+
+// STEP 2 — LOAD
+function preload() {
+  // Picsum gives a random public-domain photo
+  // Change the numbers to get a different image
+  img = loadImage("https://picsum.photos/seed/ccfest/400/300");
+}
+
+// STEP 3 — USE
+function setup() {
+  createCanvas(400, 300);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // image(img, x, y, width, height)
+  // same coordinate system as rect()
+  image(img, 0, 0, width, height);
+
+  // Try uncommenting one of these:
+  // tint(255, 0, 0);        // red tint
+  // tint(255, 200, 0, 180); // yellow, semi-transparent
+  // filter(GRAY);           // grayscale
+
+  // Draw shapes on top of the image
+  noFill();
+  stroke(255);
+  strokeWeight(3);
+  rect(10, 10, width - 20, height - 20, 8);
+}`
+    },
+    "text-array-seed": {
+      title: "Text Array Seed",
+      session: "Session 4",
+      subtitle: "Store words, phrases, or poem lines in an array and display them on canvas. Text as data, arranged spatially or cycling over time.",
+      tags: ["arrays", "text()", "strings", "generative text"],
+      liveSeed: "Change the words in the array. Try your own poem lines, quotes, or word list.",
+      tryText: "Change the array to five words that describe how you feel right now.",
+      noticeText: "text() uses x and y just like circle() or rect(). Each word is positioned with its index.",
+      remixText: "Make words appear on click, fade in/out, cycle with frameCount, or arrange them in a spiral.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Arrays of strings, text(), and generative layout",
+      code: `// An array of words — text as data
+let words = [
+  "calm",
+  "curious",
+  "tangled",
+  "bright",
+  "unfinished",
+  "ready"
+];
+
+function setup() {
+  createCanvas(400, 400);
+  textAlign(CENTER, CENTER);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // Display each word at a position based on its index
+  for (let i = 0; i < words.length; i++) {
+    // Map i to x and y across the canvas
+    let x = map(i, 0, words.length - 1, 60, width - 60);
+    let y = map(i, 0, words.length - 1, 80, height - 80);
+
+    // Highlight the "current" word using frameCount
+    let current = floor(frameCount / 40) % words.length;
+
+    if (i === current) {
+      fill(224, 122, 95);
+      textSize(28);
+    } else {
+      fill(100);
+      textSize(16);
+    }
+
+    noStroke();
+    text(words[i], x, y);
+  }
+
+  // Show index of current word
+  fill(180);
+  textSize(11);
+  text("words[" + (floor(frameCount / 40) % words.length) + "]",
+       width / 2, height - 16);
+}`
+    },
     "state-machine-game-seed": {
       title: "State Machine Game Seed",
       session: "Session 5",

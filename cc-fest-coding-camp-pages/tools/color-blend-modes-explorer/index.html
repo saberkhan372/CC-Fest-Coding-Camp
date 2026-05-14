@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Palette + Blend Modes Explorer — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/color-blend-modes-explorer/">
+  <meta property="og:title" content="Color Palette + Blend Modes Explorer — CC Fest Coding Camp">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Color Palette + Blend Modes Explorer — CC Fest Coding Camp">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 4</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Color Palette + Blend Modes Explorer</h1>
+      <p class="tool-subtitle">Build arrays of colors into palettes and gradients, then see how blend modes change how layers interact — BLEND, ADD, MULTIPLY, SCREEN.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">blendMode()</span>
+        <span class="tool-tag">arrays</span>
+        <span class="tool-tag">color palettes</span>
+        <span class="tool-tag">lerpColor()</span>
+        <span class="tool-tag">layering</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Overlapping circles demonstrate the selected blend mode. Watch how the intersection area changes.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>An array of colors + blendMode() + lerpColor() for the gradient bar.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Loading...</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="control">
+                <label>Blend Mode</label>
+                <div class="button-row" style="flex-wrap:wrap;">
+                  <button class="button primary" id="modeBlend" onclick="setBlendMode('BLEND')">BLEND</button>
+                  <button class="button ghost" id="modeAdd" onclick="setBlendMode('ADD')">ADD</button>
+                  <button class="button ghost" id="modeMultiply" onclick="setBlendMode('MULTIPLY')">MULTIPLY</button>
+                  <button class="button ghost" id="modeScreen" onclick="setBlendMode('SCREEN')">SCREEN</button>
+                  <button class="button ghost" id="modeOverlay" onclick="setBlendMode('OVERLAY')">OVERLAY</button>
+                </div>
+              </div>
+
+              <div class="control">
+                <label for="opacity">Layer Opacity <span id="opacityValue">180</span></label>
+                <input id="opacity" type="range" min="20" max="255" value="180" step="5" oninput="updateOpacity(this.value)">
+              </div>
+
+              <div class="control">
+                <label for="baseColor">Base Color</label>
+                <input id="baseColor" type="color" value="#e05a3a" oninput="updateSketch()">
+              </div>
+
+              <div class="control">
+                <label for="overlayColor">Overlay Color</label>
+                <input id="overlayColor" type="color" value="#3d5a80" oninput="updateSketch()">
+              </div>
+
+              <div class="control">
+                <label>Palette</label>
+                <div id="palette-swatches" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;"></div>
+              </div>
+
+              <div class="button-row">
+                <button class="button ghost" onclick="randomizePalette()">Randomize Palette</button>
+                <button class="button ghost" onclick="resetAll()">Reset</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div><h2>Sketch State</h2></div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div><h2>Try / Notice / Remix</h2></div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Switch from BLEND to ADD with two bright colors. The overlap zone becomes brighter than either circle — RGB values literally add together.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>ADD makes overlapping areas brighter (adds RGB values). MULTIPLY makes them darker (multiplies normalized values). SCREEN is the inverse of MULTIPLY.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Build a painting tool: replace the static circles with mouseX/mouseY, put blendMode() inside draw(), and let users paint overlapping strokes.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Color Palette + Blend Modes Explorer · Session 4 · blendMode(), lerpColor(), color arrays</footer>
+  </div>
+
+  <script>
+let currentBlendMode = 'BLEND';
+let opacity = 180;
+let palette = ["#e05a3a", "#f4a261", "#e9c46a", "#2a9d8f", "#264653"];
+let animOffset = 0;
+
+function hexToRgb(hex) {
+  return {
+    r: parseInt(hex.slice(1,3),16),
+    g: parseInt(hex.slice(3,5),16),
+    b: parseInt(hex.slice(5,7),16)
+  };
+}
+
+function rgbToHex(r,g,b) {
+  return '#' + [r,g,b].map(v => Math.min(255,Math.max(0,v)).toString(16).padStart(2,'0')).join('');
+}
+
+function setBlendMode(mode) {
+  currentBlendMode = mode;
+  ['BLEND','ADD','MULTIPLY','SCREEN','OVERLAY'].forEach(m => {
+    const id = 'mode' + m.charAt(0) + m.slice(1).toLowerCase();
+    const el = document.getElementById(id);
+    if (el) el.className = m === mode ? "button primary" : "button ghost";
+  });
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function updateOpacity(v) {
+  opacity = Number(v);
+  document.getElementById("opacityValue").textContent = opacity;
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function randomizePalette() {
+  palette = Array.from({length: 5}, () =>
+    '#' + Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')
+  );
+  renderSwatches();
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function renderSwatches() {
+  const container = document.getElementById("palette-swatches");
+  container.innerHTML = palette.map((c, i) =>
+    `<div style="width:32px;height:32px;border-radius:8px;background:${c};border:2px solid rgba(0,0,0,0.15);cursor:pointer;position:relative;" title="${c}" onclick="pickPaletteColor(${i})"></div>`
+  ).join('');
+}
+
+function pickPaletteColor(i) {
+  const input = document.createElement('input');
+  input.type = 'color';
+  input.value = palette[i];
+  input.addEventListener('change', function() {
+    palette[i] = this.value;
+    renderSwatches();
+    updateCodePreview();
+    updateVariableDisplay();
+  });
+  input.click();
+}
+
+function updateSketch() {
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function resetAll() {
+  currentBlendMode = 'BLEND';
+  opacity = 180;
+  palette = ["#e05a3a", "#f4a261", "#e9c46a", "#2a9d8f", "#264653"];
+  document.getElementById("opacity").value = 180;
+  document.getElementById("opacityValue").textContent = 180;
+  document.getElementById("baseColor").value = "#e05a3a";
+  document.getElementById("overlayColor").value = "#3d5a80";
+  ['BLEND','ADD','MULTIPLY','SCREEN','OVERLAY'].forEach(m => {
+    const id = 'mode' + m.charAt(0) + m.slice(1).toLowerCase();
+    const el = document.getElementById(id);
+    if (el) el.className = m === 'BLEND' ? "button primary" : "button ghost";
+  });
+  renderSwatches();
+  updateCodePreview();
+  updateVariableDisplay();
+}
+
+function updateVariableDisplay() {
+  const variables = [
+    ["blendMode", currentBlendMode],
+    ["opacity", opacity],
+    ["palette[0]", palette[0]],
+    ["palette[1]", palette[1]],
+    ["palette[2]", palette[2]],
+  ];
+  document.getElementById("variables").innerHTML = variables
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
+}
+
+function updateCodePreview() {
+  const bc = hexToRgb(document.getElementById("baseColor").value);
+  const oc = hexToRgb(document.getElementById("overlayColor").value);
+  const code = `// Color palette as an array
+let palette = [
+  color(${hexToRgb(palette[0]).r}, ${hexToRgb(palette[0]).g}, ${hexToRgb(palette[0]).b}),
+  color(${hexToRgb(palette[1]).r}, ${hexToRgb(palette[1]).g}, ${hexToRgb(palette[1]).b}),
+  color(${hexToRgb(palette[2]).r}, ${hexToRgb(palette[2]).g}, ${hexToRgb(palette[2]).b}),
+  color(${hexToRgb(palette[3]).r}, ${hexToRgb(palette[3]).g}, ${hexToRgb(palette[3]).b}),
+  color(${hexToRgb(palette[4]).r}, ${hexToRgb(palette[4]).g}, ${hexToRgb(palette[4]).b})
+];
+
+function setup() {
+  createCanvas(400, 360);
+}
+
+function draw() {
+  background(240, 235, 225);
+
+  // Layer 1 — base color
+  blendMode(BLEND);
+  fill(${bc.r}, ${bc.g}, ${bc.b}, ${opacity});
+  noStroke();
+  circle(140, height / 2, 180);
+
+  // Layer 2 — overlay with blend mode
+  blendMode(${currentBlendMode});
+  fill(${oc.r}, ${oc.g}, ${oc.b}, ${opacity});
+  circle(260, height / 2, 180);
+
+  // Gradient bar using lerpColor
+  blendMode(BLEND);
+  let c1 = color(${bc.r}, ${bc.g}, ${bc.b});
+  let c2 = color(${oc.r}, ${oc.g}, ${oc.b});
+  for (let x = 0; x < width; x++) {
+    let amt = x / width;
+    stroke(lerpColor(c1, c2, amt));
+    line(x, height - 30, x, height - 10);
+  }
+}`;
+  document.getElementById("code-preview").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+
+new p5(function(p) {
+  p.setup = function() {
+    const canvas = p.createCanvas(400, 360);
+    canvas.parent("canvas-container");
+    renderSwatches();
+    updateCodePreview();
+    updateVariableDisplay();
+  };
+
+  p.draw = function() {
+    animOffset += 0.01;
+    const bc = hexToRgb(document.getElementById("baseColor").value);
+    const oc = hexToRgb(document.getElementById("overlayColor").value);
+
+    p.blendMode(p.BLEND);
+    p.background(240, 235, 225);
+
+    const cx = p.width / 2;
+    const cy = p.height / 2 - 20;
+    const r = 140;
+    const sep = 60 + Math.sin(animOffset) * 10; // gentle oscillation
+
+    // Layer 1
+    p.blendMode(p.BLEND);
+    p.fill(bc.r, bc.g, bc.b, opacity);
+    p.noStroke();
+    p.circle(cx - sep/2, cy, r);
+
+    // Layer 2 with chosen blend mode
+    const modeMap = {
+      BLEND: p.BLEND, ADD: p.ADD, MULTIPLY: p.MULTIPLY,
+      SCREEN: p.SCREEN, OVERLAY: p.OVERLAY
+    };
+    p.blendMode(modeMap[currentBlendMode] || p.BLEND);
+    p.fill(oc.r, oc.g, oc.b, opacity);
+    p.circle(cx + sep/2, cy, r);
+
+    // Gradient bar
+    p.blendMode(p.BLEND);
+    const c1 = p.color(bc.r, bc.g, bc.b);
+    const c2 = p.color(oc.r, oc.g, oc.b);
+    for (let x = 20; x < p.width - 20; x++) {
+      const amt = (x - 20) / (p.width - 40);
+      p.stroke(p.lerpColor(c1, c2, amt));
+      p.strokeWeight(1);
+      p.line(x, p.height - 38, x, p.height - 16);
+    }
+    p.noStroke();
+
+    // Palette swatches on canvas
+    for (let i = 0; i < palette.length; i++) {
+      const sc = hexToRgb(palette[i]);
+      p.fill(sc.r, sc.g, sc.b);
+      p.noStroke();
+      const sw = 28;
+      const sx = 20 + i * (sw + 8);
+      p.rect(sx, p.height - 80, sw, sw, 6);
+    }
+
+    // Labels
+    p.blendMode(p.BLEND);
+    p.noStroke();
+    p.fill(60);
+    p.textSize(12);
+    p.textAlign(p.CENTER);
+    p.text("Base", cx - sep/2, cy + r/2 + 18);
+    p.text("Overlay", cx + sep/2, cy + r/2 + 18);
+    p.text("Mode: " + currentBlendMode, cx, 18);
+    p.fill(80);
+    p.textSize(10);
+    p.text("gradient", p.width/2, p.height - 6);
+    p.text("palette", 20 + palette.length * (28+8)/2 - 20, p.height - 84);
+  };
+});
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>
