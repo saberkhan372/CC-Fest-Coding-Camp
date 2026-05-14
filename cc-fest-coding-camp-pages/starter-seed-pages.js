@@ -1730,6 +1730,447 @@ function mousePressed() {
 function keyPressed() {
   moving = !moving;
 }`
+    },
+    "gravity-bounce-seed": {
+      title: "Gravity Bounce Seed",
+      session: "Session 2",
+      subtitle: "A ball falls with gravity, builds up velocity, and bounces off the floor — the simplest physics simulation in p5.js.",
+      tags: ["gravity", "velocity", "bounce", "physics"],
+      liveSeed: "Watch gravity pull the ball down each frame. Change the gravity and damping values to feel the difference.",
+      tryText: "Change gravity from 0.5 to 1.5. Then change damping from 0.75 to 0.95. How do the two variables interact?",
+      noticeText: "vy += gravity runs every frame. Even a small gravity value accumulates — that steady build-up is acceleration.",
+      remixText: "Add a second ball starting from a different position. Make each ball a different color. Can you make one ball extra bouncy and one very heavy?",
+      footer: "CC Fest Coding Camp · Starter Sketch · Gravity, velocity, and bounce",
+      code: `let ballX = 200;
+let ballY = 40;
+let vy = 0;       // vertical velocity
+let gravity = 0.5;
+let damping = 0.75; // energy kept on bounce
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // gravity adds to velocity each frame
+  vy += gravity;
+  ballY += vy;
+
+  // bounce off the floor
+  if (ballY + 20 >= height) {
+    ballY = height - 20;
+    vy *= -damping;
+  }
+
+  // draw the ball
+  fill(61, 90, 128);
+  noStroke();
+  circle(ballX, ballY, 40);
+}
+
+function mousePressed() {
+  // click to reset
+  ballY = 40;
+  vy = 0;
+}`
+    },
+    "angle-to-mouse-seed": {
+      title: "Angle to Mouse Seed",
+      session: "Session 2",
+      subtitle: "An arrow points toward the mouse using atan2() — the standard way to compute the angle between two points in p5.js.",
+      tags: ["atan2()", "rotation", "angle", "mouse"],
+      liveSeed: "Move your mouse around. The arrow follows by computing a fresh angle every frame.",
+      tryText: "Add PI to the angle: angle = atan2(dy, dx) + PI. The arrow flips 180° and now points away from the mouse.",
+      noticeText: "atan2() always takes dy first, then dx — opposite of what you might expect. The result is in radians, which rotate() uses directly.",
+      remixText: "Replace the triangle with a spaceship shape drawn with beginShape(). Add + HALF_PI to the angle if your shape's nose points up instead of right.",
+      footer: "CC Fest Coding Camp · Starter Sketch · atan2(), rotation, and mouse tracking",
+      code: `function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  let cx = width / 2;
+  let cy = height / 2;
+
+  // distance from center to mouse
+  let dx = mouseX - cx;
+  let dy = mouseY - cy;
+
+  // atan2 gives the angle between two points
+  let angle = atan2(dy, dx);
+
+  // draw from the center, rotated toward mouse
+  push();
+  translate(cx, cy);
+  rotate(angle);
+
+  // arrow body
+  stroke(61, 90, 128);
+  strokeWeight(3);
+  line(0, 0, 80, 0);
+
+  // arrowhead
+  fill(61, 90, 128);
+  noStroke();
+  triangle(80, 0, 60, -10, 60, 10);
+
+  // center dot
+  fill(224, 122, 95);
+  circle(0, 0, 16);
+  pop();
+}`
+    },
+    "sine-oscillation-seed": {
+      title: "Sine Oscillation Seed",
+      session: "Session 2",
+      subtitle: "An object moves back and forth automatically using sin(frameCount * speed) — the foundation of all smooth repeating motion in p5.js.",
+      tags: ["sin()", "oscillation", "animation", "motion"],
+      liveSeed: "The ball moves by itself. Change amplitude and speed to shape the motion.",
+      tryText: "Change speed from 0.03 to 0.1. Then change amplitude from 150 to 40. Notice how the two variables are completely independent.",
+      noticeText: "sin() always returns a value between -1 and 1. Multiplying by amplitude scales that range. frameCount * speed controls how fast the cycle repeats.",
+      remixText: "Add a second ball using cos() instead of sin() — it will be 90 degrees out of phase, making them move like a figure-8 when combined.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Sine oscillation and smooth motion",
+      code: `let amplitude = 150; // how far it moves
+let speed = 0.03;    // how fast it cycles
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(250, 246, 240);
+
+  // sin() gives a value from -1 to 1
+  // multiply by amplitude to set the range
+  let x = width / 2 + sin(frameCount * speed) * amplitude;
+
+  // guide line
+  stroke(210, 200, 185);
+  strokeWeight(1);
+  line(width / 2 - amplitude, height / 2,
+       width / 2 + amplitude, height / 2);
+
+  // oscillating dot
+  noStroke();
+  fill(224, 122, 95);
+  circle(x, height / 2, 40);
+}`
+    },
+    "circular-motion-orbit-seed": {
+      title: "Circular Motion Orbit Seed",
+      session: "Session 2",
+      subtitle: "A dot orbits a center point using sin() and cos() together — the standard pattern for circular motion in p5.js.",
+      tags: ["sin()", "cos()", "orbit", "circular motion"],
+      liveSeed: "Watch the dot trace a perfect circle. Change orbitRadius and speed to reshape the orbit.",
+      tryText: "Change orbitRadius to 50, then to 160. Then change speed from 0.03 to 0.08 — the dot moves faster without changing the circle size.",
+      noticeText: "cos() gives the x position, sin() gives the y position. Together they trace a circle — the angle advances each frame, carrying the dot around.",
+      remixText: "Add a second dot orbiting at twice the radius and half the speed. Or add a third dot that orbits the first dot — a moon orbiting a planet.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Circular motion with sin and cos",
+      code: `let angle = 0;
+let orbitRadius = 120;
+let speed = 0.03;
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // advance the angle each frame
+  angle += speed;
+
+  // cos → x, sin → y gives circular motion
+  let x = width / 2 + cos(angle) * orbitRadius;
+  let y = height / 2 + sin(angle) * orbitRadius;
+
+  // orbit path
+  noFill();
+  stroke(210, 200, 185);
+  strokeWeight(1);
+  circle(width / 2, height / 2, orbitRadius * 2);
+
+  // center anchor
+  fill(107, 103, 96);
+  noStroke();
+  circle(width / 2, height / 2, 12);
+
+  // orbiting dot
+  fill(61, 90, 128);
+  circle(x, y, 30);
+}`
+    },
+    "generative-tile-pattern-seed": {
+      title: "Generative Tile Pattern Seed",
+      session: "Session 3",
+      subtitle: "Nested loops draw a grid of tiles, each one slightly varied — the foundation of generative pattern-making in p5.js.",
+      tags: ["nested loops", "grid", "generative", "pattern"],
+      liveSeed: "Click Run to generate a new pattern. Change tileSize or the variation amounts to reshape the grid.",
+      tryText: "Change tileSize from 50 to 30. Then change the noise multiplier from 0.1 to 0.4. Notice how a smaller tile size with more variation creates a very different feel.",
+      noticeText: "The outer loop steps through rows, the inner through columns. Each tile gets a unique (col, row) address — use those numbers to drive color, size, or rotation.",
+      remixText: "Instead of circles, draw a small line at each grid point rotated by noise(). Or alternate between two shapes based on whether (col + row) is even or odd.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Nested loops and generative tile patterns",
+      code: `let tileSize = 50;
+
+function setup() {
+  createCanvas(400, 400);
+  noLoop(); // draw once; press Run to regenerate
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  let cols = width / tileSize;
+  let rows = height / tileSize;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      let x = col * tileSize + tileSize / 2;
+      let y = row * tileSize + tileSize / 2;
+
+      // vary size and color using noise
+      let n = noise(col * 0.1, row * 0.1);
+      let d = map(n, 0, 1, 10, tileSize - 4);
+
+      fill(map(n, 0, 1, 61, 224),
+           map(n, 0, 1, 90, 122),
+           map(n, 0, 1, 128, 95), 200);
+      noStroke();
+      circle(x, y, d);
+    }
+  }
+}
+
+function mousePressed() {
+  noiseSeed(floor(random(9999)));
+  redraw();
+}`
+    },
+    "class-creature-stamp-seed": {
+      title: "Class Creature Stamp Seed",
+      session: "Session 3",
+      subtitle: "A simple class with a display() method — click to stamp creatures on the canvas, each one a unique instance with its own stored properties.",
+      tags: ["class", "objects", "mousePressed", "stamp"],
+      liveSeed: "Click anywhere to stamp a creature. Each one is a new object with its own color and size.",
+      tryText: "Change the size range from random(20, 60) to random(10, 100). Then add a third property — maybe a rotation angle — and use it inside display().",
+      noticeText: "Each mousePressed() call runs new Creature() which stores fresh random values. The creature array holds all of them — each one independent.",
+      remixText: "Add a second class that extends Creature and draws a different shape. Mix both types in the same array and let the sketch stamp whichever one is selected.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Classes, objects, and stamping",
+      code: `let creatures = [];
+
+class Creature {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = random(20, 60);
+    this.r = random(40, 220);
+    this.g = random(80, 180);
+    this.b = random(80, 200);
+  }
+
+  display() {
+    fill(this.r, this.g, this.b, 200);
+    noStroke();
+
+    // body
+    circle(this.x, this.y, this.size);
+
+    // eyes
+    fill(255);
+    let eyeOff = this.size * 0.18;
+    circle(this.x - eyeOff, this.y - eyeOff * 0.5, this.size * 0.22);
+    circle(this.x + eyeOff, this.y - eyeOff * 0.5, this.size * 0.22);
+
+    fill(30);
+    circle(this.x - eyeOff, this.y - eyeOff * 0.5, this.size * 0.1);
+    circle(this.x + eyeOff, this.y - eyeOff * 0.5, this.size * 0.1);
+  }
+}
+
+function setup() {
+  createCanvas(400, 400);
+  background(244, 239, 230);
+}
+
+function draw() {
+  for (let c of creatures) {
+    c.display();
+  }
+}
+
+function mousePressed() {
+  creatures.push(new Creature(mouseX, mouseY));
+}`
+    },
+    "particle-emitter-seed": {
+      title: "Particle Emitter Seed",
+      session: "Session 3",
+      subtitle: "An array of particle objects, each emitted from the mouse position and fading out over time — the classic pattern for sparks, trails, and effects.",
+      tags: ["particles", "arrays", "objects", "fade"],
+      liveSeed: "Move the mouse to emit particles. They drift upward, fade, and are automatically removed when invisible.",
+      tryText: "Change the gravity from -0.05 to 0.1 — particles will fall down instead of floating up. Then change lifespan from 120 to 40 for a snappier effect.",
+      noticeText: "filter() removes particles whose lifespan hits zero every frame. Without it the array grows forever. The sketch slows down — try commenting it out to feel the difference.",
+      remixText: "Make particles explode outward in all directions on mousePressed() instead of streaming continuously. Or give each particle a random color from a palette array.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Particle arrays, lifecycle, and fade",
+      code: `let particles = [];
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // emit a particle at mouse position
+  if (mouseIsPressed) {
+    particles.push({
+      x: mouseX,
+      y: mouseY,
+      vx: random(-1.5, 1.5),
+      vy: random(-3, -0.5),
+      lifespan: 120,
+      size: random(8, 20)
+    });
+  }
+
+  // update and draw all particles
+  for (let p of particles) {
+    p.vy += -0.05; // gentle float up
+    p.x += p.vx;
+    p.y += p.vy;
+    p.lifespan--;
+
+    let alpha = map(p.lifespan, 0, 120, 0, 255);
+    fill(224, 122, 95, alpha);
+    noStroke();
+    circle(p.x, p.y, p.size);
+  }
+
+  // remove dead particles
+  particles = particles.filter(p => p.lifespan > 0);
+}`
+    },
+    "wander-agent-seed": {
+      title: "Wander Agent Seed",
+      session: "Session 5",
+      subtitle: "A single autonomous agent wanders the canvas using smooth noise-driven angle changes — the simplest form of emergent, life-like motion.",
+      tags: ["agents", "noise()", "wander", "autonomous"],
+      liveSeed: "The agent wanders on its own. Change wanderStrength and speed to reshape its personality.",
+      tryText: "Change wanderStrength from 0.015 to 0.08. The agent becomes jittery and erratic. Then lower speed from 2 to 0.5 — it still wanders but very slowly.",
+      noticeText: "noise() returns a smooth value that changes gradually as its input increases. Using frameCount * 0.01 as input gives a slowly drifting angle — much more organic than random().",
+      remixText: "Add a second agent with a different wanderStrength. Make them leave a trail by not clearing the background. Or make the agent turn toward the mouse when it gets close.",
+      footer: "CC Fest Coding Camp · Starter Sketch · Wander behavior with noise()",
+      code: `let x, y;
+let angle = 0;
+let wanderStrength = 0.015;
+let speed = 2;
+
+function setup() {
+  createCanvas(400, 400);
+  x = width / 2;
+  y = height / 2;
+}
+
+function draw() {
+  background(244, 239, 230, 40); // low alpha = trail
+
+  // noise() gives smooth, organic angle drift
+  angle += map(noise(frameCount * wanderStrength), 0, 1, -0.2, 0.2);
+
+  x += cos(angle) * speed;
+  y += sin(angle) * speed;
+
+  // wrap edges
+  if (x < 0) x = width;
+  if (x > width) x = 0;
+  if (y < 0) y = height;
+  if (y > height) y = 0;
+
+  // draw agent as a directional arrow
+  push();
+  translate(x, y);
+  rotate(angle);
+  fill(61, 90, 128, 200);
+  noStroke();
+  triangle(14, 0, -8, -7, -8, 7);
+  pop();
+}`
+    },
+    "state-machine-game-seed": {
+      title: "State Machine Game Seed",
+      session: "Session 5",
+      subtitle: "A minimal 3-state sketch — title, play, end — where a single gameState variable decides which screen draws and how the sketch responds to clicks.",
+      tags: ["gameState", "state machine", "conditionals", "flow"],
+      liveSeed: "Click to move through the three states. All the logic lives inside if/else checks on one variable.",
+      tryText: "Add a score variable. Increment it in the play state each frame. Show the final score on the end screen. Notice you only need to touch the play and end branches.",
+      noticeText: "Each state owns its own drawing code and its own rules for when to switch. Adding a new screen means adding one new value the variable can hold — nothing else changes.",
+      remixText: "Add a 'paused' state between title and play. Pressing P switches into it and freezes everything; pressing P again resumes. One more else-if is all it takes.",
+      footer: "CC Fest Coding Camp · Starter Sketch · State machines and game flow",
+      code: `let gameState = "title";
+let score = 0;
+let startTime = 0;
+let timeLimit = 8; // seconds
+
+function setup() {
+  createCanvas(400, 400);
+  textAlign(CENTER, CENTER);
+}
+
+function draw() {
+  if (gameState === "title") {
+    background(61, 90, 128);
+    fill(255);
+    textSize(28);
+    text("MY GAME", width / 2, height / 2 - 40);
+    textSize(16);
+    fill(200, 220, 255);
+    text("click to start", width / 2, height / 2 + 20);
+
+  } else if (gameState === "play") {
+    background(244, 239, 230);
+    let elapsed = (millis() - startTime) / 1000;
+    let left = max(0, timeLimit - elapsed);
+
+    score = floor(elapsed * 10);
+
+    fill(44, 42, 38);
+    textSize(16);
+    text("time: " + left.toFixed(1) + "s", width / 2, 30);
+    text("score: " + score, width / 2, 60);
+
+    fill(224, 122, 95);
+    noStroke();
+    circle(width / 2, height / 2, 60 + sin(elapsed * 4) * 20);
+
+    if (left <= 0) gameState = "end";
+
+  } else if (gameState === "end") {
+    background(44, 42, 38);
+    fill(255, 220, 100);
+    textSize(24);
+    text("DONE!", width / 2, height / 2 - 40);
+    fill(255);
+    textSize(16);
+    text("score: " + score, width / 2, height / 2);
+    fill(180, 170, 160);
+    textSize(14);
+    text("click to play again", width / 2, height / 2 + 50);
+  }
+}
+
+function mousePressed() {
+  if (gameState === "title") {
+    gameState = "play";
+    startTime = millis();
+    score = 0;
+  } else if (gameState === "end") {
+    gameState = "title";
+  }
+}`
     }
   };
 

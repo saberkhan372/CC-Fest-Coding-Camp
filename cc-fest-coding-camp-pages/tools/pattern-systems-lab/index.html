@@ -5,12 +5,33 @@ body{margin:0;padding:24px;background:#faf6f0;color:#2c2a26;font-family:"DM Sans
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),rows=document.getElementById('rows'),cols=document.getElementById('cols'),scale=document.getElementById('scale'),code=document.getElementById('code'),note=document.getElementById('note');let mode='grid',t=0;function map(v,a,b,c,d){return c+(d-c)*((v-a)/(b-a))}function noise(x,y,z){return (Math.sin(x*12.9898+y*78.233+z*39.41)*43758.5453%1+1)%1}
 document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;renderCode()});[rows,cols,scale].forEach(el=>el.oninput=renderCode);
 function draw(){t+=0.01;const r=+rows.value,c=+cols.value,pad=42,w=(680-pad*2)/c,h=(500-pad*2)/r;ctx.fillStyle='#faf6f0';ctx.fillRect(0,0,680,500);for(let j=0;j<r;j++)for(let i=0;i<c;i++){const x=pad+i*w,y=pad+j*h;let fill='#ded6ca',size=Math.min(w,h)*.55;if(mode==='logic')fill=(i===j||((i+j)%2===0&&j<r/2))?'#c8391d':'#e8dfd2';if(mode==='random'){size=Math.random()*Math.min(w,h)*.85+4;fill=`hsl(${Math.random()*70+185},55%,55%)`}if(mode==='noise'){const n=noise(i*+scale.value,j*+scale.value,t);size=map(n,0,1,4,Math.min(w,h)*.95);fill=`hsl(${map(n,0,1,135,215)},55%,${map(n,0,1,35,78)}%)`}ctx.strokeStyle='rgba(44,42,38,.1)';ctx.strokeRect(x,y,w,h);ctx.fillStyle=fill;ctx.beginPath();ctx.arc(x+w/2,y+h/2,size/2,0,Math.PI*2);ctx.fill()}document.getElementById('rowsVal').textContent=r;document.getElementById('colsVal').textContent=c;document.getElementById('scaleVal').textContent=scale.value;requestAnimationFrame(draw)}
-function renderCode(){const notes={grid:'A nested loop is multiplication in space.',logic:'The loop visits every cell. The condition decides what changes.',random:'random() treats every cell independently.',noise:'noise() makes neighboring cells feel related.'};note.textContent=notes[mode];code.textContent=`for (let row = 0; row < ${rows.value}; row++) {
-  for (let col = 0; col < ${cols.value}; col++) {
-    let x = col * spacing;
-    let y = row * spacing;
-    // mode: ${mode}
-    circle(x, y, 24);
+function renderCode(){const notes={grid:'A nested loop is multiplication in space.',logic:'The loop visits every cell. The condition decides what changes.',random:'random() treats every cell independently.',noise:'noise() makes neighboring cells feel related.'};note.textContent=notes[mode];const fillLine = {
+  grid:   `fill("#ded6ca");`,
+  logic:  `fill((col === row || ((col + row) % 2 === 0 && row < rows / 2)) ? "#c8391d" : "#e8dfd2");`,
+  random: `fill(\`hsl(\${random(70) + 185}, 55%, 55%)\`);`,
+  noise:  `let n = noise(col * ${scale.value}, row * ${scale.value}, t);\n    fill(\`hsl(\${map(n,0,1,135,215)}, 55%, \${map(n,0,1,35,78)}%)\`);`
+}[mode];
+code.textContent=`let t = 0;
+let rows = ${rows.value}, cols = ${cols.value};
+
+function setup() {
+  createCanvas(680, 500);
+}
+
+function draw() {
+  background("#faf6f0");
+  t += 0.01;
+  let spacing = width / cols;
+  let pad = 42;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      let x = pad + col * (width - pad * 2) / cols;
+      let y = pad + row * (height - pad * 2) / rows;
+      noStroke();
+      ${fillLine}
+      circle(x, y, min(spacing, (height - pad * 2) / rows) * 0.55);
+    }
   }
 }`;}
 renderCode();draw();

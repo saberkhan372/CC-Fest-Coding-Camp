@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sine &amp; Cosine Motion Explorer — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/sine-cosine-motion-explorer/">
+  <meta property="og:title" content="Sine & Cosine Motion Explorer — CC Fest Coding Camp">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sine & Cosine Motion Explorer — CC Fest Coding Camp">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 2</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Sine &amp; Cosine Motion Explorer</h1>
+      <p class="tool-subtitle">Visualize how sin() and cos() create smooth, repeating motion. A dot rides the wave while sliders reveal how amplitude, frequency, and phase shape the curve.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">sin()</span>
+        <span class="tool-tag">cos()</span>
+        <span class="tool-tag">waves</span>
+        <span class="tool-tag">oscillation</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>The orange dot rides the wave. Adjust amplitude, frequency, and phase to reshape it.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>Live readout of the wave math currently running in the sketch.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Live code will appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Shape the wave and switch between sine and cosine.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="control">
+                <label for="amplitudeSlider">Amplitude <span id="amplitudeValue">80</span></label>
+                <input id="amplitudeSlider" type="range" min="10" max="150" value="80" step="5" oninput="updateAmplitude(this.value)">
+              </div>
+              <div class="control">
+                <label for="freqSlider">Frequency <span id="freqValue">0.03</span></label>
+                <input id="freqSlider" type="range" min="0.005" max="0.12" value="0.03" step="0.005" oninput="updateFreq(this.value)">
+              </div>
+              <div class="control">
+                <label for="phaseSlider">Phase Offset <span id="phaseValue">0.00</span></label>
+                <input id="phaseSlider" type="range" min="0" max="6.28" value="0" step="0.1" oninput="updatePhase(this.value)">
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="toggleWaveType()">Switch sin / cos</button>
+                <button class="button ghost" onclick="toggleOrbit()">Show Orbit</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>Live wave values changing every frame.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Set amplitude to <code>120</code> and frequency to <code>0.08</code>. Then drag phase and watch the whole wave slide sideways without changing its shape.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>Amplitude controls height, frequency controls how tightly the wave is packed, and phase shifts the starting point. All three are independent of each other.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Use both sin() and cos() together to make the dot move in a circle. Set <code>x = cos(t) * r</code> and <code>y = sin(t) * r</code>.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Sine &amp; Cosine Motion Explorer · Waves, amplitude, frequency, phase</footer>
+  </div>
+
+  <script>
+let amplitude = 80;
+let freq = 0.03;
+let phase = 0;
+let useSine = true;
+let showOrbit = false;
+let currentY = 0;
+let t = 0;
+
+function setup() {
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  let cy = height / 2;
+
+  // Draw center axis
+  stroke(200, 190, 175);
+  strokeWeight(1);
+  line(0, cy, width, cy);
+
+  // Draw amplitude guide lines
+  stroke(220, 210, 195);
+  strokeWeight(1);
+  setLineDash([4, 4]);
+  line(0, cy - amplitude, width, cy - amplitude);
+  line(0, cy + amplitude, width, cy + amplitude);
+  setLineDash([]);
+
+  // Draw wave
+  noFill();
+  stroke(61, 90, 128, 180);
+  strokeWeight(2);
+  beginShape();
+  for (let x = 0; x <= width; x += 2) {
+    let sampleT = t - (width / 2 - x);
+    let y = useSine
+      ? cy + sin(sampleT * freq + phase) * amplitude
+      : cy + cos(sampleT * freq + phase) * amplitude;
+    vertex(x, y);
+  }
+  endShape();
+
+  // Moving dot position
+  currentY = useSine
+    ? cy + sin(t * freq + phase) * amplitude
+    : cy + cos(t * freq + phase) * amplitude;
+
+  let dotX = width / 2;
+
+  if (showOrbit) {
+    // Show circular orbit
+    let orbitX = width * 0.75;
+    let orbitY = cy;
+    let cosVal = cos(t * freq + phase) * amplitude;
+    let sinVal = sin(t * freq + phase) * amplitude;
+
+    noFill();
+    stroke(200, 190, 175);
+    strokeWeight(1);
+    circle(orbitX, orbitY, amplitude * 2);
+
+    stroke(224, 122, 95, 100);
+    strokeWeight(1);
+    line(orbitX, orbitY, orbitX + cosVal, orbitY + sinVal);
+
+    fill(224, 122, 95);
+    noStroke();
+    circle(orbitX + cosVal, orbitY + sinVal, 14);
+  }
+
+  // Vertical guide line at dot
+  stroke(180, 170, 155);
+  strokeWeight(1);
+  setLineDash([3, 3]);
+  line(dotX, cy, dotX, currentY);
+  setLineDash([]);
+
+  // Dot on wave
+  fill(224, 122, 95);
+  noStroke();
+  circle(dotX, currentY, 18);
+
+  // Wave type label
+  fill(107, 103, 96);
+  noStroke();
+  textSize(13);
+  textAlign(LEFT, TOP);
+  text(useSine ? "sin()" : "cos()", 10, 10);
+
+  t++;
+  updateVariableDisplay();
+  updateCodePreview();
+}
+
+function setLineDash(list) {
+  drawingContext.setLineDash(list);
+}
+
+function updateAmplitude(v) {
+  amplitude = Number(v);
+  document.getElementById("amplitudeValue").textContent = String(amplitude);
+}
+
+function updateFreq(v) {
+  freq = Number(v);
+  document.getElementById("freqValue").textContent = freq.toFixed(3);
+}
+
+function updatePhase(v) {
+  phase = Number(v);
+  document.getElementById("phaseValue").textContent = phase.toFixed(2);
+}
+
+function toggleWaveType() {
+  useSine = !useSine;
+}
+
+function toggleOrbit() {
+  showOrbit = !showOrbit;
+}
+
+function updateVariableDisplay() {
+  const variables = [
+    ["type", useSine ? "sin()" : "cos()"],
+    ["amplitude", amplitude],
+    ["frequency", freq.toFixed(3)],
+    ["phase", phase.toFixed(2)],
+    ["t (frameCount)", t],
+    ["currentY", Math.round(currentY)]
+  ];
+  document.getElementById("variables").innerHTML = variables
+    .map(([k, v]) => `<div class="stat"><strong>${k}</strong><code>${v}</code></div>`)
+    .join("");
+}
+
+function updateCodePreview() {
+  const fn = useSine ? "sin" : "cos";
+  const code = `let amplitude = ${amplitude};
+let freq = ${freq.toFixed(3)};
+let phase = ${phase.toFixed(2)};
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // Dot moves along a wave
+  let y = height / 2 +
+    ${fn}(frameCount * freq + phase) * amplitude;
+
+  noStroke();
+  fill(224, 122, 95);
+  circle(width / 2, y, 18);
+}`;
+  document.getElementById("code-preview").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

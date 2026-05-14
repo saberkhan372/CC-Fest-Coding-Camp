@@ -3,24 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Animation Explorer — CC Fest Coding Camp</title>
+  <title>Gravity & Acceleration Playground — CC Fest Coding Camp</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../tool-page.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/animation-explorer/">
-  <meta property="og:title" content="Animation Explorer — CC Fest Coding Camp">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/gravity-acceleration-playground/">
+  <meta property="og:title" content="Gravity & Acceleration Playground — CC Fest Coding Camp">
   <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
   <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Animation Explorer — CC Fest Coding Camp">
+  <meta name="twitter:title" content="Gravity & Acceleration Playground — CC Fest Coding Camp">
   <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
   <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
   <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
@@ -37,13 +35,13 @@
         <span class="tool-pill session">Session 2</span>
         <span class="tool-pill type">Interactive Tool</span>
       </div>
-      <h1>Animation Explorer</h1>
-      <p class="tool-subtitle">Learn how variables create motion by changing speed, size, and path behavior, then watch the code readout update as the sketch runs.</p>
+      <h1>Gravity &amp; Acceleration Playground</h1>
+      <p class="tool-subtitle">Watch how gravity pulls a ball downward and velocity builds up over time. Adjust gravity strength and damping to see how the numbers drive the bounce.</p>
       <div class="tool-tags">
-        <span class="tool-tag">variables</span>
-        <span class="tool-tag">motion</span>
-        <span class="tool-tag">conditionals</span>
-        <span class="tool-tag">coordinates</span>
+        <span class="tool-tag">gravity</span>
+        <span class="tool-tag">acceleration</span>
+        <span class="tool-tag">bounce</span>
+        <span class="tool-tag">physics</span>
       </div>
     </header>
 
@@ -54,7 +52,7 @@
             <div class="card-header">
               <div>
                 <h2>Main Workspace</h2>
-                <p>Change the controls, then study how the moving circle responds inside the canvas.</p>
+                <p>Adjust gravity and damping, then click the canvas to drop the ball from that spot.</p>
               </div>
             </div>
             <div class="canvas-frame">
@@ -68,12 +66,12 @@
             <div class="card-header">
               <div>
                 <h2>Code Preview</h2>
-                <p>This live readout shows the values and logic currently driving the sketch.</p>
+                <p>This live readout shows the physics variables currently driving the sketch.</p>
               </div>
               <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
             </div>
             <div class="code-panel">
-              <pre id="code-preview">// Live starter code will appear here.</pre>
+              <pre id="code-preview">// Live code will appear here.</pre>
             </div>
           </div>
         </article>
@@ -85,26 +83,25 @@
             <div class="card-header">
               <div>
                 <h2>Controls</h2>
-                <p>What can I change? Adjust speed, scale, and trail behavior.</p>
+                <p>Change gravity and damping to explore different physics behaviors.</p>
               </div>
             </div>
             <div class="controls-grid">
               <div class="control">
-                <label for="speedX">Speed X <span id="speedXValue">1.0</span></label>
-                <input id="speedX" type="range" min="-5" max="5" value="1" step="0.1" oninput="updateSpeedX(this.value)">
+                <label for="gravitySlider">Gravity <span id="gravityValue">0.50</span></label>
+                <input id="gravitySlider" type="range" min="0.05" max="2" value="0.5" step="0.05" oninput="updateGravity(this.value)">
               </div>
               <div class="control">
-                <label for="speedY">Speed Y <span id="speedYValue">1.0</span></label>
-                <input id="speedY" type="range" min="-5" max="5" value="1" step="0.1" oninput="updateSpeedY(this.value)">
+                <label for="dampingSlider">Bounce Damping <span id="dampingValue">0.75</span></label>
+                <input id="dampingSlider" type="range" min="0.3" max="0.99" value="0.75" step="0.01" oninput="updateDamping(this.value)">
               </div>
               <div class="control">
-                <label for="ballSize">Ball Size <span id="ballSizeValue">20</span></label>
-                <input id="ballSize" type="range" min="10" max="100" value="20" step="1" oninput="updateBallSize(this.value)">
+                <label for="ballSizeSlider">Ball Size <span id="ballSizeValue">30</span></label>
+                <input id="ballSizeSlider" type="range" min="10" max="80" value="30" step="1" oninput="updateBallSize(this.value)">
               </div>
               <div class="button-row">
-                <button class="button primary" onclick="togglePath()">Toggle Path</button>
-                <button class="button ghost" onclick="togglePause()">Pause / Resume</button>
-                <button class="button ghost" onclick="resetAnimation()">Reset</button>
+                <button class="button primary" onclick="dropBall()">Drop Ball</button>
+                <button class="button ghost" onclick="resetBall()">Reset</button>
               </div>
             </div>
           </div>
@@ -115,7 +112,7 @@
             <div class="card-header">
               <div>
                 <h2>Sketch State</h2>
-                <p>Where is the code? These are the variables changing live in the sketch.</p>
+                <p>Live physics variables changing every frame.</p>
               </div>
             </div>
             <div class="stat-list" id="variables"></div>
@@ -133,15 +130,15 @@
             <div class="lesson-grid">
               <div class="lesson-card">
                 <h3>Try this</h3>
-                <p>Set <code>Speed X</code> to <code>3.5</code>, <code>Speed Y</code> to <code>-1.5</code>, then turn the path on and watch the travel pattern change.</p>
+                <p>Set gravity to <code>1.5</code> and damping to <code>0.95</code>. Watch how the ball keeps its energy and bounces very high for a long time.</p>
               </div>
               <div class="lesson-card">
                 <h3>Notice this</h3>
-                <p>When the circle reaches an edge, the speed flips sign. That single change in a variable creates the bounce.</p>
+                <p><code>vy += gravity</code> runs every frame. Even a tiny gravity value builds up velocity steadily — that accumulation is acceleration.</p>
               </div>
               <div class="lesson-card">
                 <h3>Remix this</h3>
-                <p>Change the circle color based on speed, or make the ball grow a little each time it hits a wall.</p>
+                <p>Add a second ball with different gravity. Or make the ball leave a fading trail so you can see the path it took between bounces.</p>
               </div>
             </div>
           </div>
@@ -149,80 +146,107 @@
       </aside>
     </main>
 
-    <footer class="tool-footer">CC Fest Coding Camp · Animation Explorer · Variables, motion, and bounce logic</footer>
+    <footer class="tool-footer">CC Fest Coding Camp · Gravity &amp; Acceleration Playground · Physics, velocity, and bounce logic</footer>
   </div>
 
   <script>
-let x, y;
-let speedX = 1;
-let speedY = 1;
-let showPath = false;
-let path = [];
-let ballSize = 20;
-let paused = false;
-let edgeCollisions = 0;
+let bx, by, vx, vy;
+let gravity = 0.5;
+let damping = 0.75;
+let ballSize = 30;
+let bounceCount = 0;
+let dropped = false;
 
 function setup() {
   const canvas = createCanvas(400, 400);
   canvas.parent("canvas-container");
-  resetAnimation();
+  canvas.mousePressed(onCanvasClick);
+  resetBall();
+}
+
+function onCanvasClick() {
+  bx = mouseX;
+  by = mouseY;
+  vx = random(-2, 2);
+  vy = 0;
+  dropped = true;
 }
 
 function draw() {
-  if (paused) return;
+  background(244, 239, 230);
 
-  if (!showPath) {
-    background(244, 239, 230);
-  } else {
-    background(244, 239, 230, 16);
-  }
+  if (dropped) {
+    vy += gravity;
+    bx += vx;
+    by += vy;
 
-  x += speedX;
-  y += speedY;
-
-  if (x < 0 || x > width) {
-    speedX *= -1;
-    edgeCollisions++;
-  }
-
-  if (y < 0 || y > height) {
-    speedY *= -1;
-    edgeCollisions++;
-  }
-
-  x = constrain(x, 0, width);
-  y = constrain(y, 0, height);
-
-  fill(224, 122, 95);
-  noStroke();
-  circle(x, y, ballSize);
-
-  if (showPath) {
-    path.push({ x, y });
-    if (path.length > 100) path.shift();
-
-    noFill();
-    beginShape();
-    for (let i = 0; i < path.length; i++) {
-      stroke(61, 90, 128, map(i, 0, path.length, 40, 220));
-      vertex(path[i].x, path[i].y);
+    // Floor bounce
+    if (by + ballSize / 2 >= height) {
+      by = height - ballSize / 2;
+      vy *= -damping;
+      vx *= 0.98;
+      bounceCount++;
+      if (abs(vy) < 0.5) vy = 0;
     }
-    endShape();
+
+    // Ceiling
+    if (by - ballSize / 2 <= 0) {
+      by = ballSize / 2;
+      vy *= -damping;
+    }
+
+    // Walls
+    if (bx + ballSize / 2 >= width) {
+      bx = width - ballSize / 2;
+      vx *= -damping;
+    }
+    if (bx - ballSize / 2 <= 0) {
+      bx = ballSize / 2;
+      vx *= -damping;
+    }
+  }
+
+  // Draw floor line
+  stroke(180, 170, 155);
+  strokeWeight(2);
+  line(0, height - 1, width, height - 1);
+
+  // Draw ball
+  noStroke();
+  fill(224, 122, 95);
+  circle(bx, by, ballSize);
+
+  // Velocity arrow
+  if (dropped && (abs(vx) > 0.1 || abs(vy) > 0.1)) {
+    stroke(61, 90, 128);
+    strokeWeight(2);
+    line(bx, by, bx + vx * 8, by + vy * 8);
+    noStroke();
+    fill(61, 90, 128);
+    circle(bx + vx * 8, by + vy * 8, 6);
+  }
+
+  if (!dropped) {
+    fill(107, 103, 96);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(14);
+    text("Click canvas to drop the ball", width / 2, height / 2);
   }
 
   updateVariableDisplay();
   updateCodePreview();
 }
 
-function updateSpeedX(value) {
-  speedX = Number(value);
-  document.getElementById("speedXValue").textContent = speedX.toFixed(1);
+function updateGravity(value) {
+  gravity = Number(value);
+  document.getElementById("gravityValue").textContent = gravity.toFixed(2);
   updateCodePreview();
 }
 
-function updateSpeedY(value) {
-  speedY = Number(value);
-  document.getElementById("speedYValue").textContent = speedY.toFixed(1);
+function updateDamping(value) {
+  damping = Number(value);
+  document.getElementById("dampingValue").textContent = damping.toFixed(2);
   updateCodePreview();
 }
 
@@ -232,85 +256,74 @@ function updateBallSize(value) {
   updateCodePreview();
 }
 
-function togglePath() {
-  showPath = !showPath;
-  if (!showPath) path = [];
-  updateCodePreview();
+function dropBall() {
+  bx = width / 2;
+  by = 40;
+  vx = 0;
+  vy = 0;
+  dropped = true;
 }
 
-function togglePause() {
-  paused = !paused;
-  updateCodePreview();
-}
-
-function resetAnimation() {
-  x = width / 2;
-  y = height / 2;
-  path = [];
-  edgeCollisions = 0;
-  paused = false;
-  document.getElementById("speedX").value = speedX;
-  document.getElementById("speedY").value = speedY;
-  document.getElementById("ballSize").value = ballSize;
-  document.getElementById("speedXValue").textContent = speedX.toFixed(1);
-  document.getElementById("speedYValue").textContent = speedY.toFixed(1);
-  document.getElementById("ballSizeValue").textContent = String(ballSize);
-  updateVariableDisplay();
-  updateCodePreview();
+function resetBall() {
+  bx = width / 2;
+  by = 40;
+  vx = 0;
+  vy = 0;
+  bounceCount = 0;
+  dropped = false;
 }
 
 function updateVariableDisplay() {
   const variables = [
-    ["x", Math.round(x)],
-    ["y", Math.round(y)],
-    ["speedX", speedX.toFixed(1)],
-    ["speedY", speedY.toFixed(1)],
-    ["ballSize", ballSize],
-    ["edgeCollisions", edgeCollisions],
-    ["pathOn", showPath],
-    ["paused", paused]
+    ["bx", Math.round(bx)],
+    ["by", Math.round(by)],
+    ["vx", vx.toFixed(2)],
+    ["vy", vy.toFixed(2)],
+    ["gravity", gravity.toFixed(2)],
+    ["damping", damping.toFixed(2)],
+    ["bounces", bounceCount]
   ];
-
   document.getElementById("variables").innerHTML = variables
     .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
     .join("");
 }
 
 function updateCodePreview() {
-  const code = `let x, y;
-let speedX = ${speedX.toFixed(1)};
-let speedY = ${speedY.toFixed(1)};
+  const code = `let bx, by, vx, vy;
+let gravity = ${gravity.toFixed(2)};
+let damping = ${damping.toFixed(2)};
 let ballSize = ${ballSize};
-let showPath = ${showPath};
-let paused = ${paused};
 
 function setup() {
   createCanvas(400, 400);
-  x = width / 2;
-  y = height / 2;
+  bx = width / 2;
+  by = 40;
+  vy = 0;
+  vx = 0;
 }
 
 function draw() {
-  if (paused) return;
   background(244, 239, 230);
 
-  x += speedX;
-  y += speedY;
+  // gravity accelerates vy each frame
+  vy += gravity;
+  bx += vx;
+  by += vy;
 
-  if (x < 0 || x > width) speedX *= -1;
-  if (y < 0 || y > height) speedY *= -1;
+  // bounce off floor
+  if (by + ballSize / 2 >= height) {
+    by = height - ballSize / 2;
+    vy *= -damping;
+    vx *= 0.98;
+  }
 
-  fill(224, 122, 95);
-  noStroke();
-  circle(x, y, ballSize);
+  circle(bx, by, ballSize);
 }`;
-
   document.getElementById("code-preview").textContent = code;
 }
 
 function copyCode() {
-  const code = document.getElementById("code-preview").textContent;
-  navigator.clipboard.writeText(code);
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
 }
   </script>
   <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>

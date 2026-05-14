@@ -310,10 +310,67 @@ function updateMaxArraySize(value) {
 }
 
 function updateArrayDisplay() {
-  let code = `let numbers = [${numbers.join(", ")}];\nlet visualizationType = "${visualizationType}";`;
-  if (highlighted >= 0) {
-    code += `\n\n// highlighted element\nnumbers[${highlighted}] = ${numbers[highlighted]};`;
+  let drawBlock = "";
+  if (visualizationType === "bars") {
+    drawBlock = `
+  let barWidth = width / numbers.length;
+  for (let i = 0; i < numbers.length; i++) {
+    let x = i * barWidth;
+    let h = map(numbers[i], 0, 10, 0, height - 70);
+    fill(61, 90, 128);
+    noStroke();
+    rect(x + 4, height - h - 24, barWidth - 8, h, 12);
+    fill(44, 42, 38);
+    textAlign(CENTER);
+    text(numbers[i], x + barWidth / 2, height - h - 36);
+  }`;
+  } else if (visualizationType === "circles") {
+    drawBlock = `
+  let angle = TWO_PI / numbers.length;
+  let radius = min(width, height) * 0.3;
+  for (let i = 0; i < numbers.length; i++) {
+    let a = angle * i - PI / 2;
+    let x = width / 2 + cos(a) * radius;
+    let y = height / 2 + sin(a) * radius;
+    let sz = map(numbers[i], 0, 10, 16, 70);
+    fill(61, 90, 128);
+    noStroke();
+    circle(x, y, sz);
+    fill(250, 246, 240);
+    textAlign(CENTER, CENTER);
+    text(numbers[i], x, y);
+  }`;
+  } else {
+    drawBlock = `
+  stroke(61, 90, 128);
+  strokeWeight(2.5);
+  for (let i = 0; i < numbers.length - 1; i++) {
+    let x1 = map(i,     0, numbers.length - 1, 50, width - 50);
+    let y1 = map(numbers[i],     0, 10, height - 60, 50);
+    let x2 = map(i + 1, 0, numbers.length - 1, 50, width - 50);
+    let y2 = map(numbers[i + 1], 0, 10, height - 60, 50);
+    line(x1, y1, x2, y2);
   }
+  for (let i = 0; i < numbers.length; i++) {
+    let x = map(i, 0, numbers.length - 1, 50, width - 50);
+    let y = map(numbers[i], 0, 10, height - 60, 50);
+    fill(61, 90, 128);
+    noStroke();
+    circle(x, y, 14);
+    fill(44, 42, 38);
+    textAlign(CENTER);
+    text(numbers[i], x, y - 14);
+  }`;
+  }
+  const code = `let numbers = [${numbers.join(", ")}];
+
+function setup() {
+  createCanvas(500, 400);
+}
+
+function draw() {
+  background(250, 246, 240);${drawBlock}
+}`;
   document.getElementById("array-display").textContent = code;
 }
 

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Easing Types Comparison — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/easing-types-comparison/">
+  <meta property="og:title" content="Easing Types Comparison — CC Fest Coding Camp">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Easing Types Comparison — CC Fest Coding Camp">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 2</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Easing Types Comparison</h1>
+      <p class="tool-subtitle">Watch four balls race across the canvas — each using a different easing style. See how lerp() and a tiny t variable create dramatically different feelings of motion.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">easing</span>
+        <span class="tool-tag">lerp()</span>
+        <span class="tool-tag">animation</span>
+        <span class="tool-tag">timing</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Press Launch to start the race. Each row uses a different easing function.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>The easing math for the currently highlighted type.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Live code will appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Adjust speed and restart to compare again.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="control">
+                <label for="durationSlider">Duration (frames) <span id="durationValue">120</span></label>
+                <input id="durationSlider" type="range" min="40" max="300" value="120" step="10" oninput="updateDuration(this.value)">
+              </div>
+              <div class="control">
+                <label for="lerpAmtSlider">Lerp Amount <span id="lerpAmtValue">0.08</span></label>
+                <input id="lerpAmtSlider" type="range" min="0.01" max="0.3" value="0.08" step="0.01" oninput="updateLerpAmt(this.value)">
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="launchRace()">Launch</button>
+                <button class="button ghost" onclick="resetRace()">Reset</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>Progress values for each easing type.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Set duration to <code>240</code> frames and watch the ease-in ball — it barely moves for the first half, then rushes to catch up at the end.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>The lerp ball never truly stops — it always moves a fraction of the remaining distance. That "almost there" behavior is the signature of lerp-based easing.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Add a fifth row using <code>lerp(x, target, noise(t))</code> — the amount itself varies over time, making the ball wander unpredictably toward the goal.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Easing Types Comparison · lerp(), easing, and motion timing</footer>
+  </div>
+
+  <script>
+let duration = 120;
+let lerpAmt = 0.08;
+let running = false;
+let elapsed = 0;
+
+// Ball positions
+let xLinear = 30;
+let xEaseIn = 30;
+let xEaseOut = 30;
+let xEaseInOut = 30;
+let xLerp = 30;
+
+const START_X = 30;
+const END_X = 370;
+const colors = [
+  [61, 90, 128],
+  [224, 122, 95],
+  [107, 163, 136],
+  [178, 132, 190],
+  [200, 160, 80]
+];
+const labels = ["Linear", "Ease In", "Ease Out", "Ease In-Out", "lerp()"];
+
+function setup() {
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
+  resetRace();
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  let rowH = height / 5;
+
+  if (running) {
+    elapsed++;
+    let t = constrain(elapsed / duration, 0, 1);
+
+    let tEaseIn = t * t;
+    let tEaseOut = t * (2 - t);
+    let tEaseInOut = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+    xLinear = map(t, 0, 1, START_X, END_X);
+    xEaseIn = map(tEaseIn, 0, 1, START_X, END_X);
+    xEaseOut = map(tEaseOut, 0, 1, START_X, END_X);
+    xEaseInOut = map(tEaseInOut, 0, 1, START_X, END_X);
+    xLerp = lerp(xLerp, END_X, lerpAmt);
+
+    if (elapsed >= duration) running = false;
+  }
+
+  let xs = [xLinear, xEaseIn, xEaseOut, xEaseInOut, xLerp];
+
+  for (let i = 0; i < 5; i++) {
+    let cy = rowH * i + rowH / 2;
+
+    // Track
+    stroke(210, 200, 185);
+    strokeWeight(2);
+    line(START_X, cy, END_X, cy);
+
+    // Start / end markers
+    fill(200, 190, 175);
+    noStroke();
+    rect(START_X - 2, cy - 15, 4, 30);
+    rect(END_X - 2, cy - 15, 4, 30);
+
+    // Ball
+    fill(...colors[i]);
+    noStroke();
+    circle(xs[i], cy, 22);
+
+    // Label
+    fill(107, 103, 96);
+    noStroke();
+    textSize(11);
+    textAlign(LEFT, CENTER);
+    text(labels[i], START_X + 4, cy - 18);
+  }
+
+  updateVariableDisplay();
+  updateCodePreview();
+}
+
+function launchRace() {
+  resetRace();
+  running = true;
+}
+
+function resetRace() {
+  running = false;
+  elapsed = 0;
+  xLinear = START_X;
+  xEaseIn = START_X;
+  xEaseOut = START_X;
+  xEaseInOut = START_X;
+  xLerp = START_X;
+}
+
+function updateDuration(v) {
+  duration = Number(v);
+  document.getElementById("durationValue").textContent = String(duration);
+}
+
+function updateLerpAmt(v) {
+  lerpAmt = Number(v);
+  document.getElementById("lerpAmtValue").textContent = lerpAmt.toFixed(2);
+}
+
+function updateVariableDisplay() {
+  const t = constrain(elapsed / duration, 0, 1);
+  const variables = [
+    ["t (progress)", t.toFixed(3)],
+    ["linear x", Math.round(xLinear)],
+    ["ease-in x", Math.round(xEaseIn)],
+    ["ease-out x", Math.round(xEaseOut)],
+    ["ease-in-out x", Math.round(xEaseInOut)],
+    ["lerp x", Math.round(xLerp)]
+  ];
+  document.getElementById("variables").innerHTML = variables
+    .map(([k, v]) => `<div class="stat"><strong>${k}</strong><code>${v}</code></div>`)
+    .join("");
+}
+
+function updateCodePreview() {
+  const code = `let duration = ${duration};
+let elapsed = 0;
+
+function easeIn(t)    { return t * t; }
+function easeOut(t)   { return t * (2 - t); }
+function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+function setup() {
+  createCanvas(500, 400);
+}
+
+function draw() {
+  background(244, 239, 230);
+  elapsed = (elapsed + 1) % (duration + 60);
+  let t = constrain(elapsed / duration, 0, 1);
+  let lerpX = 30;
+
+  noStroke();
+  let labels = ["linear", "ease-in", "ease-out", "ease-in-out", "lerp"];
+  let easeFns = [t, easeIn(t), easeOut(t), easeInOut(t), null];
+  let spacing = height / (labels.length + 1);
+
+  for (let i = 0; i < labels.length; i++) {
+    let y = (i + 1) * spacing;
+    let x = i < 4
+      ? map(easeFns[i], 0, 1, 30, width - 30)
+      : lerp(lerpX = lerp(lerpX, width - 30, ${lerpAmt.toFixed(2)}), lerpX, 0);
+
+    fill(200, 220, 210);
+    rect(30, y - 1, width - 60, 2, 2);
+
+    fill(61, 90, 128);
+    circle(x, y, 22);
+
+    fill(44, 42, 38);
+    textAlign(LEFT, CENTER);
+    textSize(11);
+    text(labels[i], 35, y - 16);
+  }
+}`;
+  document.getElementById("code-preview").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

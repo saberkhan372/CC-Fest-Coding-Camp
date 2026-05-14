@@ -347,7 +347,64 @@ function updateObjectList() {
 }
 
 function updateClassCode() {
-  const code = `class Shape {\n  constructor(x, y, size, color) {\n    this.x = x;\n    this.y = y;\n    this.size = size;\n    this.color = color;\n    this.speed = 2;\n    this.direction = Math.random() * Math.PI * 2;\n  }\n\n  move() {\n    if (this === selectedObject) return;\n    this.x += Math.cos(this.direction) * this.speed;\n    this.y += Math.sin(this.direction) * this.speed;\n  }\n\n  contains(px, py) {\n    return Math.hypot(px - this.x, py - this.y) < this.size / 2;\n  }\n}`;
+  const code = `let shapes = [];
+let selected = null;
+
+class Shape {
+  constructor(x, y, sz, col) {
+    this.x = x;
+    this.y = y;
+    this.size = sz;
+    this.color = col;
+    this.vx = random(-1.5, 1.5);
+    this.vy = random(-1.5, 1.5);
+  }
+
+  move() {
+    if (this === selected) return;
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > width)  this.vx *= -1;
+    if (this.y < 0 || this.y > height) this.vy *= -1;
+  }
+
+  display() {
+    fill(this.color);
+    noStroke();
+    circle(this.x, this.y, this.size);
+  }
+
+  contains(px, py) {
+    return dist(px, py, this.x, this.y) < this.size / 2;
+  }
+}
+
+function setup() {
+  createCanvas(500, 400);
+  for (let i = 0; i < 5; i++) {
+    shapes.push(new Shape(random(width), random(height), random(20, 50), color(random(255), 100, 180)));
+  }
+}
+
+function draw() {
+  background(244, 239, 230);
+  for (let s of shapes) {
+    s.move();
+    s.display();
+  }
+}
+
+function mousePressed() {
+  for (let s of shapes) {
+    if (s.contains(mouseX, mouseY)) { selected = s; return; }
+  }
+}
+
+function mouseReleased() { selected = null; }
+
+function mouseDragged() {
+  if (selected) { selected.x = mouseX; selected.y = mouseY; }
+}`;
   document.getElementById("classCode").textContent = code;
 }
 
