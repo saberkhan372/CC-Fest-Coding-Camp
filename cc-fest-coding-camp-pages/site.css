@@ -720,7 +720,9 @@ a{color:inherit}
 }
 
 .station.is-collapsible .station-header,
-#starter-sketches.is-collapsible .gallery-header{
+#starter-sketches.is-collapsible .gallery-header,
+#interactive-tools.is-collapsible .gallery-header,
+#concept-bridges.is-collapsible .gallery-header{
   align-items:center;
   cursor:pointer;
   padding:14px 16px;
@@ -734,7 +736,11 @@ a{color:inherit}
 .station.is-collapsible .station-header:hover,
 .station.is-collapsible .station-header:focus-visible,
 #starter-sketches.is-collapsible .gallery-header:hover,
-#starter-sketches.is-collapsible .gallery-header:focus-visible{
+#starter-sketches.is-collapsible .gallery-header:focus-visible,
+#interactive-tools.is-collapsible .gallery-header:hover,
+#interactive-tools.is-collapsible .gallery-header:focus-visible,
+#concept-bridges.is-collapsible .gallery-header:hover,
+#concept-bridges.is-collapsible .gallery-header:focus-visible{
   border-color:rgba(200,57,29,.2);
   background:#fff;
   transform:translateY(-1px);
@@ -755,7 +761,12 @@ a{color:inherit}
   white-space:nowrap;
 }
 
-/* Starter sketches: only show header button when open (peek trigger handles collapsed CTA) */
+/* Concept bridge stations: label says "bridges" */
+#concept-bridges .station.is-collapsible.is-open .station-header::after{
+  content:"Hide bridges";
+}
+
+/* Starter sketches section: label */
 #starter-sketches.is-collapsible.is-open .gallery-header::after{
   content:"Hide sketches";
   margin-left:auto;
@@ -768,8 +779,36 @@ a{color:inherit}
   white-space:nowrap;
 }
 
+/* Workshop tools section: label */
+#interactive-tools.is-collapsible.is-open .gallery-header::after{
+  content:"Hide tools";
+  margin-left:auto;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--cream);
+  color:var(--accent);
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+/* Concept bridges section: label */
+#concept-bridges.is-collapsible.is-open .gallery-header::after{
+  content:"Hide bridges";
+  margin-left:auto;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--cream);
+  color:var(--accent);
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
 .station.is-collapsible.is-open .station-header,
-#starter-sketches.is-collapsible.is-open .gallery-header{
+#starter-sketches.is-collapsible.is-open .gallery-header,
+#interactive-tools.is-collapsible.is-open .gallery-header,
+#concept-bridges.is-collapsible.is-open .gallery-header{
   margin-bottom:20px;
 }
 
@@ -778,8 +817,23 @@ a{color:inherit}
   display:none;
 }
 
+/* Concept bridge stations: show only first 2 cards as a peek */
+#concept-bridges .station.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+3){
+  display:none;
+}
+
 /* Starter sketches: show first 3 cards as a peek */
 #starter-sketches.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+4){
+  display:none;
+}
+
+/* Section-level collapse: hide station-list and filter bars */
+#interactive-tools.is-collapsible:not(.is-open) .station-list,
+#interactive-tools.is-collapsible:not(.is-open) .tool-search-wrap,
+#interactive-tools.is-collapsible:not(.is-open) .suit-filter-bar,
+#interactive-tools.is-collapsible:not(.is-open) .pathway-filter-bar,
+#interactive-tools.is-collapsible:not(.is-open) .suit-legend,
+#concept-bridges.is-collapsible:not(.is-open) .station-list{
   display:none;
 }
 
@@ -804,7 +858,9 @@ a{color:inherit}
 }
 
 .station.is-collapsible.is-open .station-peek-trigger,
-#starter-sketches.is-collapsible.is-open .station-peek-trigger{
+#starter-sketches.is-collapsible.is-open .station-peek-trigger,
+#interactive-tools.is-collapsible.is-open .station-peek-trigger,
+#concept-bridges.is-collapsible.is-open .station-peek-trigger{
   display:none;
 }
 

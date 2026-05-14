@@ -169,6 +169,53 @@
     });
   };
 
+  // Concept bridge stations — collapsible, 2-card peek
+  document.querySelectorAll("#concept-bridges .station").forEach((station, index) => {
+    const header = station.querySelector(".station-header");
+    const grid = station.querySelector(".tool-grid");
+    if (!header || !grid) return;
+
+    const label = station.querySelector(".station-name")?.textContent?.trim() || `Bridge section ${index + 1}`;
+    grid.id = grid.id || `station-bridges-${index + 1}`;
+    makeCollapsible({
+      container: station,
+      header,
+      grid,
+      label: `${label} bridges`,
+      openByDefault: false
+    });
+
+    const previewCount = 2;
+    const remaining = grid.querySelectorAll(".tool-card").length - previewCount;
+    if (remaining > 0) {
+      const trigger = document.createElement("div");
+      trigger.className = "station-peek-trigger";
+      trigger.setAttribute("aria-hidden", "true");
+      const btn = document.createElement("span");
+      btn.className = "station-peek-btn";
+      btn.textContent = `Show ${remaining} more bridge${remaining !== 1 ? "s" : ""} →`;
+      trigger.appendChild(btn);
+      grid.appendChild(trigger);
+      trigger.addEventListener("click", () => header.click());
+    }
+  });
+
+  // Concept bridges section — section-level collapse
+  const bridgesSection = document.querySelector("#concept-bridges");
+  const bridgesHeader = bridgesSection?.querySelector(".gallery-header");
+  const bridgesStationList = bridgesSection?.querySelector(".station-list");
+  if (bridgesSection && bridgesHeader && bridgesStationList) {
+    bridgesStationList.id = bridgesStationList.id || "concept-bridges-station-list";
+    makeCollapsible({
+      container: bridgesSection,
+      header: bridgesHeader,
+      grid: bridgesStationList,
+      label: "concept bridges",
+      openByDefault: false
+    });
+  }
+
+  // Workshop tools stations — collapsible, 3-card peek
   document.querySelectorAll("#interactive-tools .station").forEach((station, index) => {
     const header = station.querySelector(".station-header");
     const grid = station.querySelector(".tool-grid");
@@ -200,6 +247,22 @@
     }
   });
 
+  // Workshop tools section — section-level collapse
+  const toolsSection = document.querySelector("#interactive-tools");
+  const toolsHeader = toolsSection?.querySelector(".gallery-header");
+  const toolsStationList = toolsSection?.querySelector(".station-list");
+  if (toolsSection && toolsHeader && toolsStationList) {
+    toolsStationList.id = toolsStationList.id || "interactive-tools-station-list";
+    makeCollapsible({
+      container: toolsSection,
+      header: toolsHeader,
+      grid: toolsStationList,
+      label: "workshop tools",
+      openByDefault: false
+    });
+  }
+
+  // Starter sketches section — section-level collapse
   const starterSection = document.querySelector("#starter-sketches");
   const starterHeader = starterSection?.querySelector(".gallery-header");
   const starterGrid = starterSection?.querySelector(".tool-grid");
