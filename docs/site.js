@@ -169,23 +169,24 @@
     });
   };
 
-  document.querySelectorAll("#interactive-tools .station").forEach((station, index) => {
+  document.querySelectorAll("#interactive-tools .station, #concept-bridges .station").forEach((station, index) => {
     const header = station.querySelector(".station-header");
     const grid = station.querySelector(".tool-grid");
     if (!header || !grid) return;
 
     const label = station.querySelector(".station-name")?.textContent?.trim() || `Tool section ${index + 1}`;
-    const gridId = `station-tools-${index + 1}`;
+    const sectionType = station.closest("#concept-bridges") ? "bridge" : "tool";
+    const gridId = `station-${sectionType}s-${index + 1}`;
     grid.id = grid.id || gridId;
     makeCollapsible({
       container: station,
       header,
       grid,
-      label: `${label} tools`,
+      label: `${label} ${sectionType}s`,
       openByDefault: false
     });
 
-    const previewCount = 3;
+    const previewCount = 2;
     const remaining = grid.querySelectorAll(".tool-card").length - previewCount;
     if (remaining <= 0) {
       // Solo station (≤3 cards): mark it so CSS can remove the column gap
@@ -197,11 +198,39 @@
     trigger.setAttribute("aria-hidden", "true");
     const btn = document.createElement("span");
     btn.className = "station-peek-btn";
-    btn.textContent = `Show ${remaining} more ${label} tool${remaining !== 1 ? "s" : ""} →`;
+    btn.textContent = `Show ${remaining} more ${label} ${sectionType}${remaining !== 1 ? "s" : ""} →`;
     trigger.appendChild(btn);
     grid.appendChild(trigger);
     trigger.addEventListener("click", () => header.click());
   });
+
+  const bridgesSection = document.querySelector("#concept-bridges");
+  const bridgesHeader = bridgesSection?.querySelector(".gallery-header");
+  const bridgesStationList = bridgesSection?.querySelector(".station-list");
+  if (bridgesSection && bridgesHeader && bridgesStationList) {
+    bridgesStationList.id = bridgesStationList.id || "concept-bridges-station-list";
+    makeCollapsible({
+      container: bridgesSection,
+      header: bridgesHeader,
+      grid: bridgesStationList,
+      label: "concept bridges",
+      openByDefault: false
+    });
+  }
+
+  const toolsSection = document.querySelector("#interactive-tools");
+  const toolsHeader = toolsSection?.querySelector(".gallery-header");
+  const toolsStationList = toolsSection?.querySelector(".station-list");
+  if (toolsSection && toolsHeader && toolsStationList) {
+    toolsStationList.id = toolsStationList.id || "interactive-tools-station-list";
+    makeCollapsible({
+      container: toolsSection,
+      header: toolsHeader,
+      grid: toolsStationList,
+      label: "workshop tools",
+      openByDefault: false
+    });
+  }
 
   const starterSection = document.querySelector("#starter-sketches");
   const starterHeader = starterSection?.querySelector(".gallery-header");

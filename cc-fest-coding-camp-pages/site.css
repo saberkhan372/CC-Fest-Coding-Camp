@@ -812,8 +812,8 @@ a{color:inherit}
   margin-bottom:20px;
 }
 
-/* Station collapsed: show first 3 cards as a peek, hide the rest */
-.station.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+4){
+/* Station collapsed: show first 2 cards as a peek, hide the rest */
+.station.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+3){
   display:none;
 }
 
