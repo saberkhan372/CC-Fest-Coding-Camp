@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>String &amp; Text Manipulation Studio — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/string-text-manipulation-studio/">
+  <meta property="og:title" content="String & Text Manipulation Studio — CC Fest Coding Camp">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="String & Text Manipulation Studio — CC Fest Coding Camp">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 4</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>String &amp; Text Manipulation Studio</h1>
+      <p class="tool-subtitle">Type any text and watch split(), toUpperCase(), slice(), and join() transform it live on the canvas. Every transformation shows its result and the code that produced it.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">String</span>
+        <span class="tool-tag">text</span>
+        <span class="tool-tag">manipulation</span>
+        <span class="tool-tag">split()</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Type in the input below. The canvas shows all transformations in real time.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>The string methods applied to your current input.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Live code will appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Type your text and adjust the slice range.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="control">
+                <label for="textInput">Input Text</label>
+                <input id="textInput" type="text" value="hello world" style="width:100%;padding:6px 8px;border:1px solid #d0c8bb;border-radius:6px;font-family:DM Mono,monospace;font-size:13px;background:#fdf9f4;" oninput="onTextChange(this.value)">
+              </div>
+              <div class="control">
+                <label for="sliceStartSlider">Slice Start <span id="sliceStartValue">0</span></label>
+                <input id="sliceStartSlider" type="range" min="0" max="20" value="0" step="1" oninput="updateSliceStart(this.value)">
+              </div>
+              <div class="control">
+                <label for="sliceEndSlider">Slice End <span id="sliceEndValue">5</span></label>
+                <input id="sliceEndSlider" type="range" min="1" max="20" value="5" step="1" oninput="updateSliceEnd(this.value)">
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="shuffleWords()">Shuffle Words</button>
+                <button class="button ghost" onclick="reverseWords()">Reverse Words</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>String properties and transformation results.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Type a sentence like <code>the quick brown fox</code>. Then set slice to characters <code>4–9</code> and watch only those characters appear on the canvas as a new word.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p><code>split(" ")</code> breaks the string on every space and returns an array — each word becomes an element. <code>join(" ")</code> does the reverse, collapsing the array back into a string.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Use split() to break text into letters, then draw each letter at a different position or size on the canvas — turning a word into a visual composition.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · String &amp; Text Manipulation Studio · String methods, split, join, slice</footer>
+  </div>
+
+  <script>
+let inputText = "hello world";
+let sliceStart = 0;
+let sliceEnd = 5;
+
+function setup() {
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
+  textFont("DM Mono, monospace");
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  let upper = inputText.toUpperCase();
+  let words = inputText.split(" ");
+  let joined = words.join("-");
+  let sliced = inputText.slice(
+    constrain(sliceStart, 0, inputText.length),
+    constrain(sliceEnd, 0, inputText.length)
+  );
+  let reversed = words.slice().reverse().join(" ");
+  let letters = inputText.replace(/ /g, "").split("");
+
+  // Row height
+  let rowH = 58;
+  let labelX = 10;
+  let resultX = 200;
+  let rows = [
+    { label: 'original:', result: inputText },
+    { label: 'toUpperCase():', result: upper },
+    { label: 'split(" ").length:', result: String(words.length) + " words" },
+    { label: 'join("-"):', result: joined.length > 18 ? joined.slice(0, 18) + "…" : joined },
+    { label: `slice(${sliceStart},${sliceEnd}):`, result: '"' + sliced + '"' },
+    { label: 'reversed words:', result: reversed.length > 16 ? reversed.slice(0, 16) + "…" : reversed },
+  ];
+
+  for (let i = 0; i < rows.length; i++) {
+    let y = 28 + i * rowH;
+
+    // Row background (alternating)
+    if (i % 2 === 0) {
+      fill(235, 229, 218, 80);
+      noStroke();
+      rect(0, y - 14, width, rowH - 4, 4);
+    }
+
+    // Label
+    fill(107, 103, 96);
+    noStroke();
+    textSize(10);
+    textAlign(LEFT, CENTER);
+    text(rows[i].label, labelX, y + 4);
+
+    // Result
+    fill(61, 90, 128);
+    textSize(13);
+    textAlign(LEFT, CENTER);
+    text(rows[i].result, resultX, y + 4);
+  }
+
+  // Letters scattered at bottom
+  let ly = height - 40;
+  fill(224, 122, 95, 160);
+  noStroke();
+  textSize(11);
+  textAlign(CENTER, CENTER);
+  let spacing = min(26, (width - 20) / max(letters.length, 1));
+  for (let i = 0; i < min(letters.length, 15); i++) {
+    let lx = 16 + i * spacing;
+    circle(lx + 6, ly + sin(frameCount * 0.05 + i * 0.6) * 4, 20);
+    fill(255);
+    text(letters[i], lx + 6, ly + sin(frameCount * 0.05 + i * 0.6) * 4);
+    fill(224, 122, 95, 160);
+  }
+
+  updateVariableDisplay();
+  updateCodePreview();
+}
+
+function onTextChange(v) {
+  inputText = v;
+}
+
+function updateSliceStart(v) {
+  sliceStart = Number(v);
+  document.getElementById("sliceStartValue").textContent = String(sliceStart);
+}
+
+function updateSliceEnd(v) {
+  sliceEnd = Number(v);
+  document.getElementById("sliceEndValue").textContent = String(sliceEnd);
+}
+
+function shuffleWords() {
+  let words = inputText.split(" ");
+  for (let i = words.length - 1; i > 0; i--) {
+    let j = floor(random(i + 1));
+    [words[i], words[j]] = [words[j], words[i]];
+  }
+  inputText = words.join(" ");
+  document.getElementById("textInput").value = inputText;
+}
+
+function reverseWords() {
+  inputText = inputText.split(" ").reverse().join(" ");
+  document.getElementById("textInput").value = inputText;
+}
+
+function updateVariableDisplay() {
+  const sliced = inputText.slice(
+    constrain(sliceStart, 0, inputText.length),
+    constrain(sliceEnd, 0, inputText.length)
+  );
+  const variables = [
+    ["length", inputText.length],
+    ["word count", inputText.split(" ").length],
+    [`slice(${sliceStart},${sliceEnd})`, '"' + sliced + '"'],
+    ["toUpperCase", inputText.toUpperCase().slice(0, 12) + (inputText.length > 12 ? "…" : "")]
+  ];
+  document.getElementById("variables").innerHTML = variables
+    .map(([k, v]) => `<div class="stat"><strong>${k}</strong><code>${v}</code></div>`)
+    .join("");
+}
+
+function updateCodePreview() {
+  const code = `let str = "${inputText}";
+
+// toUpperCase
+let upper = str.toUpperCase();
+// → "${inputText.toUpperCase()}"
+
+// split on spaces → array of words
+let words = str.split(" ");
+// → [${inputText.split(" ").map(w => `"${w}"`).join(", ")}]
+
+// join with dash
+let dashed = words.join("-");
+// → "${inputText.split(" ").join("-")}"
+
+// slice characters ${sliceStart} to ${sliceEnd}
+let sliced = str.slice(${sliceStart}, ${sliceEnd});
+// → "${inputText.slice(sliceStart, sliceEnd)}"
+
+// reverse word order
+let rev = words.reverse().join(" ");
+// → "${inputText.split(" ").reverse().join(" ")}"`;
+  document.getElementById("code-preview").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

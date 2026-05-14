@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents &amp; Rules Playground — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/agents-rules-playground/">
+  <meta property="og:title" content="Agents & Rules Playground — CC Fest Coding Camp">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Agents & Rules Playground — CC Fest Coding Camp">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 5</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Agents &amp; Rules Playground</h1>
+      <p class="tool-subtitle">A simulation where autonomous dots wander, avoid edges, and seek the mouse — all from simple per-agent rules. Adjust wander and seek strength to watch complex behavior emerge.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">agents</span>
+        <span class="tool-tag">autonomous</span>
+        <span class="tool-tag">behavior</span>
+        <span class="tool-tag">simulation</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Move your mouse over the canvas to attract agents. Adjust rules to change behavior.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>The agent class and behavior rules currently active.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Live code will appear here.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Tune the three behavior rules independently.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="control">
+                <label for="wanderSlider">Wander Strength <span id="wanderValue">0.15</span></label>
+                <input id="wanderSlider" type="range" min="0" max="1" value="0.15" step="0.01" oninput="updateWander(this.value)">
+              </div>
+              <div class="control">
+                <label for="seekSlider">Seek Strength <span id="seekValue">0.04</span></label>
+                <input id="seekSlider" type="range" min="0" max="0.3" value="0.04" step="0.005" oninput="updateSeek(this.value)">
+              </div>
+              <div class="control">
+                <label for="edgeSlider">Edge Avoidance <span id="edgeValue">0.8</span></label>
+                <input id="edgeSlider" type="range" min="0" max="3" value="0.8" step="0.05" oninput="updateEdge(this.value)">
+              </div>
+              <div class="control">
+                <label for="agentCountSlider">Agent Count <span id="agentCountValue">12</span></label>
+                <input id="agentCountSlider" type="range" min="1" max="40" value="12" step="1" oninput="updateAgentCount(this.value)">
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="resetAgents()">Reset</button>
+                <button class="button ghost" onclick="toggleTrails()">Trails</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Sketch State</h2>
+                <p>Live simulation values.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Set wander to <code>0</code> and seek to <code>0.15</code>. Every agent locks onto the mouse instantly. Now raise wander back to <code>0.3</code> — they circle and drift rather than beeline.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>No agent knows about any other agent — each only reads its own position and the mouse. The flock-like pattern emerges purely from identical rules applied independently.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Add a separation rule: if two agents are closer than 30px, push them apart. Each agent still acts alone, but now they respond to each other — true emergent behavior.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Agents &amp; Rules Playground · Autonomous agents, behavior, simulation</footer>
+  </div>
+
+  <script>
+let agents = [];
+let wanderStr = 0.15;
+let seekStr = 0.04;
+let edgeStr = 0.8;
+let agentCount = 12;
+let showTrails = false;
+
+class Agent {
+  constructor() {
+    this.x = random(60, width - 60);
+    this.y = random(60, height - 60);
+    this.vx = random(-1.5, 1.5);
+    this.vy = random(-1.5, 1.5);
+    this.angle = random(TWO_PI);
+    this.col = [
+      random(40, 80),
+      random(80, 130),
+      random(100, 180)
+    ];
+    this.size = random(10, 18);
+    this.maxSpeed = random(1.5, 3);
+  }
+
+  update() {
+    // Wander: add random angular drift
+    this.angle += random(-wanderStr, wanderStr) * TWO_PI;
+    this.vx += cos(this.angle) * 0.08;
+    this.vy += sin(this.angle) * 0.08;
+
+    // Seek mouse
+    if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+      let dx = mouseX - this.x;
+      let dy = mouseY - this.y;
+      let d = dist(0, 0, dx, dy);
+      if (d > 0) {
+        this.vx += (dx / d) * seekStr;
+        this.vy += (dy / d) * seekStr;
+      }
+    }
+
+    // Edge avoidance
+    let margin = 40;
+    if (this.x < margin)       this.vx += edgeStr * 0.05 * (margin - this.x) / margin;
+    if (this.x > width - margin) this.vx -= edgeStr * 0.05 * (this.x - (width - margin)) / margin;
+    if (this.y < margin)       this.vy += edgeStr * 0.05 * (margin - this.y) / margin;
+    if (this.y > height - margin) this.vy -= edgeStr * 0.05 * (this.y - (height - margin)) / margin;
+
+    // Speed limit
+    let spd = sqrt(this.vx * this.vx + this.vy * this.vy);
+    if (spd > this.maxSpeed) {
+      this.vx = (this.vx / spd) * this.maxSpeed;
+      this.vy = (this.vy / spd) * this.maxSpeed;
+    }
+
+    this.x += this.vx;
+    this.y += this.vy;
+  }
+
+  display() {
+    let heading = atan2(this.vy, this.vx);
+    push();
+    translate(this.x, this.y);
+    rotate(heading);
+    fill(...this.col, 200);
+    noStroke();
+    // Arrow body
+    triangle(this.size, 0, -this.size * 0.6, -this.size * 0.5, -this.size * 0.6, this.size * 0.5);
+    pop();
+  }
+}
+
+function setup() {
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
+  resetAgents();
+}
+
+function resetAgents() {
+  agents = [];
+  for (let i = 0; i < agentCount; i++) {
+    agents.push(new Agent());
+  }
+}
+
+function draw() {
+  if (showTrails) {
+    background(244, 239, 230, 30);
+  } else {
+    background(244, 239, 230);
+  }
+
+  // Mouse target
+  if (mouseX > 0 && mouseX < width) {
+    noFill();
+    stroke(200, 190, 175);
+    strokeWeight(1);
+    circle(mouseX, mouseY, 24);
+  }
+
+  for (let a of agents) {
+    a.update();
+    a.display();
+  }
+
+  updateVariableDisplay();
+  updateCodePreview();
+}
+
+function updateWander(v) {
+  wanderStr = Number(v);
+  document.getElementById("wanderValue").textContent = wanderStr.toFixed(2);
+}
+function updateSeek(v) {
+  seekStr = Number(v);
+  document.getElementById("seekValue").textContent = seekStr.toFixed(3);
+}
+function updateEdge(v) {
+  edgeStr = Number(v);
+  document.getElementById("edgeValue").textContent = edgeStr.toFixed(2);
+}
+function updateAgentCount(v) {
+  agentCount = Number(v);
+  document.getElementById("agentCountValue").textContent = String(agentCount);
+  resetAgents();
+}
+function toggleTrails() {
+  showTrails = !showTrails;
+}
+
+function updateVariableDisplay() {
+  const a = agents[0];
+  const variables = [
+    ["agents.length", agents.length],
+    ["wanderStr", wanderStr.toFixed(2)],
+    ["seekStr", seekStr.toFixed(3)],
+    ["edgeStr", edgeStr.toFixed(2)],
+    ["agent[0].x", a ? Math.round(a.x) : "—"],
+    ["agent[0].speed", a ? sqrt(a.vx*a.vx + a.vy*a.vy).toFixed(2) : "—"]
+  ];
+  document.getElementById("variables").innerHTML = variables
+    .map(([k, v]) => `<div class="stat"><strong>${k}</strong><code>${v}</code></div>`)
+    .join("");
+}
+
+function updateCodePreview() {
+  const code = `class Agent {
+  constructor() {
+    this.x = random(width);
+    this.y = random(height);
+    this.vx = random(-1.5, 1.5);
+    this.vy = random(-1.5, 1.5);
+    this.angle = random(TWO_PI);
+  }
+
+  update() {
+    // Rule 1: Wander (random angle drift)
+    this.angle += random(-${wanderStr.toFixed(2)}, ${wanderStr.toFixed(2)}) * TWO_PI;
+    this.vx += cos(this.angle) * 0.08;
+    this.vy += sin(this.angle) * 0.08;
+
+    // Rule 2: Seek mouse
+    let dx = mouseX - this.x;
+    let dy = mouseY - this.y;
+    let d = dist(0, 0, dx, dy);
+    this.vx += (dx / d) * ${seekStr.toFixed(3)};
+    this.vy += (dy / d) * ${seekStr.toFixed(3)};
+
+    // Rule 3: Avoid edges
+    if (this.x < 40) this.vx += ${edgeStr.toFixed(2)} * 0.05;
+    if (this.x > width - 40) this.vx -= ${edgeStr.toFixed(2)} * 0.05;
+
+    this.x += this.vx;
+    this.y += this.vy;
+  }
+}`;
+  document.getElementById("code-preview").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

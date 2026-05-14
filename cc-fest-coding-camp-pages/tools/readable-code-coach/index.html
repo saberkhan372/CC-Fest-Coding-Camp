@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Readable Code Coach — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/readable-code-coach/">
+  <meta property="og:title" content="Readable Code Coach — CC Fest Coding Camp">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Readable Code Coach — CC Fest Coding Camp">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Debugging + Confidence</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Readable Code Coach</h1>
+      <p class="tool-subtitle">Compare before-and-after examples of readable vs. hard-to-read p5.js code. See how naming, spacing, and comments change the same sketch from cryptic to clear — without changing what it does.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">readability</span>
+        <span class="tool-tag">naming</span>
+        <span class="tool-tag">comments</span>
+        <span class="tool-tag">style</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Both sketches run identically — only their code quality differs. Switch examples to see different patterns.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Comparison</h2>
+                <p>The same sketch written two ways. Which would you rather debug at 11pm?</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyGood()">Copy Clean</button>
+            </div>
+            <div class="code-panel" style="max-height:320px;overflow-y:auto;">
+              <pre id="code-preview" style="white-space:pre-wrap;font-size:11px;">// Select an example to see the comparison.</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Browse examples and toggle between before/after.</p>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="button-row" style="flex-wrap:wrap;gap:6px;">
+                <button class="button primary" onclick="loadExample(0)">Naming</button>
+                <button class="button ghost" onclick="loadExample(1)">Comments</button>
+                <button class="button ghost" onclick="loadExample(2)">Spacing</button>
+                <button class="button ghost" onclick="loadExample(3)">Functions</button>
+              </div>
+              <div class="button-row">
+                <button class="button primary" onclick="toggleView()">Flip Before/After</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Score</h2>
+                <p>Readability signals found in the code.</p>
+              </div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Try / Notice / Remix</h2>
+              </div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Open the Naming example. Read the "before" version aloud. How many seconds before you know what <code>x2</code> means? Now read the "after" — does your brain relax?</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>Both versions run identically on the canvas. Readability isn't about correctness — it's about how fast the next person (or future you) can understand the intent.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Take one of your own sketches. Rename every variable that is a single letter. Add one comment per function explaining WHY it exists, not what it literally does.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Readable Code Coach · Readability, naming, comments, style</footer>
+  </div>
+
+  <script>
+let currentExample = 0;
+let showingAfter = true;
+
+const examples = [
+  {
+    title: "Variable Naming",
+    bad: `// Hard to read: single-letter names
+let x = 200;
+let y = 200;
+let x2 = 3;
+let y2 = 2;
+let s = 40;
+let c = 0;
+
+function setup() { createCanvas(400,400); }
+
+function draw() {
+  background(244, 239, 230);
+  x += x2; y += y2;
+  if (x<s||x>width-s) x2*=-1;
+  if (y<s||y>height-s) y2*=-1;
+  c = (c+1)%360;
+  fill(c,80,80);
+  circle(x,y,s*2);
+}`,
+    good: `// Readable: descriptive names
+let ballX = 200;
+let ballY = 200;
+let speedX = 3;
+let speedY = 2;
+let ballRadius = 40;
+let hue = 0;
+
+function setup() {
+  createCanvas(400, 400);
+  colorMode(HSB, 360, 100, 100);
+}
+
+function draw() {
+  background(35, 15, 96);
+
+  // Move ball
+  ballX += speedX;
+  ballY += speedY;
+
+  // Bounce off walls
+  if (ballX < ballRadius || ballX > width - ballRadius) speedX *= -1;
+  if (ballY < ballRadius || ballY > height - ballRadius) speedY *= -1;
+
+  // Cycle color
+  hue = (hue + 1) % 360;
+
+  fill(hue, 80, 90);
+  noStroke();
+  circle(ballX, ballY, ballRadius * 2);
+}`,
+    checks: ["descriptive names", "no single letters", "spaces around operators", "comments explain logic"]
+  },
+  {
+    title: "Comments",
+    bad: `let t = 0;
+let r = 120;
+
+function setup() { createCanvas(400,400); }
+
+function draw() {
+  background(244,239,230);
+  t += 0.03;
+  let px = width/2 + cos(t)*r;
+  let py = height/2 + sin(t)*r;
+  fill(61,90,128);
+  noStroke();
+  circle(px,py,24);
+  fill(224,122,95);
+  circle(width/2,height/2,12);
+}`,
+    good: `// Orbit animation: a dot circles a center point
+// using cos/sin to convert angle → x, y position
+
+let angle = 0;         // current angle in radians
+let orbitRadius = 120; // how far from center
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // Advance angle each frame (controls speed)
+  angle += 0.03;
+
+  // Convert polar → cartesian coordinates
+  let orbitX = width / 2 + cos(angle) * orbitRadius;
+  let orbitY = height / 2 + sin(angle) * orbitRadius;
+
+  // Draw orbit path hint
+  noFill();
+  stroke(210, 200, 185);
+  circle(width / 2, height / 2, orbitRadius * 2);
+
+  // Draw orbiting dot
+  fill(61, 90, 128);
+  noStroke();
+  circle(orbitX, orbitY, 24);
+
+  // Draw center anchor
+  fill(224, 122, 95);
+  circle(width / 2, height / 2, 12);
+}`,
+    checks: ["file-level comment", "inline comments", "comments explain WHY", "no magic numbers"]
+  },
+  {
+    title: "Spacing & Formatting",
+    bad: `let px=200,py=200,sz=60,r=0,g=120,b=180;
+function setup(){createCanvas(400,400);}
+function draw(){background(244,239,230);if(mouseIsPressed){sz=lerp(sz,100,0.1);}else{sz=lerp(sz,60,0.1);}r=lerp(r,mouseX/width*255,0.05);g=lerp(g,mouseY/height*255,0.05);fill(r,g,b);noStroke();circle(px,py,sz);}
+function mouseMoved(){px=lerp(px,mouseX,0.08);py=lerp(py,mouseY,0.08);}`,
+    good: `let dotX = 200;
+let dotY = 200;
+let dotSize = 60;
+let redChannel = 0;
+let greenChannel = 120;
+let blueChannel = 180;
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // Grow on press, shrink on release
+  if (mouseIsPressed) {
+    dotSize = lerp(dotSize, 100, 0.1);
+  } else {
+    dotSize = lerp(dotSize, 60, 0.1);
+  }
+
+  // Color follows mouse position
+  redChannel   = lerp(redChannel,   mouseX / width  * 255, 0.05);
+  greenChannel = lerp(greenChannel, mouseY / height * 255, 0.05);
+
+  fill(redChannel, greenChannel, blueChannel);
+  noStroke();
+  circle(dotX, dotY, dotSize);
+}
+
+function mouseMoved() {
+  // Smoothly follow the mouse
+  dotX = lerp(dotX, mouseX, 0.08);
+  dotY = lerp(dotY, mouseY, 0.08);
+}`,
+    checks: ["one statement per line", "blank lines between blocks", "consistent indentation", "spaces around operators"]
+  },
+  {
+    title: "Functions & Structure",
+    bad: `let stars=[];
+function setup(){createCanvas(400,400);for(let i=0;i<60;i++){stars.push({x:random(width),y:random(height),s:random(2,6),sp:random(0.3,1.5)});}}
+function draw(){background(20,20,40);for(let s of stars){fill(255,255,200,180);noStroke();circle(s.x,s.y,s.s);s.y+=s.sp;if(s.y>height){s.y=0;s.x=random(width);}}}`,
+    good: `// Falling stars simulation
+// Separated into: setup, draw, and helper functions
+
+let stars = [];
+
+function setup() {
+  createCanvas(400, 400);
+  spawnAllStars();
+}
+
+function draw() {
+  drawBackground();
+  updateAndDrawStars();
+}
+
+// ── Helpers ──────────────────────────────────────
+
+function spawnAllStars() {
+  for (let i = 0; i < 60; i++) {
+    stars.push(createStar());
+  }
+}
+
+function createStar() {
+  return {
+    x: random(width),
+    y: random(height),
+    size: random(2, 6),
+    speed: random(0.3, 1.5)
+  };
+}
+
+function drawBackground() {
+  background(20, 20, 40);
+}
+
+function updateAndDrawStars() {
+  for (let star of stars) {
+    drawStar(star);
+    moveStar(star);
+    wrapStarToTop(star);
+  }
+}
+
+function drawStar(star) {
+  fill(255, 255, 200, 180);
+  noStroke();
+  circle(star.x, star.y, star.size);
+}
+
+function moveStar(star) {
+  star.y += star.speed;
+}
+
+function wrapStarToTop(star) {
+  if (star.y > height) {
+    star.y = 0;
+    star.x = random(width);
+  }
+}`,
+    checks: ["functions have clear names", "each function does one thing", "no logic in setup()", "code is skimmable"]
+  }
+];
+
+// p5 sketch — runs the "good" version live
+let ballX, ballY, speedX, speedY, ballRadius, hue;
+let angle, orbitRadius;
+let dotX, dotY, dotSize, redCh, greenCh, blueCh;
+let stars = [];
+
+function setup() {
+  const canvas = createCanvas(400, 400);
+  canvas.parent("canvas-container");
+  resetForExample(currentExample);
+  loadExample(0);
+}
+
+function resetForExample(i) {
+  if (i === 0) {
+    colorMode(HSB, 360, 100, 100);
+    ballX = width / 2; ballY = height / 2;
+    speedX = 3; speedY = 2; ballRadius = 40; hue = 0;
+  } else if (i === 1) {
+    colorMode(RGB, 255);
+    angle = 0; orbitRadius = 120;
+  } else if (i === 2) {
+    colorMode(RGB, 255);
+    dotX = width / 2; dotY = height / 2;
+    dotSize = 60; redCh = 0; greenCh = 120; blueCh = 180;
+  } else if (i === 3) {
+    colorMode(RGB, 255);
+    stars = [];
+    for (let i = 0; i < 60; i++) {
+      stars.push({ x: random(width), y: random(height), size: random(2, 6), speed: random(0.3, 1.5) });
+    }
+  }
+}
+
+function draw() {
+  if (currentExample === 0) {
+    background(35, 15, 96);
+    ballX += speedX; ballY += speedY;
+    if (ballX < ballRadius || ballX > width - ballRadius) speedX *= -1;
+    if (ballY < ballRadius || ballY > height - ballRadius) speedY *= -1;
+    hue = (hue + 1) % 360;
+    fill(hue, 80, 90); noStroke();
+    circle(ballX, ballY, ballRadius * 2);
+  } else if (currentExample === 1) {
+    background(244, 239, 230);
+    angle += 0.03;
+    let ox = width / 2 + cos(angle) * orbitRadius;
+    let oy = height / 2 + sin(angle) * orbitRadius;
+    noFill(); stroke(210, 200, 185);
+    circle(width / 2, height / 2, orbitRadius * 2);
+    fill(61, 90, 128); noStroke();
+    circle(ox, oy, 24);
+    fill(224, 122, 95);
+    circle(width / 2, height / 2, 12);
+  } else if (currentExample === 2) {
+    background(244, 239, 230);
+    if (mouseIsPressed) { dotSize = lerp(dotSize, 100, 0.1); }
+    else { dotSize = lerp(dotSize, 60, 0.1); }
+    if (mouseX > 0) {
+      redCh = lerp(redCh, mouseX / width * 255, 0.05);
+      greenCh = lerp(greenCh, mouseY / height * 255, 0.05);
+    }
+    dotX = lerp(dotX, mouseX > 0 ? mouseX : dotX, 0.08);
+    dotY = lerp(dotY, mouseY > 0 ? mouseY : dotY, 0.08);
+    fill(redCh, greenCh, blueCh); noStroke();
+    circle(dotX, dotY, dotSize);
+  } else if (currentExample === 3) {
+    background(20, 20, 40);
+    for (let s of stars) {
+      fill(255, 255, 200, 180); noStroke();
+      circle(s.x, s.y, s.size);
+      s.y += s.speed;
+      if (s.y > height) { s.y = 0; s.x = random(width); }
+    }
+  }
+
+  // Label
+  let lbl = showingAfter ? "AFTER (clean)" : "BEFORE (messy)";
+  fill(showingAfter ? color(107, 163, 136) : color(200, 80, 80));
+  if (currentExample === 0) colorMode(RGB, 255);
+  noStroke();
+  textSize(11);
+  textAlign(RIGHT, TOP);
+  text(lbl, width - 8, 8);
+  if (currentExample === 0) colorMode(HSB, 360, 100, 100);
+
+  updateVariableDisplay();
+}
+
+function loadExample(i) {
+  currentExample = i;
+  showingAfter = true;
+  resetForExample(i);
+  renderComparison();
+  updateVariableDisplay();
+}
+
+function toggleView() {
+  showingAfter = !showingAfter;
+  renderComparison();
+}
+
+function renderComparison() {
+  const ex = examples[currentExample];
+  const code = showingAfter ? ex.good : ex.bad;
+  const label = showingAfter ? "// ✓ AFTER — clean version\n\n" : "// ✗ BEFORE — hard to read\n\n";
+  document.getElementById("code-preview").textContent = label + code;
+}
+
+function updateVariableDisplay() {
+  const ex = examples[currentExample];
+  const codeToCheck = showingAfter ? ex.good : ex.bad;
+  const checks = ex.checks;
+  const hasComment = codeToCheck.includes("//");
+  const hasBlankLine = codeToCheck.includes("\n\n");
+  const hasSingleLetters = /\blet [a-z] /.test(codeToCheck);
+  const hasFunctions = (codeToCheck.match(/^function /mg) || []).length;
+
+  const variables = [
+    ["example", ex.title],
+    ["view", showingAfter ? "after (clean)" : "before (messy)"],
+    ["has comments", String(hasComment)],
+    ["has blank lines", String(hasBlankLine)],
+    ["single-letter vars", String(hasSingleLetters)],
+    ["function count", hasFunctions]
+  ];
+  document.getElementById("variables").innerHTML = variables
+    .map(([k, v]) => `<div class="stat"><strong>${k}</strong><code>${v}</code></div>`)
+    .join("");
+}
+
+function copyGood() {
+  navigator.clipboard.writeText(examples[currentExample].good);
+}
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>
