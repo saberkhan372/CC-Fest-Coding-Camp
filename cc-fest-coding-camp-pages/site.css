@@ -614,6 +614,11 @@ a{color:inherit}
   display:flex;
   justify-content:flex-start;
 }
+.overview-filter-stack{
+  display:grid;
+  gap:10px;
+  margin:0 0 22px;
+}
 .tool-search{
   width:100%;
   max-width:620px;
@@ -835,16 +840,6 @@ body.search-active #starter-sketches{
 
 /* Starter sketches: show first 3 cards as a peek */
 #starter-sketches.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+4){
-  display:none;
-}
-
-/* Section-level collapse: hide station-list and filter bars */
-#interactive-tools.is-collapsible:not(.is-open) .station-list,
-#interactive-tools.is-collapsible:not(.is-open) .tool-search-wrap,
-#interactive-tools.is-collapsible:not(.is-open) .suit-filter-bar,
-#interactive-tools.is-collapsible:not(.is-open) .pathway-filter-bar,
-#interactive-tools.is-collapsible:not(.is-open) .suit-legend,
-#concept-bridges.is-collapsible:not(.is-open) .station-list{
   display:none;
 }
 

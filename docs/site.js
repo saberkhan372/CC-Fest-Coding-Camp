@@ -204,34 +204,6 @@
     trigger.addEventListener("click", () => header.click());
   });
 
-  const bridgesSection = document.querySelector("#concept-bridges");
-  const bridgesHeader = bridgesSection?.querySelector(".gallery-header");
-  const bridgesStationList = bridgesSection?.querySelector(".station-list");
-  if (bridgesSection && bridgesHeader && bridgesStationList) {
-    bridgesStationList.id = bridgesStationList.id || "concept-bridges-station-list";
-    makeCollapsible({
-      container: bridgesSection,
-      header: bridgesHeader,
-      grid: bridgesStationList,
-      label: "concept bridges",
-      openByDefault: false
-    });
-  }
-
-  const toolsSection = document.querySelector("#interactive-tools");
-  const toolsHeader = toolsSection?.querySelector(".gallery-header");
-  const toolsStationList = toolsSection?.querySelector(".station-list");
-  if (toolsSection && toolsHeader && toolsStationList) {
-    toolsStationList.id = toolsStationList.id || "interactive-tools-station-list";
-    makeCollapsible({
-      container: toolsSection,
-      header: toolsHeader,
-      grid: toolsStationList,
-      label: "workshop tools",
-      openByDefault: false
-    });
-  }
-
   const starterSection = document.querySelector("#starter-sketches");
   const starterHeader = starterSection?.querySelector(".gallery-header");
   const starterGrid = starterSection?.querySelector(".tool-grid");
@@ -460,8 +432,6 @@
       document.body.classList.remove("search-active");
       allCards.forEach(c => c.hidden = false);
       stations.forEach(s => s.hidden = false);
-      bridgeSection?.classList.remove("is-open");
-      toolSection?.classList.remove("is-open");
       sketchSection?.classList.remove("is-open");
       if (bridgeSection) bridgeSection.hidden = false;
       if (toolSection) toolSection.hidden = false;
@@ -486,12 +456,10 @@
     if (bridgeSection) {
       const visible = Array.from(bridgeSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
       bridgeSection.hidden = !visible;
-      if (!bridgeSection.hidden) bridgeSection.classList.add("is-open");
     }
     if (toolSection) {
       const visible = Array.from(toolSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
       toolSection.hidden = !visible;
-      if (!toolSection.hidden) toolSection.classList.add("is-open");
     }
     if (sketchSection) {
       const visible = Array.from(sketchSection.querySelectorAll(".tool-card")).some(c => !c.hidden);

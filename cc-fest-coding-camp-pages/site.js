@@ -203,34 +203,6 @@
     trigger.addEventListener("click", () => header.click());
   });
 
-  const bridgesSection = document.querySelector("#concept-bridges");
-  const bridgesHeader = bridgesSection?.querySelector(".gallery-header");
-  const bridgesStationList = bridgesSection?.querySelector(".station-list");
-  if (bridgesSection && bridgesHeader && bridgesStationList) {
-    bridgesStationList.id = bridgesStationList.id || "concept-bridges-station-list";
-    makeCollapsible({
-      container: bridgesSection,
-      header: bridgesHeader,
-      grid: bridgesStationList,
-      label: "concept bridges",
-      openByDefault: false
-    });
-  }
-
-  const toolsSection = document.querySelector("#interactive-tools");
-  const toolsHeader = toolsSection?.querySelector(".gallery-header");
-  const toolsStationList = toolsSection?.querySelector(".station-list");
-  if (toolsSection && toolsHeader && toolsStationList) {
-    toolsStationList.id = toolsStationList.id || "interactive-tools-station-list";
-    makeCollapsible({
-      container: toolsSection,
-      header: toolsHeader,
-      grid: toolsStationList,
-      label: "workshop tools",
-      openByDefault: false
-    });
-  }
-
   const starterSection = document.querySelector("#starter-sketches");
   const starterHeader = starterSection?.querySelector(".gallery-header");
   const starterGrid = starterSection?.querySelector(".tool-grid");
