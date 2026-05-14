@@ -609,15 +609,20 @@ a{color:inherit}
 
 /* Search box */
 .tool-search-wrap{margin-bottom:14px}
+.overview-search-wrap{
+  margin:18px 0 22px;
+  display:flex;
+  justify-content:flex-start;
+}
 .tool-search{
   width:100%;
-  max-width:520px;
-  padding:9px 16px;
+  max-width:620px;
+  padding:12px 18px;
   border-radius:999px;
   border:1.5px solid var(--line);
   background:#fff;
   font-family:"DM Sans",system-ui,sans-serif;
-  font-size:14px;
+  font-size:15px;
   color:var(--ink);
   outline:none;
   transition:border-color .15s,box-shadow .15s;
@@ -625,6 +630,17 @@ a{color:inherit}
 .tool-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,57,29,.1)}
 .tool-search::placeholder{color:var(--ink-light)}
 .tool-search::-webkit-search-cancel-button{-webkit-appearance:none}
+
+body.search-active #interactive-tools .station-list,
+body.search-active #concept-bridges .station-list{
+  display:flex !important;
+}
+
+body.search-active #interactive-tools,
+body.search-active #concept-bridges,
+body.search-active #starter-sketches{
+  display:block !important;
+}
 
 /* Pathway filter bar */
 .pathway-filter-bar{
@@ -808,8 +824,8 @@ a{color:inherit}
   margin-bottom:20px;
 }
 
-/* Station collapsed: show first 2 cards as a peek, hide the rest */
-.station.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+3){
+/* Station collapsed: show first 3 cards as a peek, hide the rest */
+.station.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+4){
   display:none;
 }
 

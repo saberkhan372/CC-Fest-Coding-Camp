@@ -186,7 +186,7 @@
       openByDefault: false
     });
 
-    const previewCount = 2;
+    const previewCount = 3;
     const remaining = grid.querySelectorAll(".tool-card").length - previewCount;
     if (remaining <= 0) {
       // Solo station (≤3 cards): mark it so CSS can remove the column gap
@@ -442,7 +442,9 @@
   if (!searchInput) return;
 
   const allCards = document.querySelectorAll(".tool-card");
-  const stations = document.querySelectorAll("#interactive-tools .station");
+  const stations = document.querySelectorAll("#interactive-tools .station, #concept-bridges .station");
+  const bridgeSection = document.querySelector("#concept-bridges");
+  const toolSection = document.querySelector("#interactive-tools");
   const sketchSection = document.querySelector("#starter-sketches");
 
   searchInput.addEventListener("input", function() {
@@ -455,17 +457,25 @@
       .forEach(b => b.classList.toggle("active", b.dataset.pathwayFilter === "all"));
 
     if (!q) {
+      document.body.classList.remove("search-active");
       allCards.forEach(c => c.hidden = false);
       stations.forEach(s => s.hidden = false);
+      bridgeSection?.classList.remove("is-open");
+      toolSection?.classList.remove("is-open");
+      sketchSection?.classList.remove("is-open");
+      if (bridgeSection) bridgeSection.hidden = false;
+      if (toolSection) toolSection.hidden = false;
       if (sketchSection) sketchSection.hidden = false;
       return;
     }
 
+    document.body.classList.add("search-active");
     allCards.forEach(c => {
       const title = c.querySelector("h3")?.textContent.toLowerCase() || "";
       const desc  = c.querySelector(".tool-description")?.textContent.toLowerCase() || "";
+      const meta  = Array.from(c.querySelectorAll(".pill")).map(t => t.textContent.toLowerCase()).join(" ");
       const tags  = Array.from(c.querySelectorAll(".tag")).map(t => t.textContent.toLowerCase()).join(" ");
-      c.hidden = !(title.includes(q) || desc.includes(q) || tags.includes(q));
+      c.hidden = !(title.includes(q) || desc.includes(q) || tags.includes(q) || meta.includes(q));
     });
 
     stations.forEach(s => {
@@ -473,6 +483,16 @@
       s.hidden = !visible;
       if (!s.hidden) s.classList.add("is-open");
     });
+    if (bridgeSection) {
+      const visible = Array.from(bridgeSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
+      bridgeSection.hidden = !visible;
+      if (!bridgeSection.hidden) bridgeSection.classList.add("is-open");
+    }
+    if (toolSection) {
+      const visible = Array.from(toolSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
+      toolSection.hidden = !visible;
+      if (!toolSection.hidden) toolSection.classList.add("is-open");
+    }
     if (sketchSection) {
       const visible = Array.from(sketchSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
       sketchSection.hidden = !visible;
