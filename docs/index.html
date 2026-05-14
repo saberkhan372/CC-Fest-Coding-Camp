@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CC Fest Coding Camp: Creative Coding Tools for p5.js</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css?v=20260506-debug-card-previews">
+  <link rel="stylesheet" href="site.css?v=20260514-homepage-polish">
   <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/">
@@ -30,7 +30,7 @@
       <div class="brand-mark">CC Fest · Coding Camp Tools</div>
       <nav class="topbar-links">
         <a class="topbar-link" href="https://ccfest.rocks">ccfest.rocks</a>
-        <a class="topbar-link" href="https://sustaining-boursin-d41.notion.site/CC-Fest-Creative-Coding-for-Connection-Expression-and-Learning-2016-now-2c79950a7da980128738c06677fedcb8">Notion</a>
+        <a class="topbar-link" href="https://sustaining-boursin-d41.notion.site/CC-Fest-Creative-Coding-for-Connection-Expression-and-Learning-2016-now-2c79950a7da980128738c06677fedcb8">Camp Notes</a>
         <a class="topbar-link" href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">GitHub</a>
       </nav>
     </div>
@@ -40,12 +40,34 @@
         <div class="hero-text">
           <p class="eyebrow">CC Fest Coding Camp · Free · Open to everyone</p>
           <h1>Tools for Creative Coding.</h1>
-          <p class="lede">17 concept bridges, 60 workshop tools, and 40 starter sketches for teaching <a href="https://p5js.org">p5.js</a> and creative coding. Built by <a href="https://www.linkedin.com/in/edsaber/" target="_blank" rel="noopener">Saber Khan</a> for <a href="https://ccfest.rocks/coding-camp" target="_blank" rel="noopener">CC Fest Coding Camp</a>. Free, open, remixable.</p>
+          <p class="lede">17 concept bridges, 60 workshop tools, and 40 starter sketches for learning <a href="https://p5js.org">p5.js</a> together. Start with a bridge when an idea feels fuzzy, open a tool when you want guided practice, then remix a sketch into your own project.</p>
           <div class="hero-actions">
             <a class="button primary" href="#interactive-tools">Browse Tools</a>
             <a class="button secondary" href="#concept-bridges">Concept Bridges</a>
             <a class="button secondary" href="#starter-sketches">Starter Sketches</a>
             <a class="button" href="https://sustaining-boursin-d41.notion.site/3369950a7da981169ceffb7d3dbd73e9">About the Camp →</a>
+          </div>
+          <div class="library-summary" aria-label="Library summary">
+            <div class="summary-card">
+              <strong>17</strong>
+              <span>Concept bridges</span>
+              <small>For intuition before syntax.</small>
+            </div>
+            <div class="summary-card">
+              <strong>60</strong>
+              <span>Workshop tools</span>
+              <small>For guided demos and stations.</small>
+            </div>
+            <div class="summary-card">
+              <strong>40</strong>
+              <span>Starter sketches</span>
+              <small>For editing, remixing, and projects.</small>
+            </div>
+            <div class="summary-card">
+              <strong>5</strong>
+              <span>Sessions</span>
+              <small>One arc from first marks to open studio.</small>
+            </div>
           </div>
         </div>
         <div class="hero-visual">
@@ -90,7 +112,7 @@
 <section class="overview panel" aria-label="Suggested learning sequence">
         <div class="section-label">The Camp Arc</div>
         <h2>Five sessions. One arc.</h2>
-        <p>CC Fest Coding Camp runs five sessions over five weeks. The sequence moves from first marks to open studio. Each session builds on the last, but every tool and sketch also stands alone. Jump in anywhere.</p>
+        <p>CC Fest Coding Camp runs five sessions over five weeks, moving from first marks to open studio. Use the arc if you want the camp order, or use search and filters if you already know what you need.</p>
         <div class="tool-search-wrap overview-search-wrap">
           <input class="tool-search" type="search" placeholder="Search bridges, tools, and sketches — noise, array, text, game…" aria-label="Search concept bridges, tools, and starter sketches" autocomplete="off" spellcheck="false">
         </div>
@@ -113,6 +135,36 @@
             <button class="suit-btn" data-filter="open">☽ Open</button>
             <button class="suit-btn" data-filter="support">⊕ Support</button>
           </div>
+        </div>
+        <p class="overview-helper">Search everything, or choose a pathway first. The session cards below show the teaching arc; the sections underneath regroup the same material as concept bridges, workshop tools, and starter sketches.</p>
+        <div class="quickstart-grid" aria-label="Recommended starting points">
+          <article class="quickstart-card">
+            <div class="quickstart-label">Brand new to p5.js</div>
+            <h3>Start with one bridge</h3>
+            <p>Open a concept bridge first when a keyword like <code>draw()</code>, <code>noise()</code>, or <code>map()</code> still feels slippery.</p>
+            <div class="quickstart-actions">
+              <a class="button primary" href="concept-bridges/how-p5-thinks-about-time/">Start with Time</a>
+              <a class="button text-link" href="#concept-bridges">See all bridges</a>
+            </div>
+          </article>
+          <article class="quickstart-card">
+            <div class="quickstart-label">Want a guided demo</div>
+            <h3>Open one workshop tool</h3>
+            <p>Choose a single concept, change one slider, and watch the code and canvas stay connected while you explore.</p>
+            <div class="quickstart-actions">
+              <a class="button primary" href="tools/coordinate-system-explorer/">Open Coordinates</a>
+              <a class="button text-link" href="#interactive-tools">See all tools</a>
+            </div>
+          </article>
+          <article class="quickstart-card">
+            <div class="quickstart-label">Ready to remix code</div>
+            <h3>Edit one starter sketch</h3>
+            <p>Jump into the mini editor, run the sketch, then change one line so the idea becomes yours instead of ours.</p>
+            <div class="quickstart-actions">
+              <a class="button primary" href="tools/bouncing-ball-starter/">Open Bouncing Ball</a>
+              <a class="button text-link" href="#starter-sketches">See all sketches</a>
+            </div>
+          </article>
         </div>
         <div class="sequence">
           <div class="sequence-card">
@@ -167,11 +219,10 @@
             </div>
           </div>
         </div>
-        <p style="margin-top:18px;font-size:13px;color:var(--ink-light)">
-          <a href="https://sustaining-boursin-d41.notion.site/3349950a7da981dd939ad16078343178" style="color:var(--accent)">Read the full cohort roadmap and session recaps →</a>
-          &nbsp;·&nbsp;
-          <a href="https://sustaining-boursin-d41.notion.site/3339950a7da9819a9b73d83d97eaf2c2" style="color:var(--accent)">Teaching notes for every tool →</a>
-        </p>
+        <div class="overview-links">
+          <a href="https://sustaining-boursin-d41.notion.site/3349950a7da981dd939ad16078343178">Read the full cohort roadmap and session recaps →</a>
+          <a href="https://sustaining-boursin-d41.notion.site/3339950a7da9819a9b73d83d97eaf2c2">Teaching notes for every tool →</a>
+        </div>
       </section>
 
       <div class="gallery">
@@ -1357,7 +1408,7 @@
       </span>
     </footer>
   </div>
-  <script src="preview-sketches.js?v=20260507-expanded-tools"></script>
-  <script src="site.js?v=20260506-debug-card-previews"></script>
+  <script src="preview-sketches.js?v=20260514-homepage-polish"></script>
+  <script src="site.js?v=20260514-homepage-polish"></script>
 </body>
 </html>
