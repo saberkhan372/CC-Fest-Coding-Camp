@@ -578,6 +578,115 @@ a{color:inherit}
   color:var(--accent);
 }
 
+/* ─── SEQUENCE BRIDGE LINK ─── */
+.sequence-bridge{
+  display:inline-block;
+  margin-top:10px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.04em;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(45,106,79,.08);
+  border:1.5px solid rgba(45,106,79,.2);
+  color:#2d6a4f;
+  text-decoration:none;
+  transition:background .12s,border-color .12s;
+  white-space:nowrap;
+}
+.sequence-bridge:hover{
+  background:rgba(45,106,79,.15);
+  border-color:#2d6a4f;
+}
+
+/* ─── WHERE TO START ─── */
+.start-here{
+  padding:28px;
+  margin-bottom:26px;
+}
+.start-here-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:20px;
+}
+.library-stat-bar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--ink-light);
+}
+.library-stat-bar a{
+  color:var(--ink);
+  text-decoration:none;
+  font-weight:700;
+  transition:color .12s;
+}
+.library-stat-bar a:hover{color:var(--accent)}
+.library-stat-bar span{color:var(--ink-light);font-weight:400}
+.start-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+@media(max-width:860px){.start-grid{grid-template-columns:1fr}}
+.start-card{
+  background:rgba(255,255,255,.7);
+  border:1.5px solid rgba(44,42,38,.08);
+  border-radius:14px;
+  padding:18px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.start-card-icon{
+  font-size:22px;
+  line-height:1;
+  margin-bottom:2px;
+}
+.start-card h3{
+  font-size:15px;
+  font-weight:800;
+  margin:0;
+  color:var(--ink);
+}
+.start-card p{
+  font-size:13px;
+  color:var(--ink-light);
+  margin:0;
+  line-height:1.5;
+}
+.start-links{
+  list-style:none;
+  padding:0;
+  margin:4px 0 8px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.start-links li a{
+  font-size:13px;
+  font-weight:600;
+  color:var(--accent);
+  text-decoration:none;
+}
+.start-links li a:hover{text-decoration:underline}
+.start-links li::before{
+  content:"→ ";
+  color:var(--ink-light);
+  font-size:12px;
+}
+.start-card .button{
+  align-self:flex-start;
+  margin-top:auto;
+  font-size:12px;
+  padding:6px 14px;
+}
+
 /* ─── CAMP WORDS STRIP ─── */
 
 .camp-words{
