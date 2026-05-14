@@ -267,6 +267,7 @@
   <main>
     <section class="controls" aria-label="Explorer controls">
       <div class="row">
+        <button id="mode-why">Why Vectors?</button>
         <button id="mode-position" class="active">Position Vector</button>
         <button id="mode-velocity">Velocity</button>
         <button id="mode-acceleration">Acceleration</button>
@@ -372,12 +373,17 @@
       velocity: { x: 3, y: -1.5 },
       acceleration: { x: 0, y: 0.08 },
       target: { x: 560, y: 220 },
-      trail: []
+      trail: [],
+      whyLeftWindClicked: false,
+      whyRightWindClicked: false,
+      whyLeftNewLines: 0,
+      whyRightNewLines: 0
     };
 
     const els = {};
 
     function setupUI() {
+      els.modeWhy = document.querySelector("#mode-why");
       els.modePosition = document.querySelector("#mode-position");
       els.modeVelocity = document.querySelector("#mode-velocity");
       els.modeAcceleration = document.querySelector("#mode-acceleration");
@@ -404,6 +410,7 @@
       els.codeCard = document.querySelector("#code-card");
       els.codeBox = document.querySelector("#code-box");
 
+      els.modeWhy.addEventListener("click", () => setMode("why"));
       els.modePosition.addEventListener("click", () => setMode("position"));
       els.modeVelocity.addEventListener("click", () => setMode("velocity"));
       els.modeAcceleration.addEventListener("click", () => setMode("acceleration"));
@@ -440,6 +447,13 @@
 
     function setMode(mode) {
       state.mode = mode;
+      if (mode === "why") {
+        state.whyLeftWindClicked = false;
+        state.whyRightWindClicked = false;
+        state.whyLeftNewLines = 0;
+        state.whyRightNewLines = 0;
+        // whyInitialized reset is done in sketch via a flag check
+      }
       resetMotion(false);
       updateUI();
     }
@@ -455,7 +469,7 @@
     }
 
     function updateUI() {
-      const buttons = [[els.modePosition,"position"],[els.modeVelocity,"velocity"],[els.modeAcceleration,"acceleration"],[els.modeAddition,"addition"],[els.modeSeek,"seek"]];
+      const buttons = [[els.modeWhy,"why"],[els.modePosition,"position"],[els.modeVelocity,"velocity"],[els.modeAcceleration,"acceleration"],[els.modeAddition,"addition"],[els.modeSeek,"seek"]];
       for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
 
       els.playButton.textContent = state.running ? "⏸ Pause" : "▶ Play";
@@ -471,6 +485,15 @@
       els.codeCard.classList.toggle("visible", state.showCode);
 
       const lessons = {
+        why: {
+          pill: "vectors keep related values together",
+          title: "Why use vectors?",
+          text: "Both sides show the same bouncing ball. Left uses 4 separate variables; right uses 2 vectors. Click 'Add Wind' to see the difference.",
+          formula: `// Left: 4 variables\nlet x, y, vx, vy;\n\n// Right: 2 vectors\nlet pos, vel;`,
+          question: "Click 'Add Wind' on each side. Which approach adds wind in fewer lines?",
+          caption: "Both balls behave identically. The difference shows up when you need to add more forces.",
+          code: `// 4 variables approach:\nwindX = 0.5; windY = -0.1;\nvx += windX; vy += windY;\n\n// 2 vectors approach:\nvel.add(createVector(0.5, -0.1));`
+        },
         position: {
           pill: "a vector can store x and y together",
           title: "A vector stores x and y together",
@@ -533,6 +556,12 @@
     const sketch = (p) => {
       let canvas, holder, previousWidth = 0, previousHeight = 0;
 
+      // Why Vectors? mode — two bouncing balls
+      let whyLeft = { x: 0, y: 0, vx: 2.2, vy: 1.5, windX: 0, windY: 0 };
+      let whyRight = { x: 0, y: 0, vx: 2.2, vy: 1.5, windX: 0, windY: 0 };
+      let whyInitialized = false;
+      let prevMode = "";
+
       p.setup = () => {
         holder = document.querySelector("#sketch-holder");
         const rect = holder.getBoundingClientRect();
@@ -548,6 +577,23 @@
 
       p.mousePressed = () => {
         const s = stage();
+        if (state.mode === "why") {
+          // Left "Add Wind" button
+          const lbx = s.x + s.w * 0.25 - 48; const lby = s.y + s.h - 142;
+          if (p.mouseX > lbx && p.mouseX < lbx + 96 && p.mouseY > lby && p.mouseY < lby + 30) {
+            state.whyLeftWindClicked = true;
+            whyLeft.windX = 0.5; whyLeft.windY = -0.1;
+            updateUI();
+          }
+          // Right "Add Wind" button
+          const midX = s.x + s.w / 2;
+          const rbx = s.x + s.w * 0.75 - 48; const rby = s.y + s.h - 142;
+          if (p.mouseX > rbx && p.mouseX < rbx + 96 && p.mouseY > rby && p.mouseY < rby + 30) {
+            state.whyRightWindClicked = true;
+            whyRight.windX = 0.5; whyRight.windY = -0.1;
+            updateUI();
+          }
+        }
         if (state.mode === "seek" && p.mouseX > s.x && p.mouseX < s.x + s.w && p.mouseY > s.y && p.mouseY < s.y + s.h) {
           state.target = { x: p.mouseX, y: p.mouseY };
         }
@@ -555,11 +601,17 @@
 
       p.draw = () => {
         resizeToHolder();
+        // Reset why balls when entering why mode
+        if (state.mode !== prevMode) {
+          if (state.mode === "why") whyInitialized = false;
+          prevMode = state.mode;
+        }
         p.background(255, 250, 242);
         drawSubtleGrid();
         drawPanelTitle();
         if (state.running) updateMotion();
 
+        if (state.mode === "why") drawWhyMode();
         if (state.mode === "position") drawPositionMode();
         if (state.mode === "velocity") drawVelocityMode();
         if (state.mode === "acceleration") drawAccelerationMode();
@@ -640,6 +692,7 @@
 
       function drawPanelTitle() {
         const titles = {
+          why:["Why Vectors?","Compare 4 variables vs 2 vectors — same result, one scales better."],
           position:["Position Vector","A vector can store a location as x and y."],
           velocity:["Velocity","Add velocity to position to create movement."],
           acceleration:["Acceleration","Add acceleration to velocity to change motion over time."],
@@ -652,6 +705,134 @@
 
       function stage() { return { x:p.width*0.08, y:p.height*0.15, w:p.width*0.84, h:p.height*0.50 }; }
       function drawStage() { const s=stage(); p.push(); p.noStroke(); p.fill(255,255,255,235); p.rect(s.x,s.y,s.w,s.h,24); p.pop(); return s; }
+
+      function drawWhyMode() {
+        const s = stage();
+        // divider line
+        const midX = s.x + s.w / 2;
+        p.push();
+        p.stroke("#ded2c1"); p.strokeWeight(2);
+        p.line(midX, s.y + 8, midX, s.y + s.h - 8);
+        p.pop();
+
+        // Initialize ball positions once per mode enter
+        if (!whyInitialized) {
+          whyLeft.x = s.x + s.w * 0.22; whyLeft.y = s.y + s.h * 0.45;
+          whyRight.x = s.x + s.w * 0.72; whyRight.y = s.y + s.h * 0.45;
+          whyLeft.vx = 2.2; whyLeft.vy = 1.5;
+          whyRight.vx = 2.2; whyRight.vy = 1.5;
+          whyLeft.windX = 0; whyLeft.windY = 0;
+          whyRight.windX = 0; whyRight.windY = 0;
+          whyInitialized = true;
+        }
+
+        // Bounds for each half
+        const leftBounds = { x1: s.x + 10, x2: midX - 10, y1: s.y + 10, y2: s.y + s.h - 50 };
+        const rightBounds = { x1: midX + 10, x2: s.x + s.w - 10, y1: s.y + 10, y2: s.y + s.h - 50 };
+
+        // Update left ball
+        if (state.running) {
+          whyLeft.vx += whyLeft.windX; whyLeft.vy += whyLeft.windY;
+          whyLeft.x += whyLeft.vx; whyLeft.y += whyLeft.vy;
+          if (whyLeft.x < leftBounds.x1 + 18 || whyLeft.x > leftBounds.x2 - 18) whyLeft.vx *= -1;
+          if (whyLeft.y < leftBounds.y1 + 18 || whyLeft.y > leftBounds.y2 - 18) whyLeft.vy *= -1;
+          whyLeft.x = p.constrain(whyLeft.x, leftBounds.x1 + 18, leftBounds.x2 - 18);
+          whyLeft.y = p.constrain(whyLeft.y, leftBounds.y1 + 18, leftBounds.y2 - 18);
+          whyLeft.windX = 0; whyLeft.windY = 0;
+
+          // Update right ball identically
+          whyRight.vx += whyRight.windX; whyRight.vy += whyRight.windY;
+          whyRight.x += whyRight.vx; whyRight.y += whyRight.vy;
+          if (whyRight.x < rightBounds.x1 + 18 || whyRight.x > rightBounds.x2 - 18) whyRight.vx *= -1;
+          if (whyRight.y < rightBounds.y1 + 18 || whyRight.y > rightBounds.y2 - 18) whyRight.vy *= -1;
+          whyRight.x = p.constrain(whyRight.x, rightBounds.x1 + 18, rightBounds.x2 - 18);
+          whyRight.y = p.constrain(whyRight.y, rightBounds.y1 + 18, rightBounds.y2 - 18);
+          whyRight.windX = 0; whyRight.windY = 0;
+        }
+
+        // --- LEFT PANEL ---
+        p.push();
+        p.noStroke(); p.fill(240, 248, 255, 200);
+        p.rect(s.x + 4, s.y + 4, s.w/2 - 8, s.h - 8, 18);
+
+        // Header
+        p.fill("#334155"); p.textStyle(p.BOLD); p.textSize(14);
+        p.textAlign(p.CENTER, p.TOP);
+        p.text("4 Variables", s.x + s.w * 0.25, s.y + 18);
+
+        // Code panel (left)
+        const leftCode = state.whyLeftWindClicked
+          ? "let x, y, vx, vy;\n// wind:\nwindX = 0.5;\nwindY = -0.1;\nvx += windX;\nvy += windY;"
+          : "let x, y, vx, vy;";
+        drawWhyCodePanel(s.x + 14, s.y + s.h - 130, s.w/2 - 28, 116, leftCode, state.whyLeftWindClicked, "#7c3aed");
+
+        // Ball
+        drawMover(whyLeft.x, whyLeft.y, "#7c3aed");
+
+        // Add Wind button
+        const lbx = s.x + s.w * 0.25 - 48; const lby = s.y + s.h - 142;
+        p.noStroke(); p.fill(state.whyLeftWindClicked ? "#7c3aed" : "#f3f0ff");
+        p.rect(lbx, lby, 96, 30, 14);
+        p.fill(state.whyLeftWindClicked ? "#fff" : "#7c3aed"); p.textSize(12); p.textStyle(p.BOLD);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text("+ Add Wind", lbx + 48, lby + 15);
+        p.pop();
+
+        // --- RIGHT PANEL ---
+        p.push();
+        p.noStroke(); p.fill(240, 255, 248, 200);
+        p.rect(midX + 4, s.y + 4, s.w/2 - 8, s.h - 8, 18);
+
+        // Header
+        p.fill("#334155"); p.textStyle(p.BOLD); p.textSize(14);
+        p.textAlign(p.CENTER, p.TOP);
+        p.text("2 Vectors", s.x + s.w * 0.75, s.y + 18);
+
+        // Code panel (right)
+        const rightCode = state.whyRightWindClicked
+          ? "let pos, vel;\n// wind:\nvel.add(\n  createVector(0.5, -0.1)\n);"
+          : "let pos, vel;";
+        drawWhyCodePanel(midX + 14, s.y + s.h - 130, s.w/2 - 28, 116, rightCode, state.whyRightWindClicked, "#16a34a");
+
+        // Ball
+        drawMover(whyRight.x, whyRight.y, "#16a34a");
+
+        // Add Wind button
+        const rbx = s.x + s.w * 0.75 - 48; const rby = s.y + s.h - 142;
+        p.noStroke(); p.fill(state.whyRightWindClicked ? "#16a34a" : "#f0fdf4");
+        p.rect(rbx, rby, 96, 30, 14);
+        p.fill(state.whyRightWindClicked ? "#fff" : "#16a34a"); p.textSize(12); p.textStyle(p.BOLD);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text("+ Add Wind", rbx + 48, rby + 15);
+        p.pop();
+
+        // Bottom label
+        p.push();
+        p.noStroke(); p.fill(255, 250, 242, 230);
+        p.textStyle(p.BOLD); p.textSize(13); p.fill("#334155");
+        p.textAlign(p.CENTER, p.BOTTOM);
+        p.text("Same result. One approach scales.", s.x + s.w/2, s.y + s.h + 18);
+        p.pop();
+      }
+
+      function drawWhyCodePanel(x, y, w, h, code, hasNew, color) {
+        p.push();
+        p.noStroke(); p.fill(17, 24, 39); p.rect(x, y, w, h, 10);
+        const lines = code.split("\n");
+        p.textAlign(p.LEFT, p.TOP); p.textSize(11);
+        p.textStyle(p.NORMAL);
+        const lineH = 15;
+        for (let i = 0; i < lines.length; i++) {
+          const isNew = hasNew && i > 0;
+          if (isNew) {
+            p.noStroke(); p.fill(255, 230, 0, 60);
+            p.rect(x + 6, y + 8 + i * lineH, w - 12, lineH, 3);
+          }
+          p.fill(isNew ? "#fbbf24" : "#e5e7eb");
+          p.text(lines[i], x + 10, y + 8 + i * lineH);
+        }
+        p.pop();
+      }
 
       function drawPositionMode() {
         const s = drawStage();

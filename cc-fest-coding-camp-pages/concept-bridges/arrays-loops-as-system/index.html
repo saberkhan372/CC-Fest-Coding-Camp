@@ -242,6 +242,7 @@
       <button class="step-btn" id="sb4" onclick="goToStep(4)">4 · Array + Loop</button>
       <button class="step-btn" id="sb5" onclick="goToStep(5)">5 · Array of Objects</button>
       <button class="step-btn" id="sb6" onclick="goToStep(6)">6 · Class</button>
+      <button id="add-ball-btn" onclick="addAnotherBall()" style="display:none;background:#fee2e2;border:1.5px solid #fca5a5;color:#b91c1c;border-radius:999px;padding:8px 16px;font-size:0.9rem;cursor:pointer;transition:transform 0.1s;">+ Add Another Ball</button>
       <div class="step-nav-arrows">
         <button class="arrow-btn" id="prevBtn" onclick="goToStep(currentStep - 1)" disabled>← Prev</button>
         <button class="arrow-btn" id="nextBtn" onclick="goToStep(currentStep + 1)">Next →</button>
@@ -279,6 +280,8 @@
 
   <script>
     let currentStep = 1;
+    let extraBallsStep2 = 0; // how many extra balls added in step 2
+    let extraBallsStep4 = 0; // how many extra balls added in step 4
 
     const steps = [
       {
@@ -495,13 +498,97 @@ function draw() {
       document.getElementById("step-title").textContent = s.title;
       document.getElementById("step-desc").textContent = s.desc;
       document.getElementById("insight-box").innerHTML = s.insight;
-      document.getElementById("code-box").textContent = s.code;
+      updateCodeDisplay();
       for (let i = 1; i <= 6; i++) {
         document.getElementById(`sb${i}`).className = `step-btn${i === step ? ' active' : ''}`;
       }
       document.getElementById("prevBtn").disabled = step === 1;
       document.getElementById("nextBtn").disabled = step === 6;
+      // Show/hide add-ball button
+      const addBtn = document.getElementById("add-ball-btn");
+      if (step === 2 || step === 4) {
+        addBtn.style.display = "";
+        const n = step === 2 ? 3 + extraBallsStep2 : 5 + extraBallsStep4;
+        if (step === 2) {
+          addBtn.textContent = `+ Add Another Ball (${n} balls)`;
+          addBtn.style.background = extraBallsStep2 >= 1 ? "#fee2e2" : "#fee2e2";
+        } else {
+          addBtn.textContent = `+ Add Another Ball (${n} balls)`;
+          addBtn.style.background = "#dcfce7";
+          addBtn.style.borderColor = "#86efac";
+          addBtn.style.color = "#15803d";
+        }
+      } else {
+        addBtn.style.display = "none";
+        addBtn.style.background = "#fee2e2";
+        addBtn.style.borderColor = "#fca5a5";
+        addBtn.style.color = "#b91c1c";
+      }
       renderLadder();
+    }
+
+    function addAnotherBall() {
+      if (currentStep === 2) {
+        extraBallsStep2 += 1;
+      } else if (currentStep === 4) {
+        extraBallsStep4 += 1;
+      }
+      // Refresh step display to update button label and code
+      goToStep(currentStep);
+    }
+
+    function updateCodeDisplay() {
+      const step = currentStep;
+      if (step === 2) {
+        const n = 3 + extraBallsStep2;
+        const varLines = generateStep2Code(n);
+        document.getElementById("code-box").textContent = varLines;
+      } else if (step === 4) {
+        document.getElementById("code-box").textContent = generateStep4Code();
+      } else {
+        document.getElementById("code-box").textContent = steps[step - 1].code;
+      }
+    }
+
+    function generateStep2Code(n) {
+      let baseVars = `let x1=80,  y1=100, vx1=2,   vy1=1.5;\nlet x2=200, y2=200, vx2=-1.5, vy2=2;\nlet x3=320, y3=300, vx3=1,   vy3=-1;`;
+      for (let i = 4; i <= n; i++) {
+        baseVars += `\nlet x${i}=${50 + i*60},  y${i}=${80 + i*40}, vx${i}=${(i%2===0?-1:1)*1.5}, vy${i}=${(i%3===0?-1:1)*1};`;
+      }
+      const updateLines = [];
+      for (let i = 1; i <= n; i++) {
+        updateLines.push(`  x${i}+=vx${i}; y${i}+=vy${i};\n  if(x${i}<15||x${i}>width-15) vx${i}*=-1;\n  if(y${i}<15||y${i}>height-15) vy${i}*=-1;\n  circle(x${i},y${i},30);`);
+      }
+      const varCount = n * 4;
+      const suffix = n >= 4 ? `\n  // Imagine 50 balls...` : `\n  // ...add a ${n+1}th? copy ${8} more lines`;
+      return `// ${n} balls = ${varCount} variable lines!\n${baseVars}\n\nfunction setup() { createCanvas(400, 380); }\n\nfunction draw() {\n  background(244, 239, 230);\n\n${updateLines.join("\n\n")}\n${suffix}\n}`;
+    }
+
+    function generateStep4Code() {
+      return `let xs  = [60, 140, 220, 300, 360];
+let ys  = [80, 200, 140, 280, 100];
+let vxs = [2, -1.5, 1, -2, 1.5];
+let vys = [1.5, 2, -1, 1, -2];
+// code lines: still 3 — no matter how many balls!
+
+function setup() { createCanvas(400, 380); }
+
+function draw() {
+  background(244, 239, 230);
+
+  for (let i = 0; i < xs.length; i++) {
+    xs[i] += vxs[i];
+    ys[i] += vys[i];
+
+    if (xs[i]<15 || xs[i]>width-15) vxs[i]*=-1;
+    if (ys[i]<15 || ys[i]>height-15) vys[i]*=-1;
+
+    fill(61, 90, 128);
+    noStroke();
+    circle(xs[i], ys[i], 30);
+  }
+  // Add a ball: push one value to each array
+}`;
     }
 
     goToStep(1);
@@ -510,15 +597,21 @@ function draw() {
     const sketch = (p) => {
       let balls = [];
       let singleBall = { x: 200, y: 190, vx: 2, vy: 1.5 };
-      let multiBalls = [
+      // multiBalls starts with 3, extras tracked separately
+      let multiBallsBase = [
         { x: 80,  y: 100, vx: 2,    vy: 1.5,  r: 224, g: 122, b: 95  },
         { x: 200, y: 200, vx: -1.5, vy: 2,    r: 61,  g: 90,  b: 128 },
         { x: 320, y: 300, vx: 1,    vy: -1,   r: 78,  g: 160, b: 120 }
       ];
+      let multiBallsExtra = []; // extra balls for step 2
+      let prevExtraStep2 = 0;
+      // Step 4: arrays start with 5 balls
       let arrXs = [60, 140, 220, 300, 360];
       let arrYs = [80, 200, 140, 280, 100];
       let arrVxs = [2, -1.5, 1, -2, 1.5];
       let arrVys = [1.5, 2, -1, 1, -2];
+      let prevExtraStep4 = 0;
+      let sketchPrevStep = 1;
 
       class Ball {
         constructor() {
@@ -571,6 +664,23 @@ function draw() {
         p.background(244, 239, 230);
         const step = currentStep;
 
+        // Reset arrays when switching steps
+        if (step !== sketchPrevStep) {
+          if (sketchPrevStep === 4 && step !== 4) {
+            // Reset arr arrays to original 5 balls
+            arrXs = [60, 140, 220, 300, 360];
+            arrYs = [80, 200, 140, 280, 100];
+            arrVxs = [2, -1.5, 1, -2, 1.5];
+            arrVys = [1.5, 2, -1, 1, -2];
+            prevExtraStep4 = 0;
+          }
+          if (sketchPrevStep === 2 && step !== 2) {
+            multiBallsExtra = [];
+            prevExtraStep2 = 0;
+          }
+          sketchPrevStep = step;
+        }
+
         if (step === 1) {
           singleBall.x += singleBall.vx; singleBall.y += singleBall.vy;
           if (singleBall.x < 15 || singleBall.x > p.width - 15)  singleBall.vx *= -1;
@@ -579,13 +689,37 @@ function draw() {
           label(p, `x = ${Math.round(singleBall.x)}, y = ${Math.round(singleBall.y)}, vx = ${singleBall.vx.toFixed(1)}`);
 
         } else if (step === 2) {
-          for (const b of multiBalls) {
+          // Sync extra balls
+          while (multiBallsExtra.length < extraBallsStep2) {
+            const palette = [[255,150,50],[180,60,220],[50,200,180],[240,80,100],[100,180,80]];
+            const col = palette[multiBallsExtra.length % palette.length];
+            multiBallsExtra.push({
+              x: 40 + (multiBallsExtra.length * 80) % (p.width - 80),
+              y: 60 + (multiBallsExtra.length * 70) % (p.height - 100),
+              vx: (multiBallsExtra.length%2===0 ? 1.8 : -1.8),
+              vy: (multiBallsExtra.length%3===0 ? -1.3 : 1.3),
+              r: col[0], g: col[1], b: col[2]
+            });
+          }
+          const allBalls = [...multiBallsBase, ...multiBallsExtra];
+          for (const b of allBalls) {
             b.x += b.vx; b.y += b.vy;
             if (b.x < 15 || b.x > p.width - 15)  b.vx *= -1;
             if (b.y < 15 || b.y > p.height - 15) b.vy *= -1;
             p.fill(b.r, b.g, b.b); p.noStroke(); p.circle(b.x, b.y, 32);
           }
-          label(p, "3 balls = 3×4 variables = 12 lines of update code");
+          const n2 = 3 + extraBallsStep2;
+          const varLines2 = n2 * 4;
+          // Red bloat counter
+          p.noStroke(); p.fill(239, 68, 68, 220);
+          p.rect(8, 8, p.width - 16, 40, 8);
+          p.fill(255); p.textSize(13); p.textStyle(p.BOLD);
+          p.textAlign(p.LEFT, p.TOP);
+          p.text(`${n2} balls = ${varLines2} variable lines`, 18, 18);
+          if (n2 >= 4) {
+            p.textStyle(p.NORMAL); p.textSize(11);
+            p.text("Imagine 50 balls...", 18, 34);
+          }
 
         } else if (step === 3) {
           const xs = [60, 140, 220, 300, 360];
@@ -596,13 +730,27 @@ function draw() {
           label(p, "xs[] and ys[] — 5 balls, 2 arrays, 0 movement yet");
 
         } else if (step === 4) {
+          // Sync extra array entries
+          while (arrXs.length < 5 + extraBallsStep4) {
+            const i = arrXs.length;
+            arrXs.push(30 + (i * 70) % (p.width - 60));
+            arrYs.push(50 + (i * 55) % (p.height - 80));
+            arrVxs.push((i%2===0 ? 1.6 : -2));
+            arrVys.push((i%3===0 ? -1.4 : 1.7));
+          }
           for (let i = 0; i < arrXs.length; i++) {
             arrXs[i] += arrVxs[i]; arrYs[i] += arrVys[i];
             if (arrXs[i] < 15 || arrXs[i] > p.width - 15)  arrVxs[i] *= -1;
             if (arrYs[i] < 15 || arrYs[i] > p.height - 15) arrVys[i] *= -1;
             p.fill(61, 90, 128, 210); p.noStroke(); p.circle(arrXs[i], arrYs[i], 30);
           }
-          label(p, "4 parallel arrays, 1 loop — add values, code stays same");
+          const n4 = 5 + extraBallsStep4;
+          // Green "code still 3" counter
+          p.noStroke(); p.fill(22, 163, 74, 220);
+          p.rect(8, 8, p.width - 16, 36, 8);
+          p.fill(255); p.textSize(13); p.textStyle(p.BOLD);
+          p.textAlign(p.LEFT, p.TOP);
+          p.text(`${n4} balls — code lines: still 3`, 18, 20);
 
         } else if (step === 5) {
           for (const b of objBalls) {

@@ -298,42 +298,32 @@
   <main>
     <section class="controls" aria-label="Explorer controls">
       <div class="row">
-        <button id="mode-grid" class="active">Image Grid</button>
+        <button id="mode-grid" class="active">Paint &amp; Grid</button>
         <button id="mode-rgb">RGB Values</button>
         <button id="mode-sample">get() / Sample</button>
         <button id="mode-pixels">pixels[] Array</button>
         <button id="mode-remix">Remix</button>
-        <button id="reset-button">Reset</button>
-        <span id="mode-pill" class="pill">image = grid of pixels</span>
+        <button id="reset-button">Clear canvas</button>
+        <span id="mode-pill" class="pill">paint your own pixel art</span>
       </div>
 
       <div class="row">
-        <div class="slider-wrap">
-          <label for="sample-x-slider">Pixel x</label>
-          <input id="sample-x-slider" type="range" min="0" max="15" value="7" step="1" />
-          <span id="sample-x-value" class="value-label">7</span>
-        </div>
-        <div class="slider-wrap">
-          <label for="sample-y-slider">Pixel y</label>
-          <input id="sample-y-slider" type="range" min="0" max="11" value="5" step="1" />
-          <span id="sample-y-value" class="value-label">5</span>
-        </div>
-        <div class="slider-wrap">
-          <label for="pixel-size-slider">Pixel size</label>
-          <input id="pixel-size-slider" type="range" min="8" max="34" value="22" step="1" />
-          <span id="pixel-size-value" class="value-label">22</span>
-        </div>
-      </div>
-
-      <div class="row">
-        <span class="preset-label">Remix:</span>
+        <span class="preset-label">Load preset:</span>
+        <button class="preset-button" data-preset="smiley">smiley</button>
+        <button class="preset-button" data-preset="heart">heart</button>
+        <button class="preset-button" data-preset="arrow">arrow</button>
+        <span class="preset-label" style="margin-left:12px">Remix:</span>
         <button class="effect-button" data-effect="normal">normal</button>
         <button class="effect-button" data-effect="grayscale">grayscale</button>
         <button class="effect-button" data-effect="threshold">threshold</button>
         <button class="effect-button" data-effect="invert">invert</button>
-        <button class="effect-button" data-effect="mosaic">mosaic</button>
         <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
         <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      </div>
+
+      <div class="row" id="palette-row" style="gap:6px;align-items:center;">
+        <span class="preset-label">Color:</span>
+        <!-- swatches injected by JS -->
       </div>
     </section>
 
@@ -393,17 +383,74 @@ let b = blue(c);</code></pre>
   </main>
 
   <script>
+    // Palette: 8 colors + eraser (white)
+    const PALETTE = [
+      { r: 231, g: 29, b: 72, label: "red" },
+      { r: 245, g: 158, b: 11, label: "orange" },
+      { r: 234, g: 200, b: 50, label: "yellow" },
+      { r: 22, g: 163, b: 74, label: "green" },
+      { r: 8, g: 145, b: 178, label: "cyan" },
+      { r: 37, g: 99, b: 235, label: "blue" },
+      { r: 124, g: 58, b: 237, label: "purple" },
+      { r: 34, g: 34, b: 34, label: "black" },
+      { r: 255, g: 255, b: 255, label: "eraser" }
+    ];
+
+    // Presets: 10x10 encoded as palette index (-1 = white/eraser, 0-7 = color)
+    const PRESETS = {
+      smiley: [
+        [-1,-1, 1, 1, 1, 1, 1, 1,-1,-1],
+        [-1, 1, 1, 1, 1, 1, 1, 1, 1,-1],
+        [ 1, 1, 7, 7, 1, 1, 7, 7, 1, 1],
+        [ 1, 1, 7, 7, 1, 1, 7, 7, 1, 1],
+        [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [ 1, 7, 1, 1, 1, 1, 1, 1, 7, 1],
+        [ 1, 1, 7, 1, 1, 1, 1, 7, 1, 1],
+        [-1, 1, 1, 7, 7, 7, 7, 1, 1,-1],
+        [-1,-1, 1, 1, 1, 1, 1, 1,-1,-1]
+      ],
+      heart: [
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+        [-1, 0, 0,-1,-1,-1, 0, 0,-1,-1],
+        [ 0, 0, 0, 0,-1, 0, 0, 0, 0,-1],
+        [ 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+        [ 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+        [-1, 0, 0, 0, 0, 0, 0, 0,-1,-1],
+        [-1,-1, 0, 0, 0, 0, 0,-1,-1,-1],
+        [-1,-1,-1, 0, 0, 0,-1,-1,-1,-1],
+        [-1,-1,-1,-1, 0,-1,-1,-1,-1,-1],
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
+      ],
+      arrow: [
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+        [-1,-1,-1,-1,-1, 4,-1,-1,-1,-1],
+        [-1,-1,-1,-1, 4, 4,-1,-1,-1,-1],
+        [ 4, 4, 4, 4, 4, 4, 4, 4, 4,-1],
+        [ 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+        [ 4, 4, 4, 4, 4, 4, 4, 4, 4,-1],
+        [-1,-1,-1,-1, 4, 4,-1,-1,-1,-1],
+        [-1,-1,-1,-1,-1, 4,-1,-1,-1,-1],
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
+      ]
+    };
+
     const state = {
       mode: "grid",
-      sampleX: 7,
-      sampleY: 5,
-      pixelSize: 22,
+      sampleX: 4,
+      sampleY: 3,
+      pixelSize: 28,
       effect: "normal",
       showLabels: true,
       showCode: false,
-      cols: 16,
-      rows: 12,
-      data: []
+      cols: 10,
+      rows: 10,
+      data: [],
+      selectedColor: 0,      // index into PALETTE
+      fillMode: true,
+      hoveredX: -1,
+      hoveredY: -1
     };
 
     const els = {};
@@ -416,13 +463,8 @@ let b = blue(c);</code></pre>
       els.modeRemix = document.querySelector("#mode-remix");
       els.resetButton = document.querySelector("#reset-button");
       els.modePill = document.querySelector("#mode-pill");
-      els.sampleXSlider = document.querySelector("#sample-x-slider");
-      els.sampleYSlider = document.querySelector("#sample-y-slider");
-      els.pixelSizeSlider = document.querySelector("#pixel-size-slider");
-      els.sampleXValue = document.querySelector("#sample-x-value");
-      els.sampleYValue = document.querySelector("#sample-y-value");
-      els.pixelSizeValue = document.querySelector("#pixel-size-value");
       els.effectButtons = Array.from(document.querySelectorAll(".effect-button"));
+      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
       els.showLabels = document.querySelector("#show-labels");
       els.showCode = document.querySelector("#show-code");
       els.lessonTitle = document.querySelector("#lesson-title");
@@ -432,6 +474,21 @@ let b = blue(c);</code></pre>
       els.caption = document.querySelector("#canvas-caption");
       els.codeCard = document.querySelector("#code-card");
       els.codeBox = document.querySelector("#code-box");
+      els.paletteRow = document.querySelector("#palette-row");
+
+      // Build palette swatches
+      PALETTE.forEach((col, i) => {
+        const btn = document.createElement("button");
+        btn.className = "swatch-btn";
+        btn.title = col.label;
+        btn.style.cssText = `width:28px;height:28px;border-radius:6px;border:3px solid ${i === state.selectedColor ? "#222" : "#ded2c1"};background:rgb(${col.r},${col.g},${col.b});cursor:pointer;padding:0;flex-shrink:0;`;
+        btn.addEventListener("click", () => {
+          state.selectedColor = i;
+          updateSwatchSelection();
+        });
+        els.paletteRow.appendChild(btn);
+      });
+      els.swatchBtns = Array.from(els.paletteRow.querySelectorAll(".swatch-btn"));
 
       els.modeGrid.addEventListener("click", () => setMode("grid"));
       els.modeRgb.addEventListener("click", () => setMode("rgb"));
@@ -439,25 +496,17 @@ let b = blue(c);</code></pre>
       els.modePixels.addEventListener("click", () => setMode("pixels"));
       els.modeRemix.addEventListener("click", () => setMode("remix"));
 
-      els.sampleXSlider.addEventListener("input", () => {
-        state.sampleX = Number(els.sampleXSlider.value);
-        updateUI();
-      });
-
-      els.sampleYSlider.addEventListener("input", () => {
-        state.sampleY = Number(els.sampleYSlider.value);
-        updateUI();
-      });
-
-      els.pixelSizeSlider.addEventListener("input", () => {
-        state.pixelSize = Number(els.pixelSizeSlider.value);
-        updateUI();
-      });
-
       els.effectButtons.forEach((button) => {
         button.addEventListener("click", () => {
           state.effect = button.dataset.effect;
           state.mode = "remix";
+          updateUI();
+        });
+      });
+
+      els.presetButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          loadPreset(button.dataset.preset);
           updateUI();
         });
       });
@@ -480,26 +529,49 @@ let b = blue(c);</code></pre>
       updateUI();
     }
 
+    function updateSwatchSelection() {
+      if (!els.swatchBtns) return;
+      els.swatchBtns.forEach((btn, i) => {
+        btn.style.borderColor = i === state.selectedColor ? "#222" : "#ded2c1";
+        btn.style.transform = i === state.selectedColor ? "scale(1.25)" : "scale(1)";
+      });
+    }
+
     function buildImageData() {
       state.data = [];
       for (let y = 0; y < state.rows; y++) {
         const row = [];
         for (let x = 0; x < state.cols; x++) {
-          const dx = x / (state.cols - 1);
-          const dy = y / (state.rows - 1);
-          const wave = Math.sin(x * 0.75) * 0.5 + Math.cos(y * 0.9) * 0.5;
-          const r = Math.round(40 + dx * 190 + Math.max(0, wave) * 35);
-          const g = Math.round(55 + dy * 170 + Math.sin((x + y) * 0.45) * 30);
-          const b = Math.round(210 - dx * 115 + dy * 45 + Math.cos(x * 0.35) * 30);
-          row.push({
-            r: clamp(r, 0, 255),
-            g: clamp(g, 0, 255),
-            b: clamp(b, 0, 255),
-            a: 255
-          });
+          row.push({ r: 255, g: 255, b: 255, a: 255 });
         }
         state.data.push(row);
       }
+    }
+
+    function loadPreset(name) {
+      const preset = PRESETS[name];
+      if (!preset) return;
+      buildImageData();
+      for (let y = 0; y < state.rows; y++) {
+        for (let x = 0; x < state.cols; x++) {
+          const idx = preset[y][x];
+          if (idx === -1) {
+            state.data[y][x] = { r: 255, g: 255, b: 255, a: 255 };
+          } else {
+            const col = PALETTE[idx];
+            state.data[y][x] = { r: col.r, g: col.g, b: col.b, a: 255 };
+          }
+        }
+      }
+    }
+
+    function paintCell(gx, gy) {
+      if (gx < 0 || gx >= state.cols || gy < 0 || gy >= state.rows) return;
+      const col = PALETTE[state.selectedColor];
+      state.data[gy][gx] = { r: col.r, g: col.g, b: col.b, a: 255 };
+      state.sampleX = gx;
+      state.sampleY = gy;
+      updateUI();
     }
 
     function clamp(v, min, max) {
@@ -539,63 +611,58 @@ let b = blue(c);</code></pre>
       for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
       els.effectButtons.forEach((button) => button.classList.toggle("active", button.dataset.effect === state.effect));
 
-      els.sampleXSlider.value = state.sampleX;
-      els.sampleYSlider.value = state.sampleY;
-      els.pixelSizeSlider.value = state.pixelSize;
-      els.sampleXValue.textContent = String(state.sampleX);
-      els.sampleYValue.textContent = String(state.sampleY);
-      els.pixelSizeValue.textContent = String(state.pixelSize);
       els.showLabels.checked = state.showLabels;
       els.showCode.checked = state.showCode;
       els.codeCard.classList.toggle("visible", state.showCode);
+      updateSwatchSelection();
 
       const c = selectedPixel();
       const idx = 4 * (state.sampleY * state.cols + state.sampleX);
       const lessons = {
         grid: {
-          pill: "image = grid of pixels",
-          title: "A picture is a grid",
-          text: "Digital images are made of pixels. Each pixel is a tiny square with a position, like (x, y), and color values.",
-          formula: "pixel at (x, y)\ncolor = [red, green, blue, alpha]",
-          question: "What happens to image detail when the pixel squares get larger?",
-          caption: "An image is a grid. Each pixel has a location and a color.",
-          code: `image(img, 0, 0);\n// The image is made of many pixels.`
+          pill: "paint your own pixel art",
+          title: "Paint pixels — they are just data",
+          text: "Click the grid to paint. Each cell is one pixel. Hover to see its RGB values. Your painting is a 10×10 array of colors.",
+          formula: `pixel at (${state.sampleX}, ${state.sampleY})\ncolor = [${c.r}, ${c.g}, ${c.b}, ${c.a}]`,
+          question: "What happens to image detail when the pixel squares are bigger? Smaller?",
+          caption: "Click to paint. Hover to inspect. Each cell stores color as numbers.",
+          code: `// Each painted cell:\nfill(${c.r}, ${c.g}, ${c.b});\nrect(${state.sampleX * 28}, ${state.sampleY * 28}, 28, 28);`
         },
         rgb: {
           pill: "each pixel stores RGB values",
           title: "Each pixel stores color numbers",
-          text: "A pixel color is usually stored as red, green, blue, and alpha values. Each channel is a number from 0 to 255.",
-          formula: `pixel(${state.sampleX}, ${state.sampleY})\nred = ${c.r}\ngreen = ${c.g}\nblue = ${c.b}\nalpha = ${c.a}`,
-          question: "Which channel is strongest in the selected pixel?",
-          caption: "RGB values are numbers. Change the numbers, and you change the color.",
-          code: `let c = img.get(${state.sampleX}, ${state.sampleY});\nlet r = red(c);\nlet g = green(c);\nlet b = blue(c);`
+          text: "The color you painted is stored as three numbers: red, green, and blue. Hover or click a cell to see its values.",
+          formula: `pixel(${state.sampleX}, ${state.sampleY})\nred   = ${c.r}\ngreen = ${c.g}\nblue  = ${c.b}\nalpha = ${c.a}`,
+          question: "Which channel is strongest in the selected pixel? How does that relate to the color you see?",
+          caption: "RGB values are numbers. Change the numbers, change the color.",
+          code: `let c = img.get(${state.sampleX}, ${state.sampleY});\nlet r = red(c);   // ${c.r}\nlet g = green(c); // ${c.g}\nlet b = blue(c);  // ${c.b}`
         },
         sample: {
           pill: "get(x, y) samples one pixel",
-          title: "get() samples a pixel color",
-          text: "get(x, y) asks the image for the color at one location. That sampled color can be used to draw something new.",
-          formula: `let c = img.get(${state.sampleX}, ${state.sampleY});\nfill(c);\ncircle(...);`,
-          question: "How could sampled colors become a painting or mosaic?",
-          caption: "Sampling means reading a color from the image, then using that data somewhere else.",
+          title: "get() reads one pixel's color",
+          text: "get(x, y) asks the image for the color stored at one position. That data can be used to draw something new anywhere.",
+          formula: `let c = img.get(${state.sampleX}, ${state.sampleY});\n// c = [${c.r}, ${c.g}, ${c.b}]\nfill(c);\ncircle(mouseX, mouseY, 30);`,
+          question: "How could you use get() to make a mosaic of circles from your pixel art?",
+          caption: "Hover a cell to see its color data. get() reads that color from the painted image.",
           code: `let c = img.get(mouseX, mouseY);\nfill(c);\ncircle(mouseX, mouseY, 30);`
         },
         pixels: {
           pill: "pixels[] stores raw image data",
-          title: "pixels[] is a long list of color values",
-          text: "Behind the grid, p5.js stores pixel data in one long array. Each pixel uses four values: red, green, blue, and alpha.",
-          formula: `index = 4 * (y * width + x)\npixels[index + 0] = red\npixels[index + 1] = green\npixels[index + 2] = blue\npixels[index + 3] = alpha\n\nselected index = ${idx}`,
+          title: "pixels[] is one long list",
+          text: "Behind the grid, p5.js stores pixel data in a single long array. Each pixel takes four slots: red, green, blue, and alpha.",
+          formula: `index = 4 * (y * width + x)\n     = 4 * (${state.sampleY} * ${state.cols} + ${state.sampleX})\n     = ${idx}\n\npixels[${idx}] = ${c.r}  (red)\npixels[${idx + 1}] = ${c.g}  (green)\npixels[${idx + 2}] = ${c.b}  (blue)\npixels[${idx + 3}] = ${c.a}  (alpha)`,
           question: "Why does each pixel need four positions in the pixels[] array?",
-          caption: "pixels[] is not a 2D grid. It is a long list, with four numbers for each pixel.",
-          code: `loadPixels();\nlet index = 4 * (y * width + x);\nlet r = pixels[index + 0];\nlet g = pixels[index + 1];\nlet b = pixels[index + 2];\nlet a = pixels[index + 3];`
+          caption: "pixels[] is not a 2D grid. It is one long list with four numbers per pixel.",
+          code: `loadPixels();\nlet index = 4 * (${state.sampleY} * width + ${state.sampleX});\nlet r = pixels[index + 0]; // ${c.r}\nlet g = pixels[index + 1]; // ${c.g}\nlet b = pixels[index + 2]; // ${c.b}\nlet a = pixels[index + 3]; // ${c.a}`
         },
         remix: {
-          pill: "read pixels, transform, draw again",
-          title: "Pixel remix changes color data",
-          text: "Once pixels are numbers, code can transform them. Grayscale averages RGB. Invert subtracts each channel from 255. Threshold turns brightness into black or white.",
-          formula: `effect = ${state.effect}\nbrightness = (r + g + b) / 3`,
-          question: "Which remix keeps the most information? Which throws the most away?",
-          caption: "Pixel remixing means reading color data, changing it, and drawing a new image.",
-          code: `loadPixels();\nfor (let i = 0; i < pixels.length; i += 4) {\n  let r = pixels[i + 0];\n  let g = pixels[i + 1];\n  let b = pixels[i + 2];\n  let avg = (r + g + b) / 3;\n  pixels[i + 0] = avg;\n  pixels[i + 1] = avg;\n  pixels[i + 2] = avg;\n}\nupdatePixels();`
+          pill: "transform your painting's pixel data",
+          title: "Remix transforms your pixel data",
+          text: "The same painting — your colors — run through a math formula. Grayscale averages R, G, B. Invert subtracts each from 255. Threshold turns brightness into black or white.",
+          formula: `effect = ${state.effect}\noriginal = rgb(${c.r}, ${c.g}, ${c.b})\nbrightness = (${c.r} + ${c.g} + ${c.b}) / 3 = ${Math.round((c.r + c.g + c.b) / 3)}`,
+          question: "Which remix keeps the most color information? Which throws the most away?",
+          caption: "Same pixel data, different formula. Remixing means math on your numbers.",
+          code: `loadPixels();\nfor (let i = 0; i < pixels.length; i += 4) {\n  let r = pixels[i + 0];\n  let g = pixels[i + 1];\n  let b = pixels[i + 2];\n  let avg = (r + g + b) / 3;\n  // grayscale:\n  pixels[i + 0] = avg;\n  pixels[i + 1] = avg;\n  pixels[i + 2] = avg;\n}\nupdatePixels();`
         }
       };
 
@@ -645,8 +712,48 @@ let b = blue(c);</code></pre>
         drawReadoutCards();
       };
 
-      p.mousePressed = () => selectPixelFromMouse();
-      p.mouseDragged = () => selectPixelFromMouse();
+      p.mousePressed = () => handleMouseInteraction(true);
+      p.mouseDragged = () => handleMouseInteraction(false);
+      p.mouseMoved = () => {
+        const grid = getPaintGrid();
+        if (p.mouseX >= grid.x && p.mouseX <= grid.x + grid.w && p.mouseY >= grid.y && p.mouseY <= grid.y + grid.h) {
+          const col = Math.floor((p.mouseX - grid.x) / grid.cell);
+          const row = Math.floor((p.mouseY - grid.y) / grid.cell);
+          const nx = clamp(col, 0, state.cols - 1);
+          const ny = clamp(row, 0, state.rows - 1);
+          if (nx !== state.hoveredX || ny !== state.hoveredY) {
+            state.hoveredX = nx;
+            state.hoveredY = ny;
+            if (state.mode !== "grid") {
+              state.sampleX = nx;
+              state.sampleY = ny;
+              updateUI();
+            }
+          }
+        } else {
+          state.hoveredX = -1;
+          state.hoveredY = -1;
+        }
+      };
+
+      function handleMouseInteraction(isClick) {
+        const grid = getPaintGrid();
+        if (p.mouseX < grid.x || p.mouseX > grid.x + grid.w || p.mouseY < grid.y || p.mouseY > grid.y + grid.h) {
+          // Not on paint grid — just update selection
+          const ig = getImageGrid();
+          if (p.mouseX >= ig.x && p.mouseX <= ig.x + ig.w && p.mouseY >= ig.y && p.mouseY <= ig.y + ig.h) {
+            const col = Math.floor((p.mouseX - ig.x) / ig.cell);
+            const row = Math.floor((p.mouseY - ig.y) / ig.cell);
+            state.sampleX = clamp(col, 0, state.cols - 1);
+            state.sampleY = clamp(row, 0, state.rows - 1);
+            updateUI();
+          }
+          return;
+        }
+        const col = Math.floor((p.mouseX - grid.x) / grid.cell);
+        const row = Math.floor((p.mouseY - grid.y) / grid.cell);
+        paintCell(clamp(col, 0, state.cols - 1), clamp(row, 0, state.rows - 1));
+      }
 
       function resizeToHolder() {
         const rect = holder.getBoundingClientRect();
@@ -659,14 +766,11 @@ let b = blue(c);</code></pre>
         }
       }
 
-      function selectPixelFromMouse() {
-        const grid = getImageGrid();
-        if (p.mouseX < grid.x || p.mouseX > grid.x + grid.w || p.mouseY < grid.y || p.mouseY > grid.y + grid.h) return;
-        const col = Math.floor((p.mouseX - grid.x) / grid.cell);
-        const row = Math.floor((p.mouseY - grid.y) / grid.cell);
-        state.sampleX = clamp(col, 0, state.cols - 1);
-        state.sampleY = clamp(row, 0, state.rows - 1);
-        updateUI();
+      function getPaintGrid() {
+        const cell = state.pixelSize;
+        const w = cell * state.cols;
+        const h = cell * state.rows;
+        return { x: p.width * 0.06, y: p.height * 0.16, w, h, cell };
       }
 
       function drawSubtleGrid() {
@@ -680,11 +784,11 @@ let b = blue(c);</code></pre>
 
       function drawPanelTitle() {
         const titles = {
-          grid: ["Image Grid", "A picture is a grid of tiny colored squares."],
-          rgb: ["RGB Values", "Each pixel stores color as numbers."],
+          grid: ["Paint & Grid", "Click to paint. Hover to inspect. Each cell is one pixel."],
+          rgb: ["RGB Values", "Each painted pixel stores color as three numbers."],
           sample: ["get() / Sample", "Read one pixel and use its color somewhere else."],
-          pixels: ["pixels[] Array", "The grid is stored as one long list of RGBA values."],
-          remix: ["Remix", "Transform pixel values to create a new image."]
+          pixels: ["pixels[] Array", "Your painting is stored as one long list of RGBA values."],
+          remix: ["Remix", "Transform your painting's pixel values with a formula."]
         };
         const [title, subtitle] = titles[state.mode];
         p.push();
@@ -701,17 +805,16 @@ let b = blue(c);</code></pre>
       }
 
       function getImageGrid() {
-        const maxCellW = (p.width * 0.52) / state.cols;
-        const maxCellH = (p.height * 0.45) / state.rows;
-        const cell = Math.min(state.pixelSize, maxCellW, maxCellH);
+        // For non-grid modes, show a smaller version on left for reference
+        const cell = state.pixelSize;
         const w = cell * state.cols;
         const h = cell * state.rows;
-        return { x: p.width * 0.09, y: p.height * 0.16, w, h, cell };
+        return { x: p.width * 0.06, y: p.height * 0.16, w, h, cell };
       }
 
       function drawGridMode() {
-        const grid = getImageGrid();
-        drawImageGrid(grid, false, true);
+        const grid = getPaintGrid();
+        drawPaintGrid(grid);
         drawZoomedPixelPanel(grid.x + grid.w + 42, grid.y, p.width - (grid.x + grid.w + 74), grid.h);
       }
 
@@ -735,10 +838,76 @@ let b = blue(c);</code></pre>
 
       function drawRemixMode() {
         const leftGrid = getImageGrid();
-        const rightGrid = { ...leftGrid, x: p.width * 0.55 };
-        drawImageGrid(leftGrid, false, true, "original");
+        const rightGrid = { ...leftGrid, x: p.width * 0.50 };
+        drawImageGrid(leftGrid, false, true, "your painting");
         drawImageGrid(rightGrid, true, true, `${state.effect} remix`);
-        if (state.showLabels) drawLabel("same pixels → transformed values", p.width * 0.35, p.height * 0.64, "#7c3aed", 14);
+        if (state.showLabels) drawLabel("same data → transformed values", p.width * 0.32, p.height * 0.64, "#7c3aed", 14);
+      }
+
+      function drawPaintGrid(grid) {
+        // Background panel
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(grid.x - 14, grid.y - 44, grid.w + 28, grid.h + 60, 22);
+        if (state.showLabels) drawLabel("paint here — click to color", grid.x, grid.y - 18, "#7c3aed", 14);
+        p.pop();
+
+        for (let row = 0; row < state.rows; row++) {
+          for (let col = 0; col < state.cols; col++) {
+            const c = state.data[row][col];
+            const cx = grid.x + col * grid.cell;
+            const cy = grid.y + row * grid.cell;
+            const isHovered = col === state.hoveredX && row === state.hoveredY;
+            const isSelected = col === state.sampleX && row === state.sampleY;
+
+            p.push();
+            p.noStroke();
+            p.fill(c.r, c.g, c.b, c.a);
+            p.rect(cx, cy, grid.cell, grid.cell);
+            p.pop();
+
+            // Grid lines
+            p.push();
+            p.noFill();
+            p.stroke(isHovered ? "#7c3aed" : "#c4b8a8");
+            p.strokeWeight(isHovered ? 2 : 0.8);
+            p.rect(cx, cy, grid.cell, grid.cell);
+            p.pop();
+
+            // Hover highlight
+            if (isHovered) {
+              p.push();
+              p.noStroke();
+              p.fill(124, 58, 237, 40);
+              p.rect(cx, cy, grid.cell, grid.cell);
+              p.pop();
+            }
+
+            // Hovered cell code snippet inside cell
+            if (isHovered && grid.cell >= 24) {
+              const hc = state.data[row][col];
+              drawLabel(`(${col},${row})`, cx + 2, cy + grid.cell - 4, "#7c3aed", 9);
+            }
+          }
+        }
+
+        // Selection border
+        const sx = grid.x + state.sampleX * grid.cell;
+        const sy = grid.y + state.sampleY * grid.cell;
+        p.push();
+        p.noFill();
+        p.stroke("#7c3aed");
+        p.strokeWeight(3);
+        p.rect(sx, sy, grid.cell, grid.cell, 2);
+        p.pop();
+
+        // Show code for hovered cell
+        if (state.hoveredX >= 0 && state.showLabels) {
+          const hc = state.data[state.hoveredY][state.hoveredX];
+          const codeStr = `fill(${hc.r}, ${hc.g}, ${hc.b});\nrect(${state.hoveredX * grid.cell}, ${state.hoveredY * grid.cell}, ${grid.cell}, ${grid.cell});`;
+          drawLabel(codeStr, grid.x, grid.y + grid.h + 16, "#334155", 12);
+        }
       }
 
       function drawImageGrid(grid, remix = false, showSelection = true, title = "image grid") {
@@ -899,9 +1068,11 @@ let b = blue(c);</code></pre>
       }
 
       function drawReadoutCards() {
-        const c = selectedPixel();
+        const hx = state.hoveredX >= 0 ? state.hoveredX : state.sampleX;
+        const hy = state.hoveredY >= 0 ? state.hoveredY : state.sampleY;
+        const c = state.data[hy] ? state.data[hy][hx] || selectedPixel() : selectedPixel();
         const cards = [
-          { label: "pixel", value: `(${state.sampleX}, ${state.sampleY})`, color: "#7c3aed" },
+          { label: "selected", value: `(${hx}, ${hy})`, color: "#7c3aed" },
           { label: "RGB", value: `${c.r}, ${c.g}, ${c.b}`, color: "#f59e0b" },
           { label: "brightness", value: brightnessOf(c), color: "#16a34a" }
         ];

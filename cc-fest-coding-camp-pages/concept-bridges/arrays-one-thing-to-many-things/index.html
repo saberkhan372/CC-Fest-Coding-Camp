@@ -295,6 +295,7 @@
     <section class="controls" aria-label="Explorer controls">
       <div class="row">
         <button id="mode-one" class="active">One Thing</button>
+        <button id="mode-spotlight">Spotlight</button>
         <button id="mode-separate">Separate Variables</button>
         <button id="mode-array">Array List</button>
         <button id="mode-loop">Loop Draws Array</button>
@@ -395,13 +396,21 @@
       values: [],
       objects: [],
       loopCursor: 0,
-      lastLoopStep: 0
+      lastLoopStep: 0,
+      spotlight: {
+        index: 2,
+        dragging: false,
+        sweeping: false,
+        sweepCursor: 0,
+        lastSweepStep: 0
+      }
     };
 
     const els = {};
 
     function setupUI() {
       els.modeOne = document.querySelector("#mode-one");
+      els.modeSpotlight = document.querySelector("#mode-spotlight");
       els.modeSeparate = document.querySelector("#mode-separate");
       els.modeArray = document.querySelector("#mode-array");
       els.modeLoop = document.querySelector("#mode-loop");
@@ -430,6 +439,7 @@
       els.codeBox = document.querySelector("#code-box");
 
       els.modeOne.addEventListener("click", () => setMode("one"));
+      els.modeSpotlight.addEventListener("click", () => setMode("spotlight"));
       els.modeSeparate.addEventListener("click", () => setMode("separate"));
       els.modeArray.addEventListener("click", () => setMode("array"));
       els.modeLoop.addEventListener("click", () => setMode("loop"));
@@ -538,6 +548,7 @@
     function updateUI() {
       const buttons = [
         [els.modeOne, "one"],
+        [els.modeSpotlight, "spotlight"],
         [els.modeSeparate, "separate"],
         [els.modeArray, "array"],
         [els.modeLoop, "loop"],
@@ -563,7 +574,18 @@
       const arrayPreview = `[${state.values.join(", ")}]`;
       const selectedValue = state.values[state.selectedIndex];
 
+      const spotIdx = state.spotlight.index;
+      const spotVal = state.values[spotIdx] || 0;
       const lessons = {
+        spotlight: {
+          pill: "spotlight one index at a time",
+          title: "The spotlight picks one item",
+          text: "Drag the spotlight left and right to select an index. Each cell holds one value. The loop button sweeps the spotlight across every cell automatically.",
+          formula: `array[${spotIdx}] = ${spotVal}`,
+          question: "What does the loop do that dragging cannot do automatically?",
+          caption: `array[${spotIdx}] → draws this. Drag to any cell, or press Loop to sweep automatically.`,
+          code: `let sizes = [${state.values.join(", ")}];\n\n// Pick one item:\nlet s = sizes[${spotIdx}]; // ${spotVal}\ncircle(200, 200, s);\n\n// Visit every item:\nfor (let i = 0; i < sizes.length; i++) {\n  drawShape(sizes[i]);\n}`
+        },
         one: {
           pill: "one variable holds one value",
           title: "One variable holds one value",
@@ -642,6 +664,45 @@
 
       p.windowResized = () => resizeToHolder();
 
+      p.mousePressed = () => {
+        if (state.mode !== "spotlight") return;
+        // Check loop button
+        if (spotlightLoopButton) {
+          const btn = spotlightLoopButton;
+          if (p.mouseX >= btn.x && p.mouseX <= btn.x + btn.w && p.mouseY >= btn.y && p.mouseY <= btn.y + btn.h) {
+            spotlightLoopRunning = !spotlightLoopRunning;
+            spotlightLoopLastStep = p.millis();
+            return;
+          }
+        }
+        // Check cell row drag start
+        handleSpotlightDrag();
+        state.spotlight.dragging = true;
+      };
+
+      p.mouseDragged = () => {
+        if (state.mode !== "spotlight") return;
+        if (state.spotlight.dragging) handleSpotlightDrag();
+      };
+
+      p.mouseReleased = () => {
+        state.spotlight.dragging = false;
+      };
+
+      function handleSpotlightDrag() {
+        const sl = getSpotlightCells();
+        const count = sl.count;
+        if (p.mouseY < sl.rowY - 40 || p.mouseY > sl.rowY + 80) return;
+        if (p.mouseX < sl.startX - 20 || p.mouseX > sl.startX + sl.totalW + 20) return;
+        const col = Math.floor((p.mouseX - sl.startX) / (sl.cellW + sl.gap));
+        const clamped = Math.max(0, Math.min(count - 1, col));
+        if (clamped !== state.spotlight.index) {
+          state.spotlight.index = clamped;
+          spotlightLoopRunning = false;
+          updateUI();
+        }
+      }
+
       p.draw = () => {
         resizeToHolder();
         updateLoopCursor();
@@ -650,6 +711,7 @@
         drawPanelTitle();
 
         if (state.mode === "one") drawOneMode();
+        if (state.mode === "spotlight") drawSpotlightMode();
         if (state.mode === "separate") drawSeparateMode();
         if (state.mode === "array") drawArrayMode();
         if (state.mode === "loop") drawLoopMode();
@@ -690,6 +752,7 @@
       function drawPanelTitle() {
         const titles = {
           one: ["One Thing", "A single variable can remember one value."],
+          spotlight: ["Spotlight", "Drag to index one item. Press Loop to sweep the whole array."],
           separate: ["Separate Variables", "Multiple variables work, but they do not scale well."],
           array: ["Array List", "One variable can hold many indexed values."],
           loop: ["Loop Draws Array", "A loop visits every item in the array."],
@@ -707,6 +770,166 @@
         p.fill("#6b6258");
         p.text(subtitle, 24, 62);
         p.pop();
+      }
+
+      // --- Spotlight mode ---
+      let spotlightLoopButton = null;
+      let spotlightLoopRunning = false;
+      let spotlightLoopLastStep = 0;
+
+      function getSpotlightCells() {
+        const count = Math.min(state.count, 8);
+        const cellW = 58;
+        const gap = 8;
+        const totalW = count * cellW + (count - 1) * gap;
+        const rowY = p.height * 0.66;
+        const startX = p.width * 0.5 - totalW / 2;
+        return { count, cellW, gap, totalW, rowY, startX };
+      }
+
+      function drawSpotlightMode() {
+        const sp = state.spotlight;
+        const sl = getSpotlightCells();
+        const count = sl.count;
+
+        // Update sweeping
+        if (spotlightLoopRunning) {
+          if (p.millis() - spotlightLoopLastStep > 620) {
+            sp.index = (sp.index + 1) % count;
+            spotlightLoopLastStep = p.millis();
+            updateUI();
+          }
+        }
+
+        // Draw top preview area (panel)
+        const previewX = p.width * 0.08;
+        const previewY = p.height * 0.13;
+        const previewW = p.width * 0.84;
+        const previewH = p.height * 0.40;
+        drawPanel(previewX, previewY, previewW, previewH);
+
+        // Draw spotlight glow circle above cells
+        const cellCx = sl.startX + sp.index * (sl.cellW + sl.gap) + sl.cellW / 2;
+        const spotY = sl.rowY - 28;
+        p.push();
+        // Outer glow
+        for (let r = 80; r >= 0; r -= 10) {
+          const alpha = p.map(r, 80, 0, 0, 55);
+          p.noStroke();
+          p.fill(255, 230, 80, alpha);
+          p.circle(cellCx, spotY, r * 2 + 30);
+        }
+        // Core spotlight beam
+        p.fill(255, 230, 80, 200);
+        p.circle(cellCx, spotY, 60);
+        p.fill(255, 255, 200, 240);
+        p.circle(cellCx, spotY, 28);
+        p.pop();
+
+        // Draw array cells row
+        for (let i = 0; i < count; i++) {
+          const cx = sl.startX + i * (sl.cellW + sl.gap);
+          const cy = sl.rowY;
+          const active = i === sp.index;
+          const val = state.values[i] || 0;
+
+          // Cell glow for active
+          if (active) {
+            p.push();
+            p.noStroke();
+            p.fill(255, 230, 80, 60);
+            p.rect(cx - 4, cy - 4, sl.cellW + 8, 68, 16);
+            p.pop();
+          }
+
+          p.push();
+          p.noStroke();
+          p.fill(active ? "#fffde0" : "#ffffff");
+          p.rect(cx, cy, sl.cellW, 60, 12);
+          p.stroke(active ? "#f59e0b" : "#ded2c1");
+          p.strokeWeight(active ? 3 : 1.5);
+          p.noFill();
+          p.rect(cx, cy, sl.cellW, 60, 12);
+          // Index label
+          p.noStroke();
+          p.fill("#6b6258");
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textStyle(p.BOLD);
+          p.textSize(11);
+          p.text(`[${i}]`, cx + sl.cellW / 2, cy + 16);
+          // Value
+          p.fill(active ? "#d97706" : "#7c3aed");
+          p.textSize(20);
+          p.text(val, cx + sl.cellW / 2, cy + 42);
+          p.pop();
+        }
+
+        // Draw selected value as a circle in the preview panel
+        const val = state.values[sp.index] || 0;
+        const previewCx = previewX + previewW * 0.5;
+        const previewCy = previewY + previewH * 0.52;
+        const previewR = Math.min(val * 0.65, previewH * 0.38);
+        p.push();
+        p.noStroke();
+        p.fill("#f59e0b");
+        p.circle(previewCx, previewCy, previewR * 2);
+        p.fill("#ffffff");
+        p.circle(previewCx, previewCy, 10);
+        if (state.showLabels) {
+          drawLabel(`array[${sp.index}] = ${val} → draws this`, previewCx - 100, previewY + 30, "#d97706", 14);
+        }
+        p.pop();
+
+        // Code snippet
+        const snippetX = previewX + previewW * 0.60;
+        const snippetY = previewY + 20;
+        const snippetW = previewW * 0.36;
+        p.push();
+        p.noStroke();
+        p.fill(17, 24, 39, 235);
+        p.rect(snippetX, snippetY, snippetW, 110, 14);
+        p.textFont("ui-monospace, SFMono-Regular, Menlo, Monaco, monospace");
+        p.textSize(12);
+        p.textAlign(p.LEFT, p.BASELINE);
+
+        // Render code with highlighting
+        const lines = [
+          { text: `let sizes = [${state.values.slice(0, count).join(", ")}];`, color: "#e5e7eb" },
+          { text: "", color: "#e5e7eb" },
+          { text: `sizes[i]  // i = ${sp.index}`, color: "#fde68a", bold: true },
+          { text: "", color: "#e5e7eb" },
+          { text: `for (let i = 0; i < sizes.length; i++) {`, color: spotlightLoopRunning ? "#86efac" : "#e5e7eb" },
+          { text: `  drawShape(sizes[i]);`, color: spotlightLoopRunning ? "#86efac" : "#e5e7eb" },
+          { text: `}`, color: spotlightLoopRunning ? "#86efac" : "#e5e7eb" }
+        ];
+        for (let li = 0; li < lines.length; li++) {
+          if (lines[li].bold) p.textStyle(p.BOLD);
+          else p.textStyle(p.NORMAL);
+          p.fill(lines[li].color);
+          p.text(lines[li].text, snippetX + 10, snippetY + 20 + li * 14);
+        }
+        p.textFont("Inter, system-ui, sans-serif");
+        p.pop();
+
+        // Loop button (HTML-overlay-style drawn on canvas)
+        const btnX = p.width * 0.5 - 50;
+        const btnY = sl.rowY + 72;
+        const btnW = 100;
+        const btnH = 32;
+        p.push();
+        p.noStroke();
+        p.fill(spotlightLoopRunning ? "#16a34a" : "#222222");
+        p.rect(btnX, btnY, btnW, btnH, 999);
+        p.fill("#ffffff");
+        p.textStyle(p.BOLD);
+        p.textSize(13);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text(spotlightLoopRunning ? "Stop" : "Loop", btnX + btnW / 2, btnY + btnH / 2);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.pop();
+
+        // Store button bounds for click
+        spotlightLoopButton = { x: btnX, y: btnY, w: btnW, h: btnH };
       }
 
       function drawOneMode() {

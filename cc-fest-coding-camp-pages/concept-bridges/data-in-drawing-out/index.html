@@ -234,6 +234,116 @@
     .code-card { display: none; }
     .code-card.visible { display: block; }
 
+    /* Edit the Table mode */
+    .table-editor-wrap {
+      display: none;
+      grid-column: 1 / -1;
+      gap: 18px;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+    .table-editor-wrap.visible {
+      display: grid;
+    }
+    .editable-table-card {
+      background: rgba(255,250,242,0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .editable-table-card h2 {
+      margin: 0 0 14px;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+    .editable-table-card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.93rem;
+    }
+    .editable-table-card th {
+      text-align: left;
+      padding: 8px 10px;
+      background: #f1f5f9;
+      border: 1px solid var(--line);
+      font-size: 0.83rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .editable-table-card td {
+      padding: 0;
+      border: 1px solid var(--line);
+    }
+    .editable-table-card td input {
+      width: 100%;
+      border: none;
+      outline: none;
+      padding: 9px 10px;
+      font-size: 0.93rem;
+      font-family: inherit;
+      background: white;
+      color: var(--ink);
+    }
+    .editable-table-card td input:focus {
+      background: #eff6ff;
+    }
+    .editable-table-card td.color-cell input[type="color"] {
+      padding: 2px 4px;
+      width: 48px;
+      height: 36px;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    .editable-table-card td.color-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .editable-table-card td.color-cell input[type="text"] {
+      flex: 1;
+    }
+    .table-caption {
+      margin-top: 14px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.5;
+    }
+    .table-code-card {
+      background: rgba(255,250,242,0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .table-code-card h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+    .table-code-card pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.83rem;
+      line-height: 1.5;
+      padding: 14px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+    .table-preview-canvas {
+      margin-top: 16px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: white;
+    }
+    .table-preview-canvas canvas { display: block; }
+
     pre {
       margin: 0;
       white-space: pre-wrap;
@@ -267,13 +377,14 @@
   <main>
     <section class="controls" aria-label="Explorer controls">
       <div class="row">
-        <button id="mode-file" class="active">External File</button>
+        <button id="mode-edittable" class="active">Edit the Table</button>
+        <button id="mode-file">External File</button>
         <button id="mode-table">Table Rows</button>
         <button id="mode-column">Columns</button>
         <button id="mode-map">Map to Visuals</button>
         <button id="mode-json">JSON Shape</button>
         <button id="reset-button">Reset Data</button>
-        <span id="mode-pill" class="pill">data file → sketch</span>
+        <span id="mode-pill" class="pill">edit data → see drawing change</span>
       </div>
 
       <div class="row">
@@ -304,7 +415,87 @@
       </div>
     </section>
 
-    <section class="workspace">
+    <!-- Edit the Table mode: full-width row -->
+    <div class="table-editor-wrap visible" id="table-editor-section" style="grid-column:1/-1;">
+      <div class="editable-table-card">
+        <h2>Edit the spreadsheet — watch the chart update live</h2>
+        <table id="live-data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Value (0–100)</th>
+              <th>Color</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" class="tbl-name" value="Week 1" /></td>
+              <td><input type="number" class="tbl-value" value="42" min="0" max="100" /></td>
+              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
+                <input type="color" class="tbl-color-picker" value="#c8391d" />
+                <input type="text" class="tbl-color-text" value="#c8391d" style="flex:1;padding:9px 6px;" />
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text" class="tbl-name" value="Week 2" /></td>
+              <td><input type="number" class="tbl-value" value="67" min="0" max="100" /></td>
+              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
+                <input type="color" class="tbl-color-picker" value="#f5a800" />
+                <input type="text" class="tbl-color-text" value="#f5a800" style="flex:1;padding:9px 6px;" />
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text" class="tbl-name" value="Week 3" /></td>
+              <td><input type="number" class="tbl-value" value="55" min="0" max="100" /></td>
+              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
+                <input type="color" class="tbl-color-picker" value="#2d6a4f" />
+                <input type="text" class="tbl-color-text" value="#2d6a4f" style="flex:1;padding:9px 6px;" />
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text" class="tbl-name" value="Week 4" /></td>
+              <td><input type="number" class="tbl-value" value="81" min="0" max="100" /></td>
+              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
+                <input type="color" class="tbl-color-picker" value="#315c92" />
+                <input type="text" class="tbl-color-text" value="#315c92" style="flex:1;padding:9px 6px;" />
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text" class="tbl-name" value="Week 5" /></td>
+              <td><input type="number" class="tbl-value" value="73" min="0" max="100" /></td>
+              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
+                <input type="color" class="tbl-color-picker" value="#7149a3" />
+                <input type="text" class="tbl-color-text" value="#7149a3" style="flex:1;padding:9px 6px;" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">
+          This is exactly what happens when your code reads from a real CSV: change the file → change the drawing.
+        </p>
+      </div>
+
+      <div class="table-code-card">
+        <h2>The chart updates from your table</h2>
+        <div class="table-preview-canvas">
+          <canvas id="table-preview-canvas" width="480" height="260"></canvas>
+        </div>
+        <p style="margin:14px 0 8px;font-size:0.88rem;color:var(--muted);">The p5.js code that would read this from a CSV file:</p>
+        <pre id="live-code-snippet">function preload() {
+  table = loadTable("data.csv", "csv", "header");
+}
+function draw() {
+  for (let i = 0; i &lt; table.getRowCount(); i++) {
+    let val = table.getNum(i, "Value");
+    let h = map(val, 0, 100, 0, 300);
+    fill(table.getString(i, "Color"));
+    rect(x, height - h, barW, h);
+  }
+}</pre>
+      </div>
+    </div>
+
+    <section class="workspace" id="main-workspace" style="display:none;">
       <div id="sketch-holder"></div>
       <div id="canvas-caption" class="canvas-caption">
         preload() gets external data ready before setup() and draw() try to use it.
@@ -399,7 +590,7 @@
     };
 
     const state = {
-      mode: "file",
+      mode: "edittable",
       datasetKey: "weather",
       selectedRow: 2,
       visualScale: 1,
@@ -427,7 +618,88 @@
     function firstNumericColumn() { return data().columns.find(c => typeof data().rows[0][c] === "number"); }
     function labelColumn() { return data().columns.find(c => typeof data().rows[0][c] === "string"); }
 
+    // ---- Live editable table preview canvas ----
+    function getTableData() {
+      const names = Array.from(document.querySelectorAll(".tbl-name")).map(i => i.value);
+      const values = Array.from(document.querySelectorAll(".tbl-value")).map(i => Number(i.value) || 0);
+      const colors = Array.from(document.querySelectorAll(".tbl-color-text")).map(i => i.value || "#888");
+      return names.map((n, i) => ({ name: n, value: values[i], color: colors[i] }));
+    }
+
+    function drawTablePreview() {
+      const canvas = document.getElementById("table-preview-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const rows = getTableData();
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#fffaf2";
+      ctx.fillRect(0, 0, W, H);
+
+      const maxVal = Math.max(...rows.map(r => r.value), 1);
+      const baseline = H - 44;
+      const barCount = rows.length;
+      const totalBarW = W - 60;
+      const barW = totalBarW / barCount;
+      const maxH = baseline - 28;
+
+      for (let i = 0; i < rows.length; i++) {
+        const { name, value, color } = rows[i];
+        const bh = (value / 100) * maxH;
+        const bx = 30 + i * barW;
+        ctx.fillStyle = color;
+        const rx = bx + barW * 0.1;
+        const rw = barW * 0.8;
+        const ry = baseline - bh;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(rx, ry, rw, bh, [6, 6, 0, 0]);
+        } else {
+          ctx.rect(rx, ry, rw, bh);
+        }
+        ctx.fill();
+        // value label
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 12px Inter, system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(value, rx + rw / 2, ry - 6);
+        // name label
+        ctx.fillStyle = "#6b6258";
+        ctx.font = "11px Inter, system-ui, sans-serif";
+        ctx.fillText(name, rx + rw / 2, baseline + 16);
+      }
+      // baseline
+      ctx.strokeStyle = "#ded2c1";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(20, baseline);
+      ctx.lineTo(W - 20, baseline);
+      ctx.stroke();
+    }
+
+    function setupTableEditor() {
+      // Wire up color pickers ↔ text inputs
+      document.querySelectorAll(".tbl-color-picker").forEach((picker, i) => {
+        const textInput = document.querySelectorAll(".tbl-color-text")[i];
+        picker.addEventListener("input", () => {
+          textInput.value = picker.value;
+          drawTablePreview();
+        });
+        textInput.addEventListener("input", () => {
+          if (/^#[0-9a-fA-F]{6}$/.test(textInput.value)) {
+            picker.value = textInput.value;
+          }
+          drawTablePreview();
+        });
+      });
+      document.querySelectorAll(".tbl-name, .tbl-value").forEach(input => {
+        input.addEventListener("input", drawTablePreview);
+      });
+      drawTablePreview();
+    }
+
     function setupUI() {
+      els.modeEditTable = document.querySelector("#mode-edittable");
       els.modeFile = document.querySelector("#mode-file");
       els.modeTable = document.querySelector("#mode-table");
       els.modeColumn = document.querySelector("#mode-column");
@@ -451,7 +723,10 @@
       els.caption = document.querySelector("#canvas-caption");
       els.codeCard = document.querySelector("#code-card");
       els.codeBox = document.querySelector("#code-box");
+      els.tableEditorSection = document.querySelector("#table-editor-section");
+      els.mainWorkspace = document.querySelector("#main-workspace");
 
+      els.modeEditTable.addEventListener("click", () => setMode("edittable"));
       els.modeFile.addEventListener("click", () => setMode("file"));
       els.modeTable.addEventListener("click", () => setMode("table"));
       els.modeColumn.addEventListener("click", () => setMode("column"));
@@ -480,15 +755,27 @@
       els.showLabels.addEventListener("change", () => { state.showLabels = els.showLabels.checked; });
       els.showCode.addEventListener("change", () => { state.showCode = els.showCode.checked; updateUI(); });
 
+      setupTableEditor();
       updateUI();
     }
 
     function setMode(mode) { state.mode = mode; updateUI(); }
 
     function updateUI() {
-      const buttons = [[els.modeFile,"file"],[els.modeTable,"table"],[els.modeColumn,"column"],[els.modeMap,"map"],[els.modeJson,"json"]];
+      const isEditTable = state.mode === "edittable";
+      els.tableEditorSection.classList.toggle("visible", isEditTable);
+      els.tableEditorSection.style.display = isEditTable ? "grid" : "none";
+      els.mainWorkspace.style.display = isEditTable ? "none" : "block";
+
+      const buttons = [[els.modeEditTable,"edittable"],[els.modeFile,"file"],[els.modeTable,"table"],[els.modeColumn,"column"],[els.modeMap,"map"],[els.modeJson,"json"]];
       for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
       els.datasetButtons.forEach(button => button.classList.toggle("active", button.dataset.dataset === state.datasetKey));
+
+      if (isEditTable) {
+        els.modePill.textContent = "edit data → see drawing change";
+        drawTablePreview();
+        return;
+      }
 
       els.rowSlider.max = String(data().rows.length - 1);
       els.rowSlider.value = state.selectedRow;
@@ -580,6 +867,7 @@
       };
       p.windowResized = () => resizeToHolder();
       p.draw = () => {
+        if (state.mode === "edittable") return;
         resizeToHolder();
         p.background(255, 250, 242);
         drawSubtleGrid();

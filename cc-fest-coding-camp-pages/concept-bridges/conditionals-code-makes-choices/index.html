@@ -811,17 +811,119 @@
 
       function drawAndOrMode() {
         const s = drawStage();
-        drawThresholdLine();
         const c = conditions();
         const andTrue = c.rightOfThreshold && c.large;
         const orTrue = c.leftOfThreshold || c.large;
-        let color = "#d8cbbb";
-        if (andTrue) color = "#16a34a";
-        else if (orTrue) color = "#f59e0b";
-        drawBall(color, andTrue ? "#16a34a" : null);
-        drawLogicGates(s.x + 28, s.y + 26, andTrue, orTrue);
+
+        // Determine which conditions are true
+        const cond1 = c.rightOfThreshold; // ball is right of threshold
+        const cond2 = c.large;            // ball is large (size > 90)
+
+        // Draw Venn diagram
+        const vennCx = s.x + s.w / 2;
+        const vennCy = s.y + s.h * 0.52;
+        const vennR = Math.min(s.w * 0.22, s.h * 0.36);
+        const overlap = vennR * 0.55;
+
+        const circle1X = vennCx - overlap * 0.5;
+        const circle2X = vennCx + overlap * 0.5;
+
+        // Draw outer zones (dimmed)
+        p.push();
+        p.noStroke();
+
+        // Left circle (cond1: right of threshold)
+        p.fill(37, 99, 235, cond1 && !cond2 ? 100 : 35);
+        p.circle(circle1X, vennCy, vennR * 2);
+
+        // Right circle (cond2: large)
+        p.fill(234, 88, 12, cond2 && !cond1 ? 100 : 35);
+        p.circle(circle2X, vennCy, vennR * 2);
+
+        // Intersection highlight
+        if (andTrue) {
+          p.drawingContext.save();
+          // Clip to both circles' intersection by drawing twice
+          p.fill(22, 163, 74, 160);
+          p.drawingContext.beginPath();
+          p.drawingContext.arc(circle1X, vennCy, vennR, 0, Math.PI * 2);
+          p.drawingContext.arc(circle2X, vennCy, vennR, 0, Math.PI * 2);
+          p.drawingContext.restore();
+        }
+
+        // Draw circle outlines
+        p.noFill();
+        p.stroke(37, 99, 235, 200);
+        p.strokeWeight(3);
+        p.circle(circle1X, vennCy, vennR * 2);
+        p.stroke(234, 88, 12, 200);
+        p.circle(circle2X, vennCy, vennR * 2);
+
+        // Intersection fill (using a simple overlapping rect approach)
+        p.noStroke();
+        if (andTrue) {
+          p.fill(22, 163, 74, 120);
+        } else {
+          p.fill(180, 180, 180, 40);
+        }
+        // Draw lens-shaped intersection by layering
+        p.drawingContext.save();
+        p.drawingContext.beginPath();
+        p.drawingContext.arc(circle1X, vennCy, vennR, 0, Math.PI * 2);
+        p.drawingContext.clip();
+        p.drawingContext.beginPath();
+        p.drawingContext.arc(circle2X, vennCy, vennR, 0, Math.PI * 2);
+        p.drawingContext.fillStyle = andTrue ? "rgba(22,163,74,0.5)" : "rgba(140,140,140,0.15)";
+        p.drawingContext.fill();
+        p.drawingContext.restore();
+
+        // Labels on Venn circles
         if (state.showLabels) {
-          drawLabel(andTrue ? "AND is true: special state" : orTrue ? "OR is true: warning state" : "no combined condition is true", s.x + 28, s.y + s.h - 28, color === "#d8cbbb" ? "#6b6258" : color, 14);
+          drawLabel("right of\nthreshold", circle1X - vennR * 0.62, vennCy - vennR + 22, "#2563eb", 12);
+          drawLabel("size > 90\n(large)", circle2X + vennR * 0.18, vennCy - vennR + 22, "#ea5c0a", 12);
+          drawLabel("AND\nzone", vennCx - 16, vennCy + 10, andTrue ? "#16a34a" : "#9ca3af", 12);
+        }
+
+        // Place the ball dot in the Venn based on conditions
+        let dotX, dotY;
+        if (cond1 && cond2) {
+          // Both: intersection
+          dotX = vennCx;
+          dotY = vennCy;
+        } else if (cond1 && !cond2) {
+          // Only cond1: left circle exclusive zone
+          dotX = circle1X - vennR * 0.42;
+          dotY = vennCy;
+        } else if (!cond1 && cond2) {
+          // Only cond2: right circle exclusive zone
+          dotX = circle2X + vennR * 0.42;
+          dotY = vennCy;
+        } else {
+          // Neither: outside both
+          dotX = vennCx;
+          dotY = vennCy + vennR * 1.55;
+        }
+
+        // Draw the dot representing the ball's state
+        const dotColor = andTrue ? "#16a34a" : orTrue ? "#f59e0b" : "#d8cbbb";
+        p.noStroke();
+        p.fill(dotColor);
+        p.circle(dotX, dotY, 22);
+        p.fill(255, 255, 255, 200);
+        p.circle(dotX + 3, dotY - 3, 7);
+
+        if (state.showLabels) {
+          const statusLabel = andTrue ? "both true → intersection" : cond1 ? "only right-of-threshold" : cond2 ? "only large" : "neither condition";
+          drawLabel(statusLabel, dotX - p.textWidth(statusLabel) / 2, dotY + 24, dotColor, 12);
+        }
+
+        p.pop();
+
+        // Logic gates summary (moved lower)
+        drawLogicGates(s.x + 28, s.y + 26, andTrue, orTrue);
+
+        if (state.showLabels && !(cond1 || cond2)) {
+          drawLabel("no combined condition is true — dot is outside both circles", s.x + 28, s.y + s.h - 28, "#6b6258", 13);
         }
       }
 

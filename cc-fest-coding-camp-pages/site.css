@@ -607,7 +607,40 @@ a{color:inherit}
 
 /* ─── TOOL STATIONS ─── */
 
-/* Search box */
+/* Global search */
+.global-search-wrap{
+  max-width:var(--content-width,1180px);
+  margin:0 auto 28px;
+  padding:0 var(--page-pad,32px);
+}
+.global-search{
+  width:100%;
+  max-width:640px;
+  padding:12px 20px;
+  border-radius:999px;
+  border:1.5px solid var(--line);
+  background:#fff;
+  font-family:"DM Sans",system-ui,sans-serif;
+  font-size:15px;
+  color:var(--ink);
+  outline:none;
+  transition:border-color .15s,box-shadow .15s;
+  display:block;
+}
+.global-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,57,29,.1)}
+.global-search::placeholder{color:var(--ink-light)}
+.global-search::-webkit-search-cancel-button{-webkit-appearance:none}
+
+/* Search-active: override all collapsed-section hide rules */
+body.search-active #interactive-tools.is-collapsible:not(.is-open) .station-list,
+body.search-active #concept-bridges.is-collapsible:not(.is-open) .station-list{display:block !important}
+body.search-active .station.is-collapsible:not(.is-open) .tool-grid{display:flex !important;flex-wrap:wrap}
+body.search-active .station.is-collapsible:not(.is-open) .tool-grid .tool-card{display:flex !important}
+body.search-active #starter-sketches.is-collapsible:not(.is-open) .tool-grid{display:flex !important;flex-wrap:wrap}
+body.search-active #starter-sketches.is-collapsible:not(.is-open) .tool-grid .tool-card{display:flex !important}
+body.search-active .station-peek-trigger{display:none !important}
+
+/* Legacy alias kept for any remaining references */
 .tool-search-wrap{margin-bottom:14px}
 .tool-search{
   width:100%;

@@ -160,9 +160,20 @@
       cursor: pointer;
       transition: transform 0.1s, background 0.1s;
       user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
     }
     .viz-btn:hover { transform: translateY(-1px); background: #fff7ed; }
     .viz-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+    .btn-desc {
+      font-size: 0.72rem;
+      opacity: 0.7;
+      font-weight: normal;
+      letter-spacing: 0;
+    }
+    .viz-btn.active .btn-desc { opacity: 0.8; }
 
     .data-editor {
       display: flex;
@@ -316,28 +327,52 @@
     <div class="visualizer-section">
       <h2>Same Data, Different Arguments</h2>
       <p>
-        Below is a simple dataset: four values representing whatever you imagine — population, income, time, feeling.
+        Below is a real dataset: survey results from coding campers about how they feel.
         Switch between chart forms. The numbers don't change. The story does.
       </p>
 
+        <p style="font-size:0.9rem;color:var(--muted);margin-bottom:10px;">
+        Adjust the sliders to see how the campers' feelings change the chart.
+      </p>
+
       <div class="data-editor">
-        <label>A: <input type="range" id="dA" min="5" max="100" value="72"> <span class="data-val" id="vA">72</span></label>
-        <label>B: <input type="range" id="dB" min="5" max="100" value="45"> <span class="data-val" id="vB">45</span></label>
-        <label>C: <input type="range" id="dC" min="5" max="100" value="88"> <span class="data-val" id="vC">88</span></label>
-        <label>D: <input type="range" id="dD" min="5" max="100" value="31"> <span class="data-val" id="vD">31</span></label>
+        <label>Excited: <input type="range" id="dA" min="5" max="100" value="72"> <span class="data-val" id="vA">72</span></label>
+        <label>Confident: <input type="range" id="dB" min="5" max="100" value="58"> <span class="data-val" id="vB">58</span></label>
+        <label>Uncertain: <input type="range" id="dC" min="5" max="100" value="35"> <span class="data-val" id="vC">35</span></label>
+        <label>Nervous: <input type="range" id="dD" min="5" max="100" value="21"> <span class="data-val" id="vD">21</span></label>
       </div>
+
+      <p style="font-size:0.92rem;font-weight:600;color:var(--ink);margin-bottom:8px;margin-top:4px;">
+        What's your argument?
+      </p>
+      <p style="font-size:0.87rem;color:var(--muted);margin-bottom:12px;">
+        Same data, different arguments. Which chart makes YOUR point?
+      </p>
 
       <div class="viz-controls">
         <span style="font-size:0.85rem;color:var(--muted);margin-right:4px;">Show as:</span>
-        <button class="viz-btn active" id="vbar"  onclick="setVizMode('bar')">Bar Chart</button>
-        <button class="viz-btn" id="vpolar" onclick="setVizMode('polar')">Polar / Coxcomb</button>
-        <button class="viz-btn" id="vdots"  onclick="setVizMode('dots')">Dot Plot</button>
-        <button class="viz-btn" id="vtext"  onclick="setVizMode('text')">Text Only</button>
-        <button class="viz-btn" id="vdubois" onclick="setVizMode('dubois')">Du Bois Style</button>
+        <button class="viz-btn active" id="vbar"  onclick="setVizMode('bar')" title="Shows exact comparison">Bar Chart <span class="btn-desc">exact comparison</span></button>
+        <button class="viz-btn" id="vpolar" onclick="setVizMode('polar')" title="Emphasizes proportions visually">Polar / Coxcomb <span class="btn-desc">proportions visually</span></button>
+        <button class="viz-btn" id="vdots"  onclick="setVizMode('dots')" title="Shows individual values">Dot Plot <span class="btn-desc">individual values</span></button>
+        <button class="viz-btn" id="vtext"  onclick="setVizMode('text')" title="Removes visual weight">Text Only <span class="btn-desc">no visual bias</span></button>
+        <button class="viz-btn" id="vdubois" onclick="setVizMode('dubois')" title="Bold argument, direct impact">Du Bois Style <span class="btn-desc">bold statement</span></button>
       </div>
 
       <div class="viz-canvas-wrap">
         <div id="viz-canvas"></div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <label for="chart-caption" style="font-size:0.88rem;color:var(--muted);display:block;margin-bottom:6px;">
+          Your caption — write a one-sentence argument for this visualization:
+        </label>
+        <input type="text" id="chart-caption"
+          placeholder='e.g. "Most campers feel excited but uncertainty is real."'
+          value="Most campers feel excited but uncertainty is real."
+          style="width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:999px;font-size:0.92rem;color:var(--ink);background:white;outline:none;font-family:inherit;" />
+        <p id="caption-display" style="margin-top:10px;font-style:italic;font-size:0.93rem;color:var(--accent);padding-left:4px;">
+          "Most campers feel excited but uncertainty is real."
+        </p>
       </div>
     </div>
 
@@ -386,8 +421,8 @@
 
   <script>
     let vizMode = 'bar';
-    let data = [72, 45, 88, 31];
-    const labels = ['A', 'B', 'C', 'D'];
+    let data = [72, 58, 35, 21];
+    const labels = ['Excited', 'Confident', 'Uncertain', 'Nervous'];
     const colors = ['#3d5a80', '#e07a5f', '#2a9d8f', '#e9c46a'];
 
     // Sliders
@@ -396,6 +431,13 @@
         data[i] = Number(this.value);
         document.getElementById(`v${l}`).textContent = this.value;
       });
+    });
+
+    // Caption input
+    const captionInput = document.getElementById('chart-caption');
+    const captionDisplay = document.getElementById('caption-display');
+    captionInput.addEventListener('input', function() {
+      captionDisplay.textContent = this.value ? `"${this.value}"` : '';
     });
 
     function setVizMode(mode) {

@@ -341,6 +341,7 @@
         <label class="toggle-label"><input id="animate-angle" type="checkbox" />Animate rotation</label>
         <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
         <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+        <button id="bug-toggle" style="display:none; border-color: #e11d48; color: #e11d48;">Show bug (no push/pop)</button>
       </div>
     </section>
 
@@ -403,7 +404,8 @@
       angle: 25,
       animate: false,
       showLabels: true,
-      showCode: false
+      showCode: false,
+      showBug: false
     };
 
     const els = {};
@@ -414,6 +416,7 @@
       els.modeRotate = document.querySelector("#mode-rotate");
       els.modePushpop = document.querySelector("#mode-pushpop");
       els.modeCompose = document.querySelector("#mode-compose");
+      els.bugToggle = document.querySelector("#bug-toggle");
       els.resetButton = document.querySelector("#reset-button");
       els.modePill = document.querySelector("#mode-pill");
       els.xSlider = document.querySelector("#x-slider");
@@ -476,6 +479,11 @@
         updateUI();
       });
 
+      els.bugToggle.addEventListener("click", () => {
+        state.showBug = !state.showBug;
+        updateUI();
+      });
+
       els.presetButtons.forEach((button) => {
         button.addEventListener("click", () => {
           const preset = button.dataset.preset;
@@ -529,6 +537,15 @@
       els.showLabels.checked = state.showLabels;
       els.showCode.checked = state.showCode;
       els.codeCard.classList.toggle("visible", state.showCode);
+
+      // Show/hide bug toggle only in pushpop mode
+      if (els.bugToggle) {
+        els.bugToggle.style.display = state.mode === "pushpop" ? "inline-block" : "none";
+        els.bugToggle.textContent = state.showBug ? "Show correct (with push/pop)" : "Show bug (no push/pop)";
+        els.bugToggle.style.borderColor = state.showBug ? "#16a34a" : "#e11d48";
+        els.bugToggle.style.color = state.showBug ? "#16a34a" : "#e11d48";
+      }
+      if (state.mode !== "pushpop") state.showBug = false;
 
       const lessons = {
         world: {
@@ -732,6 +749,14 @@
         const origin = getLocalOrigin();
         const angle = p.radians(state.angle);
 
+        if (state.showBug) {
+          drawPushPopBugMode(origin, angle);
+        } else {
+          drawPushPopCorrectMode(origin, angle);
+        }
+      }
+
+      function drawPushPopCorrectMode(origin, angle) {
         p.push();
         p.noStroke();
         p.fill(255, 255, 255, 232);
@@ -745,6 +770,97 @@
         drawLocalRectangle(origin, angle);
         drawWorldRectangle(p.width * 0.82, p.height * 0.32, "after pop()", "#64748b");
         drawPushPopStack();
+
+        // CORRECT label
+        if (state.showLabels) {
+          p.push();
+          p.noStroke();
+          p.fill(22, 163, 74, 200);
+          p.rectMode(p.CORNER);
+          const lx = p.width * 0.08 + 14;
+          const ly = p.height * 0.18 + 14;
+          p.rect(lx, ly, 110, 32, 14);
+          p.fill(255);
+          p.textStyle(p.BOLD);
+          p.textSize(14);
+          p.textAlign(p.CENTER, p.CENTER);
+          p.text("CORRECT", lx + 55, ly + 16);
+          p.pop();
+        }
+      }
+
+      function drawPushPopBugMode(origin, angle) {
+        // Show what happens WITHOUT push/pop:
+        // The second rect (after pop()) gets drawn in the STILL-TRANSFORMED coordinate system,
+        // so it lands at the wrong place.
+        p.push();
+        p.noStroke();
+        p.fill(255, 240, 240, 232);
+        p.rectMode(p.CORNER);
+        p.rect(p.width * 0.08, p.height * 0.18, p.width * 0.84, p.height * 0.50, 24);
+        p.stroke("#e11d48");
+        p.strokeWeight(2);
+        p.noFill();
+        p.rect(p.width * 0.08, p.height * 0.18, p.width * 0.84, p.height * 0.50, 24);
+        p.pop();
+
+        // Draw first world rect (correct position)
+        drawWorldRectangle(p.width * 0.18, p.height * 0.32, "first rect()", "#64748b");
+
+        // Draw the transformed local grid (no push/pop — transformation leaks)
+        drawTranslationPath(origin);
+        drawLocalGrid(origin, angle);
+        drawLocalRectangle(origin, angle);
+
+        // Without pop(), the second rect is drawn in the TRANSFORMED space
+        // Simulate: translate then rotate already happened, so a rect at (width*0.82, height*0.32)
+        // in world coords would actually be drawn relative to the local origin + angle
+        p.push();
+        p.translate(origin.x, origin.y);
+        p.rotate(angle);
+        // "after pop()" rect drawn WITHOUT restoring transforms
+        const bugLocalX = p.width * 0.82 - origin.x;
+        const bugLocalY = p.height * 0.32 - origin.y;
+        p.rectMode(p.CENTER);
+        p.noStroke();
+        p.fill(225, 29, 72, 100);
+        p.rect(bugLocalX * 0.35, bugLocalY * 0.35, 96, 60, 12);
+        p.fill(225, 29, 72, 200);
+        p.circle(bugLocalX * 0.35, bugLocalY * 0.35, 6);
+        if (state.showLabels) drawLocalLabel("wrong position!", bugLocalX * 0.35 + 8, bugLocalY * 0.35 + 48, "#e11d48", 13);
+        p.pop();
+
+        // BUG label
+        p.push();
+        p.noStroke();
+        p.fill(225, 29, 72, 220);
+        p.rectMode(p.CORNER);
+        const lx = p.width * 0.08 + 14;
+        const ly = p.height * 0.18 + 14;
+        p.rect(lx, ly, 80, 32, 14);
+        p.fill(255);
+        p.textStyle(p.BOLD);
+        p.textSize(14);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text("BUG", lx + 40, ly + 16);
+        p.pop();
+
+        // Explanation card
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rectMode(p.CORNER);
+        p.rect(p.width * 0.35, p.height * 0.70, p.width * 0.30, 92, 20);
+        p.fill("#e11d48");
+        p.textStyle(p.BOLD);
+        p.textSize(15);
+        p.text("Without push/pop", p.width * 0.35 + 18, p.height * 0.70 + 28);
+        p.fill("#6b6258");
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.text("transforms keep applying to", p.width * 0.35 + 18, p.height * 0.70 + 52);
+        p.text("everything drawn after!", p.width * 0.35 + 18, p.height * 0.70 + 72);
+        p.pop();
       }
 
       function drawComposeMode() {

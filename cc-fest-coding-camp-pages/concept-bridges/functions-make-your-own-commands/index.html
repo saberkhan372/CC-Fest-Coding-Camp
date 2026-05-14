@@ -328,7 +328,8 @@
         <button class="example-button" data-example="robot">robot</button>
         <button class="example-button" data-example="house">house</button>
         <button id="add-call-button">Add function call</button>
-        <button id="clear-calls-button">Clear calls</button>
+        <button id="clear-calls-button">Clear scene</button>
+        <button id="fifty-button">What if we had 50?</button>
         <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
         <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
       </div>
@@ -403,7 +404,8 @@ line(320, 220, 320, 270);</span>
         { x: 210, y: 280, size: 64 },
         { x: 360, y: 230, size: 92 },
         { x: 520, y: 300, size: 72 }
-      ]
+      ],
+      lastAddedIndex: -1
     };
 
     const els = {};
@@ -425,6 +427,7 @@ line(320, 220, 320, 270);</span>
       els.exampleButtons = Array.from(document.querySelectorAll(".example-button"));
       els.addCallButton = document.querySelector("#add-call-button");
       els.clearCallsButton = document.querySelector("#clear-calls-button");
+      els.fiftyButton = document.querySelector("#fifty-button");
       els.showLabels = document.querySelector("#show-labels");
       els.showCode = document.querySelector("#show-code");
       els.lessonTitle = document.querySelector("#lesson-title");
@@ -466,15 +469,31 @@ line(320, 220, 320, 270);</span>
       els.addCallButton.addEventListener("click", () => {
         state.calls.push({
           x: 110 + Math.random() * 570,
-          y: 130 + Math.random() * 250,
-          size: 42 + Math.random() * 82
+          y: 130 + Math.random() * 280,
+          size: state.size
         });
-        if (state.calls.length > 10) state.calls.shift();
+        state.lastAddedIndex = state.calls.length - 1;
+        if (state.mode !== "compose") { state.mode = "compose"; }
         updateUI();
       });
 
       els.clearCallsButton.addEventListener("click", () => {
         state.calls = [];
+        state.lastAddedIndex = -1;
+        updateUI();
+      });
+
+      els.fiftyButton.addEventListener("click", () => {
+        state.calls = [];
+        for (let i = 0; i < 50; i++) {
+          state.calls.push({
+            x: 60 + Math.random() * 640,
+            y: 100 + Math.random() * 340,
+            size: 20 + Math.random() * 60
+          });
+        }
+        state.lastAddedIndex = 49;
+        if (state.mode !== "compose") { state.mode = "compose"; }
         updateUI();
       });
 
@@ -604,13 +623,13 @@ line(320, 220, 320, 270);</span>
           code: `function scaledSize(size, factor) {\n  return size * factor;\n}\n\nlet small = scaledSize(${Math.round(state.size)}, 0.5);\nlet large = scaledSize(${Math.round(state.size)}, 1.3);\n\ncircle(220, 250, small);\ncircle(420, 250, large);`
         },
         compose: {
-          pill: "one function can build a scene",
-          title: "Functions help build scenes from ideas",
-          text: "Once you have a useful drawing function, you can call it many times with different arguments to compose a scene.",
-          formula: state.calls.map(c => `${name}(${Math.round(c.x)}, ${Math.round(c.y)}, ${Math.round(c.size)});`).join("\n") || `// Add function calls to build a scene`,
-          question: "Why is this easier than copying the full drawing code each time?",
-          caption: "Each function call uses the same recipe with different arguments. That makes the scene easier to change.",
-          code: `${functionBodyText()}\n\nfunction draw() {\n  background(240);\n${state.calls.map(c => `  ${name}(${Math.round(c.x)}, ${Math.round(c.y)}, ${Math.round(c.size)});`).join("\n")}\n}`
+          pill: "click the canvas to place a shape",
+          title: "Click anywhere to place a shape",
+          text: `Click on the canvas to place a ${thing}. Each click adds one function call. The function definition never changes — only the arguments do.`,
+          formula: state.calls.slice(-8).map(c => `${name}(${Math.round(c.x)}, ${Math.round(c.y)}, ${Math.round(c.size)});`).join("\n") || `// Click the canvas to add calls`,
+          question: "The function definition stays the same. Why does that matter when you have 50 calls?",
+          caption: `Click anywhere on the canvas to call ${name}() at that position. Try "What if we had 50?"`,
+          code: `${functionBodyText()}\n\nfunction draw() {\n  background(240);\n${state.calls.slice(0, 6).map(c => `  ${name}(${Math.round(c.x)}, ${Math.round(c.y)}, ${Math.round(c.size)});`).join("\n")}${state.calls.length > 6 ? `\n  // ... ${state.calls.length - 6} more calls` : ""}\n}`
         }
       };
 
@@ -644,6 +663,19 @@ line(320, 220, 320, 270);</span>
       };
 
       p.windowResized = () => resizeToHolder();
+
+      let recentlyAddedTimer = 0;
+
+      p.mousePressed = () => {
+        if (state.mode !== "compose") return;
+        const panel = { x: p.width * 0.08, y: p.height * 0.15, w: p.width * 0.84, h: p.height * 0.50 };
+        if (p.mouseX < panel.x || p.mouseX > panel.x + panel.w) return;
+        if (p.mouseY < panel.y || p.mouseY > panel.y + panel.h) return;
+        state.calls.push({ x: p.mouseX, y: p.mouseY, size: state.size });
+        state.lastAddedIndex = state.calls.length - 1;
+        recentlyAddedTimer = p.millis();
+        updateUI();
+      };
 
       p.draw = () => {
         resizeToHolder();
@@ -746,15 +778,102 @@ line(320, 220, 320, 270);</span>
       }
 
       function drawComposeMode() {
-        const panel = drawStage();
+        const name = currentFunctionName();
+        // Split canvas: left 60% = canvas, right 40% = code panel
+        const stageX = p.width * 0.08;
+        const stageY = p.height * 0.15;
+        const stageW = p.width * 0.55;
+        const stageH = p.height * 0.50;
+
+        // Draw stage
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(stageX, stageY, stageW, stageH, 24);
+        p.pop();
+
         if (state.calls.length === 0) {
-          drawLabel("Add function calls to build a scene", panel.x + panel.w * 0.33, panel.y + panel.h * 0.50, "#6b6258", 16);
+          drawLabel("Click anywhere in this area to place a shape", stageX + stageW * 0.15, stageY + stageH * 0.50, "#6b6258", 16);
+          // Show crosshair hint
+          p.push();
+          p.stroke("#ded2c1");
+          p.strokeWeight(2);
+          p.drawingContext.setLineDash([6, 6]);
+          p.line(stageX + stageW * 0.5, stageY + 20, stageX + stageW * 0.5, stageY + stageH - 20);
+          p.line(stageX + 20, stageY + stageH * 0.5, stageX + stageW - 20, stageY + stageH * 0.5);
+          p.drawingContext.setLineDash([]);
+          p.pop();
         }
+
+        // Draw all placed things
+        const isRecent = p.millis() - recentlyAddedTimer < 600;
         for (let i = 0; i < state.calls.length; i++) {
           const c = state.calls[i];
-          drawThing(c.x, c.y, c.size, state.example, palette(i));
-          if (state.showLabels && i < 6) drawLabel(`${currentFunctionName()}(...)`, c.x - 54, c.y + c.size * 0.70, palette(i), 11);
+          const isLast = i === state.lastAddedIndex;
+          const col = palette(i);
+          // Clip to stage area (approximate)
+          if (c.x < stageX || c.x > stageX + stageW || c.y < stageY || c.y > stageY + stageH) continue;
+          drawThing(c.x, c.y, c.size, state.example, col);
+          if (isLast && isRecent) {
+            // Flash ring
+            p.push();
+            p.noFill();
+            p.stroke("#ffffff");
+            p.strokeWeight(4);
+            p.circle(c.x, c.y, c.size * 1.4);
+            p.stroke(col);
+            p.strokeWeight(2);
+            p.circle(c.x, c.y, c.size * 1.4);
+            p.pop();
+          }
+          if (state.showLabels && i === state.lastAddedIndex && state.calls.length <= 12) {
+            drawLabel(`${name}(${Math.round(c.x)}, ${Math.round(c.y)}, ${Math.round(c.size)})`, c.x - 70, c.y - c.size * 0.6 - 10, col, 11);
+          }
         }
+
+        // Count label
+        if (state.calls.length > 0 && state.showLabels) {
+          drawLabel(`${state.calls.length} call${state.calls.length > 1 ? "s" : ""} — 1 definition`, stageX + 18, stageY + 30, "#7c3aed", 13);
+        }
+
+        // Code panel (right side)
+        const codeX = stageX + stageW + 16;
+        const codeY = stageY;
+        const codeW = p.width - codeX - p.width * 0.06;
+        const codeH = stageH;
+
+        p.push();
+        p.noStroke();
+        p.fill(17, 24, 39, 245);
+        p.rect(codeX, codeY, Math.max(80, codeW), codeH, 18);
+
+        p.textFont("ui-monospace, SFMono-Regular, Menlo, Monaco, monospace");
+        p.textSize(11);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.fill("#6b7280");
+        p.textStyle(p.BOLD);
+        p.text("// code panel", codeX + 10, codeY + 18);
+        p.textStyle(p.NORMAL);
+
+        const lineH = 14;
+        const maxVisible = Math.floor((codeH - 40) / lineH);
+        const totalLines = state.calls.length;
+        const startLine = Math.max(0, totalLines - maxVisible + 1);
+
+        for (let i = startLine; i < totalLines; i++) {
+          const c = state.calls[i];
+          const yy = codeY + 32 + (i - startLine) * lineH;
+          const isLast = i === state.lastAddedIndex && isRecent;
+          if (isLast) {
+            p.noStroke();
+            p.fill(251, 191, 36, 60);
+            p.rect(codeX + 4, yy - 11, Math.max(80, codeW) - 8, lineH + 2, 4);
+          }
+          p.fill(isLast ? "#fde68a" : palette(i));
+          p.text(`${name}(${Math.round(c.x)}, ${Math.round(c.y)}, ${Math.round(c.size)});`, codeX + 10, yy);
+        }
+        p.textFont("Inter, system-ui, sans-serif");
+        p.pop();
       }
 
       function drawStage() {
