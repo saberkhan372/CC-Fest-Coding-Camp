@@ -251,6 +251,7 @@
     @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
     @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
   </style>
+  <link rel="stylesheet" href="../concept-bridge.css" />
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -375,7 +376,8 @@
       lastClickY: 260,
       lastKey: "none",
       keyCount: 0,
-      sketchState: "calm",
+      gameState: "title",
+      playMarks: [],
       trail: [],
       clickBursts: []
     };
@@ -423,7 +425,8 @@
         state.clickCount = 0;
         state.keyCount = 0;
         state.lastKey = "none";
-        state.sketchState = "calm";
+        state.gameState = "title";
+        state.playMarks = [];
         state.trail = [];
         state.clickBursts = [];
         updateUI();
@@ -445,21 +448,29 @@
       state.lastClickX = x;
       state.lastClickY = y;
       state.clickBursts.push({ x, y, age: 0 });
-      if (state.mode === "state") cycleSketchState();
+      if (state.mode === "state" && state.gameState === "play") {
+        state.playMarks.push({
+          x,
+          y,
+          size: 18 + (state.playMarks.length % 5) * 6
+        });
+        if (state.playMarks.length > 24) state.playMarks.shift();
+      }
       updateUI();
     }
 
     function registerKey(k) {
       state.keyCount += 1;
       state.lastKey = k || "unknown";
-      if (state.mode === "state") cycleSketchState();
+      if (state.mode === "state") {
+        if (k === "Escape") {
+          state.gameState = "title";
+          state.playMarks = [];
+        } else {
+          state.gameState = "play";
+        }
+      }
       updateUI();
-    }
-
-    function cycleSketchState() {
-      const order = ["calm", "active", "surprised"];
-      const current = order.indexOf(state.sketchState);
-      state.sketchState = order[(current + 1) % order.length];
     }
 
     function updateUI() {
@@ -516,11 +527,11 @@
         state: {
           pill: "events often change state variables",
           title: "Input can change the sketch state",
-          text: "Events are often used to update variables. A click or key press might switch modes, change colors, add a new object, or start a game.",
-          formula: `let mood = "${state.sketchState}";\n\nfunction mousePressed() {\n  mood = "active";\n}`,
-          question: "How could a click move a game from start to play?",
-          caption: "Clicks and key presses can change a state variable, and draw() responds to the new state.",
-          code: `let mood = "calm";\n\nfunction mousePressed() {\n  if (mood === "calm") {\n    mood = "active";\n  } else {\n    mood = "calm";\n  }\n}\n\nfunction draw() {\n  if (mood === "active") {\n    background(255, 220, 120);\n  }\n}`
+          text: "A sketch often keeps a mode variable like title, play, or game over. Events do not draw the whole scene themselves. They change the state, and then draw() shows the right screen.",
+          formula: `let gameState = "${state.gameState}";\n\nfunction keyPressed() {\n  if (gameState === "title") gameState = "play";\n}`,
+          question: "Press any key to start, then press Escape to return. Which event changes the state, and which function keeps drawing the screen?",
+          caption: "A key event can move a sketch from title → play. Escape returns the sketch to the title screen.",
+          code: `let gameState = "title";\n\nfunction keyPressed() {\n  if (gameState === "title") {\n    gameState = "play";\n  } else if (keyCode === ESCAPE) {\n    gameState = "title";\n  }\n}\n\nfunction draw() {\n  if (gameState === "title") {\n    drawTitleScreen();\n  } else {\n    drawPlayScreen();\n  }\n}`
         }
       };
 
@@ -549,7 +560,7 @@
         canvas.elt.tabIndex = 0;
         canvas.elt.addEventListener("click", () => canvas.elt.focus());
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
+        p.textFont("DM Sans, system-ui, sans-serif");
       };
 
       p.windowResized = () => resizeToHolder();
@@ -562,7 +573,8 @@
       };
 
       p.keyPressed = () => {
-        registerKey(p.key === " " ? "space" : p.key);
+        const keyName = p.keyCode === p.ESCAPE ? "Escape" : (p.key === " " ? "space" : p.key);
+        registerKey(keyName);
         return false;
       };
 
@@ -696,27 +708,50 @@
 
       function drawStateMode() {
         const s = drawStage();
-        const colors = { calm:"#0891b2", active:"#f59e0b", surprised:"#e11d48" };
-        const color = colors[state.sketchState];
         p.push();
-        p.noStroke();
-        p.fill(color);
-        p.circle(s.x + s.w * 0.62, s.y + s.h * 0.50, 150);
-        p.fill("#ffffff");
-        p.circle(s.x + s.w * 0.58, s.y + s.h * 0.45, 22);
-        p.circle(s.x + s.w * 0.66, s.y + s.h * 0.45, 22);
-        p.fill("#222222");
-        p.circle(s.x + s.w * 0.58, s.y + s.h * 0.45, 9);
-        p.circle(s.x + s.w * 0.66, s.y + s.h * 0.45, 9);
-        p.noFill();
-        p.stroke("#ffffff");
-        p.strokeWeight(4);
-        const mouthY = state.sketchState === "surprised" ? s.y + s.h * 0.56 : s.y + s.h * 0.58;
-        if (state.sketchState === "surprised") p.circle(s.x + s.w * 0.62, mouthY, 30);
-        else p.arc(s.x + s.w * 0.62, mouthY, 58, 36, 0, p.PI);
-        if (state.showLabels) {
-          drawLabel(`mood = "${state.sketchState}"`, s.x + 28, s.y + 46, color, 15);
-          drawLabel("click or press a key to change state", s.x + 28, s.y + 78, "#6b6258", 13);
+        if (state.gameState === "title") {
+          p.fill("#fffdf8");
+          p.stroke("#c8391d");
+          p.strokeWeight(3);
+          p.rect(s.x + s.w * 0.16, s.y + s.h * 0.16, s.w * 0.68, s.h * 0.52, 28);
+          p.noStroke();
+          p.fill("#201c1a");
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textStyle(p.BOLD);
+          p.textSize(34);
+          p.text("Title Screen", s.x + s.w * 0.5, s.y + s.h * 0.33);
+          p.textStyle(p.NORMAL);
+          p.textSize(17);
+          p.fill("#5c5751");
+          p.text("Press any key to start the sketch", s.x + s.w * 0.5, s.y + s.h * 0.46);
+          p.text("Press Escape later to come back here", s.x + s.w * 0.5, s.y + s.h * 0.54);
+          if (state.showLabels) {
+            drawLabel('gameState = "title"', s.x + 28, s.y + 46, "#c8391d", 15);
+            drawLabel("A key event changes the state variable.", s.x + 28, s.y + 78, "#5c5751", 13);
+          }
+        } else {
+          p.noStroke();
+          p.fill(255, 244, 224);
+          p.rect(s.x + 18, s.y + 18, s.w - 36, s.h - 36, 24);
+          for (const mark of state.playMarks) {
+            p.fill(124, 58, 237, 190);
+            p.circle(mark.x, mark.y, mark.size);
+          }
+          p.fill("#16a34a");
+          p.circle(state.pointerX, state.pointerY, state.size * 0.7);
+          p.fill("#201c1a");
+          p.textAlign(p.LEFT, p.TOP);
+          p.textStyle(p.BOLD);
+          p.textSize(16);
+          p.text("PLAY", s.x + 34, s.y + 34);
+          p.textStyle(p.NORMAL);
+          p.textSize(14);
+          p.fill("#5c5751");
+          p.text("Click to place marks. Press Escape to return to title.", s.x + 34, s.y + 58);
+          if (state.showLabels) {
+            drawLabel('gameState = "play"', s.x + 28, s.y + 46, "#16a34a", 15);
+            drawLabel(`marks = ${state.playMarks.length}`, s.x + 28, s.y + 78, "#5c5751", 13);
+          }
         }
         p.pop();
       }

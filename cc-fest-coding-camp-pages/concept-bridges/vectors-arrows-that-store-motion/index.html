@@ -251,6 +251,7 @@
     @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
     @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
   </style>
+  <link rel="stylesheet" href="../concept-bridge.css" />
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -541,7 +542,7 @@
         canvas.elt.setAttribute("role", "img");
         canvas.elt.setAttribute("aria-label", "Interactive visualization of vectors, position, velocity, acceleration, and steering in p5.js.");
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
+        p.textFont("DM Sans, system-ui, sans-serif");
       };
 
       p.windowResized = () => resizeToHolder();

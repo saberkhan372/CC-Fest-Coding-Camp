@@ -282,6 +282,7 @@
       .workspace { height: 540px; }
     }
   </style>
+  <link rel="stylesheet" href="../concept-bridge.css" />
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -625,7 +626,7 @@ let b = blue(c);</code></pre>
         canvas.elt.setAttribute("role", "img");
         canvas.elt.setAttribute("aria-label", "Interactive visualization of images as grids of RGB pixel data in p5.js.");
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
+        p.textFont("DM Sans, system-ui, sans-serif");
       };
 
       p.windowResized = () => resizeToHolder();

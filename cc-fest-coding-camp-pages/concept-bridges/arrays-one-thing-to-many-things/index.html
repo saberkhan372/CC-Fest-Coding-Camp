@@ -279,6 +279,7 @@
       .workspace { height: 540px; }
     }
   </style>
+  <link rel="stylesheet" href="../concept-bridge.css" />
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -294,9 +295,9 @@
   <main>
     <section class="controls" aria-label="Explorer controls">
       <div class="row">
-        <button id="mode-one" class="active">One Thing</button>
+        <button id="mode-spotlight" class="active">Spotlight Index</button>
+        <button id="mode-one">One Thing</button>
         <button id="mode-separate">Separate Variables</button>
-        <button id="mode-array">Array List</button>
         <button id="mode-loop">Loop Draws Array</button>
         <button id="mode-objects">Array of Objects</button>
         <button id="shuffle-button">Shuffle</button>
@@ -385,7 +386,7 @@
 
   <script>
     const state = {
-      mode: "one",
+      mode: "spotlight",
       count: 6,
       selectedIndex: 2,
       speed: 1.4,
@@ -401,9 +402,9 @@
     const els = {};
 
     function setupUI() {
+      els.modeSpotlight = document.querySelector("#mode-spotlight");
       els.modeOne = document.querySelector("#mode-one");
       els.modeSeparate = document.querySelector("#mode-separate");
-      els.modeArray = document.querySelector("#mode-array");
       els.modeLoop = document.querySelector("#mode-loop");
       els.modeObjects = document.querySelector("#mode-objects");
       els.shuffleButton = document.querySelector("#shuffle-button");
@@ -429,9 +430,9 @@
       els.codeCard = document.querySelector("#code-card");
       els.codeBox = document.querySelector("#code-box");
 
+      els.modeSpotlight.addEventListener("click", () => setMode("spotlight"));
       els.modeOne.addEventListener("click", () => setMode("one"));
       els.modeSeparate.addEventListener("click", () => setMode("separate"));
-      els.modeArray.addEventListener("click", () => setMode("array"));
       els.modeLoop.addEventListener("click", () => setMode("loop"));
       els.modeObjects.addEventListener("click", () => setMode("objects"));
 
@@ -537,9 +538,9 @@
 
     function updateUI() {
       const buttons = [
+        [els.modeSpotlight, "spotlight"],
         [els.modeOne, "one"],
         [els.modeSeparate, "separate"],
-        [els.modeArray, "array"],
         [els.modeLoop, "loop"],
         [els.modeObjects, "objects"]
       ];
@@ -564,6 +565,15 @@
       const selectedValue = state.values[state.selectedIndex];
 
       const lessons = {
+        spotlight: {
+          pill: "an index spotlights one item in the array",
+          title: "An index points at one thing inside many things",
+          text: "Think of the index like a spotlight. It lands on one cell in the array, and the sketch uses that one value. Move the slider or hover over a cell to change which item is selected.",
+          formula: `let sizes = ${arrayPreview};\nlet selected = sizes[${state.selectedIndex}];`,
+          question: "Which array cell is selected right now? Try hovering over a different cell to move the spotlight.",
+          caption: `Hover over the array row or drag the index slider. The spotlight jumps to sizes[${state.selectedIndex}] = ${selectedValue}.`,
+          code: `let sizes = ${arrayPreview};\n\nlet selected = sizes[${state.selectedIndex}];\ncircle(width / 2, height / 2, selected);`
+        },
         one: {
           pill: "one variable holds one value",
           title: "One variable holds one value",
@@ -581,15 +591,6 @@
           question: "Why is this annoying if you want to add one more circle?",
           caption: "Separate variables create repeated code. Arrays help the code scale up.",
           code: `let size1 = ${state.values[0]};\nlet size2 = ${state.values[1] || 50};\nlet size3 = ${state.values[2] || 50};\n\nfunction draw() {\n  circle(120, 200, size1);\n  circle(220, 200, size2);\n  circle(320, 200, size3);\n}`
-        },
-        array: {
-          pill: "one variable can hold many values",
-          title: "An array is one name for many values",
-          text: "An array stores a list. Each item has an index. JavaScript arrays start counting indexes at 0.",
-          formula: `let sizes = ${arrayPreview};\nsizes[${state.selectedIndex}] = ${selectedValue};`,
-          question: "Why is the first item at index 0 instead of index 1?",
-          caption: `The selected item is sizes[${state.selectedIndex}], which currently stores ${selectedValue}.`,
-          code: `let sizes = ${arrayPreview};\n\nlet selected = sizes[${state.selectedIndex}];\ncircle(width / 2, height / 2, selected);`
         },
         loop: {
           pill: "a loop visits every item",
@@ -637,7 +638,7 @@
         canvas.elt.setAttribute("role", "img");
         canvas.elt.setAttribute("aria-label", "Interactive visualization of arrays, indexes, loops, and arrays of objects in p5.js.");
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
+        p.textFont("DM Sans, system-ui, sans-serif");
       };
 
       p.windowResized = () => resizeToHolder();
@@ -649,9 +650,9 @@
         drawSubtleGrid();
         drawPanelTitle();
 
+        if (state.mode === "spotlight") drawSpotlightMode();
         if (state.mode === "one") drawOneMode();
         if (state.mode === "separate") drawSeparateMode();
-        if (state.mode === "array") drawArrayMode();
         if (state.mode === "loop") drawLoopMode();
         if (state.mode === "objects") drawObjectsMode();
 
@@ -673,7 +674,11 @@
         if (!state.animate) return;
         const interval = 620 / Math.max(0.2, state.speed);
         if (p.millis() - state.lastLoopStep > interval) {
-          state.loopCursor = (state.loopCursor + 1) % state.count;
+          if (state.mode === "spotlight") {
+            state.selectedIndex = (state.selectedIndex + 1) % state.count;
+          } else {
+            state.loopCursor = (state.loopCursor + 1) % state.count;
+          }
           state.lastLoopStep = p.millis();
         }
       }
@@ -689,9 +694,9 @@
 
       function drawPanelTitle() {
         const titles = {
+          spotlight: ["Spotlight Index", "An index selects one value from the array."],
           one: ["One Thing", "A single variable can remember one value."],
           separate: ["Separate Variables", "Multiple variables work, but they do not scale well."],
-          array: ["Array List", "One variable can hold many indexed values."],
           loop: ["Loop Draws Array", "A loop visits every item in the array."],
           objects: ["Array of Objects", "Each item can carry multiple properties."]
         };
@@ -747,9 +752,10 @@
         p.pop();
       }
 
-      function drawArrayMode() {
+      function drawSpotlightMode() {
         drawPanel(p.width * 0.08, p.height * 0.15, p.width * 0.84, p.height * 0.50);
-        drawArrayCells(p.width * 0.12, p.height * 0.28, p.width * 0.76, 92, state.selectedIndex, false);
+        const bounds = drawArrayCells(p.width * 0.12, p.height * 0.28, p.width * 0.76, 92, state.selectedIndex, false);
+        updateSpotlightFromPointer(bounds);
 
         const selectedValue = state.values[state.selectedIndex];
         const x = p.width * 0.50;
@@ -760,7 +766,8 @@
         p.circle(x, y, selectedValue * 0.8);
         if (state.showLabels) {
           drawLabel(`sizes[${state.selectedIndex}] = ${selectedValue}`, x - 62, y + selectedValue * 0.40 + 28, "#e11d48", 15);
-          drawLabel("index selects one item from the array", p.width * 0.12, p.height * 0.22, "#6b6258", 14);
+          drawLabel("The spotlight shows which one item the sketch is reading.", p.width * 0.12, p.height * 0.22, "#6b6258", 14);
+          drawLabel("Hover over a cell to move the spotlight manually.", p.width * 0.12, p.height * 0.63, "#e11d48", 13);
         }
         p.pop();
       }
@@ -846,6 +853,30 @@
         }
         if (state.showLabels) drawLabel("sizes", startX - 52, y + 50, "#7c3aed", 14);
         p.pop();
+        return { startX, y, cellW, h, gap };
+      }
+
+      function updateSpotlightFromPointer(bounds) {
+        const inside =
+          p.mouseX >= bounds.startX &&
+          p.mouseX <= bounds.startX + bounds.cellW * state.count + bounds.gap * (state.count - 1) &&
+          p.mouseY >= bounds.y &&
+          p.mouseY <= bounds.y + bounds.h;
+
+        if (!inside) return;
+
+        const rawIndex = Math.floor((p.mouseX - bounds.startX) / (bounds.cellW + bounds.gap));
+        const cellLeft = bounds.startX + rawIndex * (bounds.cellW + bounds.gap);
+        const cellRight = cellLeft + bounds.cellW;
+
+        if (
+          rawIndex >= 0 &&
+          rawIndex < state.count &&
+          p.mouseX >= cellLeft &&
+          p.mouseX <= cellRight
+        ) {
+          state.selectedIndex = rawIndex;
+        }
       }
 
       function getRowPositions(count, left, right, y) {
