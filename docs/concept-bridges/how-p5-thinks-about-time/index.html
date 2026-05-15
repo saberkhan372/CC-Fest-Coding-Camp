@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -287,6 +287,7 @@
       .workspace { height: 540px; }
     }
   </style>
+  <link rel="stylesheet" href="../../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -308,8 +309,10 @@
         <button id="mode-framecount">frameCount</button>
         <button id="mode-framerate">frameRate()</button>
         <button id="mode-trails">Trails</button>
+        <button id="mode-slowmo">Slow-Mo Frame</button>
         <button id="play-button">⏸ Pause</button>
         <button id="reset-button">Reset</button>
+        <button id="step-button" style="display:none;">Step manually</button>
         <span id="mode-pill" class="pill">setup once → draw again and again</span>
       </div>
 
@@ -407,7 +410,15 @@ function draw() {
       ballX: 0,
       trail: [],
       setupPulse: 1,
-      drawPulse: 0
+      drawPulse: 0,
+      // Slow-Mo Frame mode
+      slowmoFrameN: 0,
+      slowmoStepN: 0,
+      slowmoTotalSteps: 5, // background + 4 shapes
+      slowmoLastFrameTime: 0,
+      slowmoLastStepTime: 0,
+      slowmoManual: false,
+      slowmoNeedsAdvance: false
     };
 
     const els = {};
@@ -418,8 +429,10 @@ function draw() {
       els.modeFramecount = document.querySelector("#mode-framecount");
       els.modeFramerate = document.querySelector("#mode-framerate");
       els.modeTrails = document.querySelector("#mode-trails");
+      els.modeSlowmo = document.querySelector("#mode-slowmo");
       els.playButton = document.querySelector("#play-button");
       els.resetButton = document.querySelector("#reset-button");
+      els.stepButton = document.querySelector("#step-button");
       els.modePill = document.querySelector("#mode-pill");
       els.fpsSlider = document.querySelector("#fps-slider");
       els.fpsValue = document.querySelector("#fps-value");
@@ -441,10 +454,22 @@ function draw() {
       els.modeFramecount.addEventListener("click", () => setMode("framecount"));
       els.modeFramerate.addEventListener("click", () => setMode("framerate"));
       els.modeTrails.addEventListener("click", () => setMode("trails"));
+      els.modeSlowmo.addEventListener("click", () => setMode("slowmo"));
 
       els.playButton.addEventListener("click", () => {
-        state.running = !state.running;
-        updateUI();
+        if (state.mode === "slowmo") {
+          state.slowmoManual = !state.slowmoManual;
+          updateUI();
+        } else {
+          state.running = !state.running;
+          updateUI();
+        }
+      });
+
+      els.stepButton.addEventListener("click", () => {
+        if (state.mode === "slowmo" && state.slowmoManual) {
+          state.slowmoNeedsAdvance = true;
+        }
       });
 
       els.resetButton.addEventListener("click", () => resetSketchTime());
@@ -482,6 +507,17 @@ function draw() {
       state.mode = mode;
       if (mode === "trails" && state.fade === 255) state.fade = 26;
       if (mode !== "trails" && state.fade < 90) state.fade = 255;
+      if (mode === "slowmo") {
+        state.slowmoFrameN = 0;
+        state.slowmoStepN = 0;
+        state.slowmoManual = false;
+        state.slowmoNeedsAdvance = false;
+        state.slowmoLastFrameTime = 0;
+        state.slowmoLastStepTime = 0;
+        state.running = false;
+      } else {
+        state.running = true;
+      }
       resetSketchTime(false);
       updateUI();
     }
@@ -504,14 +540,23 @@ function draw() {
         [els.modeLoop, "loop"],
         [els.modeFramecount, "framecount"],
         [els.modeFramerate, "framerate"],
-        [els.modeTrails, "trails"]
+        [els.modeTrails, "trails"],
+        [els.modeSlowmo, "slowmo"]
       ];
 
       for (const [button, mode] of buttons) {
         button.classList.toggle("active", state.mode === mode);
       }
 
-      els.playButton.textContent = state.running ? "⏸ Pause" : "▶ Play";
+      if (state.mode === "slowmo") {
+        els.playButton.textContent = state.slowmoManual ? "▶ Auto-advance" : "⏸ Step manually";
+        if (els.stepButton) {
+          els.stepButton.style.display = state.slowmoManual ? "inline-block" : "none";
+        }
+      } else {
+        els.playButton.textContent = state.running ? "⏸ Pause" : "▶ Play";
+        if (els.stepButton) els.stepButton.style.display = "none";
+      }
       els.fpsSlider.value = state.targetFPS;
       els.fpsValue.textContent = `${state.targetFPS} fps`;
       els.fadeSlider.value = state.fade;
@@ -565,6 +610,15 @@ function draw() {
           question: "What happens when the background fade is low? What happens when it is 255?",
           caption: "A trail appears when old frames are only partly erased. Lower background fade means longer memory.",
           code: `function draw() {\n  background(255, 250, 242, 30);\n  circle(x, y, 30);\n\n  x = x + 2;\n}`
+        },
+        slowmo: {
+          pill: "watch draw() execute step by step",
+          title: "Slow-Mo Frame: see each draw() step.",
+          text: "Each frame, draw() runs through its instructions in order. Background clears first, then shapes appear one by one. Use Step manually to click through at your own pace.",
+          formula: "draw() runs top to bottom, one call at a time",
+          question: "Which instruction runs first: background() or the circles? What would happen if the order changed?",
+          caption: "In Slow-Mo mode, you see background() fire first (canvas flashes), then each shape appears with a scan-line showing where draw() is working.",
+          code: `function draw() {\n  background(255, 250, 242); // step 1\n  circle(200, 200, 60);     // step 2\n  rect(300, 150, 80, 50);   // step 3\n  circle(x, 300, 40);       // step 4\n  // x changes here         // step 5\n  x += 3;\n}`
         }
       };
 
@@ -606,10 +660,13 @@ function draw() {
 
       p.draw = () => {
         resizeToHolder();
-        const shouldStep = state.running && p.millis() - lastStepTime >= 1000 / state.targetFPS;
-        if (shouldStep) {
-          stepTime();
-          lastStepTime = p.millis();
+        let shouldStep = false;
+        if (state.mode !== "slowmo") {
+          shouldStep = state.running && p.millis() - lastStepTime >= 1000 / state.targetFPS;
+          if (shouldStep) {
+            stepTime();
+            lastStepTime = p.millis();
+          }
         }
 
         drawScene(shouldStep);
@@ -664,6 +721,7 @@ function draw() {
         if (state.mode === "framecount") drawFrameCountMode();
         if (state.mode === "framerate") drawFrameRateMode();
         if (state.mode === "trails") drawTrailsMode();
+        if (state.mode === "slowmo") drawSlowMoMode();
 
         state.drawPulse = Math.max(0, state.drawPulse - 0.08);
       }
@@ -754,6 +812,194 @@ function draw() {
         drawPanelTitle("Trails", "Old frames remain visible when the background does not fully erase them.");
         drawTrailExplanation();
         drawStatusCards();
+      }
+
+      function drawSlowMoMode() {
+        const now = p.millis();
+        const FRAME_INTERVAL = 1000; // 1 fps = 1000ms per frame
+        const STEP_INTERVAL = 220;   // 220ms between steps within a frame
+
+        // Advance logic
+        if (state.slowmoManual) {
+          if (state.slowmoNeedsAdvance) {
+            state.slowmoNeedsAdvance = false;
+            advanceSlowmoStep();
+          }
+        } else {
+          // Auto advance: step every STEP_INTERVAL ms
+          if (now - state.slowmoLastStepTime >= STEP_INTERVAL) {
+            state.slowmoLastStepTime = now;
+            advanceSlowmoStep();
+          }
+        }
+
+        // Render
+        p.background(255, 250, 242);
+        drawSubtleGrid();
+        drawPanelTitle("Slow-Mo Frame", "Watch draw() execute one step at a time at 1 fps.");
+
+        const step = state.slowmoStepN;
+        const totalSteps = state.slowmoTotalSteps;
+        const frameN = state.slowmoFrameN;
+
+        // Stage area
+        const sx = p.width * 0.09;
+        const sy = p.height * 0.16;
+        const sw = p.width * 0.82;
+        const sh = p.height * 0.50;
+
+        // Step 0: background() flashes
+        if (step === 0) {
+          // Flash: fill with background color bright
+          p.push();
+          p.noStroke();
+          p.fill(255, 245, 200, 200); // warm flash
+          p.rect(sx, sy, sw, sh, 24);
+          p.stroke("#f59e0b");
+          p.strokeWeight(3);
+          p.noFill();
+          p.rect(sx, sy, sw, sh, 24);
+          p.noStroke();
+          p.fill("#f59e0b");
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textStyle(p.BOLD);
+          p.textSize(20);
+          p.text("background() fires!", sx + sw / 2, sy + sh / 2 - 14);
+          p.textStyle(p.NORMAL);
+          p.textSize(14);
+          p.fill("#6b6258");
+          p.text("canvas is cleared to background color", sx + sw / 2, sy + sh / 2 + 18);
+          p.pop();
+        } else {
+          // Show canvas (cleared)
+          p.push();
+          p.noStroke();
+          p.fill(255, 255, 255, 232);
+          p.rect(sx, sy, sw, sh, 24);
+          p.pop();
+
+          // Animating ball x
+          const bx = p.lerp(sx + 50, sx + sw - 50, (frameN % 6) / 5.0);
+          const by = sy + sh * 0.40;
+          const r = sy + sh * 0.70;
+
+          // Draw elements up to current step
+          if (step >= 1) {
+            // circle 1: static
+            p.push();
+            p.noStroke();
+            p.fill(37, 99, 235, 220);
+            p.circle(sx + sw * 0.25, by, 58);
+            if (state.showLabels && step === 1) drawScanLine(sx, sy + sh * 0.40, sw, sx + sw * 0.25, by, "circle(200, 200, 58)", "#2563eb");
+            p.pop();
+          }
+
+          if (step >= 2) {
+            // rect
+            p.push();
+            p.noStroke();
+            p.fill(245, 158, 11, 220);
+            p.rectMode(p.CENTER);
+            p.rect(sx + sw * 0.55, by - 14, 90, 54, 10);
+            if (state.showLabels && step === 2) drawScanLine(sx, sy + sh * 0.40, sw, sx + sw * 0.55, by - 14, "rect(300, 180, 90, 54)", "#f59e0b");
+            p.pop();
+          }
+
+          if (step >= 3) {
+            // moving circle (x changes per frame)
+            p.push();
+            p.noStroke();
+            p.fill(225, 29, 72, 220);
+            p.circle(bx, r, 42);
+            if (state.showLabels && step === 3) drawScanLine(sx, r, sw, bx, r, `circle(x, 300, 42)  x=${Math.round(bx)}`, "#e11d48");
+            p.pop();
+          }
+
+          if (step >= 4) {
+            // x update label
+            if (state.showLabels) {
+              p.push();
+              p.noStroke();
+              p.fill(22, 163, 74, 200);
+              p.rectMode(p.CENTER);
+              p.rect(sx + sw * 0.55, sy + sh - 36, 220, 34, 14);
+              p.fill(255);
+              p.textStyle(p.BOLD);
+              p.textSize(14);
+              p.textAlign(p.CENTER, p.CENTER);
+              p.text("x += 3  ← variable updated", sx + sw * 0.55, sy + sh - 36);
+              p.pop();
+            }
+          }
+        }
+
+        // Scan-line at current active step
+        if (step > 0 && step < totalSteps) {
+          // Light scan-line across the whole stage
+          const scanY = sy + (step / totalSteps) * sh;
+          p.push();
+          p.noStroke();
+          p.fill(225, 29, 72, 28);
+          p.rect(sx, scanY - 6, sw, 12);
+          p.stroke(225, 29, 72, 90);
+          p.strokeWeight(2);
+          p.drawingContext.setLineDash([6, 6]);
+          p.line(sx, scanY, sx + sw, scanY);
+          p.drawingContext.setLineDash([]);
+          p.pop();
+        }
+
+        // Frame/step counter
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rectMode(p.CORNER);
+        p.rect(sx + sw - 210, sy + 14, 196, 48, 14);
+        p.fill("#e11d48");
+        p.textStyle(p.BOLD);
+        p.textSize(14);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.text(`Frame ${frameN + 1}  —  Step ${step}/${totalSteps - 1}`, sx + sw - 200, sy + 34);
+        p.textStyle(p.NORMAL);
+        p.textSize(12);
+        p.fill("#6b6258");
+        p.text(step === 0 ? "background()" : step === 1 ? "circle(...) — shape 1" : step === 2 ? "rect(...) — shape 2" : step === 3 ? "circle(x,...) — moving shape" : "x += 3 — update", sx + sw - 200, sy + 54);
+        p.pop();
+
+        // Mode label
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 220);
+        p.rectMode(p.CORNER);
+        p.rect(sx, sy + sh + 14, sw, 50, 14);
+        p.fill(state.slowmoManual ? "#7c3aed" : "#0891b2");
+        p.textStyle(p.BOLD);
+        p.textSize(13);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.text(state.slowmoManual ? "Manual mode: click \"Step manually\" to advance" : "Auto mode: stepping every 220ms — click \"Step manually\" to take control", sx + 14, sy + sh + 42);
+        p.pop();
+
+        drawStatusCards();
+      }
+
+      function advanceSlowmoStep() {
+        state.slowmoStepN += 1;
+        if (state.slowmoStepN >= state.slowmoTotalSteps) {
+          state.slowmoStepN = 0;
+          state.slowmoFrameN += 1;
+        }
+      }
+
+      function drawScanLine(sx, y, sw, labelX, labelY, funcText, color) {
+        p.push();
+        p.noFill();
+        p.stroke(color);
+        p.strokeWeight(2.5);
+        p.drawingContext.setLineDash([4, 6]);
+        p.line(sx, y, sx + sw, y);
+        p.drawingContext.setLineDash([]);
+        drawLabel(funcText, labelX + 30, labelY - 28, color, 13);
+        p.pop();
       }
 
       function drawMotionStage() {

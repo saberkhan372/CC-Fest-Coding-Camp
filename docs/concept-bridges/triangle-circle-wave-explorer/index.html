@@ -30,7 +30,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -335,6 +335,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="../../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -394,6 +395,18 @@
         <label class="toggle-label"><input id="show-trace" type="checkbox" checked />Trace waves</label>
         <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
       </div>
+
+      <div id="wave-controls" class="control-row" style="display:none;">
+        <button id="record-button">⏺ Record</button>
+        <button id="show-snippet-button">Show Code</button>
+        <div class="slider-wrap">
+          <label for="wave-speed-slider">Wave speed</label>
+          <input id="wave-speed-slider" type="range" min="0.01" max="0.15" value="0.05" step="0.005" />
+          <span id="wave-speed-value" class="slider-value">0.05</span>
+        </div>
+      </div>
+
+      <div id="wave-snippet-box" style="display:none; margin-top: 4px; padding: 12px; background: #111827; color: #e5e7eb; border-radius: 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap;"></div>
     </section>
 
     <section class="workspace">
@@ -460,7 +473,14 @@ let y = centerY - sin(angle) * radius;</code></pre>
       showCosine: true,
       showTrace: true,
       showCode: false,
-      waveHistory: []
+      waveHistory: [],
+      // Wave Record mode
+      recording: false,
+      recordDone: false,
+      recordAngle: 0,
+      recordPoints: [],
+      waveSpeed: 0.05,
+      showSnippet: false
     };
 
     const els = {};
@@ -555,13 +575,65 @@ let y = centerY - sin(angle) * radius;</code></pre>
         updateUI();
       });
 
+      // Wave Record controls
+      els.recordButton = document.querySelector("#record-button");
+      els.showSnippetButton = document.querySelector("#show-snippet-button");
+      els.waveSpeedSlider = document.querySelector("#wave-speed-slider");
+      els.waveSpeedValue = document.querySelector("#wave-speed-value");
+      els.waveControls = document.querySelector("#wave-controls");
+      els.waveSnippetBox = document.querySelector("#wave-snippet-box");
+
+      els.recordButton.addEventListener("click", () => {
+        if (state.recording) {
+          // Stop early
+          state.recording = false;
+          state.recordDone = true;
+          els.recordButton.textContent = "⏺ Record";
+          updateSnippet();
+        } else {
+          state.recording = true;
+          state.recordDone = false;
+          state.recordAngle = 0;
+          state.recordPoints = [];
+          state.playing = false;
+          els.playButton.textContent = "▶ Play";
+          els.recordButton.textContent = "⏹ Stop";
+        }
+      });
+
+      els.showSnippetButton.addEventListener("click", () => {
+        state.showSnippet = !state.showSnippet;
+        els.waveSnippetBox.style.display = state.showSnippet ? "block" : "none";
+        els.showSnippetButton.textContent = state.showSnippet ? "Hide Code" : "Show Code";
+        if (state.showSnippet) updateSnippet();
+      });
+
+      els.waveSpeedSlider.addEventListener("input", () => {
+        state.waveSpeed = Number(els.waveSpeedSlider.value);
+        els.waveSpeedValue.textContent = state.waveSpeed.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+        updateSnippet();
+      });
+
       updateUI();
+    }
+
+    function updateSnippet() {
+      if (!els.waveSnippetBox) return;
+      const speed = state.waveSpeed.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+      els.waveSnippetBox.textContent = `let t = 0;\nfunction draw() {\n  let y = sin(t) * radius;\n  circle(x + cos(t)*radius, height/2 + y, 8);\n  t += ${speed};\n}`;
     }
 
     function setMode(mode) {
       const previousMode = state.mode;
       state.mode = mode;
       state.waveHistory = [];
+      // Reset recording state when leaving wave mode
+      if (mode !== "wave") {
+        state.recording = false;
+        state.recordDone = false;
+        state.recordPoints = [];
+        if (els.recordButton) els.recordButton.textContent = "⏺ Record";
+      }
 
       if (mode === "triangle") {
         state.angleDeg = Math.min(Math.max(state.angleDeg, 0), 90);
@@ -618,6 +690,7 @@ let y = centerY - sin(angle) * radius;</code></pre>
       els.speedValue.textContent = `${state.speed.toFixed(1)}×`;
       els.lessonFormula.style.display = state.showFormulas ? "block" : "none";
       els.codeCard.classList.toggle("visible", state.showCode);
+      if (els.waveControls) els.waveControls.style.display = state.mode === "wave" ? "flex" : "none";
       els.showSine.checked = state.showSine;
       els.showCosine.checked = state.showCosine;
 
@@ -750,6 +823,22 @@ let y = centerY - sin(angle) * radius;</code></pre>
       }
 
       function advanceAnimation() {
+        // Handle record animation
+        if (state.mode === "wave" && state.recording) {
+          state.recordAngle += state.waveSpeed;
+          if (state.recordAngle >= Math.PI * 2) {
+            state.recordAngle = Math.PI * 2;
+            state.recording = false;
+            state.recordDone = true;
+            if (els.recordButton) els.recordButton.textContent = "⏺ Record";
+            updateSnippet();
+          }
+          state.angleDeg = (state.recordAngle * 180 / Math.PI) % 360;
+          els.angleSlider.value = state.angleDeg;
+          els.angleValue.textContent = `${Math.round(state.angleDeg)}°`;
+          return;
+        }
+
         if (!state.playing) return;
 
         if (state.mode === "triangle") {
@@ -907,8 +996,82 @@ let y = centerY - sin(angle) * radius;</code></pre>
 
         drawPanelTitle("Wave View", "Record the dot’s height or sideways position over time.", 24, 36);
         drawUnitCircle(wave.center, wave.radius, wave.trig, wave.point, wave.foot, false, false);
-        drawWaveGraph(wave.graph, wave.trig, wave.radius);
-        drawConnectorLines(wave.point, wave.graph, wave.trig);
+
+        if (state.recording || state.recordDone) {
+          drawRecordingWave(wave);
+        } else {
+          drawWaveGraph(wave.graph, wave.trig, wave.radius);
+          drawConnectorLines(wave.point, wave.graph, wave.trig);
+        }
+      }
+
+      function drawRecordingWave(wave) {
+        const graph = wave.graph;
+        const radius = wave.radius;
+        const midY = graph.y + graph.height / 2;
+        const amp = graph.height * 0.35;
+
+        // Collect record point
+        if (state.recording) {
+          state.recordPoints.push({ t: state.recordAngle, sin: wave.trig.sinValue });
+        }
+
+        // Draw graph background
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 232);
+        p.rect(graph.x, graph.y, graph.width, graph.height, 18);
+
+        // Grid
+        p.stroke("#e6dac8");
+        p.strokeWeight(1);
+        for (let i = 0; i <= 4; i++) {
+          const gy = p.map(i, 0, 4, graph.y, graph.y + graph.height);
+          p.line(graph.x + 12, gy, graph.x + graph.width - 12, gy);
+        }
+        p.stroke("#8b7d6c");
+        p.strokeWeight(1.5);
+        p.line(graph.x + 12, midY, graph.x + graph.width - 12, midY);
+
+        // Draw wave so far
+        if (state.recordPoints.length >= 2) {
+          p.noFill();
+          p.stroke("#e11d48");
+          p.strokeWeight(3);
+          p.beginShape();
+          for (let i = 0; i < state.recordPoints.length; i++) {
+            const gx = p.map(state.recordPoints[i].t, 0, Math.PI * 2, graph.x + 24, graph.x + graph.width - 24);
+            const gy = midY - state.recordPoints[i].sin * amp;
+            p.vertex(gx, gy);
+          }
+          p.endShape();
+        }
+
+        // Moving pen dot
+        if (state.recording && state.recordPoints.length > 0) {
+          const last = state.recordPoints[state.recordPoints.length - 1];
+          const penX = p.map(last.t, 0, Math.PI * 2, graph.x + 24, graph.x + graph.width - 24);
+          const penY = midY - last.sin * amp;
+          p.noStroke();
+          p.fill("#e11d48");
+          p.circle(penX, penY, 12);
+          // Connector dashed line from circle point to pen
+          p.drawingContext.setLineDash([5, 7]);
+          p.stroke("#e11d4888");
+          p.strokeWeight(2);
+          p.line(wave.point.x, wave.point.y, penX, penY);
+          p.drawingContext.setLineDash([]);
+        }
+
+        // Labels
+        if (state.showLabels) {
+          drawLabel(state.recording ? "recording..." : "recording complete", graph.x + 12, graph.y + 22, state.recording ? "#e11d48" : "#16a34a", 13);
+          drawLabel("value", graph.x + 10, graph.y + 42, "#6b6258", 12);
+          drawLabel("0°", graph.x + 24, graph.y + graph.height - 12, "#6b6258", 11);
+          drawLabel("360°", graph.x + graph.width - 40, graph.y + graph.height - 12, "#6b6258", 11);
+        }
+
+        p.pop();
       }
 
       function drawAllTogether() {

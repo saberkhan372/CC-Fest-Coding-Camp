@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -251,6 +251,7 @@
     @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
     @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
   </style>
+  <link rel="stylesheet" href="../../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -557,7 +558,7 @@
       p.windowResized = () => resizeToHolder();
 
       p.mousePressed = () => {
-        if (state.mode !== "game") return;
+        if (state.mode !== "game" && state.mode !== "transitions") return;
         if (state.gameState === "start") startGame();
         else if (state.gameState === "play") {
           const d = p.dist(p.mouseX, p.mouseY, state.targetX, state.targetY);
@@ -597,7 +598,7 @@
       }
 
       function tickTimer() {
-        if (state.mode !== "game" || state.gameState !== "play" || !state.auto) return;
+        if ((state.mode !== "game" && state.mode !== "transitions") || state.gameState !== "play" || !state.auto) return;
         if (p.millis() - state.lastTick > 1000) {
           state.timeLeft = Math.max(0, state.timeLeft - 1);
           state.lastTick = p.millis();
@@ -652,16 +653,131 @@
 
       function drawTransitionsMode() {
         const s = drawStage();
+
+        // Split: left = diagram (60%), right = mini-game (40%)
+        const diagW = s.w * 0.58;
+        const gameX = s.x + diagW + 10;
+        const gameW = s.w - diagW - 14;
+
+        // Mini game (right side) — always visible
+        drawMiniGameInset(gameX, s.y + 8, gameW, s.h - 16);
+
+        // Diagram (left side)
         const nodes = {
-          start: { x:s.x+s.w*0.18, y:s.y+s.h*0.50 },
-          play: { x:s.x+s.w*0.48, y:s.y+s.h*0.50 },
-          win: { x:s.x+s.w*0.78, y:s.y+s.h*0.28 },
-          lose: { x:s.x+s.w*0.78, y:s.y+s.h*0.70 }
+          start: { x:s.x+diagW*0.16, y:s.y+s.h*0.50 },
+          play:  { x:s.x+diagW*0.48, y:s.y+s.h*0.50 },
+          win:   { x:s.x+diagW*0.82, y:s.y+s.h*0.28 },
+          lose:  { x:s.x+diagW*0.82, y:s.y+s.h*0.72 }
         };
-        drawTransitionArrow(nodes.start.x+58, nodes.start.y, nodes.play.x-58, nodes.play.y, "click start", "#f59e0b");
-        drawTransitionArrow(nodes.play.x+58, nodes.play.y-12, nodes.win.x-58, nodes.win.y, `score >= ${state.goal}`, state.score >= state.goal ? "#16a34a" : "#f59e0b");
-        drawTransitionArrow(nodes.play.x+58, nodes.play.y+12, nodes.lose.x-58, nodes.lose.y, "time <= 0", state.timeLeft <= 0 ? "#e11d48" : "#f59e0b");
-        for (const name of Object.keys(nodes)) drawStateNode(nodes[name].x, nodes[name].y, name, name === state.gameState);
+
+        const scoreClose = state.gameState === "play" && state.score >= state.goal - 1;
+        const timeClose = state.gameState === "play" && state.timeLeft <= 3 && state.timeLeft > 0;
+        const scoreTriggered = state.gameState === "win" || state.score >= state.goal;
+        const timeTriggered = state.gameState === "lose" || state.timeLeft <= 0;
+
+        // Arrows with glow if condition is close or triggered
+        drawTransitionArrowGlow(nodes.start.x+52, nodes.start.y, nodes.play.x-52, nodes.play.y, "click start",
+          state.gameState === "play" || state.gameState === "win" || state.gameState === "lose" ? "#16a34a" : "#f59e0b",
+          state.gameState !== "start");
+        drawTransitionArrowGlow(nodes.play.x+52, nodes.play.y-14, nodes.win.x-52, nodes.win.y, `score >= ${state.goal}`,
+          scoreTriggered ? "#16a34a" : scoreClose ? "#f59e0b" : "#ded2c1",
+          scoreTriggered, scoreClose);
+        drawTransitionArrowGlow(nodes.play.x+52, nodes.play.y+14, nodes.lose.x-52, nodes.lose.y, "time <= 0",
+          timeTriggered ? "#e11d48" : timeClose ? "#f59e0b" : "#ded2c1",
+          timeTriggered, timeClose);
+
+        // Restart arrow (win/lose back to start)
+        if (state.gameState === "win" || state.gameState === "lose") {
+          const fromNode = nodes[state.gameState];
+          drawTransitionArrowGlow(fromNode.x - 32, fromNode.y, nodes.start.x + 32, nodes.start.y + (state.gameState === "win" ? -18 : 18), "click restart", "#7c3aed", true, false);
+        } else {
+          // Show restart arrows dimly (dashed)
+          p.push(); p.stroke("#e8e0d4"); p.strokeWeight(1.5);
+          p.drawingContext.setLineDash([4,4]);
+          p.line(nodes.win.x - 32, nodes.win.y, nodes.start.x + 32, nodes.start.y - 18);
+          p.line(nodes.lose.x - 32, nodes.lose.y, nodes.start.x + 32, nodes.start.y + 18);
+          p.drawingContext.setLineDash([]);
+          p.pop();
+        }
+
+        for (const name of Object.keys(nodes)) {
+          drawStateNodeGlow(nodes[name].x, nodes[name].y, name, name === state.gameState);
+        }
+      }
+
+      function drawMiniGameInset(x, y, w, h) {
+        p.push();
+        p.noStroke(); p.fill(255, 255, 255, 220); p.rect(x, y, w, h, 14);
+        p.stroke("#ded2c1"); p.strokeWeight(1.5); p.noFill(); p.rect(x, y, w, h, 14);
+        p.noStroke();
+
+        if (state.gameState === "start") {
+          p.fill(stateColor("start")); p.rect(x+6, y+6, w-12, h-12, 10);
+          p.fill(255); p.textAlign(p.CENTER, p.CENTER); p.textStyle(p.BOLD); p.textSize(13);
+          p.text("START", x + w/2, y + h/2 - 10);
+          p.textSize(10); p.textStyle(p.NORMAL); p.text("click Start", x+w/2, y+h/2+8);
+        } else if (state.gameState === "play") {
+          p.fill("#e0f2fe"); p.rect(x+6, y+6, w-12, h-12, 10);
+          p.fill("#0891b2"); p.textStyle(p.BOLD); p.textSize(10);
+          p.textAlign(p.LEFT, p.TOP); p.text(`${state.score}/${state.goal}`, x+14, y+14);
+          p.textAlign(p.RIGHT, p.TOP); p.text(`t:${state.timeLeft}`, x+w-14, y+14);
+          // mini target
+          const tx = p.constrain(state.targetX, x+20, x+w-20);
+          const ty = p.constrain(state.targetY, y+30, y+h-20);
+          p.fill("#f59e0b"); p.circle(tx, ty, 22);
+          p.fill("#fff"); p.circle(tx, ty, 7);
+          p.fill("#222"); p.circle(tx, ty, 3);
+        } else if (state.gameState === "win") {
+          p.fill(stateColor("win")); p.rect(x+6, y+6, w-12, h-12, 10);
+          p.fill(255); p.textAlign(p.CENTER, p.CENTER); p.textStyle(p.BOLD); p.textSize(12);
+          p.text("WIN!", x+w/2, y+h/2);
+        } else if (state.gameState === "lose") {
+          p.fill(stateColor("lose")); p.rect(x+6, y+6, w-12, h-12, 10);
+          p.fill(255); p.textAlign(p.CENTER, p.CENTER); p.textStyle(p.BOLD); p.textSize(12);
+          p.text("LOSE", x+w/2, y+h/2);
+        }
+        p.pop();
+      }
+
+      function drawStateNodeGlow(x, y, name, active) {
+        p.push();
+        if (active) {
+          // Glow ring
+          const t = p.millis() / 400;
+          const glowR = 60 + Math.sin(t) * 8;
+          p.noStroke(); p.fill(stateColor(name) + "44");
+          p.circle(x, y, glowR * 2);
+        }
+        p.noStroke(); p.fill(active ? stateColor(name) : "#ffffff");
+        p.circle(x, y, active ? 100 : 84);
+        p.stroke(stateColor(name)); p.strokeWeight(active ? 4 : 2.5); p.noFill();
+        p.circle(x, y, active ? 100 : 84);
+        p.noStroke(); p.fill(active ? "#ffffff" : stateColor(name));
+        p.textAlign(p.CENTER, p.CENTER); p.textStyle(p.BOLD); p.textSize(14);
+        p.text(name, x, y);
+        p.pop();
+      }
+
+      function drawTransitionArrowGlow(x1, y1, x2, y2, label, color, active, pulsing) {
+        p.push();
+        if (active) {
+          // Pulsing glow under the arrow
+          const t = p.millis() / 300;
+          const alpha = pulsing ? Math.round(120 + Math.sin(t) * 80) : 180;
+          p.stroke(color + alpha.toString(16).padStart(2,"0")); p.strokeWeight(active ? 5 : 3);
+          p.line(x1, y1, x2, y2);
+          // Animated dot along arrow
+          if (pulsing) {
+            const frac = (p.millis() / 600) % 1;
+            const dotX = x1 + (x2-x1)*frac; const dotY = y1 + (y2-y1)*frac;
+            p.noStroke(); p.fill(color); p.circle(dotX, dotY, 10);
+          }
+        }
+        p.stroke(color); p.strokeWeight(active ? 3.5 : 1.5); p.line(x1, y1, x2, y2);
+        const a = Math.atan2(y2-y1, x2-x1); p.noStroke(); p.fill(color);
+        p.push(); p.translate(x2, y2); p.rotate(a); p.triangle(0,0,-10,-6,-10,6); p.pop();
+        drawLabel(label, (x1+x2)/2 - 30, (y1+y2)/2 - 14, color, 11);
+        p.pop();
       }
 
       function drawGameMode() {

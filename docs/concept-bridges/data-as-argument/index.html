@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data as Argument: When Numbers Tell Stories</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffaf2;
+      --ink: #222222;
+      --muted: #6b6258;
+      --line: #ded2c1;
+      --accent: #3d5a80;
+      --warm: #c1440e;
+      --gold: #b87333;
+      --shadow: 0 12px 28px rgba(70,50,20,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(200,160,80,0.22), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(180,100,60,0.15), transparent 32rem),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .back-link {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 18px 20px 0;
+      font-size: 14px;
+    }
+    .back-link a { color: #5c5751; text-decoration: none; }
+    .back-link a:hover { text-decoration: underline; }
+
+    header {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 24px 20px 12px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: -0.05em;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1.02rem;
+      color: var(--muted);
+      max-width: 860px;
+      line-height: 1.55;
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 14px 20px 52px;
+      display: grid;
+      gap: 18px;
+    }
+
+    /* Historical section */
+    .historians {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .hist-card {
+      background: rgba(255,250,242,0.94);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .hist-card h2 {
+      font-size: 1.2rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .hist-card .year {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hist-card p {
+      font-size: 0.92rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+    .hist-card p:last-child { margin-bottom: 0; }
+
+    .hist-canvas {
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      background: white;
+      border: 1px solid var(--line);
+    }
+
+    .quote {
+      font-style: italic;
+      border-left: 3px solid var(--gold);
+      padding-left: 12px;
+      color: var(--ink);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* Interactive visualizer */
+    .visualizer-section {
+      background: rgba(255,250,242,0.94);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .visualizer-section h2 {
+      font-size: 1.2rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .visualizer-section > p {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .viz-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .viz-btn {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.1s;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .viz-btn:hover { transform: translateY(-1px); background: #fff7ed; }
+    .viz-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+    .btn-desc {
+      font-size: 0.72rem;
+      opacity: 0.7;
+      font-weight: normal;
+      letter-spacing: 0;
+    }
+    .viz-btn.active .btn-desc { opacity: 0.8; }
+
+    .data-editor {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+
+    .data-editor label {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .data-editor input[type="range"] {
+      width: 90px;
+      accent-color: var(--accent);
+    }
+
+    .data-val {
+      font-family: ui-monospace, monospace;
+      font-size: 0.82rem;
+      color: var(--accent);
+      min-width: 24px;
+      display: inline-block;
+    }
+
+    .viz-canvas-wrap {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: white;
+    }
+
+    /* Insight cards */
+    .insights {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .insight-card {
+      background: rgba(255,250,242,0.94);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .insight-card h3 {
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .insight-card p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .closing {
+      background: linear-gradient(135deg, #2a3f5a, #3d5a80);
+      color: white;
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .closing h2 {
+      font-size: 1.3rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    .closing p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      opacity: 0.88;
+      max-width: 800px;
+    }
+
+    @media (max-width: 800px) {
+      .historians { grid-template-columns: 1fr; }
+      .insights { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      header, main { padding-left: 12px; padding-right: 12px; }
+    }
+  </style>
+  <link rel="stylesheet" href="../../concept-bridge.css">
+</head>
+<body>
+  <div class="back-link">
+    <a href="../../index.html#concept-bridges">← Back to CC Fest Coding Camp</a>
+  </div>
+
+  <header>
+    <h1>Data as Argument: When Numbers Tell Stories</h1>
+    <p class="subtitle">
+      W.E.B. Du Bois and Florence Nightingale showed that data visualization is not neutral —
+      it is a choice about what to show, how to show it, and who it is for.
+      The bar chart exercise is not just syntax. It is a statement.
+    </p>
+  </header>
+
+  <main>
+
+    <!-- Historical examples -->
+    <div class="historians">
+      <div class="hist-card">
+        <div class="hist-canvas">
+          <div id="dubois-canvas"></div>
+        </div>
+        <h2>W.E.B. Du Bois</h2>
+        <div class="year">1900 · Paris Exposition Universelle</div>
+        <p>
+          Du Bois and his students created 63 hand-drawn data visualizations showing the social and economic
+          progress of Black Americans — presented at the 1900 World's Fair in Paris to counter the narrative
+          that Black Americans were incapable of advancement.
+        </p>
+        <p>
+          His charts used bold geometric forms, striking colors, and unconventional layouts — aesthetic choices
+          that made the data impossible to ignore. The visualization was an argument.
+        </p>
+        <p class="quote">
+          "The problem of the twentieth century is the problem of the color line."
+        </p>
+      </div>
+
+      <div class="hist-card">
+        <div class="hist-canvas">
+          <div id="nightingale-canvas"></div>
+        </div>
+        <h2>Florence Nightingale</h2>
+        <div class="year">1858 · Notes on Matters Affecting the Health of the British Army</div>
+        <p>
+          Nightingale invented the polar area diagram (sometimes called a "coxcomb" chart) to show that
+          most British soldiers in the Crimean War were dying from preventable diseases — not battle wounds.
+        </p>
+        <p>
+          She presented this to Parliament not as a statistic but as a visual argument so clear
+          that policy changed: sanitation reform saved thousands of lives.
+        </p>
+        <p class="quote">
+          "To understand God's thoughts, we must study statistics, for these are the measure of his purpose."
+        </p>
+      </div>
+    </div>
+
+    <!-- Interactive visualizer -->
+    <div class="visualizer-section">
+      <h2>Same Data, Different Arguments</h2>
+      <p>
+        Below is a real dataset: survey results from coding campers about how they feel.
+        Switch between chart forms. The numbers don't change. The story does.
+      </p>
+
+        <p style="font-size:0.9rem;color:var(--muted);margin-bottom:10px;">
+        Adjust the sliders to see how the campers' feelings change the chart.
+      </p>
+
+      <div class="data-editor">
+        <label>Excited: <input type="range" id="dA" min="5" max="100" value="72"> <span class="data-val" id="vA">72</span></label>
+        <label>Confident: <input type="range" id="dB" min="5" max="100" value="58"> <span class="data-val" id="vB">58</span></label>
+        <label>Uncertain: <input type="range" id="dC" min="5" max="100" value="35"> <span class="data-val" id="vC">35</span></label>
+        <label>Nervous: <input type="range" id="dD" min="5" max="100" value="21"> <span class="data-val" id="vD">21</span></label>
+      </div>
+
+      <p style="font-size:0.92rem;font-weight:600;color:var(--ink);margin-bottom:8px;margin-top:4px;">
+        What's your argument?
+      </p>
+      <p style="font-size:0.87rem;color:var(--muted);margin-bottom:12px;">
+        Same data, different arguments. Which chart makes YOUR point?
+      </p>
+
+      <div class="viz-controls">
+        <span style="font-size:0.85rem;color:var(--muted);margin-right:4px;">Show as:</span>
+        <button class="viz-btn active" id="vbar"  onclick="setVizMode('bar')" title="Shows exact comparison">Bar Chart <span class="btn-desc">exact comparison</span></button>
+        <button class="viz-btn" id="vpolar" onclick="setVizMode('polar')" title="Emphasizes proportions visually">Polar / Coxcomb <span class="btn-desc">proportions visually</span></button>
+        <button class="viz-btn" id="vdots"  onclick="setVizMode('dots')" title="Shows individual values">Dot Plot <span class="btn-desc">individual values</span></button>
+        <button class="viz-btn" id="vtext"  onclick="setVizMode('text')" title="Removes visual weight">Text Only <span class="btn-desc">no visual bias</span></button>
+        <button class="viz-btn" id="vdubois" onclick="setVizMode('dubois')" title="Bold argument, direct impact">Du Bois Style <span class="btn-desc">bold statement</span></button>
+      </div>
+
+      <div class="viz-canvas-wrap">
+        <div id="viz-canvas"></div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <label for="chart-caption" style="font-size:0.88rem;color:var(--muted);display:block;margin-bottom:6px;">
+          Your caption — write a one-sentence argument for this visualization:
+        </label>
+        <input type="text" id="chart-caption"
+          placeholder='e.g. "Most campers feel excited but uncertainty is real."'
+          value="Most campers feel excited but uncertainty is real."
+          style="width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:999px;font-size:0.92rem;color:var(--ink);background:white;outline:none;font-family:inherit;" />
+        <p id="caption-display" style="margin-top:10px;font-style:italic;font-size:0.93rem;color:var(--accent);padding-left:4px;">
+          "Most campers feel excited but uncertainty is real."
+        </p>
+      </div>
+    </div>
+
+    <!-- Insight panels -->
+    <div class="insights">
+      <div class="insight-card">
+        <h3>What you choose to show</h3>
+        <p>
+          Du Bois chose to show Black prosperity and achievement — data that existed but was rarely visualized.
+          Nightingale chose to show preventable deaths, not total deaths. The selection of what to measure
+          is already an argument.
+        </p>
+      </div>
+      <div class="insight-card">
+        <h3>How you choose to show it</h3>
+        <p>
+          A bar chart emphasizes comparison. A polar diagram emphasizes proportion and cycle.
+          Dots emphasize individuality. Text removes visual weight entirely.
+          Every form shapes what the viewer notices first.
+        </p>
+      </div>
+      <div class="insight-card">
+        <h3>Who you're showing it to</h3>
+        <p>
+          Du Bois addressed the world at a World's Fair. Nightingale addressed Parliament.
+          You address your classroom, your community, your family.
+          The audience shapes what the visualization needs to do.
+        </p>
+      </div>
+    </div>
+
+    <!-- Closing -->
+    <div class="closing">
+      <h2>Why the bar chart exercise matters</h2>
+      <p>
+        When you write <code style="background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:4px;">names[i]</code>
+        and <code style="background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:4px;">values[i]</code>
+        in your Session 4 sketch, you are not just learning syntax.
+        You are learning how to take something you know — a number, a name, a measurement — and make it visible.
+        Du Bois and Nightingale used that same power to change policy, shift perception, and argue for justice.
+        The code is the beginning. What you say with it is the work.
+      </p>
+    </div>
+
+  </main>
+
+  <script>
+    let vizMode = 'bar';
+    let data = [72, 58, 35, 21];
+    const labels = ['Excited', 'Confident', 'Uncertain', 'Nervous'];
+    const colors = ['#3d5a80', '#e07a5f', '#2a9d8f', '#e9c46a'];
+
+    // Sliders
+    ['A','B','C','D'].forEach((l, i) => {
+      document.getElementById(`d${l}`).addEventListener('input', function() {
+        data[i] = Number(this.value);
+        document.getElementById(`v${l}`).textContent = this.value;
+      });
+    });
+
+    // Caption input
+    const captionInput = document.getElementById('chart-caption');
+    const captionDisplay = document.getElementById('caption-display');
+    captionInput.addEventListener('input', function() {
+      captionDisplay.textContent = this.value ? `"${this.value}"` : '';
+    });
+
+    function setVizMode(mode) {
+      vizMode = mode;
+      ['bar','polar','dots','text','dubois'].forEach(m => {
+        document.getElementById('v' + m).className = `viz-btn${m === mode ? ' active' : ''}`;
+      });
+    }
+
+    // Du Bois inspired static illustration
+    const duboisSketch = (p) => {
+      p.setup = () => {
+        const c = p.createCanvas(340, 220);
+        c.parent('dubois-canvas');
+        p.noLoop();
+      };
+      p.draw = () => {
+        p.background(250, 245, 235);
+        // Du Bois style: bold geometric bars, hand-lettered feel
+        const bData = [85, 62, 40, 78, 55, 90, 35];
+        const bLabels = ['1860','1870','1880','1890','1900','1910','1920'];
+        const cols = ['#c1440e','#2a3f5a','#b87333','#c1440e','#2a3f5a','#b87333','#c1440e'];
+        const maxV = 90;
+        const bw = 34;
+        const bx0 = 28;
+        const by0 = 30;
+        const maxH = 140;
+
+        p.fill(45, 35, 25);
+        p.noStroke();
+        p.textSize(9);
+        p.textAlign(p.CENTER);
+        p.textStyle(p.BOLD);
+        p.text('PROPERTY OWNED (ILLUSTRATIVE)', p.width / 2, 18);
+        p.textStyle(p.NORMAL);
+
+        for (let i = 0; i < bData.length; i++) {
+          const h = p.map(bData[i], 0, maxV, 0, maxH);
+          const x = bx0 + i * (bw + 4);
+          p.fill(cols[i]);
+          p.noStroke();
+          p.rect(x, by0 + maxH - h, bw - 6, h);
+          p.fill(60);
+          p.textSize(8);
+          p.textAlign(p.CENTER);
+          p.text(bLabels[i], x + (bw-6)/2, by0 + maxH + 12);
+          p.fill(255);
+          p.textSize(9);
+          p.textStyle(p.BOLD);
+          p.text(bData[i], x + (bw-6)/2, by0 + maxH - h - 5);
+          p.textStyle(p.NORMAL);
+        }
+
+        // Decorative line
+        p.stroke(45, 35, 25);
+        p.strokeWeight(2);
+        p.line(bx0, by0 + maxH, bx0 + 7 * (bw + 4) - 4, by0 + maxH);
+
+        p.noStroke();
+        p.fill(120);
+        p.textSize(8);
+        p.textAlign(p.CENTER);
+        p.text('Inspired by W.E.B. Du Bois, 1900 Paris Exposition', p.width/2, p.height - 8);
+      };
+    };
+
+    // Nightingale polar area illustration
+    const nightingaleSketch = (p) => {
+      p.setup = () => {
+        const c = p.createCanvas(340, 220);
+        c.parent('nightingale-canvas');
+        p.noLoop();
+      };
+      p.draw = () => {
+        p.background(250, 245, 235);
+        const cx = p.width / 2;
+        const cy = 118;
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const disease = [50, 42, 38, 28, 20, 14, 10, 8, 12, 22, 36, 48];
+        const wounds =  [8,  6,  9,  7,  5,  6,  4, 5,  6,  7,  8,  9];
+        const other =   [5,  4,  4,  3,  3,  4,  3, 3,  4,  4,  5,  5];
+        const maxR = 78;
+        const maxVal = 58;
+        const sliceAngle = (2 * Math.PI) / 12;
+
+        p.noStroke();
+        for (let i = 0; i < 12; i++) {
+          const startA = i * sliceAngle - Math.PI / 2;
+          const endA = startA + sliceAngle;
+
+          // disease (outermost)
+          const r1 = p.map(disease[i], 0, maxVal, 0, maxR);
+          p.fill(100, 140, 180, 200);
+          p.arc(cx, cy, r1*2, r1*2, startA, endA, p.PIE);
+
+          // wounds
+          const r2 = p.map(wounds[i], 0, maxVal, 0, maxR);
+          p.fill(180, 60, 40, 200);
+          p.arc(cx, cy, r2*2, r2*2, startA, endA, p.PIE);
+
+          // other
+          const r3 = p.map(other[i], 0, maxVal, 0, maxR);
+          p.fill(60, 150, 100, 200);
+          p.arc(cx, cy, r3*2, r3*2, startA, endA, p.PIE);
+        }
+
+        // Center
+        p.fill(250, 245, 235);
+        p.noStroke();
+        p.circle(cx, cy, 20);
+
+        // Legend
+        const lx = 14;
+        let ly = p.height - 46;
+        [[100,140,180,'Disease (preventable)'], [180,60,40,'Battle wounds'], [60,150,100,'Other causes']].forEach(([r,g,b,label]) => {
+          p.fill(r,g,b); p.rect(lx, ly, 10, 10, 2);
+          p.fill(70); p.textSize(8); p.textAlign(p.LEFT); p.text(label, lx+14, ly+9);
+          ly += 14;
+        });
+
+        p.fill(120); p.textSize(8); p.textAlign(p.CENTER);
+        p.text('Inspired by Nightingale\'s coxcomb diagram, 1858', p.width/2, p.height - 6);
+        p.fill(45,35,25); p.textSize(9); p.textStyle(p.BOLD);
+        p.text('CAUSES OF MORTALITY IN THE ARMY (ILLUSTRATIVE)', cx, 14);
+        p.textStyle(p.NORMAL);
+      };
+    };
+
+    // Main interactive viz sketch
+    const vizSketch = (p) => {
+      p.setup = () => {
+        const c = p.createCanvas(760, 280);
+        c.parent('viz-canvas');
+      };
+
+      p.windowResized = () => {
+        const wrap = document.getElementById('viz-canvas');
+        p.resizeCanvas(Math.max(320, wrap.offsetWidth), 280);
+      };
+
+      p.draw = () => {
+        p.background(255, 252, 248);
+        const mode = vizMode;
+        const d = [...data];
+        const maxD = Math.max(...d);
+
+        if (mode === 'bar') {
+          drawBar(p, d, maxD);
+        } else if (mode === 'polar') {
+          drawPolar(p, d, maxD);
+        } else if (mode === 'dots') {
+          drawDots(p, d, maxD);
+        } else if (mode === 'text') {
+          drawText(p, d);
+        } else if (mode === 'dubois') {
+          drawDubois(p, d, maxD);
+        }
+
+        // Mode label
+        p.noStroke(); p.fill(180); p.textSize(10);
+        p.textAlign(p.RIGHT, p.BOTTOM);
+        p.text(mode.toUpperCase(), p.width - 12, p.height - 8);
+      };
+
+      function drawBar(p, d, maxD) {
+        const bw = Math.min(100, (p.width - 80) / d.length);
+        const bx0 = (p.width - bw * d.length) / 2;
+        const maxH = 200;
+        const baseline = p.height - 36;
+
+        for (let i = 0; i < d.length; i++) {
+          const h = p.map(d[i], 0, maxD, 0, maxH);
+          const x = bx0 + i * bw;
+          p.fill(...hexToRgb(colors[i]), 220);
+          p.noStroke();
+          p.rect(x + 8, baseline - h, bw - 16, h, 4, 4, 0, 0);
+          p.fill(60); p.textSize(13); p.textAlign(p.CENTER);
+          p.text(labels[i], x + bw/2, baseline + 16);
+          p.fill(100); p.textSize(11);
+          p.text(d[i], x + bw/2, baseline - h - 6);
+        }
+        p.stroke(190); p.strokeWeight(1);
+        p.line(bx0 - 10, baseline, bx0 + bw * d.length + 10, baseline);
+        p.noStroke(); p.fill(120); p.textSize(11); p.textAlign(p.CENTER);
+        p.text('Bar chart — comparison of magnitudes', p.width/2, 18);
+      }
+
+      function drawPolar(p, d, maxD) {
+        const cx = p.width / 2, cy = p.height / 2 + 10;
+        const maxR = Math.min(cx, cy) - 28;
+        const sa = (2 * Math.PI) / d.length;
+        p.noStroke();
+        for (let i = 0; i < d.length; i++) {
+          const r = p.map(d[i], 0, maxD, 10, maxR);
+          const startA = i * sa - Math.PI / 2;
+          const endA = startA + sa;
+          const [r2,g2,b2] = hexToRgb(colors[i]);
+          p.fill(r2,g2,b2,200);
+          p.arc(cx, cy, r*2, r*2, startA, endA, p.PIE);
+
+          // label
+          const midA = startA + sa/2;
+          const labelR = r + 18;
+          p.fill(60); p.textSize(13); p.textAlign(p.CENTER, p.CENTER);
+          p.text(labels[i], cx + Math.cos(midA)*labelR, cy + Math.sin(midA)*labelR);
+        }
+        p.fill(255,252,248); p.noStroke(); p.circle(cx, cy, 18);
+        p.noStroke(); p.fill(120); p.textSize(11); p.textAlign(p.CENTER);
+        p.text('Polar / coxcomb — proportion and cycle emphasis', p.width/2, 18);
+      }
+
+      function drawDots(p, d, maxD) {
+        const dotR = 10;
+        const cols2 = d.length;
+        const colW = p.width / cols2;
+        const maxDots = Math.ceil(maxD / 5);
+
+        for (let i = 0; i < d.length; i++) {
+          const x = i * colW + colW/2;
+          const count = Math.round(d[i] / 5);
+          for (let j = 0; j < count; j++) {
+            const y = p.height - 44 - j * (dotR*2 + 3);
+            const [r2,g2,b2] = hexToRgb(colors[i]);
+            p.fill(r2,g2,b2,200); p.noStroke();
+            p.circle(x, y, dotR*2);
+          }
+          p.fill(60); p.textSize(13); p.textAlign(p.CENTER);
+          p.text(labels[i], x, p.height - 20);
+          p.fill(100); p.textSize(10);
+          p.text(d[i], x, p.height - 50 - count*(dotR*2+3));
+        }
+        p.noStroke(); p.fill(120); p.textSize(11); p.textAlign(p.CENTER);
+        p.text('Dot plot — each dot = 5 units, emphasizes individuality', p.width/2, 18);
+      }
+
+      function drawText(p, d) {
+        const total = d.reduce((a,b) => a+b, 0);
+        p.textAlign(p.LEFT, p.TOP);
+        p.fill(60); p.textSize(13);
+        let y = 36;
+        for (let i = 0; i < d.length; i++) {
+          const pct = ((d[i]/total)*100).toFixed(1);
+          p.fill(60); p.textSize(14);
+          p.text(`${labels[i]}: ${d[i]} (${pct}% of total)`, 40, y);
+          y += 36;
+        }
+        p.fill(100); p.textSize(12);
+        p.text(`Total: ${total}`, 40, y + 8);
+        p.noStroke(); p.fill(120); p.textSize(11); p.textAlign(p.CENTER);
+        p.text('Text only — precise but hard to compare quickly', p.width/2, 18);
+      }
+
+      function drawDubois(p, d, maxD) {
+        // Bold Du Bois-inspired geometric bars
+        const bw = Math.min(120, (p.width - 80) / d.length);
+        const bx0 = (p.width - bw * d.length) / 2;
+        const maxH = 190;
+        const baseline = p.height - 36;
+        const dbColors = ['#c1440e','#2a3f5a','#b87333','#c1440e'];
+
+        p.background(248, 243, 230);
+
+        for (let i = 0; i < d.length; i++) {
+          const h = p.map(d[i], 0, maxD, 0, maxH);
+          const x = bx0 + i * bw;
+          p.fill(...hexToRgb(dbColors[i]));
+          p.noStroke();
+          p.rect(x + 10, baseline - h, bw - 20, h);
+          p.fill(248,243,230);
+          p.textSize(11); p.textStyle(p.BOLD); p.textAlign(p.CENTER);
+          p.text(d[i], x + bw/2, baseline - h + 14);
+          p.fill(35,25,15); p.textStyle(p.BOLD); p.textSize(13);
+          p.text(labels[i], x + bw/2, baseline + 16);
+        }
+
+        p.stroke(35,25,15); p.strokeWeight(2);
+        p.line(bx0, baseline, bx0 + bw*d.length, baseline);
+        p.noStroke(); p.fill(35,25,15); p.textStyle(p.BOLD); p.textSize(10);
+        p.textAlign(p.CENTER);
+        p.text('DU BOIS STYLE — BOLD GEOMETRY, DIRECT ARGUMENT', p.width/2, 18);
+        p.textStyle(p.NORMAL);
+      }
+
+      function hexToRgb(hex) {
+        return [
+          parseInt(hex.slice(1,3),16),
+          parseInt(hex.slice(3,5),16),
+          parseInt(hex.slice(5,7),16)
+        ];
+      }
+    };
+
+    new p5(duboisSketch);
+    new p5(nightingaleSketch);
+    new p5(vizSketch);
+  </script>
+</body>
+</html>

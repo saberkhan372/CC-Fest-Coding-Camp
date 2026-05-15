@@ -26,7 +26,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -250,9 +250,83 @@
 
     .note { font-size: 0.86rem; color: var(--muted); }
 
-    @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
-    @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
+    /* ── Mood mode ─────────────────────────────────────────── */
+    #mood-panel {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #mood-panel.visible { display: flex; }
+
+    .mood-prompt {
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .mood-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .mood-tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 10px 6px 8px;
+      border-radius: 16px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      background: white;
+      transition: transform 0.12s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      user-select: none;
+    }
+    .mood-tile:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+    .mood-tile.selected { border-color: var(--ink); box-shadow: 0 4px 18px rgba(0,0,0,0.18); }
+
+    .mood-swatch {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.10);
+      flex-shrink: 0;
+    }
+
+    .mood-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-align: center;
+      color: var(--ink);
+      letter-spacing: 0.01em;
+    }
+
+    .mood-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #capture-mood-btn {
+      display: none;
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+    #capture-mood-btn.visible { display: inline-block; }
+
+    #mood-personal-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } .mood-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } .mood-grid { grid-template-columns: repeat(2, 1fr); } }
   </style>
+  <link rel="stylesheet" href="../../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -274,6 +348,7 @@
         <button id="mode-hsb">HSB</button>
         <button id="mode-alpha">Alpha</button>
         <button id="mode-lerp">Color Blend</button>
+        <button id="mode-mood">Mood</button>
         <button id="reset-button">Reset</button>
         <span id="mode-pill" class="pill">one number controls brightness</span>
       </div>
@@ -310,6 +385,17 @@
         <label class="toggle-label"><input id="show-stroke" type="checkbox" checked />Stroke</label>
         <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
         <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      </div>
+      <!-- Mood panel ─ visible only in Mood mode -->
+      <div id="mood-panel">
+        <p class="mood-prompt">Click a mood to load its color, then adjust the sliders to find <em>your</em> version.</p>
+        <div class="mood-grid" id="mood-grid">
+          <!-- tiles injected by JS -->
+        </div>
+        <div class="mood-actions">
+          <button id="capture-mood-btn">That's my mood color</button>
+          <span id="mood-personal-label"></span>
+        </div>
       </div>
     </section>
 
@@ -365,6 +451,27 @@
   </main>
 
   <script>
+    // ── Mood definitions (HSB: hue 0-360, sat 0-100, bright 0-100) ──
+    const MOODS = [
+      { name:"Calm",      h:210, s:40, b:85 },
+      { name:"Tense",     h:0,   s:70, b:60 },
+      { name:"Joyful",    h:50,  s:85, b:95 },
+      { name:"Melancholy",h:240, s:45, b:45 },
+      { name:"Energetic", h:25,  s:90, b:95 },
+      { name:"Eerie",     h:280, s:60, b:30 },
+      { name:"Peaceful",  h:150, s:35, b:75 },
+      { name:"Fierce",    h:10,  s:95, b:80 }
+    ];
+
+    // Convert HSB (0-360, 0-100, 0-100) to CSS hsl string for tile swatches
+    function hsbToCss(h, s, b) {
+      // HSB → HSL: L = b*(1 - s/200), S_hsl = (b*s/100) / (1 - |2L-1|)
+      const bN = b / 100, sN = s / 100;
+      const L = bN * (1 - sN / 2);
+      const Sl = (L === 0 || L === 1) ? 0 : (bN - L) / Math.min(L, 1 - L);
+      return `hsl(${h},${Math.round(Sl*100)}%,${Math.round(L*100)}%)`;
+    }
+
     const state = {
       mode: "gray",
       a: 180,
@@ -373,7 +480,12 @@
       d: 165,
       showStroke: true,
       showLabels: true,
-      showCode: false
+      showCode: false,
+      // Mood-mode state
+      selectedMood: null,      // index into MOODS, or null
+      canonicalH: 210, canonicalS: 40, canonicalB: 85,
+      personalH: 210, personalS: 40, personalB: 85,
+      capturedH: null, capturedS: null, capturedB: null
     };
 
     const els = {};
@@ -384,7 +496,12 @@
       els.modeHsb = document.querySelector("#mode-hsb");
       els.modeAlpha = document.querySelector("#mode-alpha");
       els.modeLerp = document.querySelector("#mode-lerp");
+      els.modeMood = document.querySelector("#mode-mood");
       els.resetButton = document.querySelector("#reset-button");
+      els.moodPanel = document.querySelector("#mood-panel");
+      els.moodGrid = document.querySelector("#mood-grid");
+      els.captureMoodBtn = document.querySelector("#capture-mood-btn");
+      els.moodPersonalLabel = document.querySelector("#mood-personal-label");
       els.modePill = document.querySelector("#mode-pill");
       els.aSlider = document.querySelector("#a-slider");
       els.bSlider = document.querySelector("#b-slider");
@@ -415,10 +532,36 @@
       els.modeHsb.addEventListener("click", () => setMode("hsb"));
       els.modeAlpha.addEventListener("click", () => setMode("alpha"));
       els.modeLerp.addEventListener("click", () => setMode("lerp"));
+      els.modeMood.addEventListener("click", () => setMode("mood"));
 
-      els.aSlider.addEventListener("input", () => { state.a = Number(els.aSlider.value); updateUI(); });
-      els.bSlider.addEventListener("input", () => { state.b = Number(els.bSlider.value); updateUI(); });
-      els.cSlider.addEventListener("input", () => { state.c = Number(els.cSlider.value); updateUI(); });
+      // Build mood tiles
+      MOODS.forEach((mood, idx) => {
+        const tile = document.createElement("div");
+        tile.className = "mood-tile";
+        tile.dataset.idx = idx;
+        const swatchCss = hsbToCss(mood.h, mood.s, mood.b);
+        tile.innerHTML = `<div class="mood-swatch" style="background:${swatchCss}"></div><span class="mood-name">${mood.name}</span>`;
+        tile.addEventListener("click", () => selectMood(idx));
+        els.moodGrid.appendChild(tile);
+      });
+
+      els.captureMoodBtn.addEventListener("click", captureMoodColor);
+
+      els.aSlider.addEventListener("input", () => {
+        state.a = Number(els.aSlider.value);
+        if (state.mode === "mood") { state.personalH = state.a; state.capturedH = null; }
+        updateUI();
+      });
+      els.bSlider.addEventListener("input", () => {
+        state.b = Number(els.bSlider.value);
+        if (state.mode === "mood") { state.personalS = state.b; state.capturedH = null; }
+        updateUI();
+      });
+      els.cSlider.addEventListener("input", () => {
+        state.c = Number(els.cSlider.value);
+        if (state.mode === "mood") { state.personalB = state.c; state.capturedH = null; }
+        updateUI();
+      });
       els.dSlider.addEventListener("input", () => { state.d = Number(els.dSlider.value); updateUI(); });
 
       els.presetButtons.forEach(button => button.addEventListener("click", () => {
@@ -457,14 +600,40 @@
         state.a = 0;
         state.b = 95;
         state.c = 210;
+      } else if (mode === "mood") {
+        // Default to first mood if none selected yet
+        if (state.selectedMood === null) selectMood(0);
+        else selectMood(state.selectedMood);
+        return; // selectMood calls updateUI
       }
       updateUI();
+    }
+
+    function selectMood(idx) {
+      state.selectedMood = idx;
+      const mood = MOODS[idx];
+      // Snap sliders to canonical mood values
+      state.a = mood.h; state.b = mood.s; state.c = mood.b;
+      state.personalH = mood.h; state.personalS = mood.s; state.personalB = mood.b;
+      state.canonicalH = mood.h; state.canonicalS = mood.s; state.canonicalB = mood.b;
+      state.capturedH = null; // reset any previous capture
+      // Update tile selection styling
+      document.querySelectorAll(".mood-tile").forEach((t, i) => t.classList.toggle("selected", i === idx));
+      updateUI();
+    }
+
+    function captureMoodColor() {
+      state.capturedH = state.personalH;
+      state.capturedS = state.personalS;
+      state.capturedB = state.personalB;
+      const moodName = state.selectedMood !== null ? MOODS[state.selectedMood].name : "mood";
+      els.moodPersonalLabel.textContent = `Saved your ${moodName}: fill(${state.capturedH}, ${state.capturedS}, ${state.capturedB})`;
     }
 
     function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
     function updateSliderRanges() {
-      if (state.mode === "hsb") {
+      if (state.mode === "hsb" || state.mode === "mood") {
         els.aSlider.min = 0; els.aSlider.max = 360; els.aSlider.step = 1;
         els.bSlider.min = 0; els.bSlider.max = 100; els.bSlider.step = 1;
         els.cSlider.min = 0; els.cSlider.max = 100; els.cSlider.step = 1;
@@ -494,19 +663,36 @@
 
     function updateUI() {
       updateSliderRanges();
-      const buttons = [[els.modeGray,"gray"],[els.modeRgb,"rgb"],[els.modeHsb,"hsb"],[els.modeAlpha,"alpha"],[els.modeLerp,"lerp"]];
+      const buttons = [[els.modeGray,"gray"],[els.modeRgb,"rgb"],[els.modeHsb,"hsb"],[els.modeAlpha,"alpha"],[els.modeLerp,"lerp"],[els.modeMood,"mood"]];
       for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
+
+      // Show/hide mood panel
+      els.moodPanel.classList.toggle("visible", state.mode === "mood");
+      if (state.mode === "mood" && state.selectedMood !== null) {
+        const moodName = MOODS[state.selectedMood].name;
+        els.captureMoodBtn.textContent = `That's my ${moodName}`;
+        // Show capture button only once sliders have been adjusted away from canonical
+        const adjusted = state.a !== state.canonicalH || state.b !== state.canonicalS || state.c !== state.canonicalB;
+        els.captureMoodBtn.classList.toggle("visible", adjusted);
+      } else {
+        els.captureMoodBtn.classList.remove("visible");
+      }
 
       const labelSets = {
         gray: ["Gray", "unused", "unused", "Alpha"],
         rgb: ["Red", "Green", "Blue", "Alpha"],
         hsb: ["Hue", "Saturation", "Brightness", "Alpha"],
         alpha: ["Red", "Green", "Blue", "Alpha"],
-        lerp: ["Blend amt", "Start hue", "End hue", "Alpha"]
+        lerp: ["Blend amt", "Start hue", "End hue", "Alpha"],
+        mood: ["Hue", "Saturation", "Brightness", "Alpha"]
       };
       const labels = labelSets[state.mode];
       [els.aLabel, els.bLabel, els.cLabel, els.dLabel].forEach((el, i) => el.textContent = labels[i]);
 
+      // In mood mode, sliders track personal values
+      if (state.mode === "mood") {
+        state.a = state.personalH; state.b = state.personalS; state.c = state.personalB;
+      }
       els.aSlider.value = state.a;
       els.bSlider.value = state.b;
       els.cSlider.value = state.c;
@@ -514,7 +700,7 @@
       els.aValue.textContent = state.mode === "lerp" ? state.a.toFixed(2) : Math.round(state.a);
       els.bValue.textContent = Math.round(state.b);
       els.cValue.textContent = Math.round(state.c);
-      els.dValue.textContent = state.mode === "hsb" ? state.d.toFixed(2) : Math.round(state.d);
+      els.dValue.textContent = (state.mode === "hsb" || state.mode === "mood") ? state.d.toFixed(2) : Math.round(state.d);
       els.showStroke.checked = state.showStroke;
       els.showLabels.checked = state.showLabels;
       els.showCode.checked = state.showCode;
@@ -565,7 +751,20 @@
           question: "Where is the blend amount closest to the first color? Where is it closest to the second?",
           caption: "Interpolation turns color into a smooth transition instead of a hard jump.",
           code: `let c1 = color(240, ${Math.round(state.b)}, 80);\nlet c2 = color(40, 120, ${Math.round(state.c)});\nlet mixed = lerpColor(c1, c2, ${state.a.toFixed(2)});\nfill(mixed);\ncircle(300, 200, 140);`
-        }
+        },
+        mood: (() => {
+          const moodName = state.selectedMood !== null ? MOODS[state.selectedMood].name : "Calm";
+          const pH = Math.round(state.personalH), pS = Math.round(state.personalS), pB = Math.round(state.personalB);
+          return {
+            pill: "color is personal — numbers are a starting point",
+            title: `Mood: ${moodName}`,
+            text: `The numbers ${pH}, ${pS}, ${pB} describe a color in HSB. But what feels "${moodName}" to you might be different. Adjust the sliders and find your own version.`,
+            formula: `colorMode(HSB, 360, 100, 100);\nfill(${pH}, ${pS}, ${pB}); // your ${moodName}`,
+            question: `How does changing saturation or brightness shift the feeling? Can you make "${moodName}" feel more intense?`,
+            caption: "Color is personal. These numbers are just a starting point.",
+            code: `colorMode(HSB, 360, 100, 100);\n// Canonical ${moodName}\nfill(${Math.round(state.canonicalH)}, ${Math.round(state.canonicalS)}, ${Math.round(state.canonicalB)});\nrect(60, 100, 240, 240, 20);\n// Your ${moodName}\nfill(${pH}, ${pS}, ${pB});\nrect(340, 100, 240, 240, 20);`
+          };
+        })()
       };
 
       const lesson = lessons[state.mode];
@@ -608,6 +807,7 @@
         if (state.mode === "hsb") drawHsbMode();
         if (state.mode === "alpha") drawAlphaMode();
         if (state.mode === "lerp") drawLerpMode();
+        if (state.mode === "mood") drawMoodMode();
 
         p.colorMode(p.RGB, 255, 255, 255, 255);
         drawReadoutCards();
@@ -628,14 +828,16 @@
       }
 
       function drawPanelTitle() {
+        const moodTitle = state.selectedMood !== null ? `Mood: ${MOODS[state.selectedMood].name}` : "Mood";
         const titles = {
           gray:["Grayscale","One value controls brightness."],
           rgb:["RGB","Red, green, and blue channels mix color."],
           hsb:["HSB","Hue, saturation, and brightness separate color decisions."],
           alpha:["Alpha","Transparency lets colors layer."],
-          lerp:["Color Blend","lerpColor() makes smooth transitions."]
+          lerp:["Color Blend","lerpColor() makes smooth transitions."],
+          mood:[moodTitle,"Color is personal. Numbers are just a starting point."]
         };
-        const [title, subtitle] = titles[state.mode];
+        const [title, subtitle] = titles[state.mode] || titles.gray;
         p.push(); p.noStroke(); p.fill("#222"); p.textStyle(p.BOLD); p.textSize(22); p.text(title,24,38); p.textStyle(p.NORMAL); p.textSize(14); p.fill("#6b6258"); p.text(subtitle,24,62); p.pop();
       }
 
@@ -786,7 +988,13 @@
 
       function drawReadoutCards() {
         let cards;
-        if (state.mode === "hsb") {
+        if (state.mode === "mood") {
+          cards = [
+            { label:"hue", value:Math.round(state.personalH), color:"#7c3aed" },
+            { label:"sat", value:Math.round(state.personalS), color:"#e11d48" },
+            { label:"bright", value:Math.round(state.personalB), color:"#f59e0b" }
+          ];
+        } else if (state.mode === "hsb") {
           cards = [
             { label:"hue", value:Math.round(state.a), color:"#7c3aed" },
             { label:"sat", value:Math.round(state.b), color:"#e11d48" },
@@ -820,6 +1028,128 @@
         p.push(); p.textSize(size); p.textStyle(p.BOLD); const padX=7,padY=4,tw=p.textWidth(text);
         p.noStroke(); p.fill(255,250,242,238); p.rect(x-padX,y-size-padY+3,tw+padX*2,size+padY*2,9);
         p.fill(color); p.textAlign(p.LEFT,p.BASELINE); p.text(text,x,y); p.pop();
+      }
+
+      // ── Mood mode canvas ─────────────────────────────────────
+      function drawMoodMode() {
+        if (state.selectedMood === null) return;
+        const mood = MOODS[state.selectedMood];
+        const cH = state.canonicalH, cS = state.canonicalS, cB = state.canonicalB;
+        const pH = state.personalH, pS = state.personalS, pB = state.personalB;
+
+        // Stage area
+        const padX = p.width * 0.06;
+        const stageY = p.height * 0.14;
+        const stageH = p.height * 0.52;
+        const halfW = (p.width - padX * 2) / 2 - 8;
+
+        // Left swatch: canonical mood color
+        const lx = padX, ly = stageY;
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 220);
+        p.rect(lx, ly, halfW, stageH, 20);
+
+        p.colorMode(p.HSB, 360, 100, 100, 1);
+        p.noStroke();
+        p.fill(cH, cS, cB, 1);
+        const swatchSize = Math.min(halfW - 40, stageH - 80);
+        const swatchX = lx + halfW / 2 - swatchSize / 2;
+        const swatchY = ly + 14;
+        p.rect(swatchX, swatchY, swatchSize, swatchSize - 36, 16);
+        p.colorMode(p.RGB, 255, 255, 255, 255);
+
+        // Label: mood name
+        p.noStroke();
+        p.fill("#222");
+        p.textStyle(p.BOLD);
+        p.textSize(17);
+        p.textAlign(p.CENTER, p.BASELINE);
+        p.text(mood.name, lx + halfW / 2, ly + stageH - 52);
+
+        // Numbers
+        p.textStyle(p.NORMAL);
+        p.textSize(12);
+        p.fill("#6b6258");
+        p.text(`fill(${cH}, ${cS}, ${cB})`, lx + halfW / 2, ly + stageH - 30);
+        p.textStyle(p.BOLD);
+        p.textSize(11);
+        p.fill("#7c3aed");
+        p.text("canonical", lx + halfW / 2, ly + stageH - 14);
+        p.pop();
+
+        // Right swatch: student's color
+        const rx = lx + halfW + 16, ry = stageY;
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 220);
+        p.rect(rx, ry, halfW, stageH, 20);
+
+        p.colorMode(p.HSB, 360, 100, 100, 1);
+        p.noStroke();
+        p.fill(pH, pS, pB, 1);
+        p.rect(rx + halfW / 2 - swatchSize / 2, ry + 14, swatchSize, swatchSize - 36, 16);
+        p.colorMode(p.RGB, 255, 255, 255, 255);
+
+        // Label
+        p.noStroke();
+        p.fill("#222");
+        p.textStyle(p.BOLD);
+        p.textSize(17);
+        p.textAlign(p.CENTER, p.BASELINE);
+        p.text("Your color", rx + halfW / 2, ry + stageH - 52);
+
+        p.textStyle(p.NORMAL);
+        p.textSize(12);
+        p.fill("#6b6258");
+        p.text(`fill(${pH}, ${pS}, ${pB})`, rx + halfW / 2, ry + stageH - 30);
+
+        // Capture indicator
+        if (state.capturedH !== null) {
+          p.textStyle(p.BOLD);
+          p.textSize(11);
+          p.fill("#16a34a");
+          p.text("saved!", rx + halfW / 2, ry + stageH - 14);
+        } else {
+          const adjusted = pH !== cH || pS !== cS || pB !== cB;
+          if (adjusted) {
+            p.textStyle(p.BOLD);
+            p.textSize(11);
+            p.fill("#f59e0b");
+            p.text("adjusted ↑", rx + halfW / 2, ry + stageH - 14);
+          } else {
+            p.textStyle(p.BOLD);
+            p.textSize(11);
+            p.fill("#7c3aed");
+            p.text("your version", rx + halfW / 2, ry + stageH - 14);
+          }
+        }
+        p.pop();
+
+        // Bottom banner
+        const bannerY = stageY + stageH + 10;
+        p.push();
+        p.noStroke();
+        p.fill(255, 250, 242, 200);
+        p.rect(padX, bannerY, p.width - padX * 2, 38, 12);
+        p.fill("#6b6258");
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text("Color is personal. These numbers are just a starting point.", p.width / 2, bannerY + 19);
+        p.pop();
+
+        // Prompt
+        if (pH === cH && pS === cS && pB === cB) {
+          const promptY = bannerY + 50;
+          p.push();
+          p.fill("#6b6258");
+          p.textStyle(p.ITALIC);
+          p.textSize(13);
+          p.textAlign(p.CENTER, p.BASELINE);
+          p.text(`Now try to find a color that feels ${mood.name} to YOU.`, p.width / 2, promptY);
+          p.pop();
+        }
       }
     };
 

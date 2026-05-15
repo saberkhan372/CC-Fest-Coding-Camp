@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -295,6 +295,7 @@
       .workspace { height: 540px; }
     }
   </style>
+  <link rel="stylesheet" href="../../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -316,6 +317,7 @@
         <button id="mode-bar">Bar Height</button>
         <button id="mode-opacity">Opacity</button>
         <button id="mode-reverse">Reverse Range</button>
+        <button id="mode-wireit">Wire It</button>
         <span id="mode-pill" class="pill">Input world → output world</span>
       </div>
 
@@ -416,7 +418,9 @@ circle(width / 2, height / 2, size);</code></pre>
       animationDirection: 1,
       showFormula: true,
       showCode: false,
-      clamp: true
+      clamp: true,
+      wireInput: 50,
+      wireConnected: null  // "circle-size" | "x-position" | "color-brightness" | "rotation"
     };
 
     const els = {};
@@ -427,6 +431,7 @@ circle(width / 2, height / 2, size);</code></pre>
       els.modeBar = document.querySelector("#mode-bar");
       els.modeOpacity = document.querySelector("#mode-opacity");
       els.modeReverse = document.querySelector("#mode-reverse");
+      els.modeWireit = document.querySelector("#mode-wireit");
       els.modePill = document.querySelector("#mode-pill");
       els.inputSlider = document.querySelector("#input-slider");
       els.inputValue = document.querySelector("#input-value");
@@ -452,6 +457,7 @@ circle(width / 2, height / 2, size);</code></pre>
       els.modeBar.addEventListener("click", () => setMode("bar"));
       els.modeOpacity.addEventListener("click", () => setMode("opacity"));
       els.modeReverse.addEventListener("click", () => setMode("reverse"));
+      els.modeWireit.addEventListener("click", () => setMode("wireit"));
 
       els.inputSlider.addEventListener("input", () => {
         state.input = Number(els.inputSlider.value);
@@ -519,6 +525,9 @@ circle(width / 2, height / 2, size);</code></pre>
       } else if (mode === "reverse") {
         state.outMin = 200;
         state.outMax = 20;
+      } else if (mode === "wireit") {
+        state.wireInput = 50;
+        state.wireConnected = null;
       }
 
       updateUI();
@@ -545,7 +554,8 @@ circle(width / 2, height / 2, size);</code></pre>
         [els.modeColor, "color"],
         [els.modeBar, "bar"],
         [els.modeOpacity, "opacity"],
-        [els.modeReverse, "reverse"]
+        [els.modeReverse, "reverse"],
+        [els.modeWireit, "wireit"]
       ];
 
       for (const [button, mode] of modeButtons) {
@@ -605,6 +615,18 @@ circle(width / 2, height / 2, size);</code></pre>
           question: "Where is the output largest: when the input is small or when the input is large?",
           code: `let size = map(mouseX, 0, width, ${state.outMin}, ${state.outMax});\ncircle(width / 2, height / 2, size);`,
           caption: `The input moves forward, but the output range goes backward. This creates an inverse relationship.`
+        },
+        wireit: {
+          pill: "Wire the input to an output",
+          title: "Wire It: map() as a connection",
+          text: "Click a port on the right to connect it. The input slider drives the connected property. map() is the wire that translates one range into another.",
+          question: "Click each port. How does the same slider value become a completely different thing?",
+          code: state.wireConnected
+            ? `map(input, 0, 100, outMin, outMax) = result`
+            : `// click a port to connect it`,
+          caption: state.wireConnected
+            ? `map(${Math.round(state.wireInput)}, 0, 100, outMin, outMax) — connected to: ${state.wireConnected}`
+            : "Click a port on the right to connect the slider to that property."
         }
       };
 
@@ -638,6 +660,18 @@ circle(width / 2, height / 2, size);</code></pre>
       };
 
       p.windowResized = () => resizeToHolder();
+
+      p.mousePressed = () => {
+        if (state.mode !== "wireit") return;
+        for (const rect of wirePortRects) {
+          if (p.mouseX >= rect.x && p.mouseX <= rect.x + rect.w &&
+              p.mouseY >= rect.y && p.mouseY <= rect.y + rect.h) {
+            state.wireConnected = (state.wireConnected === rect.id) ? null : rect.id;
+            updateUI();
+            return;
+          }
+        }
+      };
 
       p.draw = () => {
         resizeToHolder();
@@ -837,6 +871,7 @@ circle(width / 2, height / 2, size);</code></pre>
         if (state.mode === "opacity") drawOpacityDemo(panelX, panelY, panelW, panelH, output);
         if (state.mode === "reverse") drawReverseDemo(panelX, panelY, panelW, panelH, output);
         p.pop();
+        if (state.mode === "wireit") drawWireitMode();
       }
 
       function drawSizeDemo(x, y, w, h, output) {
@@ -911,6 +946,206 @@ circle(width / 2, height / 2, size);</code></pre>
         p.circle(cx, cy, Math.max(12, output));
         drawLabel(`reversed size = ${output.toFixed(1)}`, cx - 68, cy + 130, "#0891b2", 14);
         p.pop();
+      }
+
+      // Wire It mode
+      const wirePortDefs = [
+        { id: "circle-size",       label: "Circle Size",      outMin: 20,  outMax: 160, color: "#2563eb" },
+        { id: "x-position",        label: "X Position",       outMin: 0,   outMax: 1,   color: "#7c3aed" },
+        { id: "color-brightness",  label: "Color Brightness", outMin: 0,   outMax: 255, color: "#e11d48" },
+        { id: "rotation",          label: "Rotation",         outMin: 0,   outMax: 360, color: "#f59e0b" }
+      ];
+
+      let wirePortRects = []; // filled each draw frame for click detection
+
+      function drawWireitMode() {
+        const t = state.wireInput / 100;
+        const sliderX = p.width * 0.10;
+        const sliderY = p.height * 0.22;
+        const sliderH = p.height * 0.42;
+        const sliderMid = sliderX + 18;
+        const handleY = sliderY + (1 - t) * sliderH;
+        const portsX = p.width * 0.72;
+        const portSpacing = sliderH / (wirePortDefs.length - 1);
+        const demoX = p.width * 0.42;
+        const demoCY = sliderY + sliderH * 0.5;
+        const portW = p.width * 0.22;
+        const portH = 38;
+
+        wirePortRects = [];
+
+        // Background panel
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(p.width * 0.06, p.height * 0.14, p.width * 0.88, p.height * 0.56, 22);
+        p.pop();
+
+        // Title
+        p.push();
+        p.noStroke();
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(18);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.text("Wire It", p.width * 0.09, p.height * 0.21);
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.fill("#6b6258");
+        p.text("Click a port to connect — then move the slider", p.width * 0.09, p.height * 0.265);
+        p.pop();
+
+        // Left vertical slider track
+        p.push();
+        p.stroke("#d8cbbb");
+        p.strokeWeight(8);
+        p.strokeCap(p.ROUND);
+        p.line(sliderMid, sliderY, sliderMid, sliderY + sliderH);
+        p.stroke("#7c3aed");
+        p.strokeWeight(8);
+        p.line(sliderMid, sliderY + sliderH, sliderMid, handleY);
+
+        // Handle
+        p.noStroke();
+        p.fill("#7c3aed");
+        p.circle(sliderMid, handleY, 26);
+        p.fill("#ffffff");
+        p.circle(sliderMid, handleY, 8);
+
+        // Slider label
+        p.fill("#7c3aed");
+        p.textStyle(p.BOLD);
+        p.textSize(13);
+        p.textAlign(p.CENTER, p.BASELINE);
+        p.text("INPUT", sliderMid, sliderY - 12);
+        p.textSize(16);
+        p.text(Math.round(state.wireInput), sliderMid, handleY - 18);
+        p.text("0", sliderMid, sliderY + sliderH + 18);
+        p.text("100", sliderMid, sliderY - 22);
+        p.pop();
+
+        // Track slider drag
+        if (p.mouseIsPressed && p.mouseX > sliderMid - 30 && p.mouseX < sliderMid + 30 &&
+            p.mouseY > sliderY - 20 && p.mouseY < sliderY + sliderH + 20) {
+          const raw = 1 - (p.mouseY - sliderY) / sliderH;
+          state.wireInput = Math.round(Math.max(0, Math.min(100, raw * 100)));
+          updateUI();
+        }
+
+        // Ports on right
+        wirePortDefs.forEach((port, i) => {
+          const py = sliderY + i * portSpacing - portH / 2;
+          const px = portsX;
+          const connected = state.wireConnected === port.id;
+          wirePortRects.push({ id: port.id, x: px, y: py, w: portW, h: portH });
+
+          // Wire from slider to port
+          if (connected) {
+            p.push();
+            p.stroke(port.color);
+            p.strokeWeight(4);
+            p.noFill();
+            p.drawingContext.setLineDash([]);
+            const cpx = (sliderMid + px) / 2;
+            p.beginShape();
+            p.vertex(sliderMid, handleY);
+            p.bezierVertex(cpx, handleY, cpx, sliderY + i * portSpacing, px, sliderY + i * portSpacing);
+            p.endShape();
+            p.pop();
+          } else {
+            // Thin dashed guide
+            p.push();
+            p.stroke("#d8cbbb");
+            p.strokeWeight(1.5);
+            p.drawingContext.setLineDash([5, 6]);
+            p.line(sliderMid, sliderY + i * portSpacing, px, sliderY + i * portSpacing);
+            p.drawingContext.setLineDash([]);
+            p.pop();
+          }
+
+          // Port box
+          p.push();
+          p.noStroke();
+          p.fill(connected ? port.color : "#f8fafc");
+          p.rect(px, py, portW, portH, 10);
+          p.stroke(connected ? port.color : "#ded2c1");
+          p.strokeWeight(2);
+          p.noFill();
+          p.rect(px, py, portW, portH, 10);
+
+          // Port label + value
+          const mappedVal = mapWire(port);
+          p.noStroke();
+          p.fill(connected ? "#ffffff" : "#222222");
+          p.textStyle(p.BOLD);
+          p.textSize(12);
+          p.textAlign(p.LEFT, p.CENTER);
+          p.text(port.label, px + 10, py + portH / 2 - 7);
+          p.textStyle(p.NORMAL);
+          p.textSize(11);
+          p.fill(connected ? "#e0f2fe" : "#6b6258");
+          p.text(`= ${port.id === "rotation" ? mappedVal.toFixed(0) + "°" : mappedVal.toFixed(1)}`, px + 10, py + portH / 2 + 8);
+          p.pop();
+        });
+
+        // Demo shape in center
+        p.push();
+        p.translate(demoX, demoCY);
+        const connected = wirePortDefs.find(p => p.id === state.wireConnected);
+        if (connected) {
+          const val = mapWire(connected);
+          let sz = 80, xOff = 0, br = 150, rot = 0;
+          if (connected.id === "circle-size") sz = val;
+          if (connected.id === "x-position") xOff = p.map(val, 0, 1, -p.width * 0.10, p.width * 0.10);
+          if (connected.id === "color-brightness") br = val;
+          if (connected.id === "rotation") rot = p.radians(val);
+
+          p.rotate(rot);
+          p.noStroke();
+          p.fill(connected.color + "40");
+          p.circle(xOff, 0, sz + 30);
+          p.fill(connected.color);
+          p.rect(xOff - sz / 2, -sz / 2, sz, sz, 12);
+          drawLabel(`${connected.label} = ${mapWire(connected).toFixed(1)}`, xOff - 40, sz / 2 + 22, connected.color, 13);
+        } else {
+          p.noStroke();
+          p.fill("#ded2c1");
+          p.circle(0, 0, 80);
+          p.fill("#8b7d6c");
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textSize(13);
+          p.text("← connect\na port", 0, 0);
+        }
+        p.pop();
+
+        // Live map() call at bottom
+        const liveY = p.height * 0.70;
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(p.width * 0.06, liveY, p.width * 0.88, 44, 14);
+        p.fill("#111827");
+        p.textStyle(p.BOLD);
+        p.textSize(13.5);
+        p.textAlign(p.LEFT, p.BASELINE);
+        if (state.wireConnected) {
+          const port = wirePortDefs.find(pp => pp.id === state.wireConnected);
+          const result = mapWire(port);
+          p.text(
+            `map(${Math.round(state.wireInput)}, 0, 100, ${port.outMin}, ${port.outMax}) = ${result.toFixed(1)}   ← live result for "${port.label}"`,
+            p.width * 0.09, liveY + 28
+          );
+        } else {
+          p.fill("#6b6258");
+          p.textStyle(p.NORMAL);
+          p.text("map(input, 0, 100, outMin, outMax) = result  — click a port to see a live formula", p.width * 0.09, liveY + 28);
+        }
+        p.pop();
+      }
+
+      function mapWire(port) {
+        const t = state.wireInput / 100;
+        return port.outMin + t * (port.outMax - port.outMin);
       }
 
       function drawArrow(x1, y1, x2, y2, color) {

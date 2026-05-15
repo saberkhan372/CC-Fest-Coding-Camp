@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -287,6 +287,7 @@
       .workspace { height: 540px; }
     }
   </style>
+  <link rel="stylesheet" href="../../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -308,6 +309,7 @@
         <button id="mode-brightness">Distance → Brightness</button>
         <button id="mode-collision">Collision</button>
         <button id="mode-ripple">Ripple Field</button>
+        <button id="mode-doorlock">Door Lock</button>
         <button id="reset-button">Reset</button>
         <span id="mode-pill" class="pill">dist() measures between two points</span>
       </div>
@@ -327,6 +329,11 @@
           <label for="range-slider">active range</label>
           <input id="range-slider" type="range" min="50" max="320" value="190" step="1" />
           <span id="range-value" class="value-label">190</span>
+        </div>
+        <div class="slider-wrap" id="door-radius-wrap" style="display:none;">
+          <label for="door-radius-slider">Radius</label>
+          <input id="door-radius-slider" type="range" min="50" max="200" value="110" step="1" />
+          <span id="door-radius-value" class="value-label">110</span>
         </div>
       </div>
 
@@ -399,7 +406,8 @@
       showLabels: true,
       showCode: false,
       pointerX: 190,
-      pointerY: 230
+      pointerY: 230,
+      doorRadius: 110
     };
 
     const els = {};
@@ -410,7 +418,11 @@
       els.modeBrightness = document.querySelector("#mode-brightness");
       els.modeCollision = document.querySelector("#mode-collision");
       els.modeRipple = document.querySelector("#mode-ripple");
+      els.modeDoorlock = document.querySelector("#mode-doorlock");
       els.resetButton = document.querySelector("#reset-button");
+      els.doorRadiusWrap = document.querySelector("#door-radius-wrap");
+      els.doorRadiusSlider = document.querySelector("#door-radius-slider");
+      els.doorRadiusValue = document.querySelector("#door-radius-value");
       els.modePill = document.querySelector("#mode-pill");
       els.targetXSlider = document.querySelector("#target-x-slider");
       els.targetYSlider = document.querySelector("#target-y-slider");
@@ -434,6 +446,12 @@
       els.modeBrightness.addEventListener("click", () => setMode("brightness"));
       els.modeCollision.addEventListener("click", () => setMode("collision"));
       els.modeRipple.addEventListener("click", () => setMode("ripple"));
+      els.modeDoorlock.addEventListener("click", () => setMode("doorlock"));
+
+      els.doorRadiusSlider.addEventListener("input", () => {
+        state.doorRadius = Number(els.doorRadiusSlider.value);
+        els.doorRadiusValue.textContent = String(state.doorRadius);
+      });
 
       els.resetButton.addEventListener("click", () => {
         state.targetX = 390;
@@ -501,12 +519,17 @@
         [els.modeSize, "size"],
         [els.modeBrightness, "brightness"],
         [els.modeCollision, "collision"],
-        [els.modeRipple, "ripple"]
+        [els.modeRipple, "ripple"],
+        [els.modeDoorlock, "doorlock"]
       ];
 
       for (const [button, mode] of buttons) {
         button.classList.toggle("active", state.mode === mode);
       }
+
+      els.doorRadiusWrap.style.display = state.mode === "doorlock" ? "" : "none";
+      els.doorRadiusSlider.value = state.doorRadius;
+      els.doorRadiusValue.textContent = String(state.doorRadius);
 
       els.targetXSlider.value = state.targetX;
       els.targetYSlider.value = state.targetY;
@@ -563,6 +586,15 @@
           question: "Why do the shapes form rings around the target?",
           caption: "Every dot asks the same question: how far am I from the target? That distance creates the pattern.",
           code: `for (let x = 0; x < width; x += 30) {\n  for (let y = 0; y < height; y += 30) {\n    let d = dist(x, y, targetX, targetY);\n    let size = map(sin(d * 0.05), -1, 1, 4, 22);\n    circle(x, y, size);\n  }\n}`
+        },
+        doorlock: {
+          pill: "dist() can unlock a door",
+          title: "Distance can trigger events",
+          text: "When distance drops below a threshold, something happens. Here: when the cursor is close enough to the lock, the door unlocks. This is the same logic as hover effects and proximity triggers.",
+          formula: `if (dist(mouseX, mouseY, lockX, lockY) < radius) { unlock(); }`,
+          question: "Grow the radius. Why does unlocking get easier as the radius gets larger?",
+          caption: "Watch the live distance. When it drops below the radius, the door unlocks. dist() powers the check.",
+          code: `if (dist(mouseX, mouseY, lockX, lockY) < radius) {\n  unlock();\n}`
         }
       };
 
@@ -610,6 +642,7 @@
         if (state.mode === "brightness") drawBrightnessMode();
         if (state.mode === "collision") drawCollisionMode();
         if (state.mode === "ripple") drawRippleMode();
+        if (state.mode === "doorlock") drawDoorlockMode();
 
         drawReadoutCards();
       };
@@ -699,7 +732,8 @@
           size: ["Distance → Size", "Use distance as input, then map it to a visual size."],
           brightness: ["Distance → Brightness", "Use distance to make proximity feel gradual."],
           collision: ["Collision", "A collision is a distance comparison."],
-          ripple: ["Ripple Field", "Many points measure their distance from the same target."]
+          ripple: ["Ripple Field", "Many points measure their distance from the same target."],
+          doorlock: ["Door Lock", "When dist() drops below the radius, the door unlocks."]
         };
         const [title, subtitle] = titles[state.mode];
         p.push();
@@ -906,6 +940,124 @@
           p.text(String(cards[i].value), cx + 12, y + 48);
         }
         p.pop();
+      }
+
+      function drawDoorlockMode() {
+        const doorX = p.width * 0.70;
+        const doorY = p.height * 0.36;
+        const doorW = 90;
+        const doorH = 150;
+        const lockX = doorX + doorW / 2;
+        const lockY = doorY + doorH * 0.42;
+
+        const m = getPointer();
+        const d = p.dist(m.x, m.y, lockX, lockY);
+        const unlocked = d < state.doorRadius;
+
+        // Glow ring around lock
+        p.push();
+        p.noFill();
+        const pulseAlpha = unlocked ? 220 : 80 + 40 * Math.sin(p.frameCount * 0.07);
+        p.stroke(unlocked ? p.color(22, 163, 74, pulseAlpha) : p.color(124, 58, 237, pulseAlpha));
+        p.strokeWeight(3);
+        p.drawingContext.setLineDash([8, 7]);
+        p.circle(lockX, lockY, state.doorRadius * 2);
+        p.drawingContext.setLineDash([]);
+        p.pop();
+
+        // Door body
+        p.push();
+        p.noStroke();
+        p.fill(unlocked ? p.color(22, 163, 74, 220) : p.color(160, 150, 140, 200));
+        p.rect(doorX, doorY, doorW, doorH, 8, 8, 0, 0);
+
+        // Door frame
+        p.stroke("#5c4f3a");
+        p.strokeWeight(4);
+        p.noFill();
+        p.rect(doorX, doorY, doorW, doorH, 8, 8, 0, 0);
+
+        // Door knob
+        p.noStroke();
+        p.fill(unlocked ? "#ffffff" : "#8b7d6c");
+        p.circle(doorX + 18, doorY + doorH * 0.50, 14);
+
+        // Lock icon or checkmark
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textSize(28);
+        p.fill("#ffffff");
+        p.text(unlocked ? "✓" : "🔒", lockX, lockY);
+
+        // State label
+        p.textSize(17);
+        p.fill(unlocked ? "#ffffff" : "#f8fafc");
+        p.textStyle(p.BOLD);
+        p.text(unlocked ? "UNLOCKED" : "LOCKED", lockX, doorY + doorH + 28);
+        p.pop();
+
+        // Cursor / key circle
+        p.push();
+        p.noStroke();
+        p.fill(unlocked ? "#16a34a" : "#7c3aed");
+        p.circle(m.x, m.y, 32);
+        p.fill("#ffffff");
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(15);
+        p.text("🗝", m.x, m.y);
+        if (state.showLabels) drawLabel("cursor (key)", m.x + 20, m.y - 14, unlocked ? "#16a34a" : "#7c3aed", 13);
+        p.pop();
+
+        // Distance line
+        p.push();
+        p.stroke(unlocked ? "#16a34a" : "#7c3aed");
+        p.strokeWeight(3);
+        p.drawingContext.setLineDash([6, 5]);
+        p.line(m.x, m.y, lockX, lockY);
+        p.drawingContext.setLineDash([]);
+        p.pop();
+
+        // Info readout panel
+        const px = p.width * 0.06;
+        const py = p.height * 0.17;
+        const pw = p.width * 0.46;
+        const ph = 148;
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 242);
+        p.rect(px, py, pw, ph, 18);
+
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(15);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.text("Live values", px + 16, py + 28);
+
+        p.textStyle(p.NORMAL);
+        p.textSize(14);
+        p.fill("#7c3aed");
+        p.text(`dist(mouseX, mouseY, lockX, lockY) = ${d.toFixed(1)}`, px + 16, py + 56);
+        p.fill("#16a34a");
+        p.text(`radius threshold = ${state.doorRadius}`, px + 16, py + 80);
+        p.fill(unlocked ? "#16a34a" : "#e11d48");
+        p.textStyle(p.BOLD);
+        p.text(`d < radius? ${unlocked ? "YES → UNLOCK" : "NO → stay locked"}`, px + 16, py + 106);
+
+        // Code snippet
+        p.fill("#111827");
+        p.noStroke();
+        p.rect(px + 12, py + 116, pw - 24, 22, 6);
+        p.fill("#a5f3fc");
+        p.textStyle(p.NORMAL);
+        p.textSize(11.5);
+        p.text(`if (dist(mouseX, mouseY, lockX, lockY) < radius) { unlock(); }`, px + 18, py + 131);
+        p.pop();
+
+        // Radius label
+        if (state.showLabels) {
+          drawLabel(`radius = ${state.doorRadius}`, lockX + state.doorRadius * 0.55, lockY - state.doorRadius * 0.55, "#7c3aed", 13);
+        }
       }
 
       function drawLabel(text, x, y, color, size = 13) {

@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -280,6 +280,7 @@
       .workspace { height: 540px; }
     }
   </style>
+  <link rel="stylesheet" href="../../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -398,7 +399,11 @@ let speed = 1.6;</code></pre>
       showLabels: true,
       showCode: false,
       ball: { x: 260, y: 230, size: 72, speedX: 1.6, speedY: 1.1, hue: 35 },
-      balls: []
+      balls: [],
+      methodBall: { x: 240, y: 200, vx: 2, vy: 1.5, size: 72 },
+      methodLoop: false,
+      lastMethodCalled: null,
+      displayFlash: 0
     };
 
     const els = {};
@@ -498,6 +503,9 @@ let speed = 1.6;</code></pre>
 
     function resetSingleBall() {
       state.ball = { x: 260, y: 230, size: state.size, speedX: state.speed, speedY: 1.1, hue: 35 };
+      state.methodBall = { x: 240, y: 200, vx: 2, vy: 1.5, size: state.size };
+      state.methodLoop = false;
+      state.lastMethodCalled = null;
     }
 
     function makeBall(i) {
@@ -596,13 +604,13 @@ let speed = 1.6;</code></pre>
           code: `let ball = {\n  x: 200,\n  y: 200,\n  size: ${Math.round(state.size)},\n  speedX: ${state.speed.toFixed(1)}\n};\n\nfunction draw() {\n  circle(ball.x, ball.y, ball.size);\n  ball.x += ball.speedX;\n}`
         },
         methods: {
-          pill: "methods attach behavior to data",
-          title: "Methods are what an object does",
-          text: "A method is a function that belongs to an object. Instead of the sketch doing everything to the ball, the ball can move itself and display itself.",
-          formula: `ball.move();\nball.display();`,
+          pill: "methods are verbs you call on an object",
+          title: "Methods are verbs you call on the object",
+          text: "Click move() to step the ball forward. Click display() to draw it. Press \"Loop: call both\" to animate every frame — just like p5.js draw() does.",
+          formula: `ball.move();    // updates x, y\nball.display(); // draws the circle\n\n// current state:\n{ x: ${Math.round(state.methodBall.x)}, y: ${Math.round(state.methodBall.y)}, vx: ${state.methodBall.vx}, vy: ${state.methodBall.vy} }`,
           question: "What changes when move() and display() belong to the object?",
-          caption: "The object now has data and behavior: it knows its values and it knows what to do with them.",
-          code: `let ball = {\n  x: 200, y: 200, size: ${Math.round(state.size)}, speedX: ${state.speed.toFixed(1)},\n\n  move() {\n    this.x += this.speedX;\n  },\n\n  display() {\n    circle(this.x, this.y, this.size);\n  }\n};`
+          caption: "Methods are verbs. Click move() or display() to call them on the ball object.",
+          code: `let ball = {\n  x: ${Math.round(state.methodBall.x)}, y: ${Math.round(state.methodBall.y)},\n  vx: ${state.methodBall.vx}, vy: ${state.methodBall.vy},\n  size: ${Math.round(state.size)},\n\n  move() {\n    this.x += this.vx;\n    this.y += this.vy;\n  },\n\n  display() {\n    circle(this.x, this.y, this.size);\n  }\n};\n\nball.move();\nball.display();`
         },
         class: {
           pill: "a class is a reusable blueprint",
@@ -654,6 +662,36 @@ let speed = 1.6;</code></pre>
       };
 
       p.windowResized = () => resizeToHolder();
+
+      function hitTest(btn) {
+        return btn && p.mouseX >= btn.x && p.mouseX <= btn.x + btn.w && p.mouseY >= btn.y && p.mouseY <= btn.y + btn.h;
+      }
+
+      p.mousePressed = () => {
+        if (state.mode !== "methods") return;
+        const mb = state.methodBall;
+        const bounds = getStageBounds();
+        if (hitTest(methodMoveBounds)) {
+          // move step
+          mb.x += mb.vx * state.speed * 10;
+          mb.y += mb.vy * state.speed * 5;
+          // bounce
+          if (mb.x < bounds.x + mb.size / 2 || mb.x > bounds.x + bounds.w - mb.size / 2) mb.vx *= -1;
+          if (mb.y < bounds.y + mb.size / 2 || mb.y > bounds.y + bounds.h - mb.size / 2) mb.vy *= -1;
+          mb.x = Math.max(bounds.x + mb.size / 2, Math.min(bounds.x + bounds.w - mb.size / 2, mb.x));
+          mb.y = Math.max(bounds.y + mb.size / 2, Math.min(bounds.y + bounds.h - mb.size / 2, mb.y));
+          state.lastMethodCalled = "move";
+          state.displayFlash = p.millis();
+          updateUI();
+        } else if (hitTest(methodDisplayBounds)) {
+          state.lastMethodCalled = "display";
+          state.displayFlash = p.millis();
+          updateUI();
+        } else if (hitTest(methodLoopBounds)) {
+          state.methodLoop = !state.methodLoop;
+          updateUI();
+        }
+      };
 
       p.draw = () => {
         resizeToHolder();
@@ -748,12 +786,170 @@ let speed = 1.6;</code></pre>
         drawObjectCard(bounds.x + 22, bounds.y + 24, false);
       }
 
+      // Method button bounds for click detection
+      let methodMoveBounds = null;
+      let methodDisplayBounds = null;
+      let methodLoopBounds = null;
+
       function drawMethodsMode() {
         const bounds = getStageBounds();
         drawStage(bounds);
-        drawBall(state.ball, "#f59e0b");
-        drawObjectCard(bounds.x + 22, bounds.y + 24, true);
-        drawMethodArrows(bounds);
+
+        const mb = state.methodBall;
+
+        // Animate loop
+        if (state.methodLoop && state.animate) {
+          // move
+          mb.x += mb.vx * state.speed;
+          mb.y += mb.vy * state.speed;
+          // bounce within stage
+          if (mb.x < bounds.x + mb.size / 2 || mb.x > bounds.x + bounds.w - mb.size / 2) mb.vx *= -1;
+          if (mb.y < bounds.y + mb.size / 2 || mb.y > bounds.y + bounds.h - mb.size / 2) mb.vy *= -1;
+          mb.x = Math.max(bounds.x + mb.size / 2, Math.min(bounds.x + bounds.w - mb.size / 2, mb.x));
+          mb.y = Math.max(bounds.y + mb.size / 2, Math.min(bounds.y + bounds.h - mb.size / 2, mb.y));
+          updateUI();
+        }
+
+        // Draw ball with optional display flash
+        const flashActive = p.millis() - state.displayFlash < 400;
+        p.push();
+        if (flashActive) {
+          // Glow ring for display flash
+          p.noStroke();
+          p.fill(245, 158, 11, 80);
+          p.circle(mb.x, mb.y, mb.size * 1.6);
+        }
+        p.pop();
+        drawBall({ x: mb.x, y: mb.y, size: mb.size, speedX: mb.vx, speedY: mb.vy }, "#f59e0b");
+
+        // Property readout card
+        const cardX = bounds.x + 18;
+        const cardY = bounds.y + 22;
+        const cardLines = [
+          { k: "x", v: Math.round(mb.x), color: "#0891b2" },
+          { k: "y", v: Math.round(mb.y), color: "#0891b2" },
+          { k: "vx", v: mb.vx.toFixed(1), color: "#0891b2" },
+          { k: "vy", v: mb.vy.toFixed(1), color: "#0891b2" }
+        ];
+        p.push();
+        p.noStroke();
+        p.fill(255, 250, 242, 245);
+        p.rect(cardX, cardY, 160, 110, 14);
+        p.stroke("#f59e0b");
+        p.strokeWeight(2);
+        p.noFill();
+        p.rect(cardX, cardY, 160, 110, 14);
+        p.noStroke();
+        p.fill("#f59e0b");
+        p.textStyle(p.BOLD);
+        p.textSize(13);
+        p.text("ball  { ... }", cardX + 10, cardY + 18);
+        p.textSize(11);
+        for (let i = 0; i < cardLines.length; i++) {
+          const row = cardLines[i];
+          const yy = cardY + 34 + i * 18;
+          p.fill(row.color);
+          p.text(row.k + ":", cardX + 12, yy);
+          p.fill("#222222");
+          p.textAlign(p.RIGHT, p.BASELINE);
+          p.text(String(row.v), cardX + 150, yy);
+          p.textAlign(p.LEFT, p.BASELINE);
+        }
+        p.pop();
+
+        // Method buttons
+        const btnY = bounds.y + bounds.h + 18;
+        const btnH = 42;
+
+        // move() button
+        const moveBtnX = bounds.x + bounds.w * 0.22;
+        const moveBtnW = 120;
+        const moveActive = state.lastMethodCalled === "move" && p.millis() - state.displayFlash < 400;
+        p.push();
+        p.noStroke();
+        p.fill(state.methodLoop ? "#e11d48" : (moveActive ? "#b91c1c" : "#e11d48"));
+        p.rect(moveBtnX, btnY, moveBtnW, btnH, 999);
+        p.fill("#ffffff");
+        p.textStyle(p.BOLD);
+        p.textSize(15);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text("ball.move()", moveBtnX + moveBtnW / 2, btnY + btnH / 2);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.pop();
+        methodMoveBounds = { x: moveBtnX, y: btnY, w: moveBtnW, h: btnH };
+
+        // display() button
+        const dispBtnX = moveBtnX + moveBtnW + 16;
+        const dispBtnW = 140;
+        const dispActive = state.lastMethodCalled === "display" && p.millis() - state.displayFlash < 400;
+        p.push();
+        p.noStroke();
+        p.fill(dispActive ? "#b45309" : "#f59e0b");
+        p.rect(dispBtnX, btnY, dispBtnW, btnH, 999);
+        p.fill("#ffffff");
+        p.textStyle(p.BOLD);
+        p.textSize(15);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text("ball.display()", dispBtnX + dispBtnW / 2, btnY + btnH / 2);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.pop();
+        methodDisplayBounds = { x: dispBtnX, y: btnY, w: dispBtnW, h: btnH };
+
+        // Loop button
+        const loopBtnX = dispBtnX + dispBtnW + 16;
+        const loopBtnW = 150;
+        p.push();
+        p.noStroke();
+        p.fill(state.methodLoop ? "#16a34a" : "#334155");
+        p.rect(loopBtnX, btnY, loopBtnW, btnH, 999);
+        p.fill("#ffffff");
+        p.textStyle(p.BOLD);
+        p.textSize(13);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text(state.methodLoop ? "Stop loop" : "Loop: call both", loopBtnX + loopBtnW / 2, btnY + btnH / 2);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.pop();
+        methodLoopBounds = { x: loopBtnX, y: btnY, w: loopBtnW, h: btnH };
+
+        // Code snippet with active method highlighted
+        const snapX = bounds.x + bounds.w * 0.58;
+        const snapY = bounds.y + 22;
+        const snapW = bounds.w * 0.40;
+        p.push();
+        p.noStroke();
+        p.fill(17, 24, 39, 235);
+        p.rect(snapX, snapY, snapW, 90, 14);
+        p.textFont("ui-monospace, SFMono-Regular, Menlo, Monaco, monospace");
+        p.textSize(13);
+        p.textAlign(p.LEFT, p.BASELINE);
+
+        const moveLine = "ball.move();    // updates x, y";
+        const dispLine = "ball.display(); // draws the circle";
+        const moveHighlight = state.lastMethodCalled === "move" && p.millis() - state.displayFlash < 600;
+        const dispHighlight = state.lastMethodCalled === "display" && p.millis() - state.displayFlash < 600;
+        const loopHighlight = state.methodLoop;
+
+        if (moveHighlight || loopHighlight) {
+          p.noStroke();
+          p.fill(225, 29, 72, 50);
+          p.rect(snapX + 6, snapY + 14, snapW - 12, 18, 4);
+        }
+        if (dispHighlight || loopHighlight) {
+          p.noStroke();
+          p.fill(245, 158, 11, 50);
+          p.rect(snapX + 6, snapY + 36, snapW - 12, 18, 4);
+        }
+
+        p.textStyle(p.NORMAL);
+        p.fill(moveHighlight || loopHighlight ? "#fca5a5" : "#e5e7eb");
+        p.text(moveLine, snapX + 10, snapY + 28);
+        p.fill(dispHighlight || loopHighlight ? "#fde68a" : "#e5e7eb");
+        p.text(dispLine, snapX + 10, snapY + 50);
+        p.fill("#6b7280");
+        p.textSize(11);
+        p.text("// both called each frame in draw()", snapX + 10, snapY + 76);
+        p.textFont("Inter, system-ui, sans-serif");
+        p.pop();
       }
 
       function drawClassMode() {

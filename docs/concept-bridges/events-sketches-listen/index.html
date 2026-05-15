@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -251,6 +251,7 @@
     @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
     @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
   </style>
+  <link rel="stylesheet" href="../../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -302,6 +303,8 @@
         <span class="pill">click</span>
         <span class="pill">press any key</span>
         <span class="pill">hold arrow keys or WASD</span>
+        <button id="simulate-space-button" style="display:none">Simulate Space</button>
+        <button id="simulate-esc-button" style="display:none">Simulate Esc</button>
         <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
         <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
       </div>
@@ -375,7 +378,9 @@
       lastClickY: 260,
       lastKey: "none",
       keyCount: 0,
-      sketchState: "calm",
+      gameState: "title",
+      gameCircles: [],
+      cursorBlink: true,
       trail: [],
       clickBursts: []
     };
@@ -408,6 +413,9 @@
       els.codeCard = document.querySelector("#code-card");
       els.codeBox = document.querySelector("#code-box");
 
+      els.simulateSpaceButton = document.querySelector("#simulate-space-button");
+      els.simulateEscButton = document.querySelector("#simulate-esc-button");
+
       els.modeMouse.addEventListener("click", () => setMode("mouse"));
       els.modeClick.addEventListener("click", () => setMode("click"));
       els.modeKey.addEventListener("click", () => setMode("key"));
@@ -417,13 +425,28 @@
       els.simulateClickButton.addEventListener("click", () => registerClick(state.pointerX, state.pointerY));
       els.simulateKeyButton.addEventListener("click", () => registerKey("A"));
 
+      els.simulateSpaceButton.addEventListener("click", () => {
+        if (state.mode === "state" && state.gameState === "title") {
+          state.gameState = "play";
+          state.gameCircles = [];
+          updateUI();
+        }
+      });
+      els.simulateEscButton.addEventListener("click", () => {
+        if (state.mode === "state" && state.gameState === "play") {
+          state.gameState = "title";
+          updateUI();
+        }
+      });
+
       els.resetButton.addEventListener("click", () => {
         state.playerX = 360;
         state.playerY = 260;
         state.clickCount = 0;
         state.keyCount = 0;
         state.lastKey = "none";
-        state.sketchState = "calm";
+        state.gameState = "title";
+        state.gameCircles = [];
         state.trail = [];
         state.clickBursts = [];
         updateUI();
@@ -445,26 +468,31 @@
       state.lastClickX = x;
       state.lastClickY = y;
       state.clickBursts.push({ x, y, age: 0 });
-      if (state.mode === "state") cycleSketchState();
+      if (state.mode === "state") {
+        if (state.gameState === "play") {
+          // add colored circle in play mode
+          state.gameCircles.push({ x, y, r: Math.random()*30+18, hue: Math.floor(Math.random()*360) });
+        }
+      }
       updateUI();
     }
 
     function registerKey(k) {
       state.keyCount += 1;
       state.lastKey = k || "unknown";
-      if (state.mode === "state") cycleSketchState();
+      if (state.mode === "state") {
+        // handled in p5 keyPressed
+      }
       updateUI();
-    }
-
-    function cycleSketchState() {
-      const order = ["calm", "active", "surprised"];
-      const current = order.indexOf(state.sketchState);
-      state.sketchState = order[(current + 1) % order.length];
     }
 
     function updateUI() {
       const buttons = [[els.modeMouse,"mouse"],[els.modeClick,"click"],[els.modeKey,"key"],[els.modeHold,"hold"],[els.modeState,"state"]];
       for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
+
+      // Show/hide state-mode specific buttons
+      els.simulateSpaceButton.style.display = (state.mode === "state" && state.gameState === "title") ? "" : "none";
+      els.simulateEscButton.style.display = (state.mode === "state" && state.gameState === "play") ? "" : "none";
 
       els.speedSlider.value = state.speed;
       els.sizeSlider.value = state.size;
@@ -514,13 +542,13 @@
           code: `function draw() {\n  if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {\n    x -= ${state.speed};\n  }\n  if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {\n    x += ${state.speed};\n  }\n}`
         },
         state: {
-          pill: "events often change state variables",
-          title: "Input can change the sketch state",
-          text: "Events are often used to update variables. A click or key press might switch modes, change colors, add a new object, or start a game.",
-          formula: `let mood = "${state.sketchState}";\n\nfunction mousePressed() {\n  mood = "active";\n}`,
-          question: "How could a click move a game from start to play?",
-          caption: "Clicks and key presses can change a state variable, and draw() responds to the new state.",
-          code: `let mood = "calm";\n\nfunction mousePressed() {\n  if (mood === "calm") {\n    mood = "active";\n  } else {\n    mood = "calm";\n  }\n}\n\nfunction draw() {\n  if (mood === "active") {\n    background(255, 220, 120);\n  }\n}`
+          pill: `gameState = "${state.gameState}"`,
+          title: "Input changes the game state",
+          text: "A game uses a state variable like gameState to know what to draw. Space starts the game; Escape returns to the title. The draw() function checks gameState every frame.",
+          formula: `gameState = "${state.gameState}"`,
+          question: state.gameState === "title" ? "Press Space (or Simulate Space) to start the game. What changes?" : "Press Escape (or Simulate Esc) to return to title. What changes?",
+          caption: state.gameState === "title" ? 'gameState = "title" — press Space or click Simulate Space to transition to play.' : 'gameState = "play" — click to draw circles. Press Escape to return to title.',
+          code: `let gameState = "title";\n\nfunction keyPressed() {\n  if (key === ' ' && gameState === "title") gameState = "play";\n  if (keyCode === ESCAPE && gameState === "play") gameState = "title";\n}\n\nfunction draw() {\n  if (gameState === "title") drawTitleScreen();\n  if (gameState === "play") drawPlayScreen();\n}`
         }
       };
 
@@ -557,12 +585,34 @@
       p.mousePressed = () => {
         if (!insideCanvas()) return;
         canvas.elt.focus();
-        registerClick(p.mouseX, p.mouseY);
+        if (state.mode === "state") {
+          if (state.gameState === "play") {
+            const s = getStage();
+            if (p.mouseX > s.x && p.mouseX < s.x + s.w && p.mouseY > s.y && p.mouseY < s.y + s.h) {
+              state.gameCircles.push({ x: p.mouseX, y: p.mouseY, r: Math.random()*28+14, hue: Math.floor(Math.random()*360) });
+              updateUI();
+            }
+          }
+        } else {
+          registerClick(p.mouseX, p.mouseY);
+        }
         return false;
       };
 
       p.keyPressed = () => {
-        registerKey(p.key === " " ? "space" : p.key);
+        if (state.mode === "state") {
+          if (p.key === " " && state.gameState === "title") {
+            state.gameState = "play";
+            state.gameCircles = [];
+            updateUI();
+          } else if (p.keyCode === 27 && state.gameState === "play") {
+            // ESCAPE
+            state.gameState = "title";
+            updateUI();
+          }
+        } else {
+          registerKey(p.key === " " ? "space" : p.key);
+        }
         return false;
       };
 
@@ -629,7 +679,7 @@
           click:["Click Event","mousePressed() runs once when a click happens."],
           key:["Key Event","keyPressed() runs once when a key is pressed."],
           hold:["Held Keys","keyIsDown() supports continuous movement."],
-          state:["Input Changes State","Events often update variables that draw() uses later."]
+          state:["Input Changes State", state.gameState === "title" ? 'gameState = "title" — press Space to play.' : 'gameState = "play" — click to draw. Esc to go back.']
         };
         const [title, subtitle] = titles[state.mode];
         p.push(); p.noStroke(); p.fill("#222"); p.textStyle(p.BOLD); p.textSize(22); p.text(title,24,38); p.textStyle(p.NORMAL); p.textSize(14); p.fill("#6b6258"); p.text(subtitle,24,62); p.pop();
@@ -696,27 +746,51 @@
 
       function drawStateMode() {
         const s = drawStage();
-        const colors = { calm:"#0891b2", active:"#f59e0b", surprised:"#e11d48" };
-        const color = colors[state.sketchState];
+        const gs = state.gameState;
         p.push();
-        p.noStroke();
-        p.fill(color);
-        p.circle(s.x + s.w * 0.62, s.y + s.h * 0.50, 150);
-        p.fill("#ffffff");
-        p.circle(s.x + s.w * 0.58, s.y + s.h * 0.45, 22);
-        p.circle(s.x + s.w * 0.66, s.y + s.h * 0.45, 22);
-        p.fill("#222222");
-        p.circle(s.x + s.w * 0.58, s.y + s.h * 0.45, 9);
-        p.circle(s.x + s.w * 0.66, s.y + s.h * 0.45, 9);
-        p.noFill();
-        p.stroke("#ffffff");
-        p.strokeWeight(4);
-        const mouthY = state.sketchState === "surprised" ? s.y + s.h * 0.56 : s.y + s.h * 0.58;
-        if (state.sketchState === "surprised") p.circle(s.x + s.w * 0.62, mouthY, 30);
-        else p.arc(s.x + s.w * 0.62, mouthY, 58, 36, 0, p.PI);
-        if (state.showLabels) {
-          drawLabel(`mood = "${state.sketchState}"`, s.x + 28, s.y + 46, color, 15);
-          drawLabel("click or press a key to change state", s.x + 28, s.y + 78, "#6b6258", 13);
+
+        if (gs === "title") {
+          // TITLE SCREEN: black bg
+          p.noStroke();
+          p.fill(10, 10, 20);
+          p.rect(s.x, s.y, s.w, s.h, 20);
+          p.fill(255);
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textStyle(p.BOLD);
+          p.textSize(28);
+          p.text("TITLE SCREEN", s.x + s.w/2, s.y + s.h * 0.38);
+          p.textStyle(p.NORMAL);
+          p.textSize(16);
+          p.text("Press SPACE to Start", s.x + s.w/2, s.y + s.h * 0.56);
+          // blinking cursor
+          const blinkOn = Math.floor(p.millis() / 520) % 2 === 0;
+          if (blinkOn) {
+            p.fill(255, 255, 0);
+            p.textSize(20);
+            p.text("_", s.x + s.w/2 + 100, s.y + s.h * 0.56);
+          }
+          if (state.showLabels) {
+            drawLabel('gameState = "title"', s.x + 20, s.y + 26, "#7c3aed", 14);
+            drawLabel("press Space or Simulate Space", s.x + 20, s.y + 52, "#6b6258", 12);
+          }
+        } else {
+          // PLAY SCREEN: colored bg
+          p.noStroke();
+          p.fill(224, 242, 254);
+          p.rect(s.x, s.y, s.w, s.h, 20);
+          // draw all placed circles
+          for (const c of state.gameCircles) {
+            p.colorMode(p.HSB, 360, 100, 100);
+            p.fill(c.hue, 80, 90, 0.88);
+            p.colorMode(p.RGB, 255);
+            p.noStroke();
+            p.circle(c.x, c.y, c.r * 2);
+          }
+          if (state.showLabels) {
+            drawLabel('gameState = "play"', s.x + 20, s.y + 26, "#0891b2", 14);
+            drawLabel("click inside to draw shapes", s.x + 20, s.y + 52, "#6b6258", 12);
+            drawLabel("press Esc or Simulate Esc to return to title", s.x + 20, s.y + 76, "#6b6258", 12);
+          }
         }
         p.pop();
       }

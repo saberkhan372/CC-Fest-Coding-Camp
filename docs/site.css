@@ -578,6 +578,115 @@ a{color:inherit}
   color:var(--accent);
 }
 
+/* ─── SEQUENCE BRIDGE LINK ─── */
+.sequence-bridge{
+  display:inline-block;
+  margin-top:10px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.04em;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(45,106,79,.08);
+  border:1.5px solid rgba(45,106,79,.2);
+  color:#2d6a4f;
+  text-decoration:none;
+  transition:background .12s,border-color .12s;
+  white-space:nowrap;
+}
+.sequence-bridge:hover{
+  background:rgba(45,106,79,.15);
+  border-color:#2d6a4f;
+}
+
+/* ─── WHERE TO START ─── */
+.start-here{
+  padding:28px;
+  margin-bottom:26px;
+}
+.start-here-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:20px;
+}
+.library-stat-bar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--ink-light);
+}
+.library-stat-bar a{
+  color:var(--ink);
+  text-decoration:none;
+  font-weight:700;
+  transition:color .12s;
+}
+.library-stat-bar a:hover{color:var(--accent)}
+.library-stat-bar span{color:var(--ink-light);font-weight:400}
+.start-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+@media(max-width:860px){.start-grid{grid-template-columns:1fr}}
+.start-card{
+  background:rgba(255,255,255,.7);
+  border:1.5px solid rgba(44,42,38,.08);
+  border-radius:14px;
+  padding:18px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.start-card-icon{
+  font-size:22px;
+  line-height:1;
+  margin-bottom:2px;
+}
+.start-card h3{
+  font-size:15px;
+  font-weight:800;
+  margin:0;
+  color:var(--ink);
+}
+.start-card p{
+  font-size:13px;
+  color:var(--ink-light);
+  margin:0;
+  line-height:1.5;
+}
+.start-links{
+  list-style:none;
+  padding:0;
+  margin:4px 0 8px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.start-links li a{
+  font-size:13px;
+  font-weight:600;
+  color:var(--accent);
+  text-decoration:none;
+}
+.start-links li a:hover{text-decoration:underline}
+.start-links li::before{
+  content:"→ ";
+  color:var(--ink-light);
+  font-size:12px;
+}
+.start-card .button{
+  align-self:flex-start;
+  margin-top:auto;
+  font-size:12px;
+  padding:6px 14px;
+}
+
 /* ─── CAMP WORDS STRIP ─── */
 
 .camp-words{
@@ -607,7 +716,40 @@ a{color:inherit}
 
 /* ─── TOOL STATIONS ─── */
 
-/* Search box */
+/* Global search */
+.global-search-wrap{
+  max-width:var(--content-width,1180px);
+  margin:0 auto 28px;
+  padding:0 var(--page-pad,32px);
+}
+.global-search{
+  width:100%;
+  max-width:640px;
+  padding:12px 20px;
+  border-radius:999px;
+  border:1.5px solid var(--line);
+  background:#fff;
+  font-family:"DM Sans",system-ui,sans-serif;
+  font-size:15px;
+  color:var(--ink);
+  outline:none;
+  transition:border-color .15s,box-shadow .15s;
+  display:block;
+}
+.global-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,57,29,.1)}
+.global-search::placeholder{color:var(--ink-light)}
+.global-search::-webkit-search-cancel-button{-webkit-appearance:none}
+
+/* Search-active: override all collapsed-section hide rules */
+body.search-active #interactive-tools.is-collapsible:not(.is-open) .station-list,
+body.search-active #concept-bridges.is-collapsible:not(.is-open) .station-list{display:block !important}
+body.search-active .station.is-collapsible:not(.is-open) .tool-grid{display:flex !important;flex-wrap:wrap}
+body.search-active .station.is-collapsible:not(.is-open) .tool-grid .tool-card{display:flex !important}
+body.search-active #starter-sketches.is-collapsible:not(.is-open) .tool-grid{display:flex !important;flex-wrap:wrap}
+body.search-active #starter-sketches.is-collapsible:not(.is-open) .tool-grid .tool-card{display:flex !important}
+body.search-active .station-peek-trigger{display:none !important}
+
+/* Legacy alias kept for any remaining references */
 .tool-search-wrap{margin-bottom:14px}
 .tool-search{
   width:100%;
@@ -720,7 +862,9 @@ a{color:inherit}
 }
 
 .station.is-collapsible .station-header,
-#starter-sketches.is-collapsible .gallery-header{
+#starter-sketches.is-collapsible .gallery-header,
+#interactive-tools.is-collapsible .gallery-header,
+#concept-bridges.is-collapsible .gallery-header{
   align-items:center;
   cursor:pointer;
   padding:14px 16px;
@@ -734,7 +878,11 @@ a{color:inherit}
 .station.is-collapsible .station-header:hover,
 .station.is-collapsible .station-header:focus-visible,
 #starter-sketches.is-collapsible .gallery-header:hover,
-#starter-sketches.is-collapsible .gallery-header:focus-visible{
+#starter-sketches.is-collapsible .gallery-header:focus-visible,
+#interactive-tools.is-collapsible .gallery-header:hover,
+#interactive-tools.is-collapsible .gallery-header:focus-visible,
+#concept-bridges.is-collapsible .gallery-header:hover,
+#concept-bridges.is-collapsible .gallery-header:focus-visible{
   border-color:rgba(200,57,29,.2);
   background:#fff;
   transform:translateY(-1px);
@@ -755,7 +903,12 @@ a{color:inherit}
   white-space:nowrap;
 }
 
-/* Starter sketches: only show header button when open (peek trigger handles collapsed CTA) */
+/* Concept bridge stations: label says "bridges" */
+#concept-bridges .station.is-collapsible.is-open .station-header::after{
+  content:"Hide bridges";
+}
+
+/* Starter sketches section: label */
 #starter-sketches.is-collapsible.is-open .gallery-header::after{
   content:"Hide sketches";
   margin-left:auto;
@@ -768,8 +921,36 @@ a{color:inherit}
   white-space:nowrap;
 }
 
+/* Workshop tools section: label */
+#interactive-tools.is-collapsible.is-open .gallery-header::after{
+  content:"Hide tools";
+  margin-left:auto;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--cream);
+  color:var(--accent);
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+/* Concept bridges section: label */
+#concept-bridges.is-collapsible.is-open .gallery-header::after{
+  content:"Hide bridges";
+  margin-left:auto;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--cream);
+  color:var(--accent);
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
 .station.is-collapsible.is-open .station-header,
-#starter-sketches.is-collapsible.is-open .gallery-header{
+#starter-sketches.is-collapsible.is-open .gallery-header,
+#interactive-tools.is-collapsible.is-open .gallery-header,
+#concept-bridges.is-collapsible.is-open .gallery-header{
   margin-bottom:20px;
 }
 
@@ -778,8 +959,23 @@ a{color:inherit}
   display:none;
 }
 
+/* Concept bridge stations: show only first 2 cards as a peek */
+#concept-bridges .station.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+3){
+  display:none;
+}
+
 /* Starter sketches: show first 3 cards as a peek */
 #starter-sketches.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+4){
+  display:none;
+}
+
+/* Section-level collapse: hide station-list and filter bars */
+#interactive-tools.is-collapsible:not(.is-open) .station-list,
+#interactive-tools.is-collapsible:not(.is-open) .tool-search-wrap,
+#interactive-tools.is-collapsible:not(.is-open) .suit-filter-bar,
+#interactive-tools.is-collapsible:not(.is-open) .pathway-filter-bar,
+#interactive-tools.is-collapsible:not(.is-open) .suit-legend,
+#concept-bridges.is-collapsible:not(.is-open) .station-list{
   display:none;
 }
 
@@ -804,7 +1000,9 @@ a{color:inherit}
 }
 
 .station.is-collapsible.is-open .station-peek-trigger,
-#starter-sketches.is-collapsible.is-open .station-peek-trigger{
+#starter-sketches.is-collapsible.is-open .station-peek-trigger,
+#interactive-tools.is-collapsible.is-open .station-peek-trigger,
+#concept-bridges.is-collapsible.is-open .station-peek-trigger{
   display:none;
 }
 
