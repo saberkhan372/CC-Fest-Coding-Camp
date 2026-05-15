@@ -368,6 +368,9 @@ a{color:inherit}
 .card-d{right:52px;bottom:68px;--rotate:-8deg;--float-speed:6.8s;animation-delay:-2.2s;background:#2d6a4f;font-size:12px}
 .card-e{left:52%;top:44px;--rotate:3deg;--float-speed:6.5s;animation-delay:-.8s;background:var(--ink);font-size:11px}
 .card-f{right:82px;top:52%;--rotate:-5deg;--float-speed:5.6s;animation-delay:-1.2s;background:#5c4084;font-size:12px}
+.card-g{left:30%;top:48%;--rotate:6deg;--float-speed:6.9s;animation-delay:-4.1s;background:#b5451b;font-size:12px;color:rgba(255,255,255,.92)}
+.card-h{left:48%;bottom:34%;--rotate:-4deg;--float-speed:7.4s;animation-delay:-2.7s;background:#1a5276;font-size:12px}
+.card-i{right:34%;top:36%;--rotate:8deg;--float-speed:5.9s;animation-delay:-5.3s;background:#c8860a;color:var(--ink);font-size:11px}
 
 @keyframes gridDrift{
   from{background-position:0 0,0 0}
@@ -633,7 +636,7 @@ a{color:inherit}
   grid-template-columns:repeat(3,1fr);
   gap:16px;
 }
-@media(max-width:860px){.start-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.start-grid{grid-template-columns:1fr}}
 .start-card{
   background:rgba(255,255,255,.7);
   border:1.5px solid rgba(44,42,38,.08);
@@ -1006,9 +1009,9 @@ body.search-active .station-peek-trigger{display:none !important}
   display:none;
 }
 
-/* Solo station (1 card): don't create empty column gaps */
+/* Solo station (1 card): fill both columns so no empty gap appears */
 .station[data-solo]:not(#station-support) .tool-grid{
-  grid-template-columns:minmax(0,380px);
+  grid-template-columns:repeat(2,1fr);
 }
 
 .station-peek-btn{
@@ -1176,7 +1179,7 @@ body.search-active .station-peek-trigger{display:none !important}
   z-index:2;
 }
 .card-pip{top:14px;left:16px}
-.card-pip-br{bottom:14px;right:16px;transform:rotate(180deg)}
+.card-pip-br{bottom:14px;right:16px}
 .card-pip .pip-num,.card-pip-br .pip-num{font-size:13px;font-weight:800;letter-spacing:.03em}
 .card-pip .pip-sym,.card-pip-br .pip-sym{font-size:11px}
 
