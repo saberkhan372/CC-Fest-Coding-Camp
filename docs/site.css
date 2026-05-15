@@ -619,6 +619,27 @@ a{color:inherit}
   color:var(--accent);
 }
 
+.sequence-bridge{
+  display:inline-block;
+  margin-top:10px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.04em;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(45,106,79,.08);
+  border:1.5px solid rgba(45,106,79,.2);
+  color:#2d6a4f;
+  text-decoration:none;
+  transition:background .12s,border-color .12s;
+  white-space:nowrap;
+}
+
+.sequence-bridge:hover{
+  background:rgba(45,106,79,.15);
+  border-color:#2d6a4f;
+}
+
 /* ─── CAMP WORDS STRIP ─── */
 
 .camp-words{
