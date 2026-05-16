@@ -1,1187 +1,1308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>map() Range Translator</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --accent-soft: #dbeafe;
-      --input: #7c3aed;
-      --output: #e11d48;
-      --machine: #0891b2;
-      --green: #16a34a;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>map() Range Translator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link rel="stylesheet" href="../concept-bridge.css">
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #315c92;
+    --accent-dark: #23466f;
+    --accent-bg: #eef4fc;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 880px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
 
-    .controls,
-    .workspace,
-    .side-panel {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 720px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      user-select: none;
-    }
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 22px;
+  }
 
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
 
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: var(--paper);
+  }
 
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
 
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--faint);
+    margin-bottom: 5px;
+  }
 
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 120px minmax(160px, 1fr) 80px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(490px, 100%);
-    }
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
 
-    .small-slider-wrap {
-      display: grid;
-      grid-template-columns: 88px minmax(120px, 1fr) 62px;
-      gap: 8px;
-      align-items: center;
-      min-width: 240px;
-    }
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
+  }
 
-    label,
-    .value-label,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
+  .main-left {
+    display: grid;
+    gap: 18px;
+    align-content: start;
+    min-width: 0;
+  }
 
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
 
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
+  .canvas-panel { overflow: hidden; }
 
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
 
-    #sketch-holder canvas { display: block; }
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
 
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
 
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
+  #map-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
 
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
 
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
+  .ctrl-panel { padding: 16px; }
 
-    .card h2 { font-size: 1.15rem; }
-    .card h3 { font-size: 1rem; }
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
 
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
 
-    .card p { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #edf4ff; border-color: #90b4e2; }
 
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-    }
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
 
-    .legend {
-      display: grid;
-      gap: 8px;
-    }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
 
-    .legend-item {
-      display: grid;
-      grid-template-columns: 16px 1fr;
-      gap: 8px;
-      align-items: center;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(49,92,146,0.35);
+    outline-offset: 2px;
+  }
 
-    .swatch {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-    }
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
 
-    .swatch.input { background: var(--input); }
-    .swatch.output { background: var(--output); }
-    .swatch.machine { background: var(--machine); }
-    .swatch.green { background: var(--green); }
+  .box-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
 
-    .code-card { display: none; }
-    .code-card.visible { display: block; }
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
 
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
 
-    .note {
-      font-size: 0.86rem;
-      color: var(--muted);
-    }
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
+  }
 
-    @media (max-width: 980px) {
-      main { grid-template-columns: 1fr; }
-      .workspace { height: 590px; }
-    }
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
+    display: block;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
 
-    @media (max-width: 600px) {
-      header, main {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 42px;
+    text-align: center;
+  }
 
-      .slider-wrap,
-      .small-slider-wrap {
-        grid-template-columns: 1fr;
-        gap: 4px;
-      }
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
+  }
 
-      .workspace { height: 540px; }
-    }
-  </style>
-  <link rel="stylesheet" href="../../concept-bridge.css">
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 0; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 760px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
+  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--faint);
+    flex-shrink: 0;
+    min-width: 88px;
+  }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
+  .bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
+  }
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .main-left { gap: 18px; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
+    .bottom-nav { flex-direction: column; }
+  }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
+</style>
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · p5.js Core</p>
+  <h1>map() Range Translator</h1>
+  <p class="subtitle">
+    A concept bridge for <code>map()</code>. One number from an input range becomes a matching number in an output range.
+    This is how mouse position, time, sound, and data start controlling size, color, height, transparency, and motion.
+  </p>
+
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">data scaling</span>
+    <span class="unlock-pill">mouse control</span>
+    <span class="unlock-pill">visual translation</span>
+    <span class="unlock-pill">animation mapping</span>
+    <span class="unlock-pill">interactive color</span>
   </div>
-  <header>
-    <h1>map() Range Translator</h1>
-    <p class="subtitle">
-      A beginner-friendly explanation of p5.js <strong>map()</strong>: a number from one range becomes a number in another range.
-      Use it to turn mouse position into size, color, height, transparency, speed, and more.
-    </p>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-      <div class="row">
-        <button id="mode-size" class="active">Size</button>
-        <button id="mode-color">Color</button>
-        <button id="mode-bar">Bar Height</button>
-        <button id="mode-opacity">Opacity</button>
-        <button id="mode-reverse">Reverse Range</button>
-        <button id="mode-wireit">Wire It</button>
-        <span id="mode-pill" class="pill">Input world → output world</span>
-      </div>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text"><code>map()</code> is a weird formula you memorize, or a magic trick that somehow changes numbers into visuals.</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text"><code>map()</code> is a translator. It keeps the same relative position while moving a value from one range into another.</div>
+    </div>
+  </section>
 
-      <div class="row">
-        <div class="slider-wrap">
-          <label for="input-slider">Input value</label>
-          <input id="input-slider" type="range" min="0" max="100" value="35" step="1" />
-          <span id="input-value" class="value-label">35</span>
+  <section class="main-grid" aria-label="Interactive map concept bridge">
+    <div class="main-left">
+      <article class="panel canvas-panel">
+        <div class="canvas-bar">
+          <div class="canvas-bar-title" id="canvas-title">Size: mouse position becomes circle size</div>
+          <div class="canvas-bar-sub" id="canvas-sub">The input stays the same percent through its new range.</div>
         </div>
-
-        <label class="toggle-label"><input id="animate-input" type="checkbox" />Animate input</label>
-        <label class="toggle-label"><input id="show-formula" type="checkbox" checked />Show formula</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
-        <label class="toggle-label"><input id="clamp-output" type="checkbox" checked />Constrain output</label>
-      </div>
-
-      <div class="row">
-        <span class="preset-label">Input presets:</span>
-        <button class="preset-button" data-value="0">0</button>
-        <button class="preset-button" data-value="25">25</button>
-        <button class="preset-button" data-value="50">50</button>
-        <button class="preset-button" data-value="75">75</button>
-        <button class="preset-button" data-value="100">100</button>
-      </div>
-
-      <div class="row">
-        <div class="small-slider-wrap">
-          <label for="out-min-slider">Output min</label>
-          <input id="out-min-slider" type="range" min="0" max="200" value="20" step="1" />
-          <span id="out-min-value" class="value-label">20</span>
+        <div class="canvas-wrap">
+          <canvas id="map-canvas" width="620" height="420" aria-label="Interactive map() visualization"></canvas>
+          <div class="touch-hint">Tap and drag the sliders on the right to explore.</div>
         </div>
-        <div class="small-slider-wrap">
-          <label for="out-max-slider">Output max</label>
-          <input id="out-max-slider" type="range" min="0" max="240" value="140" step="1" />
-          <span id="out-max-value" class="value-label">140</span>
-        </div>
-      </div>
-    </section>
+      </article>
 
-    <section class="workspace">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        map() translates a number from one range into a matching position in another range.
-      </div>
-    </section>
-
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">The big idea</h2>
-        <p id="lesson-text">
-          map() is a translator. It takes a number from an input world, figures out how far through that world it is, and places it in the same relative spot in an output world.
-        </p>
-        <span id="formula-box" class="formula">map(value, 0, 100, 20, 140)</span>
+      <section class="prose-section">
+        <h2 id="prose-title">The same relative position moves to a new world</h2>
+        <p id="prose-body">If an input is 25% of the way through its original range, <code>map()</code> places the output 25% of the way through the new range. That is the whole idea. Once you feel that relationship, <code>map()</code> stops being a formula and starts becoming a wiring move.</p>
       </section>
 
-      <section class="card">
-        <h3>Three-step mental model</h3>
-        <p><strong>1.</strong> Where is the input value between its minimum and maximum?</p>
-        <p><strong>2.</strong> Turn that into a percent of the way through.</p>
-        <p><strong>3.</strong> Put the output value the same percent through the output range.</p>
-      </section>
+      <div class="legend" aria-label="map concept legend">
+        <div class="legend-item"><span class="swatch" style="background:#7a5ea8"></span> input range</div>
+        <div class="legend-item"><span class="swatch" style="background:#315c92"></span> translator / mapping</div>
+        <div class="legend-item"><span class="swatch" style="background:#e07a5f"></span> output value</div>
+        <div class="legend-item"><span class="swatch" style="background:#81b29a"></span> same percent through</div>
+      </div>
 
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch input"></span><span>input value</span></div>
-          <div class="legend-item"><span class="swatch output"></span><span>output value</span></div>
-          <div class="legend-item"><span class="swatch machine"></span><span>map() translator</span></div>
-          <div class="legend-item"><span class="swatch green"></span><span>same percent through the range</span></div>
+      <section class="pathways" aria-label="Practice and remix links">
+        <div class="pathways-title">What's next</div>
+        <div class="path-links">
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/map-explorer/" class="path-link">
+            <span class="path-link-type">Practice →</span>
+            <span class="path-link-name">Map() Explorer — use range translation in a full workshop tool with more guided controls</span>
+            <span class="path-link-arrow">›</span>
+          </a>
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/color-from-position/" class="path-link">
+            <span class="path-link-type">Remix →</span>
+            <span class="path-link-name">Color From Position — let mouse position map directly into brightness, hue, or size</span>
+            <span class="path-link-arrow">›</span>
+          </a>
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/" class="path-link">
+            <span class="path-link-type">Related →</span>
+            <span class="path-link-name">Distance Becomes Behavior — use one measured number to drive many visual behaviors</span>
+            <span class="path-link-arrow">›</span>
+          </a>
         </div>
       </section>
+    </div>
 
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">Move the input to 50. Why does the output land halfway between the output minimum and maximum?</p>
-      </section>
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="map() modes">
+        <button class="tab" role="tab" data-mode="size" aria-selected="true" tabindex="0">Size<span class="step">1 of 5</span></button>
+        <button class="tab" role="tab" data-mode="color" aria-selected="false" tabindex="-1">Color<span class="step">2 of 5</span></button>
+        <button class="tab" role="tab" data-mode="bar" aria-selected="false" tabindex="-1">Bar<span class="step">3 of 5</span></button>
+        <button class="tab" role="tab" data-mode="opacity" aria-selected="false" tabindex="-1">Opacity<span class="step">4 of 5</span></button>
+        <button class="tab" role="tab" data-mode="wire" aria-selected="false" tabindex="-1">Wire It<span class="step">5 of 5</span></button>
+      </nav>
 
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code id="code-box">let size = map(mouseX, 0, width, 20, 140);
-circle(width / 2, height / 2, size);</code></pre>
-        <p class="note">
-          p5.js map() does not automatically clamp values. This tool’s “Constrain output” checkbox shows the common pattern of using constrain() after map().
-        </p>
-      </section>
+      <div class="predict">
+        <span class="box-label">Predict before changing</span>
+        <span class="box-body" id="predict-text">Before you move the input slider, where do you think the output will land when the input is halfway through its range?</span>
+      </div>
+
+      <div class="ctrl-group" id="controls"></div>
+      <div id="presets-area"></div>
+
+      <div class="switches">
+        <label class="sw"><input type="checkbox" id="animateToggle"> Animate input</label>
+        <label class="sw"><input type="checkbox" id="clampToggle" checked> Constrain output</label>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header"><span>Live code</span><span id="code-note">One input value becomes one new number.</span></div>
+        <div class="code-focus-line mono" id="focus-code"></div>
+        <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">▸ See full p5.js sketch</button>
+        <div class="full-code-body mono" id="full-code"></div>
+      </div>
+
+      <div class="callout big-idea">
+        <span class="box-label">Big idea</span>
+        <span class="box-body" id="big-idea-text"></span>
+      </div>
+
+      <div class="callout bug">
+        <span class="box-label">⚠ Common mistake</span>
+        <span class="box-body" id="bug-text"></span>
+      </div>
+
+      <div class="callout try">
+        <span class="box-label">Try this</span>
+        <span class="box-body" id="try-text"></span>
+      </div>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    const state = {
-      mode: "size",
-      input: 35,
-      inMin: 0,
-      inMax: 100,
-      outMin: 20,
-      outMax: 140,
-      animate: false,
-      animationDirection: 1,
-      showFormula: true,
-      showCode: false,
-      clamp: true,
-      wireInput: 50,
-      wireConnected: null  // "circle-size" | "x-position" | "color-brightness" | "rotation"
-    };
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/">Next: Distance Becomes Behavior →</a>
+  </nav>
+</main>
 
-    const els = {};
+<script>
+'use strict';
 
-    function setupUI() {
-      els.modeSize = document.querySelector("#mode-size");
-      els.modeColor = document.querySelector("#mode-color");
-      els.modeBar = document.querySelector("#mode-bar");
-      els.modeOpacity = document.querySelector("#mode-opacity");
-      els.modeReverse = document.querySelector("#mode-reverse");
-      els.modeWireit = document.querySelector("#mode-wireit");
-      els.modePill = document.querySelector("#mode-pill");
-      els.inputSlider = document.querySelector("#input-slider");
-      els.inputValue = document.querySelector("#input-value");
-      els.outMinSlider = document.querySelector("#out-min-slider");
-      els.outMinValue = document.querySelector("#out-min-value");
-      els.outMaxSlider = document.querySelector("#out-max-slider");
-      els.outMaxValue = document.querySelector("#out-max-value");
-      els.animateInput = document.querySelector("#animate-input");
-      els.showFormula = document.querySelector("#show-formula");
-      els.showCode = document.querySelector("#show-code");
-      els.clampOutput = document.querySelector("#clamp-output");
-      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.formulaBox = document.querySelector("#formula-box");
-      els.questionText = document.querySelector("#question-text");
-      els.codeCard = document.querySelector("#code-card");
-      els.codeBox = document.querySelector("#code-box");
-      els.caption = document.querySelector("#canvas-caption");
+const state = {
+  mode: "size",
+  input: 35,
+  inMin: 0,
+  inMax: 100,
+  outMin: 20,
+  outMax: 140,
+  animate: false,
+  direction: 1,
+  changedKey: "input",
+  wireTarget: "size"
+};
 
-      els.modeSize.addEventListener("click", () => setMode("size"));
-      els.modeColor.addEventListener("click", () => setMode("color"));
-      els.modeBar.addEventListener("click", () => setMode("bar"));
-      els.modeOpacity.addEventListener("click", () => setMode("opacity"));
-      els.modeReverse.addEventListener("click", () => setMode("reverse"));
-      els.modeWireit.addEventListener("click", () => setMode("wireit"));
+const modes = {
+  size: {
+    canvasTitle: "Size: mouse position becomes circle size",
+    canvasSub: "The input stays the same percent through its new range.",
+    predict: "Before you move the input slider, where do you think the output will land when the input is halfway through its range?",
+    big: "map() is not about size. It is about translation. Size is just one easy place to feel the translation happen.",
+    bug: "A common mistake is assuming map() clamps values automatically. It does not. If your input goes outside the expected range, the output can go outside too.",
+    tryIt: "Set the input to 25, 50, and 75. Describe where each output lands in the new range before you check the result.",
+    note: "Translate mouse position into size.",
+    proseTitle: "One range becomes another range",
+    proseBody: "When a value moves from 0–100 into 20–140, it keeps its relative position. An input 50% of the way through its range becomes an output 50% of the way through the new range.",
+    controls: [
+      { key: "input", label: "Input value", code: "value", min: 0, max: 100, step: 1 },
+      { key: "outMin", label: "Output minimum", code: "outMin", min: 0, max: 200, step: 1 },
+      { key: "outMax", label: "Output maximum", code: "outMax", min: 20, max: 240, step: 1 }
+    ],
+    presets: [
+      { label: "Balanced influence", v: { input: 50, outMin: 20, outMax: 140 } },
+      { label: "Edge case", v: { input: 0, outMin: 20, outMax: 140 } },
+      { label: "Whole-canvas effect", v: { input: 100, outMin: 10, outMax: 210 } },
+      { label: "⚠ What goes wrong?", v: { input: 120, outMin: 20, outMax: 140 }, isBreak: true }
+    ]
+  },
+  color: {
+    canvasTitle: "Color: one input becomes one brightness value",
+    canvasSub: "The same translation can control lightness instead of size.",
+    predict: "Before you move the input, do you think the shape will get brighter smoothly or in jumps?",
+    big: "map() does not care what the output means. A mapped number can become a color channel just as easily as a size.",
+    bug: "Learners often think map() changes the color directly. It only returns a number. You still decide how to use that number in fill(), stroke(), or HSB.",
+    tryIt: "Find an input that feels dim, one that feels balanced, and one that feels almost glowing.",
+    note: "Translate input into brightness.",
+    proseTitle: "The output meaning is up to you",
+    proseBody: "The same mapped value can become brightness, alpha, hue, speed, bar height, or rotation. The relationship stays the same. Only the destination property changes.",
+    controls: [
+      { key: "input", label: "Input value", code: "value", min: 0, max: 100, step: 1 },
+      { key: "outMin", label: "Brightness minimum", code: "outMin", min: 0, max: 255, step: 1 },
+      { key: "outMax", label: "Brightness maximum", code: "outMax", min: 0, max: 255, step: 1 }
+    ],
+    presets: [
+      { label: "Soft range", v: { input: 50, outMin: 50, outMax: 180 } },
+      { label: "High contrast", v: { input: 50, outMin: 0, outMax: 255 } },
+      { label: "Mostly bright", v: { input: 30, outMin: 150, outMax: 255 } },
+      { label: "⚠ Inverted light", v: { input: 85, outMin: 255, outMax: 20 }, isBreak: true }
+    ]
+  },
+  bar: {
+    canvasTitle: "Bar height: how charts are really made",
+    canvasSub: "Data values become visual height through range translation.",
+    predict: "Before changing the input, where do you think a middle data value should land if the output range is tall?",
+    big: "This is the move behind nearly every beginner chart: a data value becomes a drawable height on the canvas.",
+    bug: "A common mistake is drawing raw data values directly. If your data is 88 and your canvas is 400px tall, you still need map() to decide where that 88 belongs visually.",
+    tryIt: "Treat the input like a survey score. What output range would make the differences easiest to read?",
+    note: "Translate data into bar height.",
+    proseTitle: "Data becomes drawing",
+    proseBody: "A chart is just a mapping decision. Raw values live in one world. Pixels live in another. <code>map()</code> is the bridge between them.",
+    controls: [
+      { key: "input", label: "Data value", code: "dataValue", min: 0, max: 100, step: 1 },
+      { key: "outMin", label: "Bar minimum", code: "outMin", min: 0, max: 80, step: 1 },
+      { key: "outMax", label: "Bar maximum", code: "outMax", min: 100, max: 280, step: 1 }
+    ],
+    presets: [
+      { label: "Small difference", v: { input: 50, outMin: 20, outMax: 120 } },
+      { label: "Whole chart", v: { input: 50, outMin: 20, outMax: 260 } },
+      { label: "Starts above zero", v: { input: 60, outMin: 60, outMax: 240 } },
+      { label: "⚠ Flat chart", v: { input: 60, outMin: 120, outMax: 120 }, isBreak: true }
+    ]
+  },
+  opacity: {
+    canvasTitle: "Opacity: the output can become transparency",
+    canvasSub: "A fourth color value can fade layers in and out.",
+    predict: "Before moving the input, what do you think will happen when the output range is tiny? What about when it spans 0 to 255?",
+    big: "map() is often invisible in finished sketches because it quietly drives alpha, softness, motion, and atmosphere.",
+    bug: "Another common mistake is forgetting that alpha is just another number. If you want transparency, the mapped value still needs somewhere to go: <code>fill(r, g, b, alpha)</code>.",
+    tryIt: "Find an output range where the circles feel ghostly but still readable.",
+    note: "Translate input into transparency.",
+    proseTitle: "Mapped values can become atmosphere",
+    proseBody: "Opacity is a great reminder that not every mapped value becomes position or size. Some become mood, visibility, or layering.",
+    controls: [
+      { key: "input", label: "Input value", code: "value", min: 0, max: 100, step: 1 },
+      { key: "outMin", label: "Alpha minimum", code: "outMin", min: 0, max: 255, step: 1 },
+      { key: "outMax", label: "Alpha maximum", code: "outMax", min: 0, max: 255, step: 1 }
+    ],
+    presets: [
+      { label: "Ghost trail", v: { input: 40, outMin: 18, outMax: 80 } },
+      { label: "Clear fade", v: { input: 40, outMin: 0, outMax: 255 } },
+      { label: "Mostly visible", v: { input: 70, outMin: 120, outMax: 255 } },
+      { label: "⚠ Invisible floor", v: { input: 50, outMin: 0, outMax: 0 }, isBreak: true }
+    ]
+  },
+  wire: {
+    canvasTitle: "Wire It: the same input can drive anything",
+    canvasSub: "Change what property receives the mapped output.",
+    predict: "Before switching targets, what do you think will feel most dramatic: mapping to x position, size, rotation, or color?",
+    big: "The real mental model is not “map() makes size.” It is “map() translates one world of numbers into another.” You choose the destination.",
+    bug: "Learners often think each property needs a different kind of mapping. Usually it does not. The same translated number can drive many outputs with only one line changed.",
+    tryIt: "Keep the input range the same and switch targets. Which output feels easiest to predict? Which feels most expressive?",
+    note: "One input can wire into many properties.",
+    proseTitle: "map() feels like wiring",
+    proseBody: "A mouse position, sensor reading, or dataset value can be wired into size, x position, rotation, hue, opacity, or timing. The math stays the same while the meaning changes.",
+    controls: [
+      { key: "input", label: "Input value", code: "value", min: 0, max: 100, step: 1 },
+      { key: "outMin", label: "Output minimum", code: "outMin", min: 0, max: 220, step: 1 },
+      { key: "outMax", label: "Output maximum", code: "outMax", min: 20, max: 260, step: 1 }
+    ],
+    presets: [
+      { label: "Map to size", v: { input: 50, outMin: 20, outMax: 140, wireTarget: "size" } },
+      { label: "Map to x", v: { input: 50, outMin: 80, outMax: 300, wireTarget: "x" } },
+      { label: "Map to rotation", v: { input: 50, outMin: -1.2, outMax: 1.2, wireTarget: "rotation" } },
+      { label: "Map to brightness", v: { input: 50, outMin: 20, outMax: 255, wireTarget: "brightness" } }
+    ]
+  }
+};
 
-      els.inputSlider.addEventListener("input", () => {
-        state.input = Number(els.inputSlider.value);
-        state.animate = false;
-        els.animateInput.checked = false;
-        updateUI();
+const wireTargets = [
+  { key: "size", label: "size" },
+  { key: "x", label: "x position" },
+  { key: "rotation", label: "rotation" },
+  { key: "brightness", label: "brightness" }
+];
+
+const canvas = document.getElementById("map-canvas");
+const ctx = canvas.getContext("2d");
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function mapValue(value, inMin, inMax, outMin, outMax) {
+  const t = (value - inMin) / (inMax - inMin);
+  return outMin + t * (outMax - outMin);
+}
+
+function getMappedOutput() {
+  let value = mapValue(state.input, state.inMin, state.inMax, state.outMin, state.outMax);
+  if (document.getElementById("clampToggle")?.checked) {
+    const low = Math.min(state.outMin, state.outMax);
+    const high = Math.max(state.outMin, state.outMax);
+    value = clamp(value, low, high);
+  }
+  return value;
+}
+
+function roundedRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawArrow(x1, y1, x2, y2, color) {
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.translate(x2, y2);
+  ctx.rotate(angle);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-8, -4);
+  ctx.lineTo(-8, 4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawLabel(text, x, y, color) {
+  ctx.save();
+  ctx.font = "700 13px 'DM Sans', sans-serif";
+  const padX = 7;
+  const padY = 4;
+  const tw = ctx.measureText(text).width;
+  ctx.fillStyle = "rgba(255, 250, 242, 0.94)";
+  roundedRect(x - padX, y - 18, tw + padX * 2, 24, 9);
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+function createToken(className, text) {
+  return `<span class="ct ${className}">${text}</span>`;
+}
+
+function renderFocusCode() {
+  const output = getMappedOutput();
+  const mode = modes[state.mode];
+  const key = state.changedKey;
+  const flash = (tokenKey, className, text) => createToken(`${className}${key === tokenKey ? " flash" : ""}`, text);
+
+  let line = "";
+  if (state.mode === "size") {
+    line = `${createToken("kw", "let")} size = ${createToken("fn", "map")}(mouseX, ${flash("inMin", "num", state.inMin)}, width, ${flash("outMin", "num", Math.round(state.outMin))}, ${flash("outMax", "num", Math.round(state.outMax))});\n` +
+      `${createToken("fn", "circle")}(width / 2, height / 2, ${flash("input", "str", "size")});`;
+  } else if (state.mode === "color") {
+    line = `${createToken("kw", "let")} brightness = ${createToken("fn", "map")}(mouseX, 0, width, ${flash("outMin", "num", Math.round(state.outMin))}, ${flash("outMax", "num", Math.round(state.outMax))});\n` +
+      `${createToken("fn", "fill")}(${flash("input", "str", "brightness")});`;
+  } else if (state.mode === "bar") {
+    line = `${createToken("kw", "let")} h = ${createToken("fn", "map")}(dataValue, 0, 100, ${flash("outMin", "num", Math.round(state.outMin))}, ${flash("outMax", "num", Math.round(state.outMax))});\n` +
+      `${createToken("fn", "rect")}(x, baseline - h, barWidth, ${flash("input", "str", "h")});`;
+  } else if (state.mode === "opacity") {
+    line = `${createToken("kw", "let")} alpha = ${createToken("fn", "map")}(mouseX, 0, width, ${flash("outMin", "num", Math.round(state.outMin))}, ${flash("outMax", "num", Math.round(state.outMax))});\n` +
+      `${createToken("fn", "fill")}(225, 29, 72, ${flash("input", "str", "alpha")});`;
+  } else {
+    const targetName = state.wireTarget;
+    line = `${createToken("kw", "let")} mapped = ${createToken("fn", "map")}(inputValue, 0, 100, ${flash("outMin", "num", state.outMin)}, ${flash("outMax", "num", state.outMax)});\n` +
+      `${createToken("cm", "// wire the output into " + targetName)}\n` +
+      `${flash("wireTarget", "str", targetName)} = ${createToken("str", "mapped")};`;
+  }
+
+  document.getElementById("focus-code").innerHTML = line;
+  document.getElementById("code-note").textContent = mode.note;
+
+  const fullCode = [
+    "function draw() {",
+    "  let inputValue = mouseX;",
+    `  let mapped = map(inputValue, ${state.inMin}, ${state.inMax}, ${state.outMin}, ${state.outMax});`,
+    document.getElementById("clampToggle")?.checked ? "  mapped = constrain(mapped, minOut, maxOut);" : "  // mapped is allowed to go outside the target range",
+    "  // then use mapped as size, brightness, alpha, x, or rotation",
+    "}"
+  ].join("\n");
+  document.getElementById("full-code").textContent = fullCode;
+}
+
+function makeControl(control) {
+  const row = document.createElement("div");
+  row.className = "ctrl-row";
+  row.innerHTML = `
+    <label for="ctrl-${control.key}">
+      ${control.label}
+      <small>${control.code}</small>
+    </label>
+    <span class="val-badge" id="val-${control.key}"></span>
+    <input id="ctrl-${control.key}" type="range" min="${control.min}" max="${control.max}" step="${control.step}" value="${state[control.key]}">
+  `;
+  const input = row.querySelector("input");
+  input.addEventListener("input", () => {
+    state[control.key] = Number(input.value);
+    state.changedKey = control.key;
+    if (control.key === "input") state.animate = false;
+    renderUI();
+  });
+  return row;
+}
+
+function renderControls() {
+  const controlsEl = document.getElementById("controls");
+  controlsEl.innerHTML = "";
+  modes[state.mode].controls.forEach((control) => controlsEl.appendChild(makeControl(control)));
+  modes[state.mode].controls.forEach((control) => {
+    document.getElementById(`val-${control.key}`).textContent = Number(state[control.key]).toFixed(control.step < 1 ? 1 : 0);
+  });
+  if (state.mode === "wire") {
+    const wrap = document.createElement("div");
+    wrap.className = "ctrl-row";
+    wrap.innerHTML = `
+      <label>Target property<small>where the output goes</small></label>
+      <span class="val-badge">${state.wireTarget}</span>
+    `;
+    const targetRow = document.createElement("div");
+    targetRow.className = "preset-row";
+    wireTargets.forEach((target) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "preset-btn";
+      if (state.wireTarget === target.key) btn.style.borderColor = "var(--accent)";
+      btn.textContent = target.label;
+      btn.addEventListener("click", () => {
+        state.wireTarget = target.key;
+        state.changedKey = "wireTarget";
+        renderUI();
       });
+      targetRow.appendChild(btn);
+    });
+    wrap.appendChild(targetRow);
+    controlsEl.appendChild(wrap);
+  }
+}
 
-      els.outMinSlider.addEventListener("input", () => {
-        state.outMin = Number(els.outMinSlider.value);
-        updateUI();
-      });
+function renderPresets() {
+  const area = document.getElementById("presets-area");
+  const mode = modes[state.mode];
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = `<div class="presets-label">Teaching presets</div>`;
+  const row = document.createElement("div");
+  row.className = "preset-row";
+  mode.presets.forEach((preset) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `preset-btn${preset.isBreak ? " break" : ""}`;
+    btn.textContent = preset.label;
+    btn.addEventListener("click", () => {
+      Object.entries(preset.v).forEach(([key, value]) => { state[key] = value; });
+      state.changedKey = Object.keys(preset.v)[0];
+      state.animate = false;
+      document.getElementById("animateToggle").checked = false;
+      renderUI();
+    });
+    row.appendChild(btn);
+  });
+  wrapper.appendChild(row);
+  area.innerHTML = "";
+  area.appendChild(wrapper);
+}
 
-      els.outMaxSlider.addEventListener("input", () => {
-        state.outMax = Number(els.outMaxSlider.value);
-        updateUI();
-      });
+function renderCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const displayWidth = canvas.clientWidth || 620;
+  const displayHeight = canvas.clientHeight || 420;
+  canvas.width = Math.round(displayWidth * dpr);
+  canvas.height = Math.round(displayHeight * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      els.animateInput.addEventListener("change", () => {
-        state.animate = els.animateInput.checked;
-      });
+  const w = displayWidth;
+  const h = displayHeight;
+  const output = getMappedOutput();
+  const t = (state.input - state.inMin) / (state.inMax - state.inMin);
 
-      els.showFormula.addEventListener("change", () => {
-        state.showFormula = els.showFormula.checked;
-        updateUI();
-      });
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "#fffaf2";
+  ctx.fillRect(0, 0, w, h);
 
-      els.showCode.addEventListener("change", () => {
-        state.showCode = els.showCode.checked;
-        updateUI();
-      });
+  ctx.strokeStyle = "#ece5d8";
+  ctx.lineWidth = 1;
+  for (let x = 0; x < w; x += 32) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let y = 0; y < h; y += 32) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
 
-      els.clampOutput.addEventListener("change", () => {
-        state.clamp = els.clampOutput.checked;
-        updateUI();
-      });
+  const margin = Math.max(38, w * 0.055);
+  const top = h * 0.16;
+  const rangeWidth = Math.min(220, w * 0.28);
+  const machineWidth = Math.min(150, w * 0.18);
+  const inputX = margin;
+  const machineX = inputX + rangeWidth + 28;
+  const outputX = machineX + machineWidth + 28;
+  const lineY = top + 74;
 
-      els.presetButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          state.input = Number(button.dataset.value);
-          state.animate = false;
-          els.animateInput.checked = false;
-          updateUI();
-        });
-      });
+  drawNumberLine(inputX, lineY, rangeWidth, state.inMin, state.inMax, state.input, "Input range", "#7a5ea8", t, `input = ${Math.round(state.input)}`);
+  drawMachine(machineX, top + 18, machineWidth, 110, t, output);
+  drawNumberLine(outputX, lineY, rangeWidth, state.outMin, state.outMax, output, "Output range", "#e07a5f", t, `output = ${output.toFixed(1)}`);
+  drawArrow(inputX + rangeWidth + 8, lineY, machineX - 10, lineY, "#8b7d6c");
+  drawArrow(machineX + machineWidth + 8, lineY, outputX - 10, lineY, "#8b7d6c");
 
-      updateUI();
+  drawDemo(w * 0.08, h * 0.48, w * 0.84, h * 0.34, output);
+}
+
+function drawNumberLine(x, y, width, min, max, value, label, color, t, valueLabel) {
+  const markerX = x + t * width;
+  ctx.save();
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  roundedRect(x - 18, y - 68, width + 36, 140, 18);
+  ctx.fill();
+
+  ctx.fillStyle = "#222";
+  ctx.font = "700 16px 'DM Sans', sans-serif";
+  ctx.fillText(label, x, y - 40);
+
+  ctx.strokeStyle = "#d8cbbb";
+  ctx.lineWidth = 8;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + width, y);
+  ctx.stroke();
+
+  ctx.strokeStyle = "#81b29a";
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(markerX, y);
+  ctx.stroke();
+
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(markerX, y, 9, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#6b6258";
+  ctx.font = "12px 'DM Sans', sans-serif";
+  ctx.fillText(Math.round(min), x - 3, y + 22);
+  ctx.fillText(Math.round(max), x + width - 8, y + 22);
+  drawLabel(valueLabel, markerX - 42, y - 24, color);
+  ctx.restore();
+}
+
+function drawMachine(x, y, width, height, t, output) {
+  ctx.save();
+  ctx.fillStyle = "rgba(49,92,146,0.08)";
+  roundedRect(x, y, width, height, 22);
+  ctx.fill();
+  ctx.strokeStyle = "#315c92";
+  ctx.lineWidth = 2;
+  roundedRect(x, y, width, height, 22);
+  ctx.stroke();
+  ctx.fillStyle = "#315c92";
+  ctx.font = "800 22px 'DM Sans', sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("map()", x + width / 2, y + 34);
+  ctx.fillStyle = "#334155";
+  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.fillText("same percent", x + width / 2, y + 66);
+  ctx.fillText(`${Math.round(t * 100)}% through`, x + width / 2, y + 88);
+  ctx.fillText(`→ ${output.toFixed(1)}`, x + width / 2, y + 106);
+  ctx.restore();
+}
+
+function drawDemo(x, y, width, height, output) {
+  ctx.save();
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  roundedRect(x, y, width, height, 22);
+  ctx.fill();
+  ctx.fillStyle = "#222";
+  ctx.font = "700 18px 'DM Sans', sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText("What the output controls", x + 22, y + 34);
+  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.fillStyle = "#6b6258";
+  ctx.fillText("The same mapped number can drive many visual properties.", x + 22, y + 56);
+
+  if (state.mode === "size") drawSizeDemo(x, y, width, height, output);
+  if (state.mode === "color") drawColorDemo(x, y, width, height, output);
+  if (state.mode === "bar") drawBarDemo(x, y, width, height, output);
+  if (state.mode === "opacity") drawOpacityDemo(x, y, width, height, output);
+  if (state.mode === "wire") drawWireDemo(x, y, width, height, output);
+  ctx.restore();
+}
+
+function drawSizeDemo(x, y, width, height, output) {
+  const cx = x + width * 0.52;
+  const cy = y + height * 0.58;
+  ctx.save();
+  ctx.fillStyle = "#dbeafe";
+  ctx.beginPath();
+  ctx.arc(cx, cy, Math.max(80, output / 2 + 26), 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#315c92";
+  ctx.beginPath();
+  ctx.arc(cx, cy, Math.max(12, output / 2), 0, Math.PI * 2);
+  ctx.fill();
+  drawLabel(`size = ${output.toFixed(1)}`, cx - 42, cy + 88, "#315c92");
+  ctx.restore();
+}
+
+function drawColorDemo(x, y, width, height, output) {
+  const cx = x + width * 0.52;
+  const cy = y + height * 0.58;
+  const brightness = clamp(output, 0, 255);
+  ctx.save();
+  ctx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 72, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#222";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  drawLabel(`brightness = ${brightness.toFixed(1)}`, cx - 56, cy + 96, "#222");
+  ctx.restore();
+}
+
+function drawBarDemo(x, y, width, height, output) {
+  const baseline = y + height - 34;
+  const barX = x + width * 0.48;
+  const barW = 84;
+  const barH = clamp(output, 0, height - 92);
+  ctx.save();
+  ctx.strokeStyle = "#d8cbbb";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x + 80, baseline);
+  ctx.lineTo(x + width - 80, baseline);
+  ctx.stroke();
+  ctx.fillStyle = "#e07a5f";
+  ctx.fillRect(barX, baseline - barH, barW, barH);
+  drawLabel(`bar height = ${barH.toFixed(1)}`, barX - 16, baseline - barH - 16, "#e07a5f");
+  ctx.restore();
+}
+
+function drawOpacityDemo(x, y, width, height, output) {
+  const cx = x + width * 0.52;
+  const cy = y + height * 0.58;
+  const alpha = clamp(output, 0, 255) / 255;
+  ctx.save();
+  ctx.fillStyle = "rgba(49,92,146,0.35)";
+  ctx.beginPath();
+  ctx.arc(cx - 42, cy, 56, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = `rgba(224,122,95,${alpha})`;
+  ctx.beginPath();
+  ctx.arc(cx + 24, cy, 56, 0, Math.PI * 2);
+  ctx.fill();
+  drawLabel(`alpha = ${(alpha * 255).toFixed(1)}`, cx - 20, cy + 94, "#c8391d");
+  ctx.restore();
+}
+
+function drawWireDemo(x, y, width, height, output) {
+  const cx = x + width * 0.5;
+  const cy = y + height * 0.58;
+  ctx.save();
+  ctx.strokeStyle = "#cbd5e1";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(x + 70, cy);
+  ctx.lineTo(x + width - 70, cy);
+  ctx.stroke();
+
+  if (state.wireTarget === "size") {
+    ctx.fillStyle = "#315c92";
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.max(12, output / 2), 0, Math.PI * 2);
+    ctx.fill();
+    drawLabel("mapped → size", cx - 42, cy + 92, "#315c92");
+  } else if (state.wireTarget === "x") {
+    const px = clamp(output, x + 90, x + width - 90);
+    ctx.fillStyle = "#315c92";
+    ctx.beginPath();
+    ctx.arc(px, cy, 28, 0, Math.PI * 2);
+    ctx.fill();
+    drawLabel("mapped → x", px - 28, cy + 92, "#315c92");
+  } else if (state.wireTarget === "rotation") {
+    ctx.translate(cx, cy);
+    ctx.rotate(output);
+    ctx.fillStyle = "#315c92";
+    ctx.fillRect(-10, -68, 20, 136);
+    drawLabel("mapped → rotation", -56, 96, "#315c92");
+  } else {
+    const brightness = clamp(output, 0, 255);
+    ctx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 58, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    drawLabel("mapped → brightness", cx - 62, cy + 92, "#222");
+  }
+  ctx.restore();
+}
+
+function renderUI() {
+  const mode = modes[state.mode];
+  document.getElementById("canvas-title").textContent = mode.canvasTitle;
+  document.getElementById("canvas-sub").textContent = mode.canvasSub;
+  document.getElementById("predict-text").textContent = mode.predict;
+  document.getElementById("big-idea-text").textContent = mode.big;
+  document.getElementById("bug-text").innerHTML = mode.bug;
+  document.getElementById("try-text").textContent = mode.tryIt;
+  document.getElementById("prose-title").textContent = mode.proseTitle;
+  document.getElementById("prose-body").innerHTML = mode.proseBody;
+  document.querySelectorAll(".tab").forEach((tab) => {
+    const active = tab.dataset.mode === state.mode;
+    tab.setAttribute("aria-selected", String(active));
+    tab.tabIndex = active ? 0 : -1;
+  });
+  document.getElementById("animateToggle").checked = state.animate;
+  renderControls();
+  renderPresets();
+  renderFocusCode();
+  renderCanvas();
+}
+
+function setMode(modeName) {
+  state.mode = modeName;
+  state.changedKey = "input";
+  if (modeName === "size") {
+    state.outMin = 20; state.outMax = 140;
+  } else if (modeName === "color") {
+    state.outMin = 0; state.outMax = 255;
+  } else if (modeName === "bar") {
+    state.outMin = 20; state.outMax = 240;
+  } else if (modeName === "opacity") {
+    state.outMin = 18; state.outMax = 255;
+  } else if (modeName === "wire") {
+    state.outMin = 20; state.outMax = 140;
+    state.wireTarget = "size";
+  }
+  renderUI();
+}
+
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => setMode(tab.dataset.mode));
+  tab.addEventListener("keydown", (event) => {
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const current = tabs.findIndex((item) => item.dataset.mode === state.mode);
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      setMode(tabs[(current + 1) % tabs.length].dataset.mode);
+      tabs[(current + 1) % tabs.length].focus();
     }
-
-    function setMode(mode) {
-      state.mode = mode;
-
-      if (mode === "size") {
-        state.outMin = 20;
-        state.outMax = 140;
-      } else if (mode === "color") {
-        state.outMin = 0;
-        state.outMax = 255;
-      } else if (mode === "bar") {
-        state.outMin = 30;
-        state.outMax = 260;
-      } else if (mode === "opacity") {
-        state.outMin = 20;
-        state.outMax = 255;
-      } else if (mode === "reverse") {
-        state.outMin = 200;
-        state.outMax = 20;
-      } else if (mode === "wireit") {
-        state.wireInput = 50;
-        state.wireConnected = null;
-      }
-
-      updateUI();
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      setMode(tabs[(current - 1 + tabs.length) % tabs.length].dataset.mode);
+      tabs[(current - 1 + tabs.length) % tabs.length].focus();
     }
+  });
+});
 
-    function getMappedValue() {
-      const t = (state.input - state.inMin) / (state.inMax - state.inMin);
-      let output = state.outMin + t * (state.outMax - state.outMin);
-      if (state.clamp) {
-        const low = Math.min(state.outMin, state.outMax);
-        const high = Math.max(state.outMin, state.outMax);
-        output = Math.min(high, Math.max(low, output));
-      }
-      return output;
+document.getElementById("animateToggle").addEventListener("change", (event) => {
+  state.animate = event.target.checked;
+});
+
+document.getElementById("clampToggle").addEventListener("change", () => {
+  state.changedKey = "outMax";
+  renderUI();
+});
+
+document.getElementById("fullCodeToggle").addEventListener("click", () => {
+  const body = document.getElementById("full-code");
+  const btn = document.getElementById("fullCodeToggle");
+  const open = body.classList.toggle("open");
+  btn.setAttribute("aria-expanded", String(open));
+  btn.textContent = open ? "▾ Hide full p5.js sketch" : "▸ See full p5.js sketch";
+});
+
+function tick() {
+  if (state.animate) {
+    state.input += state.direction * 0.5;
+    if (state.input >= state.inMax) {
+      state.input = state.inMax;
+      state.direction = -1;
     }
-
-    function getPercent() {
-      return (state.input - state.inMin) / (state.inMax - state.inMin);
+    if (state.input <= state.inMin) {
+      state.input = state.inMin;
+      state.direction = 1;
     }
+    state.changedKey = "input";
+    renderUI();
+  }
+  requestAnimationFrame(tick);
+}
 
-    function updateUI() {
-      const modeButtons = [
-        [els.modeSize, "size"],
-        [els.modeColor, "color"],
-        [els.modeBar, "bar"],
-        [els.modeOpacity, "opacity"],
-        [els.modeReverse, "reverse"],
-        [els.modeWireit, "wireit"]
-      ];
-
-      for (const [button, mode] of modeButtons) {
-        button.classList.toggle("active", state.mode === mode);
-      }
-
-      els.inputSlider.value = state.input;
-      els.inputValue.textContent = String(Math.round(state.input));
-      els.outMinSlider.value = state.outMin;
-      els.outMinValue.textContent = String(Math.round(state.outMin));
-      els.outMaxSlider.value = state.outMax;
-      els.outMaxValue.textContent = String(Math.round(state.outMax));
-      els.formulaBox.style.display = state.showFormula ? "block" : "none";
-      els.codeCard.classList.toggle("visible", state.showCode);
-
-      const output = getMappedValue();
-      const percent = getPercent();
-      const percentText = `${Math.round(percent * 100)}%`;
-
-      const lessons = {
-        size: {
-          pill: "Input position → circle size",
-          title: "Input becomes size",
-          text: "map() can turn one kind of number into another. Here an input from 0 to 100 becomes a circle size.",
-          question: "What output size do you expect when the input is halfway through its range?",
-          code: `let size = map(mouseX, 0, width, ${state.outMin}, ${state.outMax});\ncircle(width / 2, height / 2, size);`,
-          caption: `The input is ${percentText} through its range, so the output is ${percentText} through the size range.`
-        },
-        color: {
-          pill: "Input position → color brightness",
-          title: "Input becomes color",
-          text: "Color channels are numbers too. Here the input becomes a brightness value from 0 to 255.",
-          question: "Why does the color get brighter as the input moves to the right?",
-          code: `let brightness = map(mouseX, 0, width, ${state.outMin}, ${state.outMax});\nfill(brightness);\ncircle(x, y, 100);`,
-          caption: `The output value is ${output.toFixed(1)}, which can be used as a color or brightness number.`
-        },
-        bar: {
-          pill: "Input position → bar height",
-          title: "Input becomes bar height",
-          text: "This is the core move in data visualization: a data value gets translated into a visual height.",
-          question: "How is this similar to making a chart from data?",
-          code: `let h = map(dataValue, 0, 100, ${state.outMin}, ${state.outMax});\nrect(x, baseline - h, barWidth, h);`,
-          caption: `A data-like input becomes a bar height. This is how numbers become graphics.`
-        },
-        opacity: {
-          pill: "Input position → transparency",
-          title: "Input becomes opacity",
-          text: "Alpha transparency is also just a number. map() can turn distance, sound, or mouse position into visibility.",
-          question: "What happens if the output range starts near 0 and ends near 255?",
-          code: `let alpha = map(mouseX, 0, width, ${state.outMin}, ${state.outMax});\nfill(225, 29, 72, alpha);\ncircle(x, y, 120);`,
-          caption: `The output controls transparency. Low values are faint; high values are more visible.`
-        },
-        reverse: {
-          pill: "Input position → reversed output",
-          title: "Reversing a relationship",
-          text: "The output range can go backward. As the input increases, the output can decrease.",
-          question: "Where is the output largest: when the input is small or when the input is large?",
-          code: `let size = map(mouseX, 0, width, ${state.outMin}, ${state.outMax});\ncircle(width / 2, height / 2, size);`,
-          caption: `The input moves forward, but the output range goes backward. This creates an inverse relationship.`
-        },
-        wireit: {
-          pill: "Wire the input to an output",
-          title: "Wire It: map() as a connection",
-          text: "Click a port on the right to connect it. The input slider drives the connected property. map() is the wire that translates one range into another.",
-          question: "Click each port. How does the same slider value become a completely different thing?",
-          code: state.wireConnected
-            ? `map(input, 0, 100, outMin, outMax) = result`
-            : `// click a port to connect it`,
-          caption: state.wireConnected
-            ? `map(${Math.round(state.wireInput)}, 0, 100, outMin, outMax) — connected to: ${state.wireConnected}`
-            : "Click a port on the right to connect the slider to that property."
-        }
-      };
-
-      const lesson = lessons[state.mode];
-      els.modePill.textContent = lesson.pill;
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.questionText.textContent = lesson.question;
-      els.codeBox.textContent = lesson.code;
-      els.caption.textContent = lesson.caption;
-      els.formulaBox.innerHTML = `map(${Math.round(state.input)}, ${state.inMin}, ${state.inMax}, ${Math.round(state.outMin)}, ${Math.round(state.outMax)}) = ${output.toFixed(1)}<br>input is ${percentText} through → output is ${percentText} through`;
-    }
-
-    setupUI();
-
-    const sketch = (p) => {
-      let canvas;
-      let holder;
-      let previousWidth = 0;
-      let previousHeight = 0;
-
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive visualization of p5.js map function translating input ranges into output ranges.");
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
-      };
-
-      p.windowResized = () => resizeToHolder();
-
-      p.mousePressed = () => {
-        if (state.mode !== "wireit") return;
-        for (const rect of wirePortRects) {
-          if (p.mouseX >= rect.x && p.mouseX <= rect.x + rect.w &&
-              p.mouseY >= rect.y && p.mouseY <= rect.y + rect.h) {
-            state.wireConnected = (state.wireConnected === rect.id) ? null : rect.id;
-            updateUI();
-            return;
-          }
-        }
-      };
-
-      p.draw = () => {
-        resizeToHolder();
-        advanceAnimation();
-
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-        drawTitle();
-        drawRangeTranslator();
-        drawOutputDemo();
-      };
-
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-        if (w !== previousWidth || h !== previousHeight) {
-          p.resizeCanvas(w, h);
-          previousWidth = w;
-          previousHeight = h;
-        }
-      }
-
-      function advanceAnimation() {
-        if (!state.animate) return;
-        state.input += state.animationDirection * 0.65;
-        if (state.input >= state.inMax) {
-          state.input = state.inMax;
-          state.animationDirection = -1;
-        }
-        if (state.input <= state.inMin) {
-          state.input = state.inMin;
-          state.animationDirection = 1;
-        }
-        els.inputSlider.value = state.input;
-        updateUI();
-      }
-
-      function drawSubtleGrid() {
-        p.push();
-        p.stroke(236, 224, 207);
-        p.strokeWeight(1);
-        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
-        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
-        p.pop();
-      }
-
-      function drawTitle() {
-        p.push();
-        p.noStroke();
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(22);
-        p.text("Range Translator", 24, 38);
-        p.textStyle(p.NORMAL);
-        p.textSize(14);
-        p.fill("#6b6258");
-        p.text("A value keeps the same relative position as it moves from one range to another.", 24, 62);
-        p.pop();
-      }
-
-      function drawRangeTranslator() {
-        const margin = Math.max(38, p.width * 0.055);
-        const top = p.height * 0.18;
-        const rangeWidth = Math.min(330, p.width * 0.32);
-        const machineWidth = Math.min(190, p.width * 0.20);
-        const inputX = margin;
-        const machineX = inputX + rangeWidth + Math.max(24, p.width * 0.035);
-        const outputX = machineX + machineWidth + Math.max(24, p.width * 0.035);
-        const lineY = top + 86;
-        const output = getMappedValue();
-        const t = getPercent();
-
-        drawNumberLine({
-          x: inputX,
-          y: lineY,
-          w: rangeWidth,
-          min: state.inMin,
-          max: state.inMax,
-          value: state.input,
-          label: "Input range",
-          valueLabel: `input = ${Math.round(state.input)}`,
-          color: "#7c3aed",
-          t
-        });
-
-        drawMachine(machineX, top + 24, machineWidth, 124, t, output);
-
-        drawNumberLine({
-          x: outputX,
-          y: lineY,
-          w: rangeWidth,
-          min: state.outMin,
-          max: state.outMax,
-          value: output,
-          label: "Output range",
-          valueLabel: `output = ${output.toFixed(1)}`,
-          color: "#e11d48",
-          t
-        });
-
-        drawArrow(inputX + rangeWidth + 8, lineY, machineX - 10, lineY, "#8b7d6c");
-        drawArrow(machineX + machineWidth + 8, lineY, outputX - 10, lineY, "#8b7d6c");
-      }
-
-      function drawNumberLine({ x, y, w, min, max, value, label, valueLabel, color, t }) {
-        const markerX = x + t * w;
-
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 232);
-        p.rect(x - 18, y - 72, w + 36, 150, 18);
-
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(16);
-        p.text(label, x, y - 44);
-
-        p.stroke("#d8cbbb");
-        p.strokeWeight(8);
-        p.strokeCap(p.ROUND);
-        p.line(x, y, x + w, y);
-
-        p.stroke("#16a34a");
-        p.strokeWeight(8);
-        p.line(x, y, markerX, y);
-
-        p.stroke("#8b7d6c");
-        p.strokeWeight(2);
-        p.line(x, y - 10, x, y + 10);
-        p.line(x + w, y - 10, x + w, y + 10);
-
-        p.noStroke();
-        p.fill("#6b6258");
-        p.textSize(12);
-        p.textAlign(p.LEFT, p.TOP);
-        p.text(Math.round(min), x - 3, y + 18);
-        p.textAlign(p.RIGHT, p.TOP);
-        p.text(Math.round(max), x + w + 3, y + 18);
-
-        p.fill(color);
-        p.circle(markerX, y, 18);
-        drawLabel(valueLabel, markerX - 40, y - 26, color, 13);
-        p.pop();
-      }
-
-      function drawMachine(x, y, w, h, t, output) {
-        p.push();
-        p.noStroke();
-        p.fill(8, 145, 178, 38);
-        p.rect(x, y, w, h, 24);
-        p.stroke("#0891b2");
-        p.strokeWeight(2);
-        p.noFill();
-        p.rect(x, y, w, h, 24);
-
-        p.noStroke();
-        p.fill("#0891b2");
-        p.textAlign(p.CENTER, p.CENTER);
-        p.textStyle(p.BOLD);
-        p.textSize(22);
-        p.text("map()", x + w / 2, y + 34);
-
-        p.fill("#334155");
-        p.textStyle(p.NORMAL);
-        p.textSize(13);
-        p.text("same percent", x + w / 2, y + 68);
-        p.text(`${Math.round(t * 100)}% through`, x + w / 2, y + 90);
-        p.text(`→ ${output.toFixed(1)}`, x + w / 2, y + 112);
-        p.pop();
-      }
-
-      function drawOutputDemo() {
-        const output = getMappedValue();
-        const panelX = p.width * 0.08;
-        const panelY = p.height * 0.48;
-        const panelW = p.width * 0.84;
-        const panelH = p.height * 0.34;
-
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 232);
-        p.rect(panelX, panelY, panelW, panelH, 22);
-
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(18);
-        p.text("What the output controls", panelX + 22, panelY + 34);
-        p.textStyle(p.NORMAL);
-        p.textSize(13);
-        p.fill("#6b6258");
-        p.text("The mapped number can drive almost any visual property.", panelX + 22, panelY + 56);
-
-        if (state.mode === "size") drawSizeDemo(panelX, panelY, panelW, panelH, output);
-        if (state.mode === "color") drawColorDemo(panelX, panelY, panelW, panelH, output);
-        if (state.mode === "bar") drawBarDemo(panelX, panelY, panelW, panelH, output);
-        if (state.mode === "opacity") drawOpacityDemo(panelX, panelY, panelW, panelH, output);
-        if (state.mode === "reverse") drawReverseDemo(panelX, panelY, panelW, panelH, output);
-        p.pop();
-        if (state.mode === "wireit") drawWireitMode();
-      }
-
-      function drawSizeDemo(x, y, w, h, output) {
-        const cx = x + w * 0.52;
-        const cy = y + h * 0.58;
-        p.push();
-        p.noStroke();
-        p.fill("#dbeafe");
-        p.circle(cx, cy, Math.max(160, output + 34));
-        p.fill("#2563eb");
-        p.circle(cx, cy, output);
-        drawLabel(`circle size = ${output.toFixed(1)}`, cx - 58, cy + output / 2 + 28, "#2563eb", 14);
-        p.pop();
-      }
-
-      function drawColorDemo(x, y, w, h, output) {
-        const cx = x + w * 0.52;
-        const cy = y + h * 0.58;
-        const brightness = Math.max(0, Math.min(255, output));
-        p.push();
-        p.noStroke();
-        p.fill(brightness);
-        p.circle(cx, cy, 150);
-        p.stroke("#222222");
-        p.strokeWeight(2);
-        p.noFill();
-        p.circle(cx, cy, 150);
-        drawLabel(`brightness = ${output.toFixed(1)}`, cx - 62, cy + 100, "#222222", 14);
-        p.pop();
-      }
-
-      function drawBarDemo(x, y, w, h, output) {
-        const baseline = y + h - 34;
-        const barX = x + w * 0.48;
-        const barW = 90;
-        const barH = Math.max(0, Math.min(h - 92, output));
-        p.push();
-        p.stroke("#d8cbbb");
-        p.strokeWeight(2);
-        p.line(x + 80, baseline, x + w - 80, baseline);
-        p.noStroke();
-        p.fill("#e11d48");
-        p.rect(barX, baseline - barH, barW, barH, 10, 10, 0, 0);
-        drawLabel(`bar height = ${output.toFixed(1)}`, barX - 26, baseline - barH - 18, "#e11d48", 14);
-        p.pop();
-      }
-
-      function drawOpacityDemo(x, y, w, h, output) {
-        const cx = x + w * 0.52;
-        const cy = y + h * 0.58;
-        const alpha = Math.max(0, Math.min(255, output));
-        p.push();
-        p.noStroke();
-        p.fill(225, 29, 72, alpha);
-        p.circle(cx, cy, 160);
-        p.noFill();
-        p.stroke("#e11d48");
-        p.strokeWeight(2);
-        p.circle(cx, cy, 160);
-        drawLabel(`alpha = ${output.toFixed(1)}`, cx - 42, cy + 105, "#e11d48", 14);
-        p.pop();
-      }
-
-      function drawReverseDemo(x, y, w, h, output) {
-        const cx = x + w * 0.52;
-        const cy = y + h * 0.58;
-        p.push();
-        p.noStroke();
-        p.fill("#cffafe");
-        p.circle(cx, cy, 220);
-        p.fill("#0891b2");
-        p.circle(cx, cy, Math.max(12, output));
-        drawLabel(`reversed size = ${output.toFixed(1)}`, cx - 68, cy + 130, "#0891b2", 14);
-        p.pop();
-      }
-
-      // Wire It mode
-      const wirePortDefs = [
-        { id: "circle-size",       label: "Circle Size",      outMin: 20,  outMax: 160, color: "#2563eb" },
-        { id: "x-position",        label: "X Position",       outMin: 0,   outMax: 1,   color: "#7c3aed" },
-        { id: "color-brightness",  label: "Color Brightness", outMin: 0,   outMax: 255, color: "#e11d48" },
-        { id: "rotation",          label: "Rotation",         outMin: 0,   outMax: 360, color: "#f59e0b" }
-      ];
-
-      let wirePortRects = []; // filled each draw frame for click detection
-
-      function drawWireitMode() {
-        const t = state.wireInput / 100;
-        const sliderX = p.width * 0.10;
-        const sliderY = p.height * 0.22;
-        const sliderH = p.height * 0.42;
-        const sliderMid = sliderX + 18;
-        const handleY = sliderY + (1 - t) * sliderH;
-        const portsX = p.width * 0.72;
-        const portSpacing = sliderH / (wirePortDefs.length - 1);
-        const demoX = p.width * 0.42;
-        const demoCY = sliderY + sliderH * 0.5;
-        const portW = p.width * 0.22;
-        const portH = 38;
-
-        wirePortRects = [];
-
-        // Background panel
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 235);
-        p.rect(p.width * 0.06, p.height * 0.14, p.width * 0.88, p.height * 0.56, 22);
-        p.pop();
-
-        // Title
-        p.push();
-        p.noStroke();
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(18);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.text("Wire It", p.width * 0.09, p.height * 0.21);
-        p.textStyle(p.NORMAL);
-        p.textSize(13);
-        p.fill("#6b6258");
-        p.text("Click a port to connect — then move the slider", p.width * 0.09, p.height * 0.265);
-        p.pop();
-
-        // Left vertical slider track
-        p.push();
-        p.stroke("#d8cbbb");
-        p.strokeWeight(8);
-        p.strokeCap(p.ROUND);
-        p.line(sliderMid, sliderY, sliderMid, sliderY + sliderH);
-        p.stroke("#7c3aed");
-        p.strokeWeight(8);
-        p.line(sliderMid, sliderY + sliderH, sliderMid, handleY);
-
-        // Handle
-        p.noStroke();
-        p.fill("#7c3aed");
-        p.circle(sliderMid, handleY, 26);
-        p.fill("#ffffff");
-        p.circle(sliderMid, handleY, 8);
-
-        // Slider label
-        p.fill("#7c3aed");
-        p.textStyle(p.BOLD);
-        p.textSize(13);
-        p.textAlign(p.CENTER, p.BASELINE);
-        p.text("INPUT", sliderMid, sliderY - 12);
-        p.textSize(16);
-        p.text(Math.round(state.wireInput), sliderMid, handleY - 18);
-        p.text("0", sliderMid, sliderY + sliderH + 18);
-        p.text("100", sliderMid, sliderY - 22);
-        p.pop();
-
-        // Track slider drag
-        if (p.mouseIsPressed && p.mouseX > sliderMid - 30 && p.mouseX < sliderMid + 30 &&
-            p.mouseY > sliderY - 20 && p.mouseY < sliderY + sliderH + 20) {
-          const raw = 1 - (p.mouseY - sliderY) / sliderH;
-          state.wireInput = Math.round(Math.max(0, Math.min(100, raw * 100)));
-          updateUI();
-        }
-
-        // Ports on right
-        wirePortDefs.forEach((port, i) => {
-          const py = sliderY + i * portSpacing - portH / 2;
-          const px = portsX;
-          const connected = state.wireConnected === port.id;
-          wirePortRects.push({ id: port.id, x: px, y: py, w: portW, h: portH });
-
-          // Wire from slider to port
-          if (connected) {
-            p.push();
-            p.stroke(port.color);
-            p.strokeWeight(4);
-            p.noFill();
-            p.drawingContext.setLineDash([]);
-            const cpx = (sliderMid + px) / 2;
-            p.beginShape();
-            p.vertex(sliderMid, handleY);
-            p.bezierVertex(cpx, handleY, cpx, sliderY + i * portSpacing, px, sliderY + i * portSpacing);
-            p.endShape();
-            p.pop();
-          } else {
-            // Thin dashed guide
-            p.push();
-            p.stroke("#d8cbbb");
-            p.strokeWeight(1.5);
-            p.drawingContext.setLineDash([5, 6]);
-            p.line(sliderMid, sliderY + i * portSpacing, px, sliderY + i * portSpacing);
-            p.drawingContext.setLineDash([]);
-            p.pop();
-          }
-
-          // Port box
-          p.push();
-          p.noStroke();
-          p.fill(connected ? port.color : "#f8fafc");
-          p.rect(px, py, portW, portH, 10);
-          p.stroke(connected ? port.color : "#ded2c1");
-          p.strokeWeight(2);
-          p.noFill();
-          p.rect(px, py, portW, portH, 10);
-
-          // Port label + value
-          const mappedVal = mapWire(port);
-          p.noStroke();
-          p.fill(connected ? "#ffffff" : "#222222");
-          p.textStyle(p.BOLD);
-          p.textSize(12);
-          p.textAlign(p.LEFT, p.CENTER);
-          p.text(port.label, px + 10, py + portH / 2 - 7);
-          p.textStyle(p.NORMAL);
-          p.textSize(11);
-          p.fill(connected ? "#e0f2fe" : "#6b6258");
-          p.text(`= ${port.id === "rotation" ? mappedVal.toFixed(0) + "°" : mappedVal.toFixed(1)}`, px + 10, py + portH / 2 + 8);
-          p.pop();
-        });
-
-        // Demo shape in center
-        p.push();
-        p.translate(demoX, demoCY);
-        const connected = wirePortDefs.find(p => p.id === state.wireConnected);
-        if (connected) {
-          const val = mapWire(connected);
-          let sz = 80, xOff = 0, br = 150, rot = 0;
-          if (connected.id === "circle-size") sz = val;
-          if (connected.id === "x-position") xOff = p.map(val, 0, 1, -p.width * 0.10, p.width * 0.10);
-          if (connected.id === "color-brightness") br = val;
-          if (connected.id === "rotation") rot = p.radians(val);
-
-          p.rotate(rot);
-          p.noStroke();
-          p.fill(connected.color + "40");
-          p.circle(xOff, 0, sz + 30);
-          p.fill(connected.color);
-          p.rect(xOff - sz / 2, -sz / 2, sz, sz, 12);
-          drawLabel(`${connected.label} = ${mapWire(connected).toFixed(1)}`, xOff - 40, sz / 2 + 22, connected.color, 13);
-        } else {
-          p.noStroke();
-          p.fill("#ded2c1");
-          p.circle(0, 0, 80);
-          p.fill("#8b7d6c");
-          p.textAlign(p.CENTER, p.CENTER);
-          p.textSize(13);
-          p.text("← connect\na port", 0, 0);
-        }
-        p.pop();
-
-        // Live map() call at bottom
-        const liveY = p.height * 0.70;
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 235);
-        p.rect(p.width * 0.06, liveY, p.width * 0.88, 44, 14);
-        p.fill("#111827");
-        p.textStyle(p.BOLD);
-        p.textSize(13.5);
-        p.textAlign(p.LEFT, p.BASELINE);
-        if (state.wireConnected) {
-          const port = wirePortDefs.find(pp => pp.id === state.wireConnected);
-          const result = mapWire(port);
-          p.text(
-            `map(${Math.round(state.wireInput)}, 0, 100, ${port.outMin}, ${port.outMax}) = ${result.toFixed(1)}   ← live result for "${port.label}"`,
-            p.width * 0.09, liveY + 28
-          );
-        } else {
-          p.fill("#6b6258");
-          p.textStyle(p.NORMAL);
-          p.text("map(input, 0, 100, outMin, outMax) = result  — click a port to see a live formula", p.width * 0.09, liveY + 28);
-        }
-        p.pop();
-      }
-
-      function mapWire(port) {
-        const t = state.wireInput / 100;
-        return port.outMin + t * (port.outMax - port.outMin);
-      }
-
-      function drawArrow(x1, y1, x2, y2, color) {
-        p.push();
-        p.stroke(color);
-        p.strokeWeight(2);
-        p.line(x1, y1, x2, y2);
-        const angle = Math.atan2(y2 - y1, x2 - x1);
-        p.noStroke();
-        p.fill(color);
-        p.push();
-        p.translate(x2, y2);
-        p.rotate(angle);
-        p.triangle(0, 0, -9, -5, -9, 5);
-        p.pop();
-        p.pop();
-      }
-
-      function drawLabel(text, x, y, color, size = 13) {
-        p.push();
-        p.textSize(size);
-        p.textStyle(p.BOLD);
-        const padX = 7;
-        const padY = 4;
-        const tw = p.textWidth(text);
-        p.noStroke();
-        p.fill(255, 250, 242, 238);
-        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
-        p.fill(color);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.text(text, x, y);
-        p.pop();
-      }
-    };
-
-    new p5(sketch);
-  </script>
+window.addEventListener("resize", renderCanvas);
+renderUI();
+requestAnimationFrame(tick);
+</script>
 </body>
 </html>
