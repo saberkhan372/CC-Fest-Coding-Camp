@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -286,8 +286,152 @@
 
       .workspace { height: 540px; }
     }
-  </style>
-  <link rel="stylesheet" href="../concept-bridge.css" />
+  
+  /* ── Bridge improvement additions ─────────────────────────────── */
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+  }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2a5e3e;
+    background: #eef8f2;
+    border: 1px solid #b8dcc8;
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: rgba(255,255,255,0.55);
+  }
+  .ba-col { padding: 14px 18px; }
+  .ba-col:first-child {
+    background: rgba(0,0,0,0.025);
+    border-right: 1px solid var(--line, #ded2c1);
+  }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #9e9789;
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: #2a5e3e; }
+  .ba-text { font-size: 0.9rem; line-height: 1.5; }
+  .predict-box {
+    background: #fef9ee;
+    border: 1px solid #efd09e;
+    border-radius: 10px;
+    padding: 11px 14px;
+    margin-bottom: 12px;
+  }
+  .predict-box .pbox-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .predict-box .pbox-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .callout-mistake {
+    background: #fff3e6;
+    border: 1px solid #edbd83;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0 0;
+  }
+  .callout-mistake .cm-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .callout-mistake .cm-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .pathways-section {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 32px 20px 8px;
+  }
+  .pathways-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9e9789;
+    margin-bottom: 12px;
+  }
+  .path-links { display: grid; gap: 8px; max-width: 820px; }
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--ink, #222);
+    background: rgba(255,250,242,0.92);
+    transition: border-color 0.14s ease, background 0.14s ease;
+    font-family: inherit;
+  }
+  .path-link:hover {
+    border-color: var(--accent, #2563eb);
+    background: rgba(230,240,255,0.6);
+  }
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9e9789;
+    flex-shrink: 0;
+    min-width: 82px;
+  }
+  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .bottom-nav {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 18px 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid var(--line, #ded2c1);
+  }
+  .bottom-nav a {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6b6258;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  .bottom-nav a:hover { color: var(--accent, #2563eb); }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .bottom-nav { flex-direction: column; }
+  }
+</style>
+  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -299,16 +443,37 @@
       A concept bridge for the <strong>%</strong> operator. Modulo gives the remainder after division — and in creative coding,
       remainders become cycles, rhythms, alternating colors, timers, and repeating patterns.
     </p>
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">repeating patterns</span>
+    <span class="unlock-pill">color cycling</span>
+    <span class="unlock-pill">grid layout</span>
+    <span class="unlock-pill">wrap-around counting</span>
+  </div>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text">% is just the remainder from division — I don't see why I'd use it in a sketch</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text">Modulo resets a count back to zero — it turns any increasing number into a repeating cycle</div>
+    </div>
+  </section>
   </header>
 
   <main>
     <section class="controls" aria-label="Explorer controls">
-      <div class="row">
+            <div class="predict-box">
+        <span class="pbox-label">Before you interact — predict first</span>
+        <span class="pbox-body">Before you change the divisor — how many color groups will appear across the grid?</span>
+      </div>
+<div class="row">
         <button id="mode-counting" class="active">Counting</button>
         <button id="mode-wheel">Remainder Wheel</button>
         <button id="mode-alternate">Alternate Colors</button>
         <button id="mode-timing">Timing / Blink</button>
         <button id="mode-grid">Pattern Grid</button>
+        <button id="mode-clock">Clock</button>
         <button id="play-button">⏸ Pause</button>
         <button id="step-button">Step +1</button>
         <button id="reset-button">Reset</button>
@@ -403,7 +568,9 @@
       running: true,
       showLabels: true,
       showCode: false,
-      lastTick: 0
+      lastTick: 0,
+      clockCount: 0,
+      wheelDragging: false
     };
 
     const els = {};
@@ -414,6 +581,7 @@
       els.modeAlternate = document.querySelector("#mode-alternate");
       els.modeTiming = document.querySelector("#mode-timing");
       els.modeGrid = document.querySelector("#mode-grid");
+      els.modeClock = document.querySelector("#mode-clock");
       els.playButton = document.querySelector("#play-button");
       els.stepButton = document.querySelector("#step-button");
       els.resetButton = document.querySelector("#reset-button");
@@ -440,6 +608,7 @@
       els.modeAlternate.addEventListener("click", () => setMode("alternate"));
       els.modeTiming.addEventListener("click", () => setMode("timing"));
       els.modeGrid.addEventListener("click", () => setMode("grid"));
+      els.modeClock.addEventListener("click", () => setMode("clock"));
 
       els.playButton.addEventListener("click", () => {
         state.running = !state.running;
@@ -508,7 +677,8 @@
         [els.modeWheel, "wheel"],
         [els.modeAlternate, "alternate"],
         [els.modeTiming, "timing"],
-        [els.modeGrid, "grid"]
+        [els.modeGrid, "grid"],
+        [els.modeClock, "clock"]
       ];
 
       for (const [button, mode] of buttons) {
@@ -573,6 +743,15 @@
           question: "What changes when the modulo number gets larger?",
           caption: "Each cell calculates a remainder. The repeating remainders create the visual pattern.",
           code: `for (let row = 0; row < rows; row++) {\n  for (let col = 0; col < cols; col++) {\n    let r = (row + col) % ${state.mod};\n    fill(colors[r]);\n    rect(col * size, row * size, size, size);\n  }\n}`
+        },
+        clock: {
+          pill: "hour % 12 = clock position",
+          title: "Clocks already use modulo",
+          text: `You use modulo every day. After 12 hours, the clock wraps back to 12. After 7 days, the week restarts. ${state.clockCount} % 12 = ${state.clockCount % 12 || 12} on a clock face.`,
+          formula: `${state.clockCount} % 12 = ${state.clockCount % 12 || 12}  (clock hand position)\n${state.clockCount} % 7 = ${state.clockCount % 7}  (day of week)\n${state.clockCount} % 60 = ${state.clockCount % 60}  (minutes)`,
+          question: "It's been 14 hours since midnight. What time is it? Try: 14 % 12 = ?",
+          caption: `Tick the clock and watch: ${state.clockCount} hours → hand points to ${state.clockCount % 12 || (state.clockCount === 0 ? 12 : 12)}. Modulo wraps it back.`,
+          code: `let hour = 14;\nlet clockPos = hour % 12; // = 2\n// The hand points to 2 o'clock`
         }
       };
 
@@ -614,10 +793,40 @@
         canvas.elt.setAttribute("role", "img");
         canvas.elt.setAttribute("aria-label", "Interactive visualization of modulo, remainders, cycles, patterns, and timing in p5.js.");
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("DM Sans, system-ui, sans-serif");
+        p.textFont("Inter, system-ui, sans-serif");
       };
 
       p.windowResized = () => resizeToHolder();
+
+      p.mousePressed = () => {
+        if (state.mode === "wheel") {
+          const dx = p.mouseX - _wheelCx;
+          const dy = p.mouseY - _wheelCy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > _wheelRadius * 0.3 && dist < _wheelRadius + 60) {
+            state.wheelDragging = true;
+            setCountFromWheelAngle(p.mouseX, p.mouseY);
+          }
+        }
+        if (state.mode === "clock" && _clockTickBtn) {
+          const b = _clockTickBtn;
+          if (p.mouseX >= b.x && p.mouseX <= b.x + b.w &&
+              p.mouseY >= b.y && p.mouseY <= b.y + b.h) {
+            state.clockCount = (state.clockCount + 1) % 120;
+            updateUI();
+          }
+        }
+      };
+
+      p.mouseDragged = () => {
+        if (state.mode === "wheel" && state.wheelDragging) {
+          setCountFromWheelAngle(p.mouseX, p.mouseY);
+        }
+      };
+
+      p.mouseReleased = () => {
+        state.wheelDragging = false;
+      };
 
       p.draw = () => {
         resizeToHolder();
@@ -631,6 +840,7 @@
         if (state.mode === "alternate") drawAlternateMode();
         if (state.mode === "timing") drawTimingMode();
         if (state.mode === "grid") drawGridMode();
+        if (state.mode === "clock") drawClockMode();
 
         drawReadoutCards();
       };
@@ -669,10 +879,11 @@
       function drawPanelTitle() {
         const titles = {
           counting: ["Counting", "The count keeps increasing. The remainder loops."],
-          wheel: ["Remainder Wheel", "Modulo is a circular counter."],
+          wheel: ["Remainder Wheel", "Click or drag the wheel to set count. Modulo is a circular counter."],
           alternate: ["Alternate Colors", "Remainders can choose visual states."],
           timing: ["Timing / Blink", "frameCount % n creates rhythm."],
-          grid: ["Pattern Grid", "Remainders can organize repeating patterns."]
+          grid: ["Pattern Grid", "Remainders can organize repeating patterns."],
+          clock: ["Clock", "Clocks already use % 12. Days use % 7. Minutes use % 60."]
         };
         const [title, subtitle] = titles[state.mode];
         p.push();
@@ -714,11 +925,15 @@
         drawSequenceStrip();
       }
 
+      // Store wheel center/radius for mouse interaction
+      let _wheelCx = 0, _wheelCy = 0, _wheelRadius = 0;
+
       function drawWheelMode() {
         const cx = p.width * 0.5;
         const cy = p.height * 0.37;
         const radius = Math.min(p.width, p.height) * 0.21;
         const r = getRemainder();
+        _wheelCx = cx; _wheelCy = cy; _wheelRadius = radius;
 
         p.push();
         p.noStroke();
@@ -729,6 +944,13 @@
         p.stroke("#d8cbbb");
         p.strokeWeight(5);
         p.circle(cx, cy, radius * 2);
+
+        // Drag hint ring
+        p.stroke("#7c3aed");
+        p.strokeWeight(2);
+        p.drawingContext.setLineDash([5, 7]);
+        p.circle(cx, cy, (radius + 26) * 2);
+        p.drawingContext.setLineDash([]);
 
         for (let i = 0; i < state.mod; i++) {
           const angle = -p.HALF_PI + i * p.TWO_PI / state.mod;
@@ -745,7 +967,11 @@
           p.text(i, x, y);
         }
 
+        // Draggable handle on circumference
         const activeAngle = -p.HALF_PI + r * p.TWO_PI / state.mod;
+        const handleX = cx + Math.cos(activeAngle) * (radius + 26);
+        const handleY = cy + Math.sin(activeAngle) * (radius + 26);
+
         p.stroke("#16a34a");
         p.strokeWeight(4);
         p.line(cx, cy, cx + Math.cos(activeAngle) * radius, cy + Math.sin(activeAngle) * radius);
@@ -753,11 +979,40 @@
         p.fill("#222222");
         p.circle(cx, cy, 8);
 
+        // Drag handle
+        p.fill("#16a34a");
+        p.stroke("#ffffff");
+        p.strokeWeight(3);
+        p.circle(handleX, handleY, 30);
+        p.noStroke();
+        p.fill("#ffffff");
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textSize(12);
+        p.text("drag", handleX, handleY);
+
         if (state.showLabels) {
           drawLabel(`${state.count} % ${state.mod} = ${r}`, cx - 52, cy + radius + 56, "#e11d48", 16);
-          drawLabel("after the last remainder, return to 0", cx - 110, cy - radius - 34, "#6b6258", 13);
+          drawLabel("click wheel or drag handle to set count", cx - 128, cy - radius - 50, "#7c3aed", 13);
+          drawLabel("after the last remainder, return to 0", cx - 110, cy - radius - 28, "#6b6258", 13);
         }
         p.pop();
+      }
+
+      function setCountFromWheelAngle(mx, my) {
+        const angle = Math.atan2(my - _wheelCy, mx - _wheelCx);
+        // Normalize angle to 0..TWO_PI starting from -HALF_PI
+        let a = angle + p.HALF_PI;
+        if (a < 0) a += p.TWO_PI;
+        const segment = Math.round(a / p.TWO_PI * state.mod) % state.mod;
+        // Set count so remainder === segment (keep higher cycles if already past first)
+        const currentCycle = Math.floor(state.count / state.mod);
+        let newCount = currentCycle * state.mod + segment;
+        if (newCount < 0) newCount = segment;
+        state.count = Math.max(0, Math.min(120, newCount));
+        state.running = false;
+        els.countSlider.value = state.count;
+        updateUI();
       }
 
       function drawAlternateMode() {
@@ -974,6 +1229,149 @@
           "#0f766e", "#ca8a04", "#be123c", "#4f46e5"
         ];
         return colors[index % colors.length];
+      }
+
+      let _clockTickBtn = null;
+
+      function drawClockMode() {
+        const cx = p.width * 0.38;
+        const cy = p.height * 0.38;
+        const radius = Math.min(p.width, p.height) * 0.20;
+        const hourPos = state.clockCount % 12 || (state.clockCount === 0 ? 0 : 0);
+        const clockHour = state.clockCount % 12;
+
+        // Panel background
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(p.width * 0.06, p.height * 0.13, p.width * 0.88, p.height * 0.56, 24);
+        p.pop();
+
+        // Clock face
+        p.push();
+        p.noStroke();
+        p.fill("#fffaf2");
+        p.circle(cx, cy, radius * 2);
+        p.stroke("#ded2c1");
+        p.strokeWeight(5);
+        p.noFill();
+        p.circle(cx, cy, radius * 2);
+
+        // Hour markers + numbers
+        for (let i = 1; i <= 12; i++) {
+          const angle = -p.HALF_PI + (i / 12) * p.TWO_PI;
+          const mx = cx + Math.cos(angle) * (radius - 14);
+          const my = cy + Math.sin(angle) * (radius - 14);
+          const active = i === (clockHour === 0 ? 12 : clockHour);
+          p.noStroke();
+          p.fill(active ? "#e11d48" : "#6b6258");
+          p.circle(mx, my, active ? 34 : 22);
+          p.fill(active ? "#ffffff" : "#222222");
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textStyle(p.BOLD);
+          p.textSize(active ? 15 : 11);
+          p.text(i, mx, my);
+        }
+
+        // Clock hand
+        const handAngle = -p.HALF_PI + ((clockHour === 0 ? 0 : clockHour) / 12) * p.TWO_PI;
+        p.stroke("#e11d48");
+        p.strokeWeight(5);
+        p.strokeCap(p.ROUND);
+        p.line(cx, cy, cx + Math.cos(handAngle) * (radius - 30), cy + Math.sin(handAngle) * (radius - 30));
+        p.noStroke();
+        p.fill("#222222");
+        p.circle(cx, cy, 10);
+        p.pop();
+
+        // Tick forward button
+        const btnX = cx - 52;
+        const btnY = cy + radius + 22;
+        const btnW = 104;
+        const btnH = 36;
+        _clockTickBtn = { x: btnX, y: btnY, w: btnW, h: btnH };
+
+        p.push();
+        p.noStroke();
+        p.fill("#7c3aed");
+        p.rect(btnX, btnY, btnW, btnH, 999);
+        p.fill("#ffffff");
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textStyle(p.BOLD);
+        p.textSize(14);
+        p.text("Tick +1 hour", btnX + btnW / 2, btnY + btnH / 2);
+        p.pop();
+
+        // Right info panel
+        const infoX = p.width * 0.58;
+        const infoY = p.height * 0.16;
+        const infoW = p.width * 0.34;
+
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rect(infoX, infoY, infoW, p.height * 0.52, 18);
+
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.fill("#222222");
+        p.textStyle(p.BOLD);
+        p.textSize(15);
+        p.text("How it works", infoX + 14, infoY + 28);
+
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.fill("#6b6258");
+        p.text(`Hours elapsed: ${state.clockCount}`, infoX + 14, infoY + 58);
+
+        p.fill("#e11d48");
+        p.textStyle(p.BOLD);
+        p.textSize(18);
+        p.text(`${state.clockCount} % 12 = ${clockHour === 0 && state.clockCount > 0 ? 0 : clockHour}`, infoX + 14, infoY + 90);
+
+        p.fill("#222222");
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.text(`Clock shows: ${clockHour === 0 ? 12 : clockHour} o'clock`, infoX + 14, infoY + 118);
+
+        // Example questions
+        p.fill("#ded2c1");
+        p.noStroke();
+        p.rect(infoX + 10, infoY + 132, infoW - 20, 1);
+
+        p.fill("#7c3aed");
+        p.textStyle(p.BOLD);
+        p.textSize(13);
+        p.text("Real-world modulo:", infoX + 14, infoY + 160);
+        p.textStyle(p.NORMAL);
+        p.fill("#6b6258");
+        p.textSize(12);
+        p.text(`14 hours → 14 % 12 = 2 → 2:00`, infoX + 14, infoY + 180);
+        p.text(`25 hours → 25 % 12 = 1 → 1:00`, infoX + 14, infoY + 198);
+
+        p.fill("#0891b2");
+        p.textStyle(p.BOLD);
+        p.textSize(13);
+        p.text("Days of the week (% 7):", infoX + 14, infoY + 224);
+        p.textStyle(p.NORMAL);
+        p.fill("#6b6258");
+        p.textSize(12);
+        const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+        p.text(`${state.clockCount} days → day ${state.clockCount % 7} = ${days[state.clockCount % 7]}`, infoX + 14, infoY + 244);
+
+        p.fill("#f59e0b");
+        p.textStyle(p.BOLD);
+        p.textSize(13);
+        p.text("Minutes (% 60):", infoX + 14, infoY + 268);
+        p.textStyle(p.NORMAL);
+        p.fill("#6b6258");
+        p.textSize(12);
+        p.text(`${state.clockCount} min → ${state.clockCount % 60} past the hour`, infoX + 14, infoY + 288);
+        p.pop();
+
+        // Labels on clock
+        if (state.showLabels) {
+          drawLabel(`hour % 12 = clock position`, cx - 80, cy - radius - 22, "#e11d48", 13);
+        }
       }
 
       function drawLabel(text, x, y, color, size = 13) {

@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -278,8 +278,152 @@
       .slider-wrap { grid-template-columns: 1fr; gap: 4px; }
       .workspace { height: 540px; }
     }
-  </style>
-  <link rel="stylesheet" href="../concept-bridge.css" />
+  
+  /* ── Bridge improvement additions ─────────────────────────────── */
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+  }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2a5e3e;
+    background: #eef8f2;
+    border: 1px solid #b8dcc8;
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: rgba(255,255,255,0.55);
+  }
+  .ba-col { padding: 14px 18px; }
+  .ba-col:first-child {
+    background: rgba(0,0,0,0.025);
+    border-right: 1px solid var(--line, #ded2c1);
+  }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #9e9789;
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: #2a5e3e; }
+  .ba-text { font-size: 0.9rem; line-height: 1.5; }
+  .predict-box {
+    background: #fef9ee;
+    border: 1px solid #efd09e;
+    border-radius: 10px;
+    padding: 11px 14px;
+    margin-bottom: 12px;
+  }
+  .predict-box .pbox-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .predict-box .pbox-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .callout-mistake {
+    background: #fff3e6;
+    border: 1px solid #edbd83;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0 0;
+  }
+  .callout-mistake .cm-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .callout-mistake .cm-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .pathways-section {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 32px 20px 8px;
+  }
+  .pathways-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9e9789;
+    margin-bottom: 12px;
+  }
+  .path-links { display: grid; gap: 8px; max-width: 820px; }
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--ink, #222);
+    background: rgba(255,250,242,0.92);
+    transition: border-color 0.14s ease, background 0.14s ease;
+    font-family: inherit;
+  }
+  .path-link:hover {
+    border-color: var(--accent, #2563eb);
+    background: rgba(230,240,255,0.6);
+  }
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9e9789;
+    flex-shrink: 0;
+    min-width: 82px;
+  }
+  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .bottom-nav {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 18px 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid var(--line, #ded2c1);
+  }
+  .bottom-nav a {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6b6258;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  .bottom-nav a:hover { color: var(--accent, #2563eb); }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .bottom-nav { flex-direction: column; }
+  }
+</style>
+  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -290,14 +434,35 @@
     <p class="subtitle">
       A concept bridge for arrays, indexes, loops, and arrays of objects. An array is how one variable can hold many related things.
     </p>
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">managing many values</span>
+    <span class="unlock-pill">loops and arrays together</span>
+    <span class="unlock-pill">indexed data</span>
+    <span class="unlock-pill">dynamic lists</span>
+  </div>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text">Arrays are just a syntax thing — I can use separate variables instead</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text">One name controls many related values — and a loop can act on all of them at once</div>
+    </div>
+  </section>
   </header>
 
   <main>
     <section class="controls" aria-label="Explorer controls">
-      <div class="row">
-        <button id="mode-spotlight" class="active">Spotlight Index</button>
+            <div class="predict-box">
+        <span class="pbox-label">Before you interact — predict first</span>
+        <span class="pbox-body">Before you look at the loop — how many lines of code would it take to draw 50 circles without an array?</span>
+      </div>
+<div class="row">
+        <button id="mode-spotlight" class="active">Spotlight</button>
         <button id="mode-one">One Thing</button>
         <button id="mode-separate">Separate Variables</button>
+        <button id="mode-array">Array List</button>
         <button id="mode-loop">Loop Draws Array</button>
         <button id="mode-objects">Array of Objects</button>
         <button id="shuffle-button">Shuffle</button>
@@ -396,15 +561,23 @@
       values: [],
       objects: [],
       loopCursor: 0,
-      lastLoopStep: 0
+      lastLoopStep: 0,
+      spotlight: {
+        index: 2,
+        dragging: false,
+        sweeping: false,
+        sweepCursor: 0,
+        lastSweepStep: 0
+      }
     };
 
     const els = {};
 
     function setupUI() {
-      els.modeSpotlight = document.querySelector("#mode-spotlight");
       els.modeOne = document.querySelector("#mode-one");
+      els.modeSpotlight = document.querySelector("#mode-spotlight");
       els.modeSeparate = document.querySelector("#mode-separate");
+      els.modeArray = document.querySelector("#mode-array");
       els.modeLoop = document.querySelector("#mode-loop");
       els.modeObjects = document.querySelector("#mode-objects");
       els.shuffleButton = document.querySelector("#shuffle-button");
@@ -430,9 +603,10 @@
       els.codeCard = document.querySelector("#code-card");
       els.codeBox = document.querySelector("#code-box");
 
-      els.modeSpotlight.addEventListener("click", () => setMode("spotlight"));
       els.modeOne.addEventListener("click", () => setMode("one"));
+      els.modeSpotlight.addEventListener("click", () => setMode("spotlight"));
       els.modeSeparate.addEventListener("click", () => setMode("separate"));
+      els.modeArray.addEventListener("click", () => setMode("array"));
       els.modeLoop.addEventListener("click", () => setMode("loop"));
       els.modeObjects.addEventListener("click", () => setMode("objects"));
 
@@ -538,9 +712,10 @@
 
     function updateUI() {
       const buttons = [
-        [els.modeSpotlight, "spotlight"],
         [els.modeOne, "one"],
+        [els.modeSpotlight, "spotlight"],
         [els.modeSeparate, "separate"],
+        [els.modeArray, "array"],
         [els.modeLoop, "loop"],
         [els.modeObjects, "objects"]
       ];
@@ -564,15 +739,17 @@
       const arrayPreview = `[${state.values.join(", ")}]`;
       const selectedValue = state.values[state.selectedIndex];
 
+      const spotIdx = state.spotlight.index;
+      const spotVal = state.values[spotIdx] || 0;
       const lessons = {
         spotlight: {
-          pill: "an index spotlights one item in the array",
-          title: "An index points at one thing inside many things",
-          text: "Think of the index like a spotlight. It lands on one cell in the array, and the sketch uses that one value. Move the slider or hover over a cell to change which item is selected.",
-          formula: `let sizes = ${arrayPreview};\nlet selected = sizes[${state.selectedIndex}];`,
-          question: "Which array cell is selected right now? Try hovering over a different cell to move the spotlight.",
-          caption: `Hover over the array row or drag the index slider. The spotlight jumps to sizes[${state.selectedIndex}] = ${selectedValue}.`,
-          code: `let sizes = ${arrayPreview};\n\nlet selected = sizes[${state.selectedIndex}];\ncircle(width / 2, height / 2, selected);`
+          pill: "spotlight one index at a time",
+          title: "The spotlight picks one item",
+          text: "Drag the spotlight left and right to select an index. Each cell holds one value. The loop button sweeps the spotlight across every cell automatically.",
+          formula: `array[${spotIdx}] = ${spotVal}`,
+          question: "What does the loop do that dragging cannot do automatically?",
+          caption: `array[${spotIdx}] → draws this. Drag to any cell, or press Loop to sweep automatically.`,
+          code: `let sizes = [${state.values.join(", ")}];\n\n// Pick one item:\nlet s = sizes[${spotIdx}]; // ${spotVal}\ncircle(200, 200, s);\n\n// Visit every item:\nfor (let i = 0; i < sizes.length; i++) {\n  drawShape(sizes[i]);\n}`
         },
         one: {
           pill: "one variable holds one value",
@@ -591,6 +768,15 @@
           question: "Why is this annoying if you want to add one more circle?",
           caption: "Separate variables create repeated code. Arrays help the code scale up.",
           code: `let size1 = ${state.values[0]};\nlet size2 = ${state.values[1] || 50};\nlet size3 = ${state.values[2] || 50};\n\nfunction draw() {\n  circle(120, 200, size1);\n  circle(220, 200, size2);\n  circle(320, 200, size3);\n}`
+        },
+        array: {
+          pill: "one variable can hold many values",
+          title: "An array is one name for many values",
+          text: "An array stores a list. Each item has an index. JavaScript arrays start counting indexes at 0.",
+          formula: `let sizes = ${arrayPreview};\nsizes[${state.selectedIndex}] = ${selectedValue};`,
+          question: "Why is the first item at index 0 instead of index 1?",
+          caption: `The selected item is sizes[${state.selectedIndex}], which currently stores ${selectedValue}.`,
+          code: `let sizes = ${arrayPreview};\n\nlet selected = sizes[${state.selectedIndex}];\ncircle(width / 2, height / 2, selected);`
         },
         loop: {
           pill: "a loop visits every item",
@@ -638,10 +824,49 @@
         canvas.elt.setAttribute("role", "img");
         canvas.elt.setAttribute("aria-label", "Interactive visualization of arrays, indexes, loops, and arrays of objects in p5.js.");
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("DM Sans, system-ui, sans-serif");
+        p.textFont("Inter, system-ui, sans-serif");
       };
 
       p.windowResized = () => resizeToHolder();
+
+      p.mousePressed = () => {
+        if (state.mode !== "spotlight") return;
+        // Check loop button
+        if (spotlightLoopButton) {
+          const btn = spotlightLoopButton;
+          if (p.mouseX >= btn.x && p.mouseX <= btn.x + btn.w && p.mouseY >= btn.y && p.mouseY <= btn.y + btn.h) {
+            spotlightLoopRunning = !spotlightLoopRunning;
+            spotlightLoopLastStep = p.millis();
+            return;
+          }
+        }
+        // Check cell row drag start
+        handleSpotlightDrag();
+        state.spotlight.dragging = true;
+      };
+
+      p.mouseDragged = () => {
+        if (state.mode !== "spotlight") return;
+        if (state.spotlight.dragging) handleSpotlightDrag();
+      };
+
+      p.mouseReleased = () => {
+        state.spotlight.dragging = false;
+      };
+
+      function handleSpotlightDrag() {
+        const sl = getSpotlightCells();
+        const count = sl.count;
+        if (p.mouseY < sl.rowY - 40 || p.mouseY > sl.rowY + 80) return;
+        if (p.mouseX < sl.startX - 20 || p.mouseX > sl.startX + sl.totalW + 20) return;
+        const col = Math.floor((p.mouseX - sl.startX) / (sl.cellW + sl.gap));
+        const clamped = Math.max(0, Math.min(count - 1, col));
+        if (clamped !== state.spotlight.index) {
+          state.spotlight.index = clamped;
+          spotlightLoopRunning = false;
+          updateUI();
+        }
+      }
 
       p.draw = () => {
         resizeToHolder();
@@ -650,9 +875,10 @@
         drawSubtleGrid();
         drawPanelTitle();
 
-        if (state.mode === "spotlight") drawSpotlightMode();
         if (state.mode === "one") drawOneMode();
+        if (state.mode === "spotlight") drawSpotlightMode();
         if (state.mode === "separate") drawSeparateMode();
+        if (state.mode === "array") drawArrayMode();
         if (state.mode === "loop") drawLoopMode();
         if (state.mode === "objects") drawObjectsMode();
 
@@ -674,11 +900,7 @@
         if (!state.animate) return;
         const interval = 620 / Math.max(0.2, state.speed);
         if (p.millis() - state.lastLoopStep > interval) {
-          if (state.mode === "spotlight") {
-            state.selectedIndex = (state.selectedIndex + 1) % state.count;
-          } else {
-            state.loopCursor = (state.loopCursor + 1) % state.count;
-          }
+          state.loopCursor = (state.loopCursor + 1) % state.count;
           state.lastLoopStep = p.millis();
         }
       }
@@ -694,9 +916,10 @@
 
       function drawPanelTitle() {
         const titles = {
-          spotlight: ["Spotlight Index", "An index selects one value from the array."],
           one: ["One Thing", "A single variable can remember one value."],
+          spotlight: ["Spotlight", "Drag to index one item. Press Loop to sweep the whole array."],
           separate: ["Separate Variables", "Multiple variables work, but they do not scale well."],
+          array: ["Array List", "One variable can hold many indexed values."],
           loop: ["Loop Draws Array", "A loop visits every item in the array."],
           objects: ["Array of Objects", "Each item can carry multiple properties."]
         };
@@ -712,6 +935,166 @@
         p.fill("#6b6258");
         p.text(subtitle, 24, 62);
         p.pop();
+      }
+
+      // --- Spotlight mode ---
+      let spotlightLoopButton = null;
+      let spotlightLoopRunning = false;
+      let spotlightLoopLastStep = 0;
+
+      function getSpotlightCells() {
+        const count = Math.min(state.count, 8);
+        const cellW = 58;
+        const gap = 8;
+        const totalW = count * cellW + (count - 1) * gap;
+        const rowY = p.height * 0.66;
+        const startX = p.width * 0.5 - totalW / 2;
+        return { count, cellW, gap, totalW, rowY, startX };
+      }
+
+      function drawSpotlightMode() {
+        const sp = state.spotlight;
+        const sl = getSpotlightCells();
+        const count = sl.count;
+
+        // Update sweeping
+        if (spotlightLoopRunning) {
+          if (p.millis() - spotlightLoopLastStep > 620) {
+            sp.index = (sp.index + 1) % count;
+            spotlightLoopLastStep = p.millis();
+            updateUI();
+          }
+        }
+
+        // Draw top preview area (panel)
+        const previewX = p.width * 0.08;
+        const previewY = p.height * 0.13;
+        const previewW = p.width * 0.84;
+        const previewH = p.height * 0.40;
+        drawPanel(previewX, previewY, previewW, previewH);
+
+        // Draw spotlight glow circle above cells
+        const cellCx = sl.startX + sp.index * (sl.cellW + sl.gap) + sl.cellW / 2;
+        const spotY = sl.rowY - 28;
+        p.push();
+        // Outer glow
+        for (let r = 80; r >= 0; r -= 10) {
+          const alpha = p.map(r, 80, 0, 0, 55);
+          p.noStroke();
+          p.fill(255, 230, 80, alpha);
+          p.circle(cellCx, spotY, r * 2 + 30);
+        }
+        // Core spotlight beam
+        p.fill(255, 230, 80, 200);
+        p.circle(cellCx, spotY, 60);
+        p.fill(255, 255, 200, 240);
+        p.circle(cellCx, spotY, 28);
+        p.pop();
+
+        // Draw array cells row
+        for (let i = 0; i < count; i++) {
+          const cx = sl.startX + i * (sl.cellW + sl.gap);
+          const cy = sl.rowY;
+          const active = i === sp.index;
+          const val = state.values[i] || 0;
+
+          // Cell glow for active
+          if (active) {
+            p.push();
+            p.noStroke();
+            p.fill(255, 230, 80, 60);
+            p.rect(cx - 4, cy - 4, sl.cellW + 8, 68, 16);
+            p.pop();
+          }
+
+          p.push();
+          p.noStroke();
+          p.fill(active ? "#fffde0" : "#ffffff");
+          p.rect(cx, cy, sl.cellW, 60, 12);
+          p.stroke(active ? "#f59e0b" : "#ded2c1");
+          p.strokeWeight(active ? 3 : 1.5);
+          p.noFill();
+          p.rect(cx, cy, sl.cellW, 60, 12);
+          // Index label
+          p.noStroke();
+          p.fill("#6b6258");
+          p.textAlign(p.CENTER, p.CENTER);
+          p.textStyle(p.BOLD);
+          p.textSize(11);
+          p.text(`[${i}]`, cx + sl.cellW / 2, cy + 16);
+          // Value
+          p.fill(active ? "#d97706" : "#7c3aed");
+          p.textSize(20);
+          p.text(val, cx + sl.cellW / 2, cy + 42);
+          p.pop();
+        }
+
+        // Draw selected value as a circle in the preview panel
+        const val = state.values[sp.index] || 0;
+        const previewCx = previewX + previewW * 0.5;
+        const previewCy = previewY + previewH * 0.52;
+        const previewR = Math.min(val * 0.65, previewH * 0.38);
+        p.push();
+        p.noStroke();
+        p.fill("#f59e0b");
+        p.circle(previewCx, previewCy, previewR * 2);
+        p.fill("#ffffff");
+        p.circle(previewCx, previewCy, 10);
+        if (state.showLabels) {
+          drawLabel(`array[${sp.index}] = ${val} → draws this`, previewCx - 100, previewY + 30, "#d97706", 14);
+        }
+        p.pop();
+
+        // Code snippet
+        const snippetX = previewX + previewW * 0.60;
+        const snippetY = previewY + 20;
+        const snippetW = previewW * 0.36;
+        p.push();
+        p.noStroke();
+        p.fill(17, 24, 39, 235);
+        p.rect(snippetX, snippetY, snippetW, 110, 14);
+        p.textFont("ui-monospace, SFMono-Regular, Menlo, Monaco, monospace");
+        p.textSize(12);
+        p.textAlign(p.LEFT, p.BASELINE);
+
+        // Render code with highlighting
+        const lines = [
+          { text: `let sizes = [${state.values.slice(0, count).join(", ")}];`, color: "#e5e7eb" },
+          { text: "", color: "#e5e7eb" },
+          { text: `sizes[i]  // i = ${sp.index}`, color: "#fde68a", bold: true },
+          { text: "", color: "#e5e7eb" },
+          { text: `for (let i = 0; i < sizes.length; i++) {`, color: spotlightLoopRunning ? "#86efac" : "#e5e7eb" },
+          { text: `  drawShape(sizes[i]);`, color: spotlightLoopRunning ? "#86efac" : "#e5e7eb" },
+          { text: `}`, color: spotlightLoopRunning ? "#86efac" : "#e5e7eb" }
+        ];
+        for (let li = 0; li < lines.length; li++) {
+          if (lines[li].bold) p.textStyle(p.BOLD);
+          else p.textStyle(p.NORMAL);
+          p.fill(lines[li].color);
+          p.text(lines[li].text, snippetX + 10, snippetY + 20 + li * 14);
+        }
+        p.textFont("Inter, system-ui, sans-serif");
+        p.pop();
+
+        // Loop button (HTML-overlay-style drawn on canvas)
+        const btnX = p.width * 0.5 - 50;
+        const btnY = sl.rowY + 72;
+        const btnW = 100;
+        const btnH = 32;
+        p.push();
+        p.noStroke();
+        p.fill(spotlightLoopRunning ? "#16a34a" : "#222222");
+        p.rect(btnX, btnY, btnW, btnH, 999);
+        p.fill("#ffffff");
+        p.textStyle(p.BOLD);
+        p.textSize(13);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text(spotlightLoopRunning ? "Stop" : "Loop", btnX + btnW / 2, btnY + btnH / 2);
+        p.textAlign(p.LEFT, p.BASELINE);
+        p.pop();
+
+        // Store button bounds for click
+        spotlightLoopButton = { x: btnX, y: btnY, w: btnW, h: btnH };
       }
 
       function drawOneMode() {
@@ -752,10 +1135,9 @@
         p.pop();
       }
 
-      function drawSpotlightMode() {
+      function drawArrayMode() {
         drawPanel(p.width * 0.08, p.height * 0.15, p.width * 0.84, p.height * 0.50);
-        const bounds = drawArrayCells(p.width * 0.12, p.height * 0.28, p.width * 0.76, 92, state.selectedIndex, false);
-        updateSpotlightFromPointer(bounds);
+        drawArrayCells(p.width * 0.12, p.height * 0.28, p.width * 0.76, 92, state.selectedIndex, false);
 
         const selectedValue = state.values[state.selectedIndex];
         const x = p.width * 0.50;
@@ -766,8 +1148,7 @@
         p.circle(x, y, selectedValue * 0.8);
         if (state.showLabels) {
           drawLabel(`sizes[${state.selectedIndex}] = ${selectedValue}`, x - 62, y + selectedValue * 0.40 + 28, "#e11d48", 15);
-          drawLabel("The spotlight shows which one item the sketch is reading.", p.width * 0.12, p.height * 0.22, "#6b6258", 14);
-          drawLabel("Hover over a cell to move the spotlight manually.", p.width * 0.12, p.height * 0.63, "#e11d48", 13);
+          drawLabel("index selects one item from the array", p.width * 0.12, p.height * 0.22, "#6b6258", 14);
         }
         p.pop();
       }
@@ -853,30 +1234,6 @@
         }
         if (state.showLabels) drawLabel("sizes", startX - 52, y + 50, "#7c3aed", 14);
         p.pop();
-        return { startX, y, cellW, h, gap };
-      }
-
-      function updateSpotlightFromPointer(bounds) {
-        const inside =
-          p.mouseX >= bounds.startX &&
-          p.mouseX <= bounds.startX + bounds.cellW * state.count + bounds.gap * (state.count - 1) &&
-          p.mouseY >= bounds.y &&
-          p.mouseY <= bounds.y + bounds.h;
-
-        if (!inside) return;
-
-        const rawIndex = Math.floor((p.mouseX - bounds.startX) / (bounds.cellW + bounds.gap));
-        const cellLeft = bounds.startX + rawIndex * (bounds.cellW + bounds.gap);
-        const cellRight = cellLeft + bounds.cellW;
-
-        if (
-          rawIndex >= 0 &&
-          rawIndex < state.count &&
-          p.mouseX >= cellLeft &&
-          p.mouseX <= cellRight
-        ) {
-          state.selectedIndex = rawIndex;
-        }
       }
 
       function getRowPositions(count, left, right, y) {

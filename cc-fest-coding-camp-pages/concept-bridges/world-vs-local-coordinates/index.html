@@ -26,7 +26,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -288,8 +288,152 @@
 
       .workspace { height: 540px; }
     }
-  </style>
-  <link rel="stylesheet" href="../concept-bridge.css" />
+  
+  /* ── Bridge improvement additions ─────────────────────────────── */
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+  }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2a5e3e;
+    background: #eef8f2;
+    border: 1px solid #b8dcc8;
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: rgba(255,255,255,0.55);
+  }
+  .ba-col { padding: 14px 18px; }
+  .ba-col:first-child {
+    background: rgba(0,0,0,0.025);
+    border-right: 1px solid var(--line, #ded2c1);
+  }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #9e9789;
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: #2a5e3e; }
+  .ba-text { font-size: 0.9rem; line-height: 1.5; }
+  .predict-box {
+    background: #fef9ee;
+    border: 1px solid #efd09e;
+    border-radius: 10px;
+    padding: 11px 14px;
+    margin-bottom: 12px;
+  }
+  .predict-box .pbox-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .predict-box .pbox-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .callout-mistake {
+    background: #fff3e6;
+    border: 1px solid #edbd83;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0 0;
+  }
+  .callout-mistake .cm-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .callout-mistake .cm-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .pathways-section {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 32px 20px 8px;
+  }
+  .pathways-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9e9789;
+    margin-bottom: 12px;
+  }
+  .path-links { display: grid; gap: 8px; max-width: 820px; }
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--ink, #222);
+    background: rgba(255,250,242,0.92);
+    transition: border-color 0.14s ease, background 0.14s ease;
+    font-family: inherit;
+  }
+  .path-link:hover {
+    border-color: var(--accent, #2563eb);
+    background: rgba(230,240,255,0.6);
+  }
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9e9789;
+    flex-shrink: 0;
+    min-width: 82px;
+  }
+  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .bottom-nav {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 18px 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid var(--line, #ded2c1);
+  }
+  .bottom-nav a {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6b6258;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  .bottom-nav a:hover { color: var(--accent, #2563eb); }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .bottom-nav { flex-direction: column; }
+  }
+</style>
+  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -301,11 +445,31 @@
       A concept bridge for <strong>translate()</strong>, <strong>rotate()</strong>, <strong>push()</strong>, and <strong>pop()</strong>.
       The key idea: transformations move and rotate the coordinate system, not just the shape.
     </p>
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">complex transforms</span>
+    <span class="unlock-pill">rotating grids</span>
+    <span class="unlock-pill">stamping patterns</span>
+    <span class="unlock-pill">push/pop thinking</span>
+  </div>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text">translate() moves shapes — but then all my coordinates get confusing</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text">translate() moves the origin, not the shape — draw as if you're always at (0, 0) and let the transform do the work</div>
+    </div>
+  </section>
   </header>
 
   <main>
     <section class="controls" aria-label="Explorer controls">
-      <div class="row">
+            <div class="predict-box">
+        <span class="pbox-label">Before you interact — predict first</span>
+        <span class="pbox-body">Before you add rotate() — will the shape spin around its own center or around the canvas origin?</span>
+      </div>
+<div class="row">
         <button id="mode-world" class="active">World Grid</button>
         <button id="mode-translate">translate()</button>
         <button id="mode-rotate">rotate()</button>
@@ -342,6 +506,7 @@
         <label class="toggle-label"><input id="animate-angle" type="checkbox" />Animate rotation</label>
         <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
         <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+        <button id="bug-toggle" style="display:none; border-color: #e11d48; color: #e11d48;">Show bug (no push/pop)</button>
       </div>
     </section>
 
@@ -404,7 +569,8 @@
       angle: 25,
       animate: false,
       showLabels: true,
-      showCode: false
+      showCode: false,
+      showBug: false
     };
 
     const els = {};
@@ -415,6 +581,7 @@
       els.modeRotate = document.querySelector("#mode-rotate");
       els.modePushpop = document.querySelector("#mode-pushpop");
       els.modeCompose = document.querySelector("#mode-compose");
+      els.bugToggle = document.querySelector("#bug-toggle");
       els.resetButton = document.querySelector("#reset-button");
       els.modePill = document.querySelector("#mode-pill");
       els.xSlider = document.querySelector("#x-slider");
@@ -477,6 +644,11 @@
         updateUI();
       });
 
+      els.bugToggle.addEventListener("click", () => {
+        state.showBug = !state.showBug;
+        updateUI();
+      });
+
       els.presetButtons.forEach((button) => {
         button.addEventListener("click", () => {
           const preset = button.dataset.preset;
@@ -530,6 +702,15 @@
       els.showLabels.checked = state.showLabels;
       els.showCode.checked = state.showCode;
       els.codeCard.classList.toggle("visible", state.showCode);
+
+      // Show/hide bug toggle only in pushpop mode
+      if (els.bugToggle) {
+        els.bugToggle.style.display = state.mode === "pushpop" ? "inline-block" : "none";
+        els.bugToggle.textContent = state.showBug ? "Show correct (with push/pop)" : "Show bug (no push/pop)";
+        els.bugToggle.style.borderColor = state.showBug ? "#16a34a" : "#e11d48";
+        els.bugToggle.style.color = state.showBug ? "#16a34a" : "#e11d48";
+      }
+      if (state.mode !== "pushpop") state.showBug = false;
 
       const lessons = {
         world: {
@@ -605,7 +786,7 @@
         canvas.elt.setAttribute("role", "img");
         canvas.elt.setAttribute("aria-label", "Interactive visualization of world coordinates, local coordinates, translate, rotate, push, and pop in p5.js.");
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("DM Sans, system-ui, sans-serif");
+        p.textFont("Inter, system-ui, sans-serif");
         p.rectMode(p.CENTER);
       };
 
@@ -733,6 +914,14 @@
         const origin = getLocalOrigin();
         const angle = p.radians(state.angle);
 
+        if (state.showBug) {
+          drawPushPopBugMode(origin, angle);
+        } else {
+          drawPushPopCorrectMode(origin, angle);
+        }
+      }
+
+      function drawPushPopCorrectMode(origin, angle) {
         p.push();
         p.noStroke();
         p.fill(255, 255, 255, 232);
@@ -746,6 +935,97 @@
         drawLocalRectangle(origin, angle);
         drawWorldRectangle(p.width * 0.82, p.height * 0.32, "after pop()", "#64748b");
         drawPushPopStack();
+
+        // CORRECT label
+        if (state.showLabels) {
+          p.push();
+          p.noStroke();
+          p.fill(22, 163, 74, 200);
+          p.rectMode(p.CORNER);
+          const lx = p.width * 0.08 + 14;
+          const ly = p.height * 0.18 + 14;
+          p.rect(lx, ly, 110, 32, 14);
+          p.fill(255);
+          p.textStyle(p.BOLD);
+          p.textSize(14);
+          p.textAlign(p.CENTER, p.CENTER);
+          p.text("CORRECT", lx + 55, ly + 16);
+          p.pop();
+        }
+      }
+
+      function drawPushPopBugMode(origin, angle) {
+        // Show what happens WITHOUT push/pop:
+        // The second rect (after pop()) gets drawn in the STILL-TRANSFORMED coordinate system,
+        // so it lands at the wrong place.
+        p.push();
+        p.noStroke();
+        p.fill(255, 240, 240, 232);
+        p.rectMode(p.CORNER);
+        p.rect(p.width * 0.08, p.height * 0.18, p.width * 0.84, p.height * 0.50, 24);
+        p.stroke("#e11d48");
+        p.strokeWeight(2);
+        p.noFill();
+        p.rect(p.width * 0.08, p.height * 0.18, p.width * 0.84, p.height * 0.50, 24);
+        p.pop();
+
+        // Draw first world rect (correct position)
+        drawWorldRectangle(p.width * 0.18, p.height * 0.32, "first rect()", "#64748b");
+
+        // Draw the transformed local grid (no push/pop — transformation leaks)
+        drawTranslationPath(origin);
+        drawLocalGrid(origin, angle);
+        drawLocalRectangle(origin, angle);
+
+        // Without pop(), the second rect is drawn in the TRANSFORMED space
+        // Simulate: translate then rotate already happened, so a rect at (width*0.82, height*0.32)
+        // in world coords would actually be drawn relative to the local origin + angle
+        p.push();
+        p.translate(origin.x, origin.y);
+        p.rotate(angle);
+        // "after pop()" rect drawn WITHOUT restoring transforms
+        const bugLocalX = p.width * 0.82 - origin.x;
+        const bugLocalY = p.height * 0.32 - origin.y;
+        p.rectMode(p.CENTER);
+        p.noStroke();
+        p.fill(225, 29, 72, 100);
+        p.rect(bugLocalX * 0.35, bugLocalY * 0.35, 96, 60, 12);
+        p.fill(225, 29, 72, 200);
+        p.circle(bugLocalX * 0.35, bugLocalY * 0.35, 6);
+        if (state.showLabels) drawLocalLabel("wrong position!", bugLocalX * 0.35 + 8, bugLocalY * 0.35 + 48, "#e11d48", 13);
+        p.pop();
+
+        // BUG label
+        p.push();
+        p.noStroke();
+        p.fill(225, 29, 72, 220);
+        p.rectMode(p.CORNER);
+        const lx = p.width * 0.08 + 14;
+        const ly = p.height * 0.18 + 14;
+        p.rect(lx, ly, 80, 32, 14);
+        p.fill(255);
+        p.textStyle(p.BOLD);
+        p.textSize(14);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text("BUG", lx + 40, ly + 16);
+        p.pop();
+
+        // Explanation card
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 235);
+        p.rectMode(p.CORNER);
+        p.rect(p.width * 0.35, p.height * 0.70, p.width * 0.30, 92, 20);
+        p.fill("#e11d48");
+        p.textStyle(p.BOLD);
+        p.textSize(15);
+        p.text("Without push/pop", p.width * 0.35 + 18, p.height * 0.70 + 28);
+        p.fill("#6b6258");
+        p.textStyle(p.NORMAL);
+        p.textSize(13);
+        p.text("transforms keep applying to", p.width * 0.35 + 18, p.height * 0.70 + 52);
+        p.text("everything drawn after!", p.width * 0.35 + 18, p.height * 0.70 + 72);
+        p.pop();
       }
 
       function drawComposeMode() {

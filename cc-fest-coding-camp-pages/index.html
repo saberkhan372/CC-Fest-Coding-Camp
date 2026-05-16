@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CC Fest Coding Camp: Creative Coding Tools for p5.js</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css?v=20260514-homepage-polish">
+  <link rel="stylesheet" href="site.css?v=20260506-debug-card-previews">
   <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
-  <meta name="description" content="19 concept bridges, 60 workshop tools, and 40 starter sketches for teaching p5.js and creative coding. Free, open, and remixable.">
+  <meta name="description" content="19 concept bridges, 66 workshop tools, and 44 starter sketches for teaching p5.js and creative coding. Free, open, and remixable.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/">
   <meta property="og:title" content="CC Fest Coding Camp: Creative Coding Tools for p5.js">
-  <meta property="og:description" content="19 concept bridges, 60 workshop tools, and 40 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:description" content="19 concept bridges, 66 workshop tools, and 44 starter sketches for educators teaching p5.js and creative coding. Free, open, and remixable.">
   <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="CC Fest Coding Camp: Creative Coding Tools for p5.js">
-  <meta name="twitter:description" content="19 concept bridges, 60 workshop tools, and 40 starter sketches for teaching p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:description" content="19 concept bridges, 66 workshop tools, and 44 starter sketches for teaching p5.js and creative coding. Free, open, and remixable.">
   <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -41,34 +41,12 @@
         <div class="hero-text">
           <p class="eyebrow">CC Fest Coding Camp · Free · Open to everyone</p>
           <h1>Tools for Creative Coding.</h1>
-          <p class="lede">19 concept bridges, 60 workshop tools, and 40 starter sketches for learning <a href="https://p5js.org">p5.js</a> together. Start with a bridge when an idea feels fuzzy, open a tool when you want guided practice, then remix a sketch into your own project.</p>
+          <p class="lede">19 concept bridges, 66 workshop tools, and 44 starter sketches for learning <a href="https://p5js.org">p5.js</a> together. Start with a bridge when an idea feels fuzzy, open a tool when you want guided practice, then remix a sketch into your own project.</p>
           <div class="hero-actions">
             <a class="button primary" href="#interactive-tools">Browse Tools</a>
             <a class="button secondary" href="#concept-bridges">Concept Bridges</a>
             <a class="button secondary" href="#starter-sketches">Starter Sketches</a>
             <a class="button" href="https://sustaining-boursin-d41.notion.site/3369950a7da981169ceffb7d3dbd73e9">About the Camp →</a>
-          </div>
-          <div class="library-summary" aria-label="Library summary">
-            <div class="summary-card">
-              <strong>19</strong>
-              <span>Concept bridges</span>
-              <small>For intuition before syntax.</small>
-            </div>
-            <div class="summary-card">
-              <strong>60</strong>
-              <span>Workshop tools</span>
-              <small>For guided demos and stations.</small>
-            </div>
-            <div class="summary-card">
-              <strong>40</strong>
-              <span>Starter sketches</span>
-              <small>For editing, remixing, and projects.</small>
-            </div>
-            <div class="summary-card">
-              <strong>5</strong>
-              <span>Sessions</span>
-              <small>One arc from first marks to open studio.</small>
-            </div>
           </div>
         </div>
         <div class="hero-visual">
@@ -83,6 +61,9 @@
             <div class="poster-card card-d" data-token data-draggable>map()</div>
             <div class="poster-card card-e" data-token data-draggable>draw()</div>
             <div class="poster-card card-f" data-token data-draggable>fill()</div>
+            <div class="poster-card card-g" data-token data-draggable>random()</div>
+            <div class="poster-card card-h" data-token data-draggable>lerp()</div>
+            <div class="poster-card card-i" data-token data-draggable>frameCount</div>
           </div>
           <aside class="hero-aside">
             <h2>Creative coding for all.</h2>
@@ -113,60 +94,7 @@
 <section class="overview panel" aria-label="Suggested learning sequence">
         <div class="section-label">The Camp Arc</div>
         <h2>Five sessions. One arc.</h2>
-        <p>CC Fest Coding Camp runs five sessions over five weeks, moving from first marks to open studio. Use the arc if you want the camp order, or use search and filters if you already know what you need.</p>
-        <div class="tool-search-wrap overview-search-wrap">
-          <input class="tool-search" type="search" placeholder="Search bridges, tools, and sketches — noise, array, text, game…" aria-label="Search concept bridges, tools, and starter sketches" autocomplete="off" spellcheck="false">
-        </div>
-        <div class="overview-filter-stack">
-          <div class="pathway-filter-bar" role="group" aria-label="Filter by learning pathway">
-            <button class="pathway-btn active" data-pathway-filter="all">All pathways</button>
-            <button class="pathway-btn" data-pathway-filter="first-time">First time with p5</button>
-            <button class="pathway-btn" data-pathway-filter="animation">I want animation</button>
-            <button class="pathway-btn" data-pathway-filter="data">I want data</button>
-            <button class="pathway-btn" data-pathway-filter="games">I want games</button>
-            <button class="pathway-btn" data-pathway-filter="stuck">I'm stuck</button>
-            <button class="pathway-btn" data-pathway-filter="final">Final project</button>
-          </div>
-          <div class="suit-filter-bar" role="group" aria-label="Filter by suit">
-            <button class="suit-btn active" data-filter="all">All</button>
-            <button class="suit-btn" data-filter="marks">✦ Marks</button>
-            <button class="suit-btn" data-filter="motion">◎ Motion</button>
-            <button class="suit-btn" data-filter="systems">⬡ Systems</button>
-            <button class="suit-btn" data-filter="data">▦ Data</button>
-            <button class="suit-btn" data-filter="open">☽ Open</button>
-            <button class="suit-btn" data-filter="support">⊕ Support</button>
-          </div>
-        </div>
-        <p class="overview-helper">Search everything, or choose a pathway first. The session cards below show the teaching arc; the sections underneath regroup the same material as concept bridges, workshop tools, and starter sketches.</p>
-        <div class="quickstart-grid" aria-label="Recommended starting points">
-          <article class="quickstart-card">
-            <div class="quickstart-label">Brand new to p5.js</div>
-            <h3>Start with one bridge</h3>
-            <p>Open a concept bridge first when a keyword like <code>draw()</code>, <code>noise()</code>, or <code>map()</code> still feels slippery.</p>
-            <div class="quickstart-actions">
-              <a class="button primary" href="concept-bridges/how-p5-thinks-about-time/">Start with Time</a>
-              <a class="button text-link" href="#concept-bridges">See all bridges</a>
-            </div>
-          </article>
-          <article class="quickstart-card">
-            <div class="quickstart-label">Want a guided demo</div>
-            <h3>Open one workshop tool</h3>
-            <p>Choose a single concept, change one slider, and watch the code and canvas stay connected while you explore.</p>
-            <div class="quickstart-actions">
-              <a class="button primary" href="tools/coordinate-system-explorer/">Open Coordinates</a>
-              <a class="button text-link" href="#interactive-tools">See all tools</a>
-            </div>
-          </article>
-          <article class="quickstart-card">
-            <div class="quickstart-label">Ready to remix code</div>
-            <h3>Edit one starter sketch</h3>
-            <p>Jump into the mini editor, run the sketch, then change one line so the idea becomes yours instead of ours.</p>
-            <div class="quickstart-actions">
-              <a class="button primary" href="tools/bouncing-ball-starter/">Open Bouncing Ball</a>
-              <a class="button text-link" href="#starter-sketches">See all sketches</a>
-            </div>
-          </article>
-        </div>
+        <p>CC Fest Coding Camp runs five sessions over five weeks. The sequence moves from first marks to open studio. Each session builds on the last, but every tool and sketch also stands alone. Jump in anywhere.</p>
         <div class="sequence">
           <div class="sequence-card">
             <strong>1 · Your Canvas, Your Voice</strong>
@@ -225,11 +153,64 @@
             <a class="sequence-bridge" href="concept-bridges/state-machines-sketches-have-modes/">⬡ Bridge: State Machines</a>
           </div>
         </div>
-        <div class="overview-links">
-          <a href="https://sustaining-boursin-d41.notion.site/3349950a7da981dd939ad16078343178">Read the full cohort roadmap and session recaps →</a>
-          <a href="https://sustaining-boursin-d41.notion.site/3339950a7da9819a9b73d83d97eaf2c2">Teaching notes for every tool →</a>
+        <p style="margin-top:18px;font-size:13px;color:var(--ink-light)">
+          <a href="https://sustaining-boursin-d41.notion.site/3349950a7da981dd939ad16078343178" style="color:var(--accent)">Read the full cohort roadmap and session recaps →</a>
+          &nbsp;·&nbsp;
+          <a href="https://sustaining-boursin-d41.notion.site/3339950a7da9819a9b73d83d97eaf2c2" style="color:var(--accent)">Teaching notes for every tool →</a>
+        </p>
+      </section>
+
+      <section class="start-here panel" aria-label="Where to start">
+        <div class="start-here-header">
+          <div class="section-label">Where to start</div>
+          <div class="library-stat-bar">
+            <a href="#concept-bridges">19 concept bridges</a>
+            <span aria-hidden="true">·</span>
+            <a href="#interactive-tools">66 workshop tools</a>
+            <span aria-hidden="true">·</span>
+            <a href="#starter-sketches">44 starter sketches</a>
+          </div>
+        </div>
+        <div class="start-grid">
+          <div class="start-card">
+            <div class="start-card-icon">◎</div>
+            <h3>New to creative coding?</h3>
+            <p>Build intuition before you write code. These bridges explain the ideas visually.</p>
+            <ul class="start-links">
+              <li><a href="concept-bridges/color-numbers-become-feeling/">Color: Numbers Become Feeling</a></li>
+              <li><a href="concept-bridges/how-p5-thinks-about-time/">How p5.js Thinks About Time</a></li>
+              <li><a href="concept-bridges/conditionals-code-makes-choices/">Conditionals: Code Makes Choices</a></li>
+            </ul>
+            <a class="button secondary" href="#concept-bridges">All 19 bridges →</a>
+          </div>
+          <div class="start-card">
+            <div class="start-card-icon">⬡</div>
+            <h3>Running a session?</h3>
+            <p>Open a tool, move a slider, read the code. These are the best live-demo starting points.</p>
+            <ul class="start-links">
+              <li><a href="tools/coordinate-system-explorer/">Coordinate System Explorer</a></li>
+              <li><a href="tools/shape-and-color-explorer/">Shape + Color Explorer</a></li>
+              <li><a href="tools/for-loop-stepper/">For Loop Stepper</a></li>
+            </ul>
+            <a class="button secondary" href="#interactive-tools">All 66 tools →</a>
+          </div>
+          <div class="start-card">
+            <div class="start-card-icon">✦</div>
+            <h3>Want to make something?</h3>
+            <p>Start from a working sketch. Change colors, add your name, make it yours.</p>
+            <ul class="start-links">
+              <li><a href="tools/bouncing-ball-seed/">Bouncing Ball Seed</a></li>
+              <li><a href="tools/gravity-bounce-seed/">Gravity Bounce Seed</a></li>
+              <li><a href="tools/postcard-studio/">Postcard Studio</a></li>
+            </ul>
+            <a class="button secondary" href="#starter-sketches">All 44 sketches →</a>
+          </div>
         </div>
       </section>
+
+      <div class="global-search-wrap">
+        <input class="global-search" type="search" placeholder="Search tools, concept bridges, and starter sketches — noise, arrays, text, game…" aria-label="Search all resources" autocomplete="off" spellcheck="false">
+      </div>
 
       <div class="gallery">
         <section id="concept-bridges" class="gallery-section panel" aria-label="Concept bridges">
@@ -354,13 +335,6 @@
                 </article>
                 <article class="tool-card">
                   <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
-                  <h3>Arrays + Loops as a System</h3>
-                  <p class="tool-description">A bridge from a single value to an array of values to a loop that acts on all of them. See how storing many things and visiting each one becomes a repeating system.</p>
-                  <div class="tag-row"><span class="tag">arrays</span><span class="tag">for loops</span><span class="tag">systems</span></div>
-                  <div class="tool-actions"><a class="button primary" href="concept-bridges/arrays-loops-as-system/">Open Bridge</a></div>
-                </article>
-                <article class="tool-card">
-                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
                   <h3>Objects: Data + Behavior</h3>
                   <p class="tool-description">A bridge for object literals, classes, properties, and methods. An object bundles what something knows with what it does.</p>
                   <div class="tag-row"><span class="tag">objects</span><span class="tag">classes</span><span class="tag">methods</span></div>
@@ -386,6 +360,13 @@
                   <p class="tool-description">A bridge for state variables, start/play/win/lose screens, and mini-game flow. One sketch can have multiple worlds depending on the mode.</p>
                   <div class="tag-row"><span class="tag">state</span><span class="tag">modes</span><span class="tag">game flow</span></div>
                   <div class="tool-actions"><a class="button primary" href="concept-bridges/state-machines-sketches-have-modes/">Open Bridge</a></div>
+                </article>
+                <article class="tool-card">
+                  <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
+                  <h3>Arrays + Loops as a System</h3>
+                  <p class="tool-description">A bridge from a single value to an array of values to a loop that acts on all of them. See how storing many things and visiting each one becomes a repeating system.</p>
+                  <div class="tag-row"><span class="tag">arrays</span><span class="tag">for loops</span><span class="tag">systems</span></div>
+                  <div class="tool-actions"><a class="button primary" href="concept-bridges/arrays-loops-as-system/">Open Bridge</a></div>
                 </article>
               </div>
             </div>
@@ -426,10 +407,28 @@
           <div class="gallery-header">
             <div class="gallery-header-copy">
               <div class="section-label bold-block">Workshop Tools</div>
-              <h2>60 workshop-ready tools for camp sessions</h2>
+              <h2>66 workshop-ready tools for camp sessions</h2>
               <p>Each tool focuses on one concept. Change a slider, see what happens. Use them for live demos, station rotations, or student-led exploration. Built for complete beginners and educators alike. <a href="https://sustaining-boursin-d41.notion.site/3339950a7da9819a9b73d83d97eaf2c2" style="color:var(--accent)">Teaching notes for each session →</a></p>
             </div>
-            <div class="gallery-count">60 tools</div>
+            <div class="gallery-count">66 tools</div>
+          </div>
+          <div class="suit-filter-bar" role="group" aria-label="Filter by suit">
+            <button class="suit-btn active" data-filter="all">All</button>
+            <button class="suit-btn" data-filter="marks">✦ Marks</button>
+            <button class="suit-btn" data-filter="motion">◎ Motion</button>
+            <button class="suit-btn" data-filter="systems">⬡ Systems</button>
+            <button class="suit-btn" data-filter="data">▦ Data</button>
+            <button class="suit-btn" data-filter="open">☽ Open</button>
+            <button class="suit-btn" data-filter="support">⊕ Support</button>
+          </div>
+          <div class="pathway-filter-bar" role="group" aria-label="Filter by learning pathway">
+            <button class="pathway-btn active" data-pathway-filter="all">All pathways</button>
+            <button class="pathway-btn" data-pathway-filter="first-time">First time with p5</button>
+            <button class="pathway-btn" data-pathway-filter="animation">I want animation</button>
+            <button class="pathway-btn" data-pathway-filter="data">I want data</button>
+            <button class="pathway-btn" data-pathway-filter="games">I want games</button>
+            <button class="pathway-btn" data-pathway-filter="stuck">I'm stuck</button>
+            <button class="pathway-btn" data-pathway-filter="final">Final project</button>
           </div>
           <p class="suit-legend">✦ Marks · drawing &amp; color &nbsp;·&nbsp; ◎ Motion · animation &amp; interaction &nbsp;·&nbsp; ⬡ Systems · loops &amp; generative &nbsp;·&nbsp; ▦ Data · visualization &amp; data &nbsp;·&nbsp; ☽ Open · images, sound, 3D &nbsp;·&nbsp; ⊕ Support · debugging &amp; confidence</p>
 
@@ -823,6 +822,24 @@
                   <div class="tool-actions"><a class="button primary" href="tools/class-inheritance-explorer/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da98175b255e8c8a540008d" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">XIV</span><span class="pip-sym">⬡</span></div>
                 </article>
+                <article class="tool-card suit-systems" data-pathway="data final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XV</span><span class="pip-sym">⬡</span></div>
+                  <div class="tool-meta"><span class="pill session">⬡ Systems · XV</span><span class="pill type">Interactive</span></div>
+                  <h3>Arrays of Objects Visualizer</h3>
+                  <p class="tool-description">Build an array of objects step-by-step: one object, a few, then many. Watch a for loop call display() on every item and see how the array grows into a system.</p>
+                  <div class="tag-row"><span class="tag">arrays</span><span class="tag">objects</span><span class="tag">for loops</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/arrays-of-objects-visualizer/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">XV</span><span class="pip-sym">⬡</span></div>
+                </article>
+                <article class="tool-card suit-systems" data-pathway="animation final" data-difficulty="capstone">
+                  <div class="card-pip"><span class="pip-num">XVI</span><span class="pip-sym">⬡</span></div>
+                  <div class="tool-meta"><span class="pill session">⬡ Systems · XVI</span><span class="pill type">Simulation</span></div>
+                  <h3>Conway's Game of Life</h3>
+                  <p class="tool-description">A classic cellular automaton where simple neighbor-counting rules produce complex emergent behavior. Pause, step, and see how alive/dead state flips a grid into a living system.</p>
+                  <div class="tag-row"><span class="tag">cellular automata</span><span class="tag">emergence</span><span class="tag">arrays</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/conways-game-of-life/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">XVI</span><span class="pip-sym">⬡</span></div>
+                </article>
               </div>
             </div>
 
@@ -895,6 +912,24 @@
                   <div class="tag-row"><span class="tag">strings</span><span class="tag">split()</span><span class="tag">generative text</span></div>
                   <div class="tool-actions"><a class="button primary" href="tools/string-text-manipulation-studio/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da981e2a480cc59120ec97a" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">VII</span><span class="pip-sym">▦</span></div>
+                </article>
+                <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">VIII</span><span class="pip-sym">▦</span></div>
+                  <div class="tool-meta"><span class="pill session">▦ Data · VIII</span><span class="pill type">Interactive</span></div>
+                  <h3>Bar Chart Studio</h3>
+                  <p class="tool-description">Type a label-value dataset, pick a palette, adjust bar width and spacing, and watch a live bar chart update. A direct connection between numbers and drawn rectangles.</p>
+                  <div class="tag-row"><span class="tag">bar chart</span><span class="tag">rect()</span><span class="tag">data viz</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/bar-chart-studio/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">VIII</span><span class="pip-sym">▦</span></div>
+                </article>
+                <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">IX</span><span class="pip-sym">▦</span></div>
+                  <div class="tool-meta"><span class="pill session">▦ Data · IX</span><span class="pill type">Interactive</span></div>
+                  <h3>Live Data Explorer</h3>
+                  <p class="tool-description">Paste a JSON array and choose bars, circles, or scatter mode. Change the field mapped to size or color and see data drive visual structure in real time.</p>
+                  <div class="tag-row"><span class="tag">JSON</span><span class="tag">map()</span><span class="tag">visualization</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/live-data-explorer/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">IX</span><span class="pip-sym">▦</span></div>
                 </article>
               </div>
             </div>
@@ -995,6 +1030,24 @@
                   <div class="tool-actions"><a class="button primary" href="tools/agents-rules-playground/">Launch Tool</a><a class="button secondary" href="https://www.notion.so/3599950a7da98182addcd81280914aa4" target="_blank" rel="noopener">Notion Notes</a></div>
                 <div class="card-pip-br"><span class="pip-num">X</span><span class="pip-sym">☽</span></div>
                 </article>
+                <article class="tool-card suit-open" data-pathway="final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XI</span><span class="pip-sym">☽</span></div>
+                  <div class="tool-meta"><span class="pill session">☽ Open · XI</span><span class="pill type">Interactive</span></div>
+                  <h3>Color Blend Modes Explorer</h3>
+                  <p class="tool-description">Drag layered shapes over each other and switch between Multiply, Screen, Overlay, and Difference blend modes. See how colors combine when layers interact beyond simple opacity.</p>
+                  <div class="tag-row"><span class="tag">blendMode()</span><span class="tag">color</span><span class="tag">layers</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/color-blend-modes-explorer/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">XI</span><span class="pip-sym">☽</span></div>
+                </article>
+                <article class="tool-card suit-open" data-pathway="final" data-difficulty="extension">
+                  <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">☽</span></div>
+                  <div class="tool-meta"><span class="pill session">☽ Open · XII</span><span class="pill type">Interactive</span></div>
+                  <h3>Font Loader Studio</h3>
+                  <p class="tool-description">Pick from system and Google Fonts, adjust size, weight, and letter spacing, then see your chosen text render live on canvas. A hands-on intro to loadFont() and textFont().</p>
+                  <div class="tag-row"><span class="tag">loadFont()</span><span class="tag">textFont()</span><span class="tag">typography</span></div>
+                  <div class="tool-actions"><a class="button primary" href="tools/font-loader-studio/">Launch Tool</a></div>
+                <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">☽</span></div>
+                </article>
               </div>
             </div>
 
@@ -1044,7 +1097,7 @@
               <h2>Seeds for live coding, remixing, and making your own</h2>
               <p>These are intentionally lean sketch seeds — a working p5.js sketch in a live editor, ready to change. Use them for live coding demos, pair extensions, challenge prompts, or as a student's first personal project. Open one, change one thing, see what happens. <a href="https://sustaining-boursin-d41.notion.site/3349950a7da981dd939ad16078343178" style="color:var(--accent)">Async learners: the Cohort Roadmap has explicit self-directed paths →</a></p>
             </div>
-            <div class="gallery-count">40 sketches</div>
+            <div class="gallery-count">44 sketches</div>
           </div>
           <div class="tool-grid">
             <article class="tool-card suit-marks" data-pathway="first-time" data-difficulty="beginner">
@@ -1407,6 +1460,42 @@
               <div class="tool-actions"><a class="button primary" href="tools/class-creature-stamp-seed/">Open Sketch</a></div>
             <div class="card-pip-br"><span class="pip-num">XIV</span><span class="pip-sym">⬡</span></div>
             </article>
+            <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XIV</span><span class="pip-sym">▦</span></div>
+              <div class="tool-meta"><span class="pill session">▦ Data · XIV</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Parallel Arrays Bar Chart Seed</h3>
+              <p class="tool-description">Two parallel arrays — labels and values — drive a bar chart loop. Change the numbers, change the picture.</p>
+              <div class="tag-row"><span class="tag">arrays</span><span class="tag">bar chart</span><span class="tag">map()</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/parallel-arrays-bar-chart-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XIV</span><span class="pip-sym">▦</span></div>
+            </article>
+            <article class="tool-card suit-data" data-pathway="data final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XV</span><span class="pip-sym">▦</span></div>
+              <div class="tool-meta"><span class="pill session">▦ Data · XV</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Text Array Seed</h3>
+              <p class="tool-description">An array of strings gets displayed one per line with text(). A minimal scaffold for word lists, poetry generators, and data-driven typography.</p>
+              <div class="tag-row"><span class="tag">arrays</span><span class="tag">text()</span><span class="tag">strings</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/text-array-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XV</span><span class="pip-sym">▦</span></div>
+            </article>
+            <article class="tool-card suit-open" data-pathway="final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XII</span><span class="pip-sym">☽</span></div>
+              <div class="tool-meta"><span class="pill session">☽ Open · XII</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Image Loader Seed</h3>
+              <p class="tool-description">preload() fetches an image, then draw() places it on canvas with tint() ready to customize. The minimal scaffold for any sketch built around a loaded image.</p>
+              <div class="tag-row"><span class="tag">loadImage()</span><span class="tag">preload()</span><span class="tag">tint()</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/image-loader-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XII</span><span class="pip-sym">☽</span></div>
+            </article>
+            <article class="tool-card suit-open" data-pathway="final" data-difficulty="extension">
+              <div class="card-pip"><span class="pip-num">XIII</span><span class="pip-sym">☽</span></div>
+              <div class="tool-meta"><span class="pill session">☽ Open · XIII</span><span class="pill seed">Starter Sketch</span></div>
+              <h3>Font Loader Seed</h3>
+              <p class="tool-description">preload() fetches a Google Font, then draw() renders styled text with textFont() and textSize(). The starting point for any typographic or data-text sketch.</p>
+              <div class="tag-row"><span class="tag">loadFont()</span><span class="tag">textFont()</span><span class="tag">typography</span></div>
+              <div class="tool-actions"><a class="button primary" href="tools/font-loader-seed/">Open Sketch</a></div>
+            <div class="card-pip-br"><span class="pip-num">XIII</span><span class="pip-sym">☽</span></div>
+            </article>
           </div>
         </section>
       </div>
@@ -1428,7 +1517,7 @@
       </span>
     </footer>
   </div>
-  <script src="preview-sketches.js?v=20260514-homepage-polish"></script>
-  <script src="site.js?v=20260514-homepage-polish"></script>
+  <script src="preview-sketches.js?v=20260507-expanded-tools"></script>
+  <script src="site.js?v=20260506-debug-card-previews"></script>
 </body>
 </html>

@@ -30,7 +30,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -334,8 +334,152 @@
         height: 540px;
       }
     }
-  </style>
-  <link rel="stylesheet" href="../concept-bridge.css" />
+  
+  /* ── Bridge improvement additions ─────────────────────────────── */
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+  }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2a5e3e;
+    background: #eef8f2;
+    border: 1px solid #b8dcc8;
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: rgba(255,255,255,0.55);
+  }
+  .ba-col { padding: 14px 18px; }
+  .ba-col:first-child {
+    background: rgba(0,0,0,0.025);
+    border-right: 1px solid var(--line, #ded2c1);
+  }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #9e9789;
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: #2a5e3e; }
+  .ba-text { font-size: 0.9rem; line-height: 1.5; }
+  .predict-box {
+    background: #fef9ee;
+    border: 1px solid #efd09e;
+    border-radius: 10px;
+    padding: 11px 14px;
+    margin-bottom: 12px;
+  }
+  .predict-box .pbox-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .predict-box .pbox-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .callout-mistake {
+    background: #fff3e6;
+    border: 1px solid #edbd83;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0 0;
+  }
+  .callout-mistake .cm-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .callout-mistake .cm-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .pathways-section {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 32px 20px 8px;
+  }
+  .pathways-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9e9789;
+    margin-bottom: 12px;
+  }
+  .path-links { display: grid; gap: 8px; max-width: 820px; }
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--ink, #222);
+    background: rgba(255,250,242,0.92);
+    transition: border-color 0.14s ease, background 0.14s ease;
+    font-family: inherit;
+  }
+  .path-link:hover {
+    border-color: var(--accent, #2563eb);
+    background: rgba(230,240,255,0.6);
+  }
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9e9789;
+    flex-shrink: 0;
+    min-width: 82px;
+  }
+  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .bottom-nav {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 18px 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid var(--line, #ded2c1);
+  }
+  .bottom-nav a {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6b6258;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  .bottom-nav a:hover { color: var(--accent, #2563eb); }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .bottom-nav { flex-direction: column; }
+  }
+</style>
+  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -347,10 +491,30 @@
       A beginner-friendly bridge from right triangles to the unit circle to sine and cosine waves.
       Start with a simple 0°–90° triangle, then unlock the full circle and see how motion becomes a graph.
     </p>
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">circular motion</span>
+    <span class="unlock-pill">sine waves</span>
+    <span class="unlock-pill">trigonometry in p5</span>
+    <span class="unlock-pill">oscillation patterns</span>
+  </div>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text">sin() and cos() are math functions from class — I don't know how to draw with them</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text">sin() produces a smooth wave between -1 and 1 — multiply it by any range to get oscillation, rotation, or circular motion</div>
+    </div>
+  </section>
   </header>
 
   <main>
     <section class="controls" aria-label="Explorer controls">
+      <div class="predict-box" style="margin-bottom:12px;">
+        <span class="pbox-label">Before you interact — predict first</span>
+        <span class="pbox-body">Before you increase the frequency — how many complete waves will you see across the canvas?</span>
+      </div>
       <div class="mode-row">
         <button id="mode-triangle" class="active">1. Triangle</button>
         <button id="mode-circle">2. Circle</button>
@@ -395,6 +559,18 @@
         <label class="toggle-label"><input id="show-trace" type="checkbox" checked />Trace waves</label>
         <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
       </div>
+
+      <div id="wave-controls" class="control-row" style="display:none;">
+        <button id="record-button">⏺ Record</button>
+        <button id="show-snippet-button">Show Code</button>
+        <div class="slider-wrap">
+          <label for="wave-speed-slider">Wave speed</label>
+          <input id="wave-speed-slider" type="range" min="0.01" max="0.15" value="0.05" step="0.005" />
+          <span id="wave-speed-value" class="slider-value">0.05</span>
+        </div>
+      </div>
+
+      <div id="wave-snippet-box" style="display:none; margin-top: 4px; padding: 12px; background: #111827; color: #e5e7eb; border-radius: 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap;"></div>
     </section>
 
     <section class="workspace">
@@ -461,7 +637,14 @@ let y = centerY - sin(angle) * radius;</code></pre>
       showCosine: true,
       showTrace: true,
       showCode: false,
-      waveHistory: []
+      waveHistory: [],
+      // Wave Record mode
+      recording: false,
+      recordDone: false,
+      recordAngle: 0,
+      recordPoints: [],
+      waveSpeed: 0.05,
+      showSnippet: false
     };
 
     const els = {};
@@ -556,13 +739,65 @@ let y = centerY - sin(angle) * radius;</code></pre>
         updateUI();
       });
 
+      // Wave Record controls
+      els.recordButton = document.querySelector("#record-button");
+      els.showSnippetButton = document.querySelector("#show-snippet-button");
+      els.waveSpeedSlider = document.querySelector("#wave-speed-slider");
+      els.waveSpeedValue = document.querySelector("#wave-speed-value");
+      els.waveControls = document.querySelector("#wave-controls");
+      els.waveSnippetBox = document.querySelector("#wave-snippet-box");
+
+      els.recordButton.addEventListener("click", () => {
+        if (state.recording) {
+          // Stop early
+          state.recording = false;
+          state.recordDone = true;
+          els.recordButton.textContent = "⏺ Record";
+          updateSnippet();
+        } else {
+          state.recording = true;
+          state.recordDone = false;
+          state.recordAngle = 0;
+          state.recordPoints = [];
+          state.playing = false;
+          els.playButton.textContent = "▶ Play";
+          els.recordButton.textContent = "⏹ Stop";
+        }
+      });
+
+      els.showSnippetButton.addEventListener("click", () => {
+        state.showSnippet = !state.showSnippet;
+        els.waveSnippetBox.style.display = state.showSnippet ? "block" : "none";
+        els.showSnippetButton.textContent = state.showSnippet ? "Hide Code" : "Show Code";
+        if (state.showSnippet) updateSnippet();
+      });
+
+      els.waveSpeedSlider.addEventListener("input", () => {
+        state.waveSpeed = Number(els.waveSpeedSlider.value);
+        els.waveSpeedValue.textContent = state.waveSpeed.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+        updateSnippet();
+      });
+
       updateUI();
+    }
+
+    function updateSnippet() {
+      if (!els.waveSnippetBox) return;
+      const speed = state.waveSpeed.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+      els.waveSnippetBox.textContent = `let t = 0;\nfunction draw() {\n  let y = sin(t) * radius;\n  circle(x + cos(t)*radius, height/2 + y, 8);\n  t += ${speed};\n}`;
     }
 
     function setMode(mode) {
       const previousMode = state.mode;
       state.mode = mode;
       state.waveHistory = [];
+      // Reset recording state when leaving wave mode
+      if (mode !== "wave") {
+        state.recording = false;
+        state.recordDone = false;
+        state.recordPoints = [];
+        if (els.recordButton) els.recordButton.textContent = "⏺ Record";
+      }
 
       if (mode === "triangle") {
         state.angleDeg = Math.min(Math.max(state.angleDeg, 0), 90);
@@ -619,6 +854,7 @@ let y = centerY - sin(angle) * radius;</code></pre>
       els.speedValue.textContent = `${state.speed.toFixed(1)}×`;
       els.lessonFormula.style.display = state.showFormulas ? "block" : "none";
       els.codeCard.classList.toggle("visible", state.showCode);
+      if (els.waveControls) els.waveControls.style.display = state.mode === "wave" ? "flex" : "none";
       els.showSine.checked = state.showSine;
       els.showCosine.checked = state.showCosine;
 
@@ -691,7 +927,7 @@ let y = centerY - sin(angle) * radius;</code></pre>
         canvas.elt.setAttribute("role", "img");
         canvas.elt.setAttribute("aria-label", "Interactive triangle, circle, and wave visualization for sine and cosine.");
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("DM Sans, system-ui, sans-serif");
+        p.textFont("Inter, system-ui, sans-serif");
       };
 
       p.windowResized = () => {
@@ -751,6 +987,22 @@ let y = centerY - sin(angle) * radius;</code></pre>
       }
 
       function advanceAnimation() {
+        // Handle record animation
+        if (state.mode === "wave" && state.recording) {
+          state.recordAngle += state.waveSpeed;
+          if (state.recordAngle >= Math.PI * 2) {
+            state.recordAngle = Math.PI * 2;
+            state.recording = false;
+            state.recordDone = true;
+            if (els.recordButton) els.recordButton.textContent = "⏺ Record";
+            updateSnippet();
+          }
+          state.angleDeg = (state.recordAngle * 180 / Math.PI) % 360;
+          els.angleSlider.value = state.angleDeg;
+          els.angleValue.textContent = `${Math.round(state.angleDeg)}°`;
+          return;
+        }
+
         if (!state.playing) return;
 
         if (state.mode === "triangle") {
@@ -908,8 +1160,82 @@ let y = centerY - sin(angle) * radius;</code></pre>
 
         drawPanelTitle("Wave View", "Record the dot’s height or sideways position over time.", 24, 36);
         drawUnitCircle(wave.center, wave.radius, wave.trig, wave.point, wave.foot, false, false);
-        drawWaveGraph(wave.graph, wave.trig, wave.radius);
-        drawConnectorLines(wave.point, wave.graph, wave.trig);
+
+        if (state.recording || state.recordDone) {
+          drawRecordingWave(wave);
+        } else {
+          drawWaveGraph(wave.graph, wave.trig, wave.radius);
+          drawConnectorLines(wave.point, wave.graph, wave.trig);
+        }
+      }
+
+      function drawRecordingWave(wave) {
+        const graph = wave.graph;
+        const radius = wave.radius;
+        const midY = graph.y + graph.height / 2;
+        const amp = graph.height * 0.35;
+
+        // Collect record point
+        if (state.recording) {
+          state.recordPoints.push({ t: state.recordAngle, sin: wave.trig.sinValue });
+        }
+
+        // Draw graph background
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 232);
+        p.rect(graph.x, graph.y, graph.width, graph.height, 18);
+
+        // Grid
+        p.stroke("#e6dac8");
+        p.strokeWeight(1);
+        for (let i = 0; i <= 4; i++) {
+          const gy = p.map(i, 0, 4, graph.y, graph.y + graph.height);
+          p.line(graph.x + 12, gy, graph.x + graph.width - 12, gy);
+        }
+        p.stroke("#8b7d6c");
+        p.strokeWeight(1.5);
+        p.line(graph.x + 12, midY, graph.x + graph.width - 12, midY);
+
+        // Draw wave so far
+        if (state.recordPoints.length >= 2) {
+          p.noFill();
+          p.stroke("#e11d48");
+          p.strokeWeight(3);
+          p.beginShape();
+          for (let i = 0; i < state.recordPoints.length; i++) {
+            const gx = p.map(state.recordPoints[i].t, 0, Math.PI * 2, graph.x + 24, graph.x + graph.width - 24);
+            const gy = midY - state.recordPoints[i].sin * amp;
+            p.vertex(gx, gy);
+          }
+          p.endShape();
+        }
+
+        // Moving pen dot
+        if (state.recording && state.recordPoints.length > 0) {
+          const last = state.recordPoints[state.recordPoints.length - 1];
+          const penX = p.map(last.t, 0, Math.PI * 2, graph.x + 24, graph.x + graph.width - 24);
+          const penY = midY - last.sin * amp;
+          p.noStroke();
+          p.fill("#e11d48");
+          p.circle(penX, penY, 12);
+          // Connector dashed line from circle point to pen
+          p.drawingContext.setLineDash([5, 7]);
+          p.stroke("#e11d4888");
+          p.strokeWeight(2);
+          p.line(wave.point.x, wave.point.y, penX, penY);
+          p.drawingContext.setLineDash([]);
+        }
+
+        // Labels
+        if (state.showLabels) {
+          drawLabel(state.recording ? "recording..." : "recording complete", graph.x + 12, graph.y + 22, state.recording ? "#e11d48" : "#16a34a", 13);
+          drawLabel("value", graph.x + 10, graph.y + 42, "#6b6258", 12);
+          drawLabel("0°", graph.x + 24, graph.y + graph.height - 12, "#6b6258", 11);
+          drawLabel("360°", graph.x + graph.width - 40, graph.y + graph.height - 12, "#6b6258", 11);
+        }
+
+        p.pop();
       }
 
       function drawAllTogether() {

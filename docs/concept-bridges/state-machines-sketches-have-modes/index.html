@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -250,8 +250,152 @@
 
     @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
     @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
-  </style>
-  <link rel="stylesheet" href="../concept-bridge.css" />
+  
+  /* ── Bridge improvement additions ─────────────────────────────── */
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+  }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2a5e3e;
+    background: #eef8f2;
+    border: 1px solid #b8dcc8;
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: rgba(255,255,255,0.55);
+  }
+  .ba-col { padding: 14px 18px; }
+  .ba-col:first-child {
+    background: rgba(0,0,0,0.025);
+    border-right: 1px solid var(--line, #ded2c1);
+  }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #9e9789;
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: #2a5e3e; }
+  .ba-text { font-size: 0.9rem; line-height: 1.5; }
+  .predict-box {
+    background: #fef9ee;
+    border: 1px solid #efd09e;
+    border-radius: 10px;
+    padding: 11px 14px;
+    margin-bottom: 12px;
+  }
+  .predict-box .pbox-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .predict-box .pbox-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .callout-mistake {
+    background: #fff3e6;
+    border: 1px solid #edbd83;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0 0;
+  }
+  .callout-mistake .cm-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .callout-mistake .cm-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .pathways-section {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 32px 20px 8px;
+  }
+  .pathways-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9e9789;
+    margin-bottom: 12px;
+  }
+  .path-links { display: grid; gap: 8px; max-width: 820px; }
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--ink, #222);
+    background: rgba(255,250,242,0.92);
+    transition: border-color 0.14s ease, background 0.14s ease;
+    font-family: inherit;
+  }
+  .path-link:hover {
+    border-color: var(--accent, #2563eb);
+    background: rgba(230,240,255,0.6);
+  }
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9e9789;
+    flex-shrink: 0;
+    min-width: 82px;
+  }
+  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .bottom-nav {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 18px 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid var(--line, #ded2c1);
+  }
+  .bottom-nav a {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6b6258;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  .bottom-nav a:hover { color: var(--accent, #2563eb); }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .bottom-nav { flex-direction: column; }
+  }
+</style>
+  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -263,11 +407,31 @@
       A concept bridge for <strong>state variables</strong>, start/play/win/lose screens, and complete mini-games.
       A state machine helps a sketch know what mode it is in and what should happen next.
     </p>
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">game modes</span>
+    <span class="unlock-pill">interactive states</span>
+    <span class="unlock-pill">mode switching</span>
+    <span class="unlock-pill">complex behavior</span>
+  </div>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text">State is just a variable I toggle — I can use multiple booleans for each condition</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text">State controls which world the sketch is in — one variable, mutually exclusive modes, no conflicts</div>
+    </div>
+  </section>
   </header>
 
   <main>
     <section class="controls" aria-label="Explorer controls">
-      <div class="row">
+            <div class="predict-box">
+        <span class="pbox-label">Before you interact — predict first</span>
+        <span class="pbox-body">Before you click to switch modes — what will be different in the sketch between Mode A and Mode B?</span>
+      </div>
+<div class="row">
         <button id="mode-idea" class="active">State Idea</button>
         <button id="mode-screens">Screens</button>
         <button id="mode-transitions">Transitions</button>
@@ -552,13 +716,13 @@
         canvas.elt.setAttribute("role", "img");
         canvas.elt.setAttribute("aria-label", "Interactive visualization of state machines and game states in p5.js.");
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("DM Sans, system-ui, sans-serif");
+        p.textFont("Inter, system-ui, sans-serif");
       };
 
       p.windowResized = () => resizeToHolder();
 
       p.mousePressed = () => {
-        if (state.mode !== "game") return;
+        if (state.mode !== "game" && state.mode !== "transitions") return;
         if (state.gameState === "start") startGame();
         else if (state.gameState === "play") {
           const d = p.dist(p.mouseX, p.mouseY, state.targetX, state.targetY);
@@ -598,7 +762,7 @@
       }
 
       function tickTimer() {
-        if (state.mode !== "game" || state.gameState !== "play" || !state.auto) return;
+        if ((state.mode !== "game" && state.mode !== "transitions") || state.gameState !== "play" || !state.auto) return;
         if (p.millis() - state.lastTick > 1000) {
           state.timeLeft = Math.max(0, state.timeLeft - 1);
           state.lastTick = p.millis();
@@ -653,16 +817,131 @@
 
       function drawTransitionsMode() {
         const s = drawStage();
+
+        // Split: left = diagram (60%), right = mini-game (40%)
+        const diagW = s.w * 0.58;
+        const gameX = s.x + diagW + 10;
+        const gameW = s.w - diagW - 14;
+
+        // Mini game (right side) — always visible
+        drawMiniGameInset(gameX, s.y + 8, gameW, s.h - 16);
+
+        // Diagram (left side)
         const nodes = {
-          start: { x:s.x+s.w*0.18, y:s.y+s.h*0.50 },
-          play: { x:s.x+s.w*0.48, y:s.y+s.h*0.50 },
-          win: { x:s.x+s.w*0.78, y:s.y+s.h*0.28 },
-          lose: { x:s.x+s.w*0.78, y:s.y+s.h*0.70 }
+          start: { x:s.x+diagW*0.16, y:s.y+s.h*0.50 },
+          play:  { x:s.x+diagW*0.48, y:s.y+s.h*0.50 },
+          win:   { x:s.x+diagW*0.82, y:s.y+s.h*0.28 },
+          lose:  { x:s.x+diagW*0.82, y:s.y+s.h*0.72 }
         };
-        drawTransitionArrow(nodes.start.x+58, nodes.start.y, nodes.play.x-58, nodes.play.y, "click start", "#f59e0b");
-        drawTransitionArrow(nodes.play.x+58, nodes.play.y-12, nodes.win.x-58, nodes.win.y, `score >= ${state.goal}`, state.score >= state.goal ? "#16a34a" : "#f59e0b");
-        drawTransitionArrow(nodes.play.x+58, nodes.play.y+12, nodes.lose.x-58, nodes.lose.y, "time <= 0", state.timeLeft <= 0 ? "#e11d48" : "#f59e0b");
-        for (const name of Object.keys(nodes)) drawStateNode(nodes[name].x, nodes[name].y, name, name === state.gameState);
+
+        const scoreClose = state.gameState === "play" && state.score >= state.goal - 1;
+        const timeClose = state.gameState === "play" && state.timeLeft <= 3 && state.timeLeft > 0;
+        const scoreTriggered = state.gameState === "win" || state.score >= state.goal;
+        const timeTriggered = state.gameState === "lose" || state.timeLeft <= 0;
+
+        // Arrows with glow if condition is close or triggered
+        drawTransitionArrowGlow(nodes.start.x+52, nodes.start.y, nodes.play.x-52, nodes.play.y, "click start",
+          state.gameState === "play" || state.gameState === "win" || state.gameState === "lose" ? "#16a34a" : "#f59e0b",
+          state.gameState !== "start");
+        drawTransitionArrowGlow(nodes.play.x+52, nodes.play.y-14, nodes.win.x-52, nodes.win.y, `score >= ${state.goal}`,
+          scoreTriggered ? "#16a34a" : scoreClose ? "#f59e0b" : "#ded2c1",
+          scoreTriggered, scoreClose);
+        drawTransitionArrowGlow(nodes.play.x+52, nodes.play.y+14, nodes.lose.x-52, nodes.lose.y, "time <= 0",
+          timeTriggered ? "#e11d48" : timeClose ? "#f59e0b" : "#ded2c1",
+          timeTriggered, timeClose);
+
+        // Restart arrow (win/lose back to start)
+        if (state.gameState === "win" || state.gameState === "lose") {
+          const fromNode = nodes[state.gameState];
+          drawTransitionArrowGlow(fromNode.x - 32, fromNode.y, nodes.start.x + 32, nodes.start.y + (state.gameState === "win" ? -18 : 18), "click restart", "#7c3aed", true, false);
+        } else {
+          // Show restart arrows dimly (dashed)
+          p.push(); p.stroke("#e8e0d4"); p.strokeWeight(1.5);
+          p.drawingContext.setLineDash([4,4]);
+          p.line(nodes.win.x - 32, nodes.win.y, nodes.start.x + 32, nodes.start.y - 18);
+          p.line(nodes.lose.x - 32, nodes.lose.y, nodes.start.x + 32, nodes.start.y + 18);
+          p.drawingContext.setLineDash([]);
+          p.pop();
+        }
+
+        for (const name of Object.keys(nodes)) {
+          drawStateNodeGlow(nodes[name].x, nodes[name].y, name, name === state.gameState);
+        }
+      }
+
+      function drawMiniGameInset(x, y, w, h) {
+        p.push();
+        p.noStroke(); p.fill(255, 255, 255, 220); p.rect(x, y, w, h, 14);
+        p.stroke("#ded2c1"); p.strokeWeight(1.5); p.noFill(); p.rect(x, y, w, h, 14);
+        p.noStroke();
+
+        if (state.gameState === "start") {
+          p.fill(stateColor("start")); p.rect(x+6, y+6, w-12, h-12, 10);
+          p.fill(255); p.textAlign(p.CENTER, p.CENTER); p.textStyle(p.BOLD); p.textSize(13);
+          p.text("START", x + w/2, y + h/2 - 10);
+          p.textSize(10); p.textStyle(p.NORMAL); p.text("click Start", x+w/2, y+h/2+8);
+        } else if (state.gameState === "play") {
+          p.fill("#e0f2fe"); p.rect(x+6, y+6, w-12, h-12, 10);
+          p.fill("#0891b2"); p.textStyle(p.BOLD); p.textSize(10);
+          p.textAlign(p.LEFT, p.TOP); p.text(`${state.score}/${state.goal}`, x+14, y+14);
+          p.textAlign(p.RIGHT, p.TOP); p.text(`t:${state.timeLeft}`, x+w-14, y+14);
+          // mini target
+          const tx = p.constrain(state.targetX, x+20, x+w-20);
+          const ty = p.constrain(state.targetY, y+30, y+h-20);
+          p.fill("#f59e0b"); p.circle(tx, ty, 22);
+          p.fill("#fff"); p.circle(tx, ty, 7);
+          p.fill("#222"); p.circle(tx, ty, 3);
+        } else if (state.gameState === "win") {
+          p.fill(stateColor("win")); p.rect(x+6, y+6, w-12, h-12, 10);
+          p.fill(255); p.textAlign(p.CENTER, p.CENTER); p.textStyle(p.BOLD); p.textSize(12);
+          p.text("WIN!", x+w/2, y+h/2);
+        } else if (state.gameState === "lose") {
+          p.fill(stateColor("lose")); p.rect(x+6, y+6, w-12, h-12, 10);
+          p.fill(255); p.textAlign(p.CENTER, p.CENTER); p.textStyle(p.BOLD); p.textSize(12);
+          p.text("LOSE", x+w/2, y+h/2);
+        }
+        p.pop();
+      }
+
+      function drawStateNodeGlow(x, y, name, active) {
+        p.push();
+        if (active) {
+          // Glow ring
+          const t = p.millis() / 400;
+          const glowR = 60 + Math.sin(t) * 8;
+          p.noStroke(); p.fill(stateColor(name) + "44");
+          p.circle(x, y, glowR * 2);
+        }
+        p.noStroke(); p.fill(active ? stateColor(name) : "#ffffff");
+        p.circle(x, y, active ? 100 : 84);
+        p.stroke(stateColor(name)); p.strokeWeight(active ? 4 : 2.5); p.noFill();
+        p.circle(x, y, active ? 100 : 84);
+        p.noStroke(); p.fill(active ? "#ffffff" : stateColor(name));
+        p.textAlign(p.CENTER, p.CENTER); p.textStyle(p.BOLD); p.textSize(14);
+        p.text(name, x, y);
+        p.pop();
+      }
+
+      function drawTransitionArrowGlow(x1, y1, x2, y2, label, color, active, pulsing) {
+        p.push();
+        if (active) {
+          // Pulsing glow under the arrow
+          const t = p.millis() / 300;
+          const alpha = pulsing ? Math.round(120 + Math.sin(t) * 80) : 180;
+          p.stroke(color + alpha.toString(16).padStart(2,"0")); p.strokeWeight(active ? 5 : 3);
+          p.line(x1, y1, x2, y2);
+          // Animated dot along arrow
+          if (pulsing) {
+            const frac = (p.millis() / 600) % 1;
+            const dotX = x1 + (x2-x1)*frac; const dotY = y1 + (y2-y1)*frac;
+            p.noStroke(); p.fill(color); p.circle(dotX, dotY, 10);
+          }
+        }
+        p.stroke(color); p.strokeWeight(active ? 3.5 : 1.5); p.line(x1, y1, x2, y2);
+        const a = Math.atan2(y2-y1, x2-x1); p.noStroke(); p.fill(color);
+        p.push(); p.translate(x2, y2); p.rotate(a); p.triangle(0,0,-10,-6,-10,6); p.pop();
+        drawLabel(label, (x1+x2)/2 - 30, (y1+y2)/2 - 14, color, 11);
+        p.pop();
       }
 
       function drawGameMode() {

@@ -1,830 +1,1208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Color: Numbers Become Feeling</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --gray: #64748b;
-      --red: #e11d48;
-      --green: #16a34a;
-      --blue: #0891b2;
-      --hue: #7c3aed;
-      --alpha: #f59e0b;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../concept-bridge.css">
+<title>Color: Numbers Become Feeling</title>
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #d86b3a;
+    --accent-dark: #9b3f1f;
+    --accent-bg: #fff6ee;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 960px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--accent-dark); }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
 
-    .controls,
-    .workspace,
-    .side-panel {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      user-select: none;
-    }
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 22px;
+  }
 
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
 
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: var(--paper);
+  }
 
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
 
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--faint);
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
 
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 116px minmax(150px, 1fr) 76px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(390px, 100%);
-    }
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
+  }
 
-    label,
-    .value-label,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
 
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
+  .canvas-panel { overflow: hidden; }
 
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
 
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
 
-    #sketch-holder canvas { display: block; }
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
 
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
+  #color-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
 
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
 
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
+  .ctrl-panel { padding: 16px; }
 
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
 
-    .card h2 { font-size: 1.15rem; }
-    .card h3 { font-size: 1rem; }
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
 
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #fff2dc; border-color: #e0a050; }
 
-    .card p { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
 
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      white-space: pre-wrap;
-    }
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(216,107,58,0.4);
+    outline-offset: 2px;
+  }
 
-    .legend { display: grid; gap: 8px; }
-    .legend-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: center; font-size: 0.9rem; color: var(--muted); }
-    .swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); }
-    .swatch.gray { background: var(--gray); }
-    .swatch.red { background: var(--red); }
-    .swatch.green { background: var(--green); }
-    .swatch.blue { background: var(--blue); }
-    .swatch.hue { background: var(--hue); }
-    .swatch.alpha { background: var(--alpha); }
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
 
-    .code-card { display: none; }
-    .code-card.visible { display: block; }
+  .box-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
 
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
 
-    .note { font-size: 0.86rem; color: var(--muted); }
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
 
-    @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
-    @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
-  </style>
-  <link rel="stylesheet" href="../concept-bridge.css" />
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
+  }
+
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
+    display: block;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 42px;
+    text-align: center;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
+  }
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: color var(--transition);
+  }
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 22px; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 720px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
+  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--faint);
+    flex-shrink: 0;
+    min-width: 88px;
+  }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
+  .bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
+  }
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color var(--transition); }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
+    .bottom-nav { flex-direction: column; }
+  }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
+</style>
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · Foundations</p>
+  <h1>Color: Numbers Become Feeling</h1>
+  <p class="subtitle">
+    A concept bridge for <code>fill()</code>, <code>stroke()</code>, grayscale, RGB, HSB, alpha, and <code>lerpColor()</code>.
+    In p5.js, color is not magic — it is numbers interpreted through a color model.
+  </p>
+
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">palettes</span>
+    <span class="unlock-pill">mood</span>
+    <span class="unlock-pill">transparency</span>
+    <span class="unlock-pill">gradients</span>
+    <span class="unlock-pill">data-driven color</span>
   </div>
-  <header>
-    <h1>Color: Numbers Become Feeling</h1>
-    <p class="subtitle">
-      A concept bridge for <strong>fill()</strong>, <strong>stroke()</strong>, grayscale, RGB, HSB, alpha, and <strong>lerpColor()</strong>.
-      In p5.js, color is not magic — it is numbers interpreted through a color model.
-    </p>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-      <div class="row">
-        <button id="mode-gray" class="active">Grayscale</button>
-        <button id="mode-rgb">RGB</button>
-        <button id="mode-hsb">HSB</button>
-        <button id="mode-alpha">Alpha</button>
-        <button id="mode-lerp">Color Blend</button>
-        <button id="reset-button">Reset</button>
-        <span id="mode-pill" class="pill">one number controls brightness</span>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text">Color in code is arbitrary numbers you have to memorize. There is no way to feel your way through it.</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text">Color is a small set of numbers — brightness, light channels, hue, or transparency — and each model gives you a different kind of expressive control.</div>
+    </div>
+  </section>
+
+  <section class="main-grid" aria-label="Interactive color concept bridge">
+    <article class="panel canvas-panel">
+      <div class="canvas-bar">
+        <div class="canvas-bar-title" id="canvas-title">Grayscale: one number controls brightness</div>
+        <div class="canvas-bar-sub" id="canvas-sub">0 is black, 255 is white, everything between is gray.</div>
       </div>
+      <div class="canvas-wrap">
+        <canvas id="color-canvas" width="620" height="420" aria-label="Interactive color visualization"></canvas>
+        <div class="touch-hint">Tap and drag the sliders on the right to explore.</div>
+      </div>
+    </article>
 
-      <div class="row">
-        <div class="slider-wrap">
-          <label id="a-label" for="a-slider">Gray</label>
-          <input id="a-slider" type="range" min="0" max="255" value="180" step="1" />
-          <span id="a-value" class="value-label">180</span>
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="Color model tabs">
+        <button class="tab" role="tab" id="tab-gray" data-mode="gray" aria-selected="true" aria-controls="bridge-panel" tabindex="0">Gray<span class="step">1 of 5</span></button>
+        <button class="tab" role="tab" id="tab-rgb" data-mode="rgb" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">RGB<span class="step">2 of 5</span></button>
+        <button class="tab" role="tab" id="tab-hsb" data-mode="hsb" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">HSB<span class="step">3 of 5</span></button>
+        <button class="tab" role="tab" id="tab-alpha" data-mode="alpha" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Alpha<span class="step">4 of 5</span></button>
+        <button class="tab" role="tab" id="tab-blend" data-mode="blend" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Blend<span class="step">5 of 5</span></button>
+      </nav>
+
+      <div id="bridge-panel" role="tabpanel" aria-live="polite">
+        <div class="predict">
+          <span class="box-label">Predict before changing</span>
+          <span class="box-body" id="predict-text">Before you move the slider — what do you think will happen as the number gets closer to 0? Closer to 255?</span>
         </div>
-        <div class="slider-wrap">
-          <label id="b-label" for="b-slider">Green</label>
-          <input id="b-slider" type="range" min="0" max="255" value="95" step="1" />
-          <span id="b-value" class="value-label">95</span>
+
+        <div class="ctrl-group" id="controls"></div>
+        <div id="presets-area"></div>
+
+        <div class="switches">
+          <label class="sw"><input type="checkbox" id="strokeToggle" checked> Stroke</label>
+          <label class="sw"><input type="checkbox" id="labelToggle" checked> Labels</label>
         </div>
-        <div class="slider-wrap">
-          <label id="c-label" for="c-slider">Blue</label>
-          <input id="c-slider" type="range" min="0" max="255" value="210" step="1" />
-          <span id="c-value" class="value-label">210</span>
+
+        <div class="code-section">
+          <div class="code-header"><span>Live code</span><span id="code-note">One number inside fill().</span></div>
+          <div class="code-focus-line mono" id="focus-code"></div>
+          <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">▸ See full p5.js sketch</button>
+          <div class="full-code-body mono" id="full-code"></div>
+        </div>
+
+        <div class="callout big-idea">
+          <span class="box-label">Big idea</span>
+          <span class="box-body" id="big-idea-text"></span>
+        </div>
+
+        <div class="callout bug">
+          <span class="box-label">⚠ Common mistake</span>
+          <span class="box-body" id="bug-text"></span>
+        </div>
+
+        <div class="callout try">
+          <span class="box-label">Try this</span>
+          <span class="box-body" id="try-text"></span>
         </div>
       </div>
-
-      <div class="row">
-        <div class="slider-wrap">
-          <label id="d-label" for="d-slider">Alpha</label>
-          <input id="d-slider" type="range" min="0" max="255" value="165" step="1" />
-          <span id="d-value" class="value-label">165</span>
-        </div>
-        <span class="preset-label">Presets:</span>
-        <button class="preset-button" data-preset="warm">warm</button>
-        <button class="preset-button" data-preset="cool">cool</button>
-        <button class="preset-button" data-preset="high-alpha">opaque</button>
-        <button class="preset-button" data-preset="low-alpha">transparent</button>
-        <label class="toggle-label"><input id="show-stroke" type="checkbox" checked />Stroke</label>
-        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
-      </div>
-    </section>
-
-    <section class="workspace">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        Grayscale uses one number. 0 is black, 255 is white, and values between are gray.
-      </div>
-    </section>
-
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">Grayscale uses one number</h2>
-        <p id="lesson-text">
-          fill(0) is black, fill(255) is white, and values between are gray. One number controls brightness.
-        </p>
-        <span id="formula-box" class="formula">fill(180);</span>
-      </section>
-
-      <section class="card">
-        <h3>Big idea</h3>
-        <p><strong>Grayscale:</strong> one number for brightness.</p>
-        <p><strong>RGB:</strong> red, green, and blue light values.</p>
-        <p><strong>HSB:</strong> hue, saturation, and brightness.</p>
-        <p><strong>Alpha:</strong> transparency, useful for layering.</p>
-      </section>
-
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch gray"></span><span>grayscale brightness</span></div>
-          <div class="legend-item"><span class="swatch red"></span><span>red channel</span></div>
-          <div class="legend-item"><span class="swatch green"></span><span>green channel</span></div>
-          <div class="legend-item"><span class="swatch blue"></span><span>blue channel</span></div>
-          <div class="legend-item"><span class="swatch hue"></span><span>hue / color angle</span></div>
-          <div class="legend-item"><span class="swatch alpha"></span><span>alpha / transparency</span></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">Move the grayscale slider. What happens when the number approaches 0 or 255?</p>
-      </section>
-
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code id="code-box">fill(180);</code></pre>
-        <p class="note">
-          Color choices can be expressive, but in code they are also precise values. That makes them easy to animate, map, randomize, and remix.
-        </p>
-      </section>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    const state = {
-      mode: "gray",
-      a: 180,
-      b: 95,
-      c: 210,
-      d: 165,
-      showStroke: true,
-      showLabels: true,
-      showCode: false
-    };
+  <section class="prose-section">
+    <h2 id="prose-title">Grayscale uses one number</h2>
+    <p id="prose-body">Think of grayscale as a brightness dial. Turn it toward 255 and the shape glows white; turn it toward 0 and it disappears into darkness. This is the simplest color mode — one number, one dimension, full control.</p>
+  </section>
 
-    const els = {};
+  <div class="legend" aria-label="Color concept legend">
+    <div class="legend-item"><span class="swatch" style="background:linear-gradient(90deg,#111,#ccc)"></span> grayscale</div>
+    <div class="legend-item"><span class="swatch" style="background:linear-gradient(90deg,#e44,#2b6,#36f)"></span> RGB channels</div>
+    <div class="legend-item"><span class="swatch" style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);border-radius:50%"></span> HSB hue</div>
+    <div class="legend-item"><span class="swatch" style="background:linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);background-size:8px 8px;background-color:rgba(216,107,58,0.45)"></span> alpha</div>
+    <div class="legend-item"><span class="swatch" style="background:linear-gradient(90deg,#f97316,#8b5cf6)"></span> lerpColor blend</div>
+    <div class="legend-item"><span class="swatch" style="background:#fff;border:2.5px solid #222"></span> stroke</div>
+  </div>
 
-    function setupUI() {
-      els.modeGray = document.querySelector("#mode-gray");
-      els.modeRgb = document.querySelector("#mode-rgb");
-      els.modeHsb = document.querySelector("#mode-hsb");
-      els.modeAlpha = document.querySelector("#mode-alpha");
-      els.modeLerp = document.querySelector("#mode-lerp");
-      els.resetButton = document.querySelector("#reset-button");
-      els.modePill = document.querySelector("#mode-pill");
-      els.aSlider = document.querySelector("#a-slider");
-      els.bSlider = document.querySelector("#b-slider");
-      els.cSlider = document.querySelector("#c-slider");
-      els.dSlider = document.querySelector("#d-slider");
-      els.aLabel = document.querySelector("#a-label");
-      els.bLabel = document.querySelector("#b-label");
-      els.cLabel = document.querySelector("#c-label");
-      els.dLabel = document.querySelector("#d-label");
-      els.aValue = document.querySelector("#a-value");
-      els.bValue = document.querySelector("#b-value");
-      els.cValue = document.querySelector("#c-value");
-      els.dValue = document.querySelector("#d-value");
-      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
-      els.showStroke = document.querySelector("#show-stroke");
-      els.showLabels = document.querySelector("#show-labels");
-      els.showCode = document.querySelector("#show-code");
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.formulaBox = document.querySelector("#formula-box");
-      els.questionText = document.querySelector("#question-text");
-      els.caption = document.querySelector("#canvas-caption");
-      els.codeCard = document.querySelector("#code-card");
-      els.codeBox = document.querySelector("#code-box");
+  <section class="pathways" aria-label="Practice and remix links">
+    <div class="pathways-title">What's next</div>
+    <div class="path-links">
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
+        <span class="path-link-type">Practice →</span>
+        <span class="path-link-name">Open the tools library and look for color, palette, layering, or shape explorers</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
+        <span class="path-link-type">Remix →</span>
+        <span class="path-link-name">Use a starter sketch and make mouse position control brightness, alpha, or blend amount</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/map-range-translator/" class="path-link">
+        <span class="path-link-type">Related →</span>
+        <span class="path-link-name">map() Range Translator — make color respond to mouse position, time, distance, or data</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+    </div>
+  </section>
 
-      els.modeGray.addEventListener("click", () => setMode("gray"));
-      els.modeRgb.addEventListener("click", () => setMode("rgb"));
-      els.modeHsb.addEventListener("click", () => setMode("hsb"));
-      els.modeAlpha.addEventListener("click", () => setMode("alpha"));
-      els.modeLerp.addEventListener("click", () => setMode("lerp"));
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/triangle-circle-wave-explorer/">Next: Triangle → Circle → Wave →</a>
+  </nav>
+</main>
 
-      els.aSlider.addEventListener("input", () => { state.a = Number(els.aSlider.value); updateUI(); });
-      els.bSlider.addEventListener("input", () => { state.b = Number(els.bSlider.value); updateUI(); });
-      els.cSlider.addEventListener("input", () => { state.c = Number(els.cSlider.value); updateUI(); });
-      els.dSlider.addEventListener("input", () => { state.d = Number(els.dSlider.value); updateUI(); });
+<script>
+'use strict';
 
-      els.presetButtons.forEach(button => button.addEventListener("click", () => {
-        const preset = button.dataset.preset;
-        if (preset === "warm") { state.a = state.mode === "hsb" ? 25 : 240; state.b = state.mode === "hsb" ? 90 : 120; state.c = state.mode === "hsb" ? 95 : 60; }
-        if (preset === "cool") { state.a = state.mode === "hsb" ? 205 : 35; state.b = state.mode === "hsb" ? 80 : 150; state.c = state.mode === "hsb" ? 95 : 230; }
-        if (preset === "high-alpha") state.d = 245;
-        if (preset === "low-alpha") state.d = 70;
-        updateUI();
-      }));
+const state = {
+  mode: 'gray',
+  gray: 180,
+  r: 230,
+  g: 95,
+  b: 80,
+  hue: 22,
+  sat: 78,
+  bright: 88,
+  alpha: 165,
+  blendAmt: 0.45,
+  strokeOn: true,
+  labelsOn: true,
+  changedKey: 'gray'
+};
 
-      els.resetButton.addEventListener("click", () => {
-        state.a = state.mode === "hsb" ? 260 : 180;
-        state.b = state.mode === "hsb" ? 75 : 95;
-        state.c = state.mode === "hsb" ? 90 : 210;
-        state.d = 165;
-        updateUI();
-      });
+const modes = {
+  gray: {
+    canvasTitle: 'Grayscale: one number controls brightness',
+    canvasSub: '0 is black, 255 is white, everything between is gray.',
+    predict: 'Before you move the slider — what do you think will happen as the number gets closer to 0? Closer to 255?',
+    big: 'Grayscale is one brightness number. It is the simplest way to see that color in code is just a value you control.',
+    bug: 'Students sometimes expect one number inside fill() to mean “a color.” In grayscale mode, one number only controls brightness — not hue.',
+    tryIt: 'Make the shape feel calm, then dramatic, then nearly invisible — using only one number. What values did you choose?',
+    note: 'One number inside fill().',
+    proseTitle: 'Grayscale uses one number',
+    proseBody: 'Think of grayscale as a brightness dial. Turn it toward 255 and the shape glows white; turn it toward 0 and it disappears into darkness. This is the simplest color mode — one number, one dimension, full control. It is also what you see when you drain saturation from an image: color disappears, but brightness remains.',
+    controls: [{ key: 'gray', label: 'Gray value', code: 'fill(gray)', min: 0, max: 255, step: 1 }],
+    presets: [
+      { label: 'Pure black', v: { gray: 0 } },
+      { label: 'Middle gray', v: { gray: 128 } },
+      { label: 'Pure white', v: { gray: 255 } },
+      { label: '⚠ Near-invisible', v: { gray: 8 }, isBreak: true }
+    ]
+  },
+  rgb: {
+    canvasTitle: 'RGB: three light channels mix a color',
+    canvasSub: 'Red, green, and blue values combine. This is additive light, not paint.',
+    predict: 'Before you move one channel — which part of the resulting color do you think will change most?',
+    big: 'RGB is how screens make color: mix red, green, and blue light at different intensities. All three at 255 is white; all three at 0 is black.',
+    bug: 'A common mistake is mixing up the order. fill(r, g, b) — red first, green second, blue third. Swapping them gives a completely different color.',
+    tryIt: 'Create a warm color and a cool color. Which channels changed the most between them?',
+    note: 'Three numbers inside fill().',
+    proseTitle: 'RGB mixes light, not paint',
+    proseBody: 'A screen has no pigment — it has tiny red, green, and blue lights. <code>fill(255, 0, 0)</code> is pure red: full red light, no green, no blue. <code>fill(255, 255, 0)</code> is yellow, because red light plus green light makes yellow on a screen. This is additive color: combining everything makes white.',
+    controls: [
+      { key: 'r', label: 'Red', code: 'r in fill(r, g, b)', min: 0, max: 255, step: 1 },
+      { key: 'g', label: 'Green', code: 'g in fill(r, g, b)', min: 0, max: 255, step: 1 },
+      { key: 'b', label: 'Blue', code: 'b in fill(r, g, b)', min: 0, max: 255, step: 1 }
+    ],
+    presets: [
+      { label: 'Warm sunset', v: { r: 240, g: 120, b: 65 } },
+      { label: 'Cool ocean', v: { r: 55, g: 130, b: 200 } },
+      { label: 'Lush green', v: { r: 60, g: 200, b: 100 } },
+      { label: 'Deep mystery', v: { r: 45, g: 20, b: 85 } },
+      { label: '⚠ All zeros = black', v: { r: 0, g: 0, b: 0 }, isBreak: true }
+    ]
+  },
+  hsb: {
+    canvasTitle: 'HSB: choose hue, intensity, brightness',
+    canvasSub: 'Hue is the color wheel. Saturation is how vivid. Brightness is how much light.',
+    predict: 'Before changing hue — what do you think will stay the same? What will change?',
+    big: 'HSB separates three decisions: which color family, how vivid, and how light or dark. That makes palette design much easier than RGB.',
+    bug: 'The most common mistake: using HSB numbers without calling colorMode(HSB) first. p5.js defaults to RGB, so hue/saturation/brightness values get read as red/green/blue.',
+    tryIt: 'Keep the hue fixed. Change only saturation and brightness. How does the feeling change without changing the color family?',
+    note: 'Needs colorMode(HSB) first.',
+    proseTitle: 'HSB thinks like an artist',
+    proseBody: 'RGB is how screens work. HSB is closer to how people think about color. Hue is the color wheel — 0 is red, 120 is green, 240 is blue, and 360 wraps back to red. Saturation is how vivid: 100 is pure color, 0 is gray. Brightness is how much light: 100 is full color, 0 is always black.',
+    controls: [
+      { key: 'hue', label: 'Hue', code: 'hue (0–360)', min: 0, max: 360, step: 1 },
+      { key: 'sat', label: 'Saturation', code: 'saturation (0–100)', min: 0, max: 100, step: 1 },
+      { key: 'bright', label: 'Brightness', code: 'brightness (0–100)', min: 0, max: 100, step: 1 }
+    ],
+    presets: [
+      { label: 'Vivid warm', v: { hue: 15, sat: 92, bright: 95 } },
+      { label: 'Soft pastel', v: { hue: 200, sat: 28, bright: 96 } },
+      { label: 'Deep jewel', v: { hue: 280, sat: 80, bright: 48 } },
+      { label: '⚠ Sat = 0 → gray!', v: { hue: 200, sat: 0, bright: 60 }, isBreak: true }
+    ]
+  },
+  alpha: {
+    canvasTitle: 'Alpha: transparency creates layers',
+    canvasSub: '255 is solid, 0 is invisible. Values between let layers show through.',
+    predict: 'Before changing alpha — what do you think will happen where the circles overlap?',
+    big: 'Alpha is a fourth number that controls transparency. It turns overlap into composition — essential for trails, shadows, glass, fog, and layered motion.',
+    bug: 'Expecting alpha to work with three numbers. In RGB mode, you need a fourth value: fill(r, g, b, alpha). Three numbers is just an opaque color.',
+    tryIt: 'Find the alpha value where you can clearly see all three circles and also see them blending where they overlap.',
+    note: 'Fourth number = transparency.',
+    proseTitle: 'Alpha adds a fourth dimension',
+    proseBody: 'Any color can take a fourth number. <code>fill(230, 95, 80, 165)</code> is the same warm color, but partially see-through. At 255 it is solid. At 0 it is invisible. Values between let layers show through each other. Alpha makes overlap feel like composition instead of just covering.',
+    controls: [
+      { key: 'r', label: 'Red', code: 'r', min: 0, max: 255, step: 1 },
+      { key: 'g', label: 'Green', code: 'g', min: 0, max: 255, step: 1 },
+      { key: 'b', label: 'Blue', code: 'b', min: 0, max: 255, step: 1 },
+      { key: 'alpha', label: 'Alpha', code: 'alpha (0–255)', min: 0, max: 255, step: 1 }
+    ],
+    presets: [
+      { label: 'Solid layer', v: { r: 230, g: 95, b: 80, alpha: 255 } },
+      { label: 'Glass overlay', v: { r: 60, g: 140, b: 220, alpha: 100 } },
+      { label: 'Ghost trail', v: { r: 255, g: 200, b: 80, alpha: 40 } },
+      { label: '⚠ Invisible (alpha 0)', v: { r: 230, g: 95, b: 80, alpha: 0 }, isBreak: true }
+    ]
+  },
+  blend: {
+    canvasTitle: 'lerpColor(): smooth blend between two colors',
+    canvasSub: 'Amount 0 = first color. Amount 1 = second. 0.5 = halfway mix.',
+    predict: 'Before changing the amount — where do you think 0, 0.5, and 1 will land on the gradient?',
+    big: 'lerpColor() blends between two colors by percentage. It powers smooth transitions, gradients, hover effects, proximity-based color, and data-driven color scales.',
+    bug: 'Using values like 50 instead of 0.5. The blend amount is normally between 0 and 1. This demo shows that values above 1 are outside the usual range and get clamped visually at Color B.',
+    tryIt: 'Set the amount near 0, then near 1. Which of the two base colors is controlling the mood at each end?',
+    note: 'Amount is normally 0 to 1.',
+    proseTitle: 'Blending is interpolation applied to color',
+    proseBody: '<code>lerpColor(colorA, colorB, amt)</code> returns a color that is <code>amt</code> percent of the way from A to B. This is the same idea as <code>lerp()</code> for numbers, but applied to color channels. It is how you make a color respond to distance, time, mouse position, or data — and it connects directly to the map() bridge.',
+    controls: [{ key: 'blendAmt', label: 'Blend amount', code: 'lerpColor(c1, c2, amt)', min: 0, max: 1.2, step: 0.01 }],
+    presets: [
+      { label: 'Pure color A', v: { blendAmt: 0 } },
+      { label: 'Even mix', v: { blendAmt: 0.5 } },
+      { label: 'Pure color B', v: { blendAmt: 1.0 } },
+      { label: '⚠ Outside normal range', v: { blendAmt: 1.2 }, isBreak: true }
+    ]
+  }
+};
 
-      els.showStroke.addEventListener("change", () => { state.showStroke = els.showStroke.checked; });
-      els.showLabels.addEventListener("change", () => { state.showLabels = els.showLabels.checked; });
-      els.showCode.addEventListener("change", () => { state.showCode = els.showCode.checked; updateUI(); });
+const canvas = document.getElementById('color-canvas');
+const ctx = canvas.getContext('2d');
+const controlsEl = document.getElementById('controls');
+const focusEl = document.getElementById('focus-code');
+const fullEl = document.getElementById('full-code');
 
-      updateUI();
+function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+function mapV(v, a, b, c, d) { return c + ((v - a) / (b - a)) * (d - c); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function lerpColorFn(a, b, t) {
+  const s = clamp(t, 0, 1);
+  return {
+    r: Math.round(lerp(a.r, b.r, s)),
+    g: Math.round(lerp(a.g, b.g, s)),
+    b: Math.round(lerp(a.b, b.b, s))
+  };
+}
+
+function hsbToRgb(h, s, b) {
+  const hue = ((h % 360) + 360) % 360;
+  const sat = clamp(s, 0, 100) / 100;
+  const bri = clamp(b, 0, 100) / 100;
+  const c = bri * sat;
+  const x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
+  const m = bri - c;
+  let rp = 0, gp = 0, bp = 0;
+  if (hue < 60) [rp, gp, bp] = [c, x, 0];
+  else if (hue < 120) [rp, gp, bp] = [x, c, 0];
+  else if (hue < 180) [rp, gp, bp] = [0, c, x];
+  else if (hue < 240) [rp, gp, bp] = [0, x, c];
+  else if (hue < 300) [rp, gp, bp] = [x, 0, c];
+  else [rp, gp, bp] = [c, 0, x];
+  return {
+    r: Math.round((rp + m) * 255),
+    g: Math.round((gp + m) * 255),
+    b: Math.round((bp + m) * 255)
+  };
+}
+
+function rgba(r, g, b, a = 1) { return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${a})`; }
+function fmtV(key) { return key === 'blendAmt' ? Number(state[key]).toFixed(2) : Math.round(state[key]); }
+
+function roundRect(x, y, w, h, r) {
+  const rad = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rad, y);
+  ctx.lineTo(x + w - rad, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rad);
+  ctx.lineTo(x + w, y + h - rad);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
+  ctx.lineTo(x + rad, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - rad);
+  ctx.lineTo(x, y + rad);
+  ctx.quadraticCurveTo(x, y, x + rad, y);
+  ctx.closePath();
+}
+
+function fillRR(x, y, w, h, r, fill, strk, sw) {
+  roundRect(x, y, w, h, r);
+  ctx.fillStyle = fill;
+  ctx.fill();
+  if (strk && sw) {
+    ctx.lineWidth = sw;
+    ctx.strokeStyle = strk;
+    ctx.stroke();
+  }
+}
+
+function label(text, x, y) {
+  if (!state.labelsOn) return;
+  ctx.save();
+  ctx.fillStyle = '#23201c';
+  ctx.font = '700 13px "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+function strokeColor() { return state.strokeOn ? '#1e1b18' : null; }
+
+function checker() {
+  const sz = 18;
+  for (let y = 0; y < canvas.height; y += sz) {
+    for (let x = 0; x < canvas.width; x += sz) {
+      ctx.fillStyle = ((x / sz + y / sz) % 2 === 0) ? '#eee' : '#ddd';
+      ctx.fillRect(x, y, sz, sz);
     }
+  }
+}
 
-    function setMode(mode) {
-      state.mode = mode;
-      if (mode === "hsb") {
-        state.a = 260;
-        state.b = 75;
-        state.c = 90;
-      } else if (mode === "gray") {
-        state.a = 180;
-      } else if (mode === "lerp") {
-        state.a = 0;
-        state.b = 95;
-        state.c = 210;
-      }
-      updateUI();
-    }
+function renderBase() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  fillRR(22, 22, canvas.width - 44, canvas.height - 44, 20, '#fffdf7', null, 0);
+}
 
-    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function renderGray() {
+  renderBase();
+  const cx = canvas.width / 2;
+  const sw = Math.min(240, canvas.width * 0.42);
+  const sx = cx - sw / 2;
+  const g = clamp(state.gray, 0, 255);
+  fillRR(sx, 80, sw, 180, 24, rgba(g, g, g), strokeColor(), state.strokeOn ? 3 : 0);
+  label(`fill(${fmtV('gray')})`, sx + 14, 108);
 
-    function updateSliderRanges() {
-      if (state.mode === "hsb") {
-        els.aSlider.min = 0; els.aSlider.max = 360; els.aSlider.step = 1;
-        els.bSlider.min = 0; els.bSlider.max = 100; els.bSlider.step = 1;
-        els.cSlider.min = 0; els.cSlider.max = 100; els.cSlider.step = 1;
-        els.dSlider.min = 0; els.dSlider.max = 1; els.dSlider.step = 0.01;
-        state.a = clamp(state.a, 0, 360);
-        state.b = clamp(state.b, 0, 100);
-        state.c = clamp(state.c, 0, 100);
-        state.d = state.d > 1 ? 0.65 : clamp(state.d, 0, 1);
-      } else if (state.mode === "lerp") {
-        els.aSlider.min = 0; els.aSlider.max = 1; els.aSlider.step = 0.01;
-        els.bSlider.min = 0; els.bSlider.max = 255; els.bSlider.step = 1;
-        els.cSlider.min = 0; els.cSlider.max = 255; els.cSlider.step = 1;
-        els.dSlider.min = 0; els.dSlider.max = 255; els.dSlider.step = 1;
-        state.a = state.a > 1 ? 0.5 : clamp(state.a, 0, 1);
-      } else {
-        els.aSlider.min = 0; els.aSlider.max = 255; els.aSlider.step = 1;
-        els.bSlider.min = 0; els.bSlider.max = 255; els.bSlider.step = 1;
-        els.cSlider.min = 0; els.cSlider.max = 255; els.cSlider.step = 1;
-        els.dSlider.min = 0; els.dSlider.max = 255; els.dSlider.step = 1;
-        if (state.d <= 1) state.d = Math.round(state.d * 255);
-        state.a = clamp(state.a, 0, 255);
-        state.b = clamp(state.b, 0, 255);
-        state.c = clamp(state.c, 0, 255);
-        state.d = clamp(state.d, 0, 255);
-      }
-    }
+  for (let i = 0; i <= 10; i++) {
+    const v = Math.round(i * 25.5);
+    fillRR(58 + i * 38, 310, 32, 36, 7, rgba(v, v, v), null, 0);
+  }
+  label('0 → 255 brightness scale', 58, 298);
+}
 
-    function updateUI() {
-      updateSliderRanges();
-      const buttons = [[els.modeGray,"gray"],[els.modeRgb,"rgb"],[els.modeHsb,"hsb"],[els.modeAlpha,"alpha"],[els.modeLerp,"lerp"]];
-      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
+function renderRGB() {
+  renderBase();
+  const cx = canvas.width / 2;
+  const sw = Math.min(240, canvas.width * 0.42);
+  const sx = cx - sw / 2;
+  fillRR(sx, 80, sw, 180, 24, rgba(state.r, state.g, state.b), strokeColor(), state.strokeOn ? 3 : 0);
+  label(`fill(${fmtV('r')}, ${fmtV('g')}, ${fmtV('b')})`, sx + 14, 108);
 
-      const labelSets = {
-        gray: ["Gray", "unused", "unused", "Alpha"],
-        rgb: ["Red", "Green", "Blue", "Alpha"],
-        hsb: ["Hue", "Saturation", "Brightness", "Alpha"],
-        alpha: ["Red", "Green", "Blue", "Alpha"],
-        lerp: ["Blend amt", "Start hue", "End hue", "Alpha"]
-      };
-      const labels = labelSets[state.mode];
-      [els.aLabel, els.bLabel, els.cLabel, els.dLabel].forEach((el, i) => el.textContent = labels[i]);
+  const bx = 68;
+  const maxW = canvas.width - 136;
+  const bars = [
+    { l: 'R', v: state.r, c: '#e03838' },
+    { l: 'G', v: state.g, c: '#30aa60' },
+    { l: 'B', v: state.b, c: '#3868e0' }
+  ];
+  bars.forEach((bar, i) => {
+    const y = 308 + i * 28;
+    fillRR(bx, y, maxW, 15, 99, '#ddd', null, 0);
+    fillRR(bx, y, mapV(bar.v, 0, 255, 0, maxW), 15, 99, bar.c, null, 0);
+    label(bar.l, 46, y + 12);
+  });
+}
 
-      els.aSlider.value = state.a;
-      els.bSlider.value = state.b;
-      els.cSlider.value = state.c;
-      els.dSlider.value = state.d;
-      els.aValue.textContent = state.mode === "lerp" ? state.a.toFixed(2) : Math.round(state.a);
-      els.bValue.textContent = Math.round(state.b);
-      els.cValue.textContent = Math.round(state.c);
-      els.dValue.textContent = state.mode === "hsb" ? state.d.toFixed(2) : Math.round(state.d);
-      els.showStroke.checked = state.showStroke;
-      els.showLabels.checked = state.showLabels;
-      els.showCode.checked = state.showCode;
-      els.codeCard.classList.toggle("visible", state.showCode);
+function renderHSB() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const bg = hsbToRgb(38, 8, 94);
+  ctx.fillStyle = rgba(bg.r, bg.g, bg.b);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  fillRR(22, 22, canvas.width - 44, canvas.height - 44, 20, 'rgba(255,255,255,0.92)', null, 0);
 
-      const lessons = {
-        gray: {
-          pill: "one number controls brightness",
-          title: "Grayscale uses one number",
-          text: "fill(0) is black, fill(255) is white, and values between are gray. One number controls brightness.",
-          formula: `fill(${Math.round(state.a)});`,
-          question: "Move the grayscale slider. What happens when the number approaches 0 or 255?",
-          caption: "Grayscale uses one number. 0 is black, 255 is white, and values between are gray.",
-          code: `background(240);\nfill(${Math.round(state.a)});\n${state.showStroke ? "stroke(30);" : "noStroke();"}\ncircle(300, 200, 140);`
-        },
-        rgb: {
-          pill: "RGB mixes red, green, and blue light",
-          title: "RGB color uses three channels",
-          text: "RGB color is built from red, green, and blue values. Each channel usually ranges from 0 to 255.",
-          formula: `fill(${Math.round(state.a)}, ${Math.round(state.b)}, ${Math.round(state.c)});`,
-          question: "Which slider has the biggest effect on the color you see?",
-          caption: "RGB is additive color: red, green, and blue light combine into many colors.",
-          code: `fill(${Math.round(state.a)}, ${Math.round(state.b)}, ${Math.round(state.c)});\nrect(180, 120, 240, 180);`
-        },
-        hsb: {
-          pill: "HSB separates color family from intensity",
-          title: "HSB is hue, saturation, brightness",
-          text: "HSB is often easier for artists. Hue chooses the color family, saturation controls vividness, and brightness controls lightness.",
-          formula: `colorMode(HSB, 360, 100, 100, 1);\nfill(${Math.round(state.a)}, ${Math.round(state.b)}, ${Math.round(state.c)}, ${state.d.toFixed(2)});`,
-          question: "What changes when you move hue compared with saturation?",
-          caption: "HSB makes it easier to rotate through colors while keeping saturation and brightness steady.",
-          code: `colorMode(HSB, 360, 100, 100, 1);\nfill(${Math.round(state.a)}, ${Math.round(state.b)}, ${Math.round(state.c)}, ${state.d.toFixed(2)});\ncircle(300, 200, 140);\ncolorMode(RGB, 255);`
-        },
-        alpha: {
-          pill: "alpha controls transparency",
-          title: "Alpha controls transparency",
-          text: "The fourth color value is alpha. Low alpha means more transparent. High alpha means more opaque. This is powerful for layering and trails.",
-          formula: `fill(${Math.round(state.a)}, ${Math.round(state.b)}, ${Math.round(state.c)}, ${Math.round(state.d)});`,
-          question: "How does transparency change the feeling of overlapping shapes?",
-          caption: "Alpha lets colors layer. Transparent shapes can build depth, trails, shadows, and atmosphere.",
-          code: `fill(${Math.round(state.a)}, ${Math.round(state.b)}, ${Math.round(state.c)}, ${Math.round(state.d)});\nfor (let i = 0; i < 8; i++) {\n  circle(160 + i * 42, 220, 100);\n}`
-        },
-        lerp: {
-          pill: "lerpColor blends between two colors",
-          title: "Color can be interpolated",
-          text: "lerpColor() blends between two colors. The amount usually ranges from 0 to 1: 0 is the first color, 1 is the second color, and 0.5 is halfway.",
-          formula: `let mixed = lerpColor(c1, c2, ${state.a.toFixed(2)});`,
-          question: "Where is the blend amount closest to the first color? Where is it closest to the second?",
-          caption: "Interpolation turns color into a smooth transition instead of a hard jump.",
-          code: `let c1 = color(240, ${Math.round(state.b)}, 80);\nlet c2 = color(40, 120, ${Math.round(state.c)});\nlet mixed = lerpColor(c1, c2, ${state.a.toFixed(2)});\nfill(mixed);\ncircle(300, 200, 140);`
-        }
-      };
+  const col = hsbToRgb(state.hue, state.sat, state.bright);
+  const cx = canvas.width / 2;
+  const sw = Math.min(240, canvas.width * 0.42);
+  const sx = cx - sw / 2;
+  fillRR(sx, 80, sw, 180, 24, rgba(col.r, col.g, col.b), strokeColor(), state.strokeOn ? 3 : 0);
+  label(`fill(${fmtV('hue')}, ${fmtV('sat')}, ${fmtV('bright')})`, sx + 14, 108);
 
-      const lesson = lessons[state.mode];
-      els.modePill.textContent = lesson.pill;
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.formulaBox.textContent = lesson.formula;
-      els.questionText.textContent = lesson.question;
-      els.caption.textContent = lesson.caption;
-      els.codeBox.textContent = lesson.code;
-    }
+  const hy = 320;
+  const hx = 60;
+  const hw = canvas.width - 120;
+  for (let i = 0; i < 360; i += 2) {
+    const c = hsbToRgb(i, 80, 90);
+    ctx.fillStyle = rgba(c.r, c.g, c.b);
+    ctx.fillRect(hx + i * (hw / 360), hy, Math.ceil(hw / 120), 26);
+  }
+  const mx = hx + state.hue * (hw / 360);
+  ctx.strokeStyle = '#171511';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(mx, hy - 8);
+  ctx.lineTo(mx, hy + 36);
+  ctx.stroke();
+  label('hue: 0 → 360', hx, hy - 14);
+}
 
-    setupUI();
+function renderAlpha() {
+  checker();
+  fillRR(22, 22, canvas.width - 44, canvas.height - 44, 20, 'rgba(255,253,247,0.86)', null, 0);
 
-    const sketch = (p) => {
-      let canvas, holder, previousWidth = 0, previousHeight = 0;
+  const cx = canvas.width / 2;
+  ctx.fillStyle = 'rgba(65,120,220,0.55)';
+  ctx.beginPath();
+  ctx.arc(cx - 70, 185, 88, 0, Math.PI * 2);
+  ctx.fill();
 
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive visualization of p5.js color models including grayscale RGB HSB alpha and color interpolation.");
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("DM Sans, system-ui, sans-serif");
-      };
+  ctx.fillStyle = 'rgba(255,200,65,0.55)';
+  ctx.beginPath();
+  ctx.arc(cx + 10, 185, 88, 0, Math.PI * 2);
+  ctx.fill();
 
-      p.windowResized = () => resizeToHolder();
+  const a = clamp(state.alpha, 0, 255);
+  ctx.fillStyle = rgba(state.r, state.g, state.b, a / 255);
+  ctx.beginPath();
+  ctx.arc(cx + 80, 185, 88, 0, Math.PI * 2);
+  ctx.fill();
+  if (state.strokeOn) {
+    ctx.strokeStyle = '#1e1b18';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
 
-      p.draw = () => {
-        resizeToHolder();
-        p.colorMode(p.RGB, 255, 255, 255, 255);
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-        drawPanelTitle();
+  label(`fill(${fmtV('r')}, ${fmtV('g')}, ${fmtV('b')}, ${fmtV('alpha')})`, cx - 140, 310);
+}
 
-        if (state.mode === "gray") drawGrayMode();
-        if (state.mode === "rgb") drawRgbMode();
-        if (state.mode === "hsb") drawHsbMode();
-        if (state.mode === "alpha") drawAlphaMode();
-        if (state.mode === "lerp") drawLerpMode();
+function renderBlend() {
+  renderBase();
+  const c1 = { r: 249, g: 115, b: 22 };
+  const c2 = { r: 139, g: 92, b: 246 };
+  const amount = clamp(state.blendAmt, 0, 1.2);
+  const visibleAmount = clamp(amount, 0, 1);
+  const mixed = lerpColorFn(c1, c2, visibleAmount);
 
-        p.colorMode(p.RGB, 255, 255, 255, 255);
-        drawReadoutCards();
-      };
+  const cx = canvas.width / 2;
+  const sw = Math.min(240, canvas.width * 0.42);
+  const sx = cx - sw / 2;
+  fillRR(sx, 80, sw, 180, 24, rgba(mixed.r, mixed.g, mixed.b), strokeColor(), state.strokeOn ? 3 : 0);
+  label(`lerpColor(c1, c2, ${fmtV('blendAmt')})`, sx + 14, 108);
 
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-        if (w !== previousWidth || h !== previousHeight) { p.resizeCanvas(w, h); previousWidth = w; previousHeight = h; }
-      }
+  const gx = 58;
+  const gy = 318;
+  const gw = canvas.width - 116;
+  for (let i = 0; i <= 100; i++) {
+    const c = lerpColorFn(c1, c2, i / 100);
+    ctx.fillStyle = rgba(c.r, c.g, c.b);
+    ctx.fillRect(gx + i * (gw / 100), gy, Math.ceil(gw / 100) + 1, 30);
+  }
 
-      function drawSubtleGrid() {
-        p.push(); p.stroke(236,224,207); p.strokeWeight(1);
-        for (let x=0; x<p.width; x+=32) p.line(x,0,x,p.height);
-        for (let y=0; y<p.height; y+=32) p.line(0,y,p.width,y);
-        p.pop();
-      }
+  const mx = gx + visibleAmount * gw;
+  ctx.strokeStyle = '#171511';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(mx, gy - 8);
+  ctx.lineTo(mx, gy + 40);
+  ctx.stroke();
+  label('amount: 0 → 1', gx, gy - 12);
 
-      function drawPanelTitle() {
-        const titles = {
-          gray:["Grayscale","One value controls brightness."],
-          rgb:["RGB","Red, green, and blue channels mix color."],
-          hsb:["HSB","Hue, saturation, and brightness separate color decisions."],
-          alpha:["Alpha","Transparency lets colors layer."],
-          lerp:["Color Blend","lerpColor() makes smooth transitions."]
-        };
-        const [title, subtitle] = titles[state.mode];
-        p.push(); p.noStroke(); p.fill("#222"); p.textStyle(p.BOLD); p.textSize(22); p.text(title,24,38); p.textStyle(p.NORMAL); p.textSize(14); p.fill("#6b6258"); p.text(subtitle,24,62); p.pop();
-      }
+  if (amount > 1) {
+    label('⚠ amount > 1: outside usual range, clamped here', gx, gy + 54);
+  }
+}
 
-      function stage() { return { x:p.width*0.08, y:p.height*0.15, w:p.width*0.84, h:p.height*0.50 }; }
-      function drawStage() { const s=stage(); p.push(); p.noStroke(); p.fill(255,255,255,235); p.rect(s.x,s.y,s.w,s.h,24); p.pop(); return s; }
+const renderers = { gray: renderGray, rgb: renderRGB, hsb: renderHSB, alpha: renderAlpha, blend: renderBlend };
+function render() { renderers[state.mode](); }
 
-      function applyStroke() {
-        if (state.showStroke) { p.stroke(34); p.strokeWeight(3); }
-        else p.noStroke();
-      }
+function buildControls() {
+  controlsEl.innerHTML = '';
+  const mode = modes[state.mode];
+  mode.controls.forEach(control => {
+    const row = document.createElement('div');
+    row.className = 'ctrl-row';
+    row.innerHTML = `
+      <div>
+        <label for="sl_${control.key}">${control.label}<small>${control.code}</small></label>
+      </div>
+      <span class="val-badge mono" id="vb_${control.key}">${fmtV(control.key)}</span>
+      <input id="sl_${control.key}" type="range" min="${control.min}" max="${control.max}" step="${control.step}" value="${state[control.key]}" aria-label="${control.label}: ${control.code}">
+    `;
+    controlsEl.appendChild(row);
 
-      function drawGrayMode() {
-        const s = drawStage();
-        drawGrayRamp(s.x + 40, s.y + s.h - 70, s.w - 80, 28);
-        p.push();
-        applyStroke();
-        p.fill(state.a);
-        p.circle(s.x + s.w * 0.52, s.y + s.h * 0.43, 170);
-        if (state.showLabels) {
-          drawLabel(`fill(${Math.round(state.a)})`, s.x + s.w * 0.52 - 46, s.y + s.h * 0.43 + 112, "#64748b", 15);
-          drawLabel("0 = black", s.x + 40, s.y + s.h - 82, "#64748b", 12);
-          drawLabel("255 = white", s.x + s.w - 124, s.y + s.h - 82, "#64748b", 12);
-        }
-        p.pop();
-      }
+    const slider = row.querySelector('input');
+    slider.addEventListener('input', event => {
+      state[control.key] = Number(event.target.value);
+      state.changedKey = control.key;
+      document.getElementById(`vb_${control.key}`).textContent = fmtV(control.key);
+      updateCode();
+      render();
+    });
+  });
+}
 
-      function drawRgbMode() {
-        const s = drawStage();
-        p.push();
-        applyStroke();
-        p.fill(state.a, state.b, state.c);
-        p.rect(s.x + s.w * 0.46, s.y + s.h * 0.22, s.w * 0.36, s.h * 0.50, 24);
-        drawChannelBars(s.x + 42, s.y + 70, s.w * 0.30, s.h * 0.55, [
-          { label:"red", value:state.a, color:"#e11d48" },
-          { label:"green", value:state.b, color:"#16a34a" },
-          { label:"blue", value:state.c, color:"#0891b2" }
-        ], 255);
-        if (state.showLabels) drawLabel(`rgb(${Math.round(state.a)}, ${Math.round(state.b)}, ${Math.round(state.c)})`, s.x + s.w * 0.50, s.y + s.h * 0.78, "#334155", 14);
-        p.pop();
-      }
+function buildPresets() {
+  const area = document.getElementById('presets-area');
+  area.innerHTML = '';
+  const mode = modes[state.mode];
 
-      function drawHsbMode() {
-        const s = drawStage();
-        p.push();
-        drawHueWheel(s.x + 130, s.y + s.h * 0.48, 88);
-        p.colorMode(p.HSB, 360, 100, 100, 1);
-        applyStroke();
-        p.fill(state.a, state.b, state.c, state.d);
-        p.circle(s.x + s.w * 0.62, s.y + s.h * 0.45, 180);
-        p.colorMode(p.RGB, 255, 255, 255, 255);
-        if (state.showLabels) {
-          drawLabel(`hue = ${Math.round(state.a)}°`, s.x + 52, s.y + s.h * 0.82, "#7c3aed", 13);
-          drawLabel(`saturation = ${Math.round(state.b)}%`, s.x + s.w * 0.52, s.y + s.h * 0.75, "#7c3aed", 13);
-          drawLabel(`brightness = ${Math.round(state.c)}%`, s.x + s.w * 0.52, s.y + s.h * 0.82, "#7c3aed", 13);
-        }
-        p.pop();
-      }
+  const label = document.createElement('div');
+  label.className = 'presets-label';
+  label.textContent = 'Try these';
+  area.appendChild(label);
 
-      function drawAlphaMode() {
-        const s = drawStage();
-        drawCheckerboard(s.x + 36, s.y + 38, s.w - 72, s.h - 76, 24);
-        p.push();
-        applyStroke();
-        for (let i = 0; i < 7; i++) {
-          p.fill(state.a, state.b, state.c, state.d);
-          p.circle(s.x + s.w * 0.25 + i * 60, s.y + s.h * 0.50, 125);
-        }
-        if (state.showLabels) drawLabel(`alpha = ${Math.round(state.d)}`, s.x + 48, s.y + s.h - 34, "#f59e0b", 15);
-        p.pop();
-      }
+  const row = document.createElement('div');
+  row.className = 'preset-row';
+  mode.presets.forEach(preset => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn' + (preset.isBreak ? ' break' : '');
+    btn.type = 'button';
+    btn.textContent = preset.label;
+    btn.addEventListener('click', () => {
+      Object.entries(preset.v).forEach(([key, value]) => { state[key] = value; });
+      buildControls();
+      updateCode();
+      render();
+    });
+    row.appendChild(btn);
+  });
+  area.appendChild(row);
+}
 
-      function drawLerpMode() {
-        const s = drawStage();
-        const c1 = p.color(240, state.b, 80, state.d);
-        const c2 = p.color(40, 120, state.c, state.d);
-        const mixed = p.lerpColor(c1, c2, state.a);
-        p.push();
-        drawGradientBar(s.x + 54, s.y + s.h - 86, s.w - 108, 34, c1, c2);
-        applyStroke();
-        p.fill(c1); p.circle(s.x + s.w * 0.25, s.y + s.h * 0.42, 115);
-        p.fill(mixed); p.circle(s.x + s.w * 0.50, s.y + s.h * 0.42, 150);
-        p.fill(c2); p.circle(s.x + s.w * 0.75, s.y + s.h * 0.42, 115);
-        const markerX = p.map(state.a, 0, 1, s.x + 54, s.x + s.w - 54);
-        p.noStroke(); p.fill("#222"); p.triangle(markerX, s.y + s.h - 94, markerX - 8, s.y + s.h - 106, markerX + 8, s.y + s.h - 106);
-        if (state.showLabels) {
-          drawLabel("color 1", s.x + s.w * 0.25 - 28, s.y + s.h * 0.68, "#e11d48", 13);
-          drawLabel(`blend ${state.a.toFixed(2)}`, s.x + s.w * 0.50 - 38, s.y + s.h * 0.72, "#16a34a", 14);
-          drawLabel("color 2", s.x + s.w * 0.75 - 28, s.y + s.h * 0.68, "#0891b2", 13);
-        }
-        p.pop();
-      }
+function codeToken(key, text) {
+  return `<span class="ct num ${state.changedKey === key ? 'flash' : ''}">${text}</span>`;
+}
 
-      function drawGrayRamp(x, y, w, h) {
-        p.push(); p.noStroke();
-        for (let i=0;i<w;i++) { const g = p.map(i,0,w,0,255); p.fill(g); p.rect(x+i,y,1,h); }
-        const markerX = p.map(state.a, 0, 255, x, x + w);
-        p.fill("#222"); p.triangle(markerX, y - 8, markerX - 8, y - 20, markerX + 8, y - 20);
-        p.pop();
-      }
+function focusHTML() {
+  if (state.mode === 'gray') {
+    return `<span class="ct fn">fill</span>(${codeToken('gray', fmtV('gray'))});`;
+  }
+  if (state.mode === 'rgb') {
+    return `<span class="ct fn">fill</span>(${codeToken('r', fmtV('r'))}, ${codeToken('g', fmtV('g'))}, ${codeToken('b', fmtV('b'))});`;
+  }
+  if (state.mode === 'hsb') {
+    return `<span class="ct fn">colorMode</span>(<span class="ct str">HSB</span>, <span class="ct num">360</span>, <span class="ct num">100</span>, <span class="ct num">100</span>);\n<span class="ct fn">fill</span>(${codeToken('hue', fmtV('hue'))}, ${codeToken('sat', fmtV('sat'))}, ${codeToken('bright', fmtV('bright'))});`;
+  }
+  if (state.mode === 'alpha') {
+    return `<span class="ct fn">fill</span>(${codeToken('r', fmtV('r'))}, ${codeToken('g', fmtV('g'))}, ${codeToken('b', fmtV('b'))}, ${codeToken('alpha', fmtV('alpha'))});`;
+  }
+  return `<span class="ct kw">let</span> mixed = <span class="ct fn">lerpColor</span>(c1, c2, ${codeToken('blendAmt', fmtV('blendAmt'))});\n<span class="ct fn">fill</span>(mixed);`;
+}
 
-      function drawChannelBars(x, y, w, h, bars, maxValue) {
-        p.push(); p.noStroke();
-        for (let i=0;i<bars.length;i++) {
-          const by = y + i * 62;
-          p.fill("#e6dac8"); p.rect(x, by, w, 26, 999);
-          p.fill(bars[i].color); p.rect(x, by, w * (bars[i].value / maxValue), 26, 999);
-          p.fill("#334155"); p.textStyle(p.BOLD); p.textSize(13); p.text(`${bars[i].label}: ${Math.round(bars[i].value)}`, x, by - 8);
-        }
-        p.pop();
-      }
+function fullCodeText() {
+  const strokeLine = state.strokeOn ? 'stroke(30);' : 'noStroke();';
+  if (state.mode === 'gray') {
+    return `function setup() {\n  createCanvas(400, 400);\n}\n\nfunction draw() {\n  background(245);\n  ${strokeLine}\n  fill(${fmtV('gray')});\n  ellipse(200, 200, 180, 180);\n}`;
+  }
+  if (state.mode === 'rgb') {
+    return `function setup() {\n  createCanvas(400, 400);\n}\n\nfunction draw() {\n  background(245);\n  ${strokeLine}\n  fill(${fmtV('r')}, ${fmtV('g')}, ${fmtV('b')});\n  ellipse(200, 200, 180, 180);\n}`;
+  }
+  if (state.mode === 'hsb') {
+    return `function setup() {\n  createCanvas(400, 400);\n  colorMode(HSB, 360, 100, 100);\n}\n\nfunction draw() {\n  background(0, 0, 96);\n  ${strokeLine}\n  fill(${fmtV('hue')}, ${fmtV('sat')}, ${fmtV('bright')});\n  ellipse(200, 200, 180, 180);\n}`;
+  }
+  if (state.mode === 'alpha') {
+    return `function setup() {\n  createCanvas(400, 400);\n}\n\nfunction draw() {\n  background(245);\n  // background circles\n  fill(65, 120, 220, 140);\n  ellipse(160, 200, 160, 160);\n  fill(255, 200, 65, 140);\n  ellipse(210, 200, 160, 160);\n  // foreground circle with alpha\n  ${strokeLine}\n  fill(${fmtV('r')}, ${fmtV('g')}, ${fmtV('b')}, ${fmtV('alpha')});\n  ellipse(260, 200, 160, 160);\n}`;
+  }
+  return `function setup() {\n  createCanvas(400, 400);\n}\n\nfunction draw() {\n  background(245);\n  let c1 = color(249, 115, 22);\n  let c2 = color(139, 92, 246);\n  // Keep amount between 0 and 1 for the usual lerpColor range.\n  let amount = constrain(${fmtV('blendAmt')}, 0, 1);\n  let mixed = lerpColor(c1, c2, amount);\n  ${strokeLine}\n  fill(mixed);\n  ellipse(200, 200, 180, 180);\n}`;
+}
 
-      function drawHueWheel(cx, cy, r) {
-        p.push();
-        p.colorMode(p.HSB, 360, 100, 100, 1);
-        p.noStroke();
-        for (let a=0; a<360; a+=3) {
-          p.fill(a, 85, 95, 1);
-          p.arc(cx, cy, r*2, r*2, p.radians(a), p.radians(a+4), p.PIE);
-        }
-        const markerA = p.radians(state.a);
-        p.stroke(0,0,15); p.strokeWeight(4);
-        p.line(cx, cy, cx + Math.cos(markerA)*r, cy + Math.sin(markerA)*r);
-        p.colorMode(p.RGB, 255,255,255,255);
-        p.pop();
-      }
+function escapeHTML(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
-      function drawCheckerboard(x, y, w, h, size) {
-        p.push(); p.noStroke();
-        for (let yy=y; yy<y+h; yy+=size) {
-          for (let xx=x; xx<x+w; xx+=size) {
-            const on = (Math.floor((xx-x)/size) + Math.floor((yy-y)/size)) % 2 === 0;
-            p.fill(on ? 230 : 250);
-            p.rect(xx, yy, size, size);
-          }
-        }
-        p.pop();
-      }
+function updateCode() {
+  focusEl.innerHTML = focusHTML();
+  fullEl.innerHTML = escapeHTML(fullCodeText());
+  document.getElementById('code-note').textContent = modes[state.mode].note;
+  setTimeout(() => {
+    document.querySelectorAll('.ct.flash').forEach(el => el.classList.remove('flash'));
+  }, 500);
+}
 
-      function drawGradientBar(x, y, w, h, c1, c2) {
-        p.push(); p.noStroke();
-        for (let i=0;i<w;i++) {
-          const amt = i / Math.max(1, w-1);
-          p.fill(p.lerpColor(c1, c2, amt));
-          p.rect(x+i, y, 1, h);
-        }
-        p.stroke("#222"); p.strokeWeight(1); p.noFill(); p.rect(x,y,w,h,8); p.pop();
-      }
+function setText(id, value, asHTML = false) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (asHTML) el.innerHTML = value;
+  else el.textContent = value;
+}
 
-      function drawReadoutCards() {
-        let cards;
-        if (state.mode === "hsb") {
-          cards = [
-            { label:"hue", value:Math.round(state.a), color:"#7c3aed" },
-            { label:"sat", value:Math.round(state.b), color:"#e11d48" },
-            { label:"bright", value:Math.round(state.c), color:"#f59e0b" }
-          ];
-        } else if (state.mode === "lerp") {
-          cards = [
-            { label:"amount", value:state.a.toFixed(2), color:"#16a34a" },
-            { label:"start", value:Math.round(state.b), color:"#e11d48" },
-            { label:"end", value:Math.round(state.c), color:"#0891b2" }
-          ];
-        } else {
-          cards = [
-            { label:"red/gray", value:Math.round(state.a), color:"#e11d48" },
-            { label:"green", value:Math.round(state.b), color:"#16a34a" },
-            { label:"blue", value:Math.round(state.c), color:"#0891b2" }
-          ];
-        }
-        const cardW=Math.min(176,(p.width-70)/cards.length); const y=p.height-168; const x=28;
-        p.push();
-        for(let i=0;i<cards.length;i++){
-          const cx=x+i*(cardW+10);
-          p.noStroke(); p.fill(255,255,255,235); p.rect(cx,y,cardW,62,14);
-          p.fill(cards[i].color); p.textStyle(p.BOLD); p.textSize(13); p.text(cards[i].label,cx+12,y+22);
-          p.fill("#222"); p.textSize(18); p.text(String(cards[i].value),cx+12,y+48);
-        }
-        p.pop();
-      }
+function setMode(modeName) {
+  state.mode = modeName;
+  state.changedKey = modes[modeName].controls[0].key;
 
-      function drawLabel(text,x,y,color,size=13){
-        p.push(); p.textSize(size); p.textStyle(p.BOLD); const padX=7,padY=4,tw=p.textWidth(text);
-        p.noStroke(); p.fill(255,250,242,238); p.rect(x-padX,y-size-padY+3,tw+padX*2,size+padY*2,9);
-        p.fill(color); p.textAlign(p.LEFT,p.BASELINE); p.text(text,x,y); p.pop();
-      }
-    };
+  document.querySelectorAll('.tab').forEach(tab => {
+    const active = tab.dataset.mode === modeName;
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    tab.tabIndex = active ? 0 : -1;
+  });
 
-    new p5(sketch);
-  </script>
+  const mode = modes[modeName];
+  setText('canvas-title', mode.canvasTitle);
+  setText('canvas-sub', mode.canvasSub);
+  setText('predict-text', mode.predict);
+  setText('big-idea-text', mode.big);
+  setText('bug-text', mode.bug);
+  setText('try-text', mode.tryIt);
+  setText('prose-title', mode.proseTitle);
+  setText('prose-body', mode.proseBody, true);
+
+  buildControls();
+  buildPresets();
+  updateCode();
+  render();
+}
+
+function selectAdjacentTab(direction) {
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const currentIndex = tabs.findIndex(tab => tab.dataset.mode === state.mode);
+  const nextIndex = (currentIndex + direction + tabs.length) % tabs.length;
+  tabs[nextIndex].focus();
+  setMode(tabs[nextIndex].dataset.mode);
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => setMode(tab.dataset.mode));
+  tab.addEventListener('keydown', event => {
+    if (event.key === 'ArrowRight') { event.preventDefault(); selectAdjacentTab(1); }
+    if (event.key === 'ArrowLeft') { event.preventDefault(); selectAdjacentTab(-1); }
+    if (event.key === 'Home') { event.preventDefault(); const first = document.querySelector('.tab'); first.focus(); setMode(first.dataset.mode); }
+    if (event.key === 'End') { event.preventDefault(); const tabs = document.querySelectorAll('.tab'); const last = tabs[tabs.length - 1]; last.focus(); setMode(last.dataset.mode); }
+  });
+});
+
+document.getElementById('strokeToggle').addEventListener('change', event => {
+  state.strokeOn = event.target.checked;
+  updateCode();
+  render();
+});
+
+document.getElementById('labelToggle').addEventListener('change', event => {
+  state.labelsOn = event.target.checked;
+  render();
+});
+
+document.getElementById('fullCodeToggle').addEventListener('click', function() {
+  const open = fullEl.classList.toggle('open');
+  this.textContent = open ? '▾ Hide full sketch' : '▸ See full p5.js sketch';
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) updateCode();
+});
+
+function runTests() {
+  const results = [];
+  const assert = (name, condition) => {
+    results.push({ name, passed: Boolean(condition) });
+    if (!condition) throw new Error(`Test failed: ${name}`);
+  };
+
+  assert('Canvas exists', canvas instanceof HTMLCanvasElement);
+  assert('Context exists', Boolean(ctx));
+  assert('Five modes exist', Object.keys(modes).length === 5);
+  assert('All modes have controls', Object.values(modes).every(mode => mode.controls.length > 0));
+  assert('HSB red converts to RGB red', (() => {
+    const red = hsbToRgb(0, 100, 100);
+    return red.r === 255 && red.g === 0 && red.b === 0;
+  })());
+  assert('HSB green converts to RGB green', (() => {
+    const green = hsbToRgb(120, 100, 100);
+    return green.r === 0 && green.g === 255 && green.b === 0;
+  })());
+  assert('lerpColor midpoint works', (() => {
+    const mid = lerpColorFn({ r: 0, g: 0, b: 0 }, { r: 100, g: 200, b: 50 }, 0.5);
+    return mid.r === 50 && mid.g === 100 && mid.b === 25;
+  })());
+  assert('lerpColor clamps above one', (() => {
+    const high = lerpColorFn({ r: 0, g: 0, b: 0 }, { r: 100, g: 0, b: 0 }, 99);
+    return high.r === 100;
+  })());
+  assert('mapV maps midpoint correctly', mapV(0.5, 0, 1, 0, 100) === 50);
+
+  console.info('Color bridge tests passed:', results);
+}
+
+runTests();
+setMode('gray');
+</script>
 </body>
 </html>

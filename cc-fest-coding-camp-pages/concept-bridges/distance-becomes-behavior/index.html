@@ -1,932 +1,1351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Distance Becomes Behavior</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --distance: #7c3aed;
-      --near: #e11d48;
-      --far: #0891b2;
-      --target: #f59e0b;
-      --green: #16a34a;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distance Becomes Behavior</title>
+<link rel="stylesheet" href="../concept-bridge.css">
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #315c92;
+    --accent-bg: #eef4fc;
+    --distance: #7a5ea8;
+    --target: #f3a340;
+    --near: #e07a5f;
+    --far: #81b29a;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  a { color: var(--accent); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 920px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
 
-    .controls,
-    .workspace,
-    .side-panel {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 760px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      user-select: none;
-    }
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 22px;
+  }
 
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
 
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: var(--paper);
+  }
 
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
 
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--faint);
+    margin-bottom: 5px;
+  }
 
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 106px minmax(150px, 1fr) 74px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(380px, 100%);
-    }
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
 
-    label,
-    .value-label,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
+  }
 
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
+  .main-left {
+    display: grid;
+    gap: 18px;
+    align-content: start;
+    min-width: 0;
+  }
 
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
 
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
+  .canvas-panel { overflow: hidden; }
 
-    #sketch-holder canvas { display: block; }
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
 
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
 
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
 
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
+  #distance-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+    cursor: crosshair;
+  }
 
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
 
-    .card h2 { font-size: 1.15rem; }
-    .card h3 { font-size: 1rem; }
+  .ctrl-panel { padding: 16px; }
 
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
 
-    .card p { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
 
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-    }
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #edf4ff; border-color: #90b4e2; }
 
-    .legend {
-      display: grid;
-      gap: 8px;
-    }
+  .tab .step {
+    display: block;
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
 
-    .legend-item {
-      display: grid;
-      grid-template-columns: 16px 1fr;
-      gap: 8px;
-      align-items: center;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
+  .tab[aria-selected="true"] .step { color: var(--accent); }
 
-    .swatch {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-    }
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(49,92,146,0.35);
+    outline-offset: 2px;
+  }
 
-    .swatch.distance { background: var(--distance); }
-    .swatch.near { background: var(--near); }
-    .swatch.far { background: var(--far); }
-    .swatch.target { background: var(--target); }
-    .swatch.green { background: var(--green); }
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
 
-    .code-card { display: none; }
-    .code-card.visible { display: block; }
+  .box-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
 
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
 
-    .note {
-      font-size: 0.86rem;
-      color: var(--muted);
-    }
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
 
-    @media (max-width: 980px) {
-      main { grid-template-columns: 1fr; }
-      .workspace { height: 590px; }
-    }
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
+  }
 
-    @media (max-width: 600px) {
-      header, main {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
+    display: block;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
 
-      .slider-wrap {
-        grid-template-columns: 1fr;
-        gap: 4px;
-      }
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 42px;
+    text-align: center;
+  }
 
-      .workspace { height: 540px; }
-    }
-  </style>
-  <link rel="stylesheet" href="../concept-bridge.css" />
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
+  }
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 0; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 760px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
+  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--faint);
+    flex-shrink: 0;
+    min-width: 88px;
+  }
+
+  .path-link:hover .path-link-type { color: var(--accent); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
+  .bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
+  }
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; }
+  .bottom-nav a:hover { color: var(--accent); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .main-left { gap: 18px; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
+    .bottom-nav { flex-direction: column; }
+  }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
+</style>
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · p5.js Core</p>
+  <h1>Distance Becomes Behavior</h1>
+  <p class="subtitle">
+    A concept bridge for <code>dist()</code>. Distance turns “how close?” into a number. Once closeness is a number,
+    your sketch can use it for size, brightness, collision, unlocking, ripples, and interaction.
+  </p>
+
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">hover effects</span>
+    <span class="unlock-pill">collision checks</span>
+    <span class="unlock-pill">range thresholds</span>
+    <span class="unlock-pill">distance mapping</span>
+    <span class="unlock-pill">reactive visuals</span>
   </div>
-  <header>
-    <h1>Distance Becomes Behavior</h1>
-    <p class="subtitle">
-      A concept bridge for <strong>dist()</strong>: distance turns “how close?” into a number.
-      Once closeness is a number, it can control size, color, collision, opacity, ripples, and interaction.
-    </p>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-      <div class="row">
-        <button id="mode-measure" class="active">Measure</button>
-        <button id="mode-size">Distance → Size</button>
-        <button id="mode-brightness">Distance → Brightness</button>
-        <button id="mode-collision">Collision</button>
-        <button id="mode-ripple">Ripple Field</button>
-        <button id="reset-button">Reset</button>
-        <span id="mode-pill" class="pill">dist() measures between two points</span>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text"><code>dist()</code> is just a measurement tool, useful for math class but not for making a sketch feel alive.</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text"><code>dist()</code> becomes a behavior trigger. Closeness can control size, color, collision, unlocking, and whole fields of motion.</div>
+    </div>
+  </section>
+
+  <section class="main-grid" aria-label="Interactive distance concept bridge">
+    <div class="main-left">
+      <article class="panel canvas-panel">
+        <div class="canvas-bar">
+          <div class="canvas-bar-title" id="canvas-title">Measure: how far is the pointer from the target?</div>
+          <div class="canvas-bar-sub" id="canvas-sub">Move inside the canvas. Drag the gold target to place the second point.</div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="distance-canvas" width="620" height="420" aria-label="Interactive distance visualization"></canvas>
+          <div class="touch-hint">Touch and drag the gold target, then use the controls on the right to explore.</div>
+        </div>
+      </article>
+
+      <section class="prose-section">
+        <h2 id="prose-title">Distance is input for decisions and feeling</h2>
+        <p id="prose-body">Once you have <code>let d = dist(...)</code>, your sketch can react to the world. That one number can become scale, brightness, collision, a locked door, or a whole ripple field. The geometry stays the same while the meaning changes.</p>
+      </section>
+
+      <div class="legend" aria-label="distance concept legend">
+        <div class="legend-item"><span class="swatch" style="background:#7a5ea8"></span>distance line</div>
+        <div class="legend-item"><span class="swatch" style="background:#f3a340"></span>target point</div>
+        <div class="legend-item"><span class="swatch" style="background:#e07a5f"></span>near / active</div>
+        <div class="legend-item"><span class="swatch" style="background:#81b29a"></span>far / inactive</div>
+        <div class="legend-item"><span class="swatch" style="background:#315c92"></span>mapped behavior</div>
       </div>
 
-      <div class="row">
-        <div class="slider-wrap">
-          <label for="target-x-slider">target x</label>
-          <input id="target-x-slider" type="range" min="80" max="720" value="390" step="1" />
-          <span id="target-x-value" class="value-label">390</span>
+      <section class="pathways" aria-label="Practice and remix links">
+        <div class="pathways-title">What's next</div>
+        <div class="path-links">
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/collision-detection-explorer/" class="path-link">
+            <span class="path-link-type">Practice →</span>
+            <span class="path-link-name">Collision Detection Explorer — use distance as a full workshop tool for collisions and interactive play</span>
+            <span class="path-link-arrow">›</span>
+          </a>
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/simple-collision-game/" class="path-link">
+            <span class="path-link-type">Remix →</span>
+            <span class="path-link-name">Simple Collision Game Seed — turn one distance check into a mini game loop</span>
+            <span class="path-link-arrow">›</span>
+          </a>
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/map-range-translator/" class="path-link">
+            <span class="path-link-type">Related →</span>
+            <span class="path-link-name">map() Range Translator — turn the distance number into size, brightness, opacity, or motion</span>
+            <span class="path-link-arrow">›</span>
+          </a>
         </div>
-        <div class="slider-wrap">
-          <label for="target-y-slider">target y</label>
-          <input id="target-y-slider" type="range" min="90" max="460" value="270" step="1" />
-          <span id="target-y-value" class="value-label">270</span>
-        </div>
-        <div class="slider-wrap">
-          <label for="range-slider">active range</label>
-          <input id="range-slider" type="range" min="50" max="320" value="190" step="1" />
-          <span id="range-value" class="value-label">190</span>
-        </div>
+      </section>
+    </div>
+
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="distance modes">
+        <button class="tab" role="tab" data-mode="measure" aria-selected="true" tabindex="0">Measure<span class="step">1 of 6</span></button>
+        <button class="tab" role="tab" data-mode="size" aria-selected="false" tabindex="-1">Size<span class="step">2 of 6</span></button>
+        <button class="tab" role="tab" data-mode="brightness" aria-selected="false" tabindex="-1">Brightness<span class="step">3 of 6</span></button>
+        <button class="tab" role="tab" data-mode="collision" aria-selected="false" tabindex="-1">Collision<span class="step">4 of 6</span></button>
+        <button class="tab" role="tab" data-mode="door" aria-selected="false" tabindex="-1">Door Lock<span class="step">5 of 6</span></button>
+        <button class="tab" role="tab" data-mode="ripple" aria-selected="false" tabindex="-1">Ripple<span class="step">6 of 6</span></button>
+      </nav>
+
+      <div class="predict">
+        <span class="box-label">Predict before changing</span>
+        <span class="box-body" id="predict-text">Before you move anything, when do you think the distance number becomes small: when the pointer is a little closer, or only when it is almost touching?</span>
       </div>
 
-      <div class="row">
-        <span class="preset-label">Presets:</span>
-        <button class="preset-button" data-preset="center">center</button>
-        <button class="preset-button" data-preset="left">left</button>
-        <button class="preset-button" data-preset="corner">corner</button>
-        <button class="preset-button" data-preset="wide">wide range</button>
-        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      <div class="ctrl-group" id="controls"></div>
+      <div id="presets-area"></div>
+
+      <div class="switches">
+        <label class="sw"><input type="checkbox" id="showRangeToggle" checked> Show range circle</label>
+        <label class="sw"><input type="checkbox" id="showLabelsToggle" checked> Show labels</label>
       </div>
-    </section>
 
-    <section class="workspace">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        Move your mouse inside the canvas. dist() measures the distance from the mouse to the target point.
+      <div class="code-section">
+        <div class="code-header"><span>Live code</span><span id="code-note">dist() gives one usable number: how far apart are these points?</span></div>
+        <div class="code-focus-line mono" id="focus-code"></div>
+        <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">▸ See full p5.js sketch</button>
+        <div class="full-code-body mono" id="full-code"></div>
       </div>
-    </section>
 
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">dist() measures between two points</h2>
-        <p id="lesson-text">
-          dist(x1, y1, x2, y2) returns the distance between two positions. In interactive sketches, that often means “how close is the mouse to something?”
-        </p>
-        <span id="formula-box" class="formula">let d = dist(mouseX, mouseY, targetX, targetY);</span>
-      </section>
+      <div class="callout big-idea">
+        <span class="box-label">Big idea</span>
+        <span class="box-body" id="big-idea-text"></span>
+      </div>
 
-      <section class="card">
-        <h3>Big idea</h3>
-        <p><strong>dist()</strong> turns nearness into a number.</p>
-        <p><strong>map()</strong> can turn that distance number into size, color, opacity, or motion.</p>
-        <p><strong>Collision</strong> happens when distance is smaller than two radii combined.</p>
-      </section>
+      <div class="callout bug">
+        <span class="box-label">⚠ Common mistake</span>
+        <span class="box-body" id="bug-text"></span>
+      </div>
 
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch target"></span><span>target object</span></div>
-          <div class="legend-item"><span class="swatch distance"></span><span>distance line</span></div>
-          <div class="legend-item"><span class="swatch near"></span><span>near / strong effect</span></div>
-          <div class="legend-item"><span class="swatch far"></span><span>far / weak effect</span></div>
-          <div class="legend-item"><span class="swatch green"></span><span>active range or collision zone</span></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">Move the mouse closer to the target. What happens to the distance number?</p>
-      </section>
-
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code id="code-box">let d = dist(mouseX, mouseY, targetX, targetY);</code></pre>
-        <p class="note">
-          dist() is based on the distance formula. In p5.js, it is useful because it turns spatial relationships into a number your code can use.
-        </p>
-      </section>
+      <div class="callout try">
+        <span class="box-label">Try this</span>
+        <span class="box-body" id="try-text"></span>
+      </div>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    const state = {
-      mode: "measure",
-      targetX: 390,
-      targetY: 270,
-      activeRange: 190,
-      showLabels: true,
-      showCode: false,
-      pointerX: 190,
-      pointerY: 230
-    };
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/map-range-translator/">← Previous: map() Range Translator</a>
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/conditionals-code-makes-choices/">Next: Conditionals: Code Makes Choices →</a>
+  </nav>
+</main>
 
-    const els = {};
+<script>
+'use strict';
 
-    function setupUI() {
-      els.modeMeasure = document.querySelector("#mode-measure");
-      els.modeSize = document.querySelector("#mode-size");
-      els.modeBrightness = document.querySelector("#mode-brightness");
-      els.modeCollision = document.querySelector("#mode-collision");
-      els.modeRipple = document.querySelector("#mode-ripple");
-      els.resetButton = document.querySelector("#reset-button");
-      els.modePill = document.querySelector("#mode-pill");
-      els.targetXSlider = document.querySelector("#target-x-slider");
-      els.targetYSlider = document.querySelector("#target-y-slider");
-      els.rangeSlider = document.querySelector("#range-slider");
-      els.targetXValue = document.querySelector("#target-x-value");
-      els.targetYValue = document.querySelector("#target-y-value");
-      els.rangeValue = document.querySelector("#range-value");
-      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
-      els.showLabels = document.querySelector("#show-labels");
-      els.showCode = document.querySelector("#show-code");
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.formulaBox = document.querySelector("#formula-box");
-      els.questionText = document.querySelector("#question-text");
-      els.caption = document.querySelector("#canvas-caption");
-      els.codeCard = document.querySelector("#code-card");
-      els.codeBox = document.querySelector("#code-box");
+const state = {
+  mode: "measure",
+  targetX: 410,
+  targetY: 210,
+  range: 150,
+  pointerX: 190,
+  pointerY: 270,
+  pointerInside: true,
+  draggingTarget: false,
+  showRange: true,
+  showLabels: true,
+  changedKey: "range"
+};
 
-      els.modeMeasure.addEventListener("click", () => setMode("measure"));
-      els.modeSize.addEventListener("click", () => setMode("size"));
-      els.modeBrightness.addEventListener("click", () => setMode("brightness"));
-      els.modeCollision.addEventListener("click", () => setMode("collision"));
-      els.modeRipple.addEventListener("click", () => setMode("ripple"));
+const modes = {
+  measure: {
+    canvasTitle: "Measure: how far is the pointer from the target?",
+    canvasSub: "Move inside the canvas. Drag the gold target to place the second point.",
+    predict: "Before you move anything, when do you think the distance number becomes small: when the pointer is a little closer, or only when it is almost touching?",
+    big: "dist() gives one useful number: how far apart are two positions? That number becomes input for the rest of your sketch.",
+    bug: "A common mistake is thinking <code>dist()</code> changes the sketch by itself. It does not. It only returns a number. You still decide what behavior that number should control.",
+    tryIt: "Move the target to a corner, then compare the distance when the pointer is nearby versus across the canvas.",
+    note: "Measure closeness with dist().",
+    proseTitle: "Distance is a question your sketch can ask every frame",
+    proseBody: "The question is simple: how far is this thing from that thing? Once your sketch knows the answer as a number, it can use that answer for behavior.",
+    controls: [
+      { key: "range", label: "Reference range", code: "activeRange", min: 50, max: 240, step: 1 },
+      { key: "targetX", label: "Target x", code: "targetX", min: 100, max: 520, step: 1 },
+      { key: "targetY", label: "Target y", code: "targetY", min: 90, max: 330, step: 1 }
+    ],
+    presets: [
+      { label: "Center target", v: { targetX: 410, targetY: 210, range: 150 } },
+      { label: "Left wall", v: { targetX: 200, targetY: 210, range: 150 } },
+      { label: "Top corner", v: { targetX: 175, targetY: 125, range: 150 } },
+      { label: "Long reach", v: { targetX: 430, targetY: 210, range: 220 } }
+    ]
+  },
+  size: {
+    canvasTitle: "Size: the closer you are, the larger the response",
+    canvasSub: "Distance becomes a value that can drive scale.",
+    predict: "Before you move closer, do you think the circle should grow steadily, or only jump in size near the target?",
+    big: "Once distance becomes a number, <code>map()</code> can turn that number into size. Near can mean big. Far can mean small.",
+    bug: "Learners often expect the effect to stop exactly at the range edge. If you do not constrain the mapped value, it can keep shrinking or growing outside the intended zone.",
+    tryIt: "Move the target and ask: where does the growth feel strongest? What range makes it feel gentle instead of dramatic?",
+    note: "Map distance into size.",
+    proseTitle: "One measurement can become visible behavior",
+    proseBody: "The distance line is invisible in many finished sketches. Instead of seeing the number directly, you feel it through scale, softness, brightness, or reaction.",
+    controls: [
+      { key: "range", label: "Active range", code: "activeRange", min: 50, max: 260, step: 1 },
+      { key: "targetX", label: "Target x", code: "targetX", min: 100, max: 520, step: 1 },
+      { key: "targetY", label: "Target y", code: "targetY", min: 90, max: 330, step: 1 }
+    ],
+    presets: [
+      { label: "Gentle scaling", v: { targetX: 410, targetY: 210, range: 200 } },
+      { label: "Tight hotspot", v: { targetX: 410, targetY: 210, range: 100 } },
+      { label: "Off-center", v: { targetX: 240, targetY: 180, range: 150 } },
+      { label: "⚠ Huge field", v: { targetX: 410, targetY: 210, range: 260 }, isBreak: true }
+    ]
+  },
+  brightness: {
+    canvasTitle: "Brightness: closeness can become light",
+    canvasSub: "The same distance number can drive color intensity instead of size.",
+    predict: "Before moving the pointer, do you think a brighter response should happen only inside the ring, or fade gradually as you approach?",
+    big: "dist() is not tied to geometry alone. The same measured value can become brightness, alpha, color temperature, or glow.",
+    bug: "A common mistake is treating color changes as separate from math. They are just number changes. Distance gives the number. Your sketch chooses what that number means visually.",
+    tryIt: "Find a target position where the glow feels dramatic, then soften it by increasing the range.",
+    note: "Map distance into brightness.",
+    proseTitle: "Distance can feel like atmosphere",
+    proseBody: "Hover states, glows, ghost trails, and spotlight effects often come from measured closeness. The geometry becomes mood.",
+    controls: [
+      { key: "range", label: "Glow range", code: "activeRange", min: 50, max: 260, step: 1 },
+      { key: "targetX", label: "Target x", code: "targetX", min: 100, max: 520, step: 1 },
+      { key: "targetY", label: "Target y", code: "targetY", min: 90, max: 330, step: 1 }
+    ],
+    presets: [
+      { label: "Soft glow", v: { targetX: 410, targetY: 210, range: 200 } },
+      { label: "Hot center", v: { targetX: 410, targetY: 210, range: 100 } },
+      { label: "Wide field", v: { targetX: 260, targetY: 210, range: 240 } },
+      { label: "⚠ Narrow flash", v: { targetX: 410, targetY: 210, range: 60 }, isBreak: true }
+    ]
+  },
+  collision: {
+    canvasTitle: "Collision: touching is a distance comparison",
+    canvasSub: "Two circles collide when the distance between centers is smaller than their radii combined.",
+    predict: "Before you touch the target, when do you think the collision should turn true: when edges overlap, or when centers overlap?",
+    big: "Collision is often not a special built-in feature. It is a distance question: are the centers close enough for the edges to touch?",
+    bug: "A common mistake is comparing the distance to one radius instead of the sum of both radii. Touching depends on both circles.",
+    tryIt: "Move the target and predict exactly where the collision flips from false to true before you cross the edge.",
+    note: "Compare distance to combined radii.",
+    proseTitle: "Touching is a threshold, not a mystery",
+    proseBody: "When the pointer circle and target circle overlap, the sketch is really checking one relationship: is <code>d &lt; r1 + r2</code>?",
+    controls: [
+      { key: "range", label: "Guide range", code: "guideRange", min: 50, max: 220, step: 1 },
+      { key: "targetX", label: "Target x", code: "targetX", min: 100, max: 520, step: 1 },
+      { key: "targetY", label: "Target y", code: "targetY", min: 90, max: 330, step: 1 }
+    ],
+    presets: [
+      { label: "Center test", v: { targetX: 410, targetY: 210, range: 150 } },
+      { label: "Near edge", v: { targetX: 500, targetY: 210, range: 150 } },
+      { label: "High target", v: { targetX: 410, targetY: 140, range: 150 } },
+      { label: "⚠ Tight path", v: { targetX: 410, targetY: 210, range: 90 }, isBreak: true }
+    ]
+  },
+  door: {
+    canvasTitle: "Door Lock: distance can unlock a threshold",
+    canvasSub: "This is the same distance math, but now the metaphor is a door that opens when you enter the radius.",
+    predict: "Before you move inside the ring, when do you think the door should switch state: gradually, or at one exact threshold?",
+    big: "This is the real-world shape of many distance checks. A trigger zone, collectible, hover state, or proximity alarm is a threshold built on distance.",
+    bug: "A common mistake is expecting an on/off threshold to feel gradual. If you want a smooth response, map the distance. If you want a switch, compare it directly.",
+    tryIt: "Try a tiny lock zone and then a wide one. Which one feels forgiving? Which one feels game-like?",
+    note: "Compare distance to a trigger radius.",
+    proseTitle: "A threshold is one clean comparison",
+    proseBody: "Not every behavior needs a smooth ramp. Sometimes you only want to know whether the pointer is inside the zone or not. That is still distance becoming behavior.",
+    controls: [
+      { key: "range", label: "Unlock radius", code: "unlockRadius", min: 50, max: 240, step: 1 },
+      { key: "targetX", label: "Door x", code: "doorX", min: 100, max: 520, step: 1 },
+      { key: "targetY", label: "Door y", code: "doorY", min: 90, max: 330, step: 1 }
+    ],
+    presets: [
+      { label: "Door in center", v: { targetX: 410, targetY: 210, range: 120 } },
+      { label: "Narrow unlock", v: { targetX: 410, targetY: 210, range: 80 } },
+      { label: "Wide unlock", v: { targetX: 410, targetY: 210, range: 180 } },
+      { label: "Side doorway", v: { targetX: 260, targetY: 210, range: 120 } }
+    ]
+  },
+  ripple: {
+    canvasTitle: "Ripple: many points can measure distance from one target",
+    canvasSub: "Each dot asks the same dist() question, creating rings and fields.",
+    predict: "Before you move the target, what do you think will happen to the rings: will they stretch, follow, or stay fixed?",
+    big: "Loops plus <code>dist()</code> create fields. Each point measures itself against the same target, and the whole surface responds together.",
+    bug: "Learners often see a ripple field as a separate visual trick. Underneath, each dot is just using the same distance formula with different x and y positions.",
+    tryIt: "Move the target near an edge. How does the pattern change when the distances to nearby dots become uneven?",
+    note: "Many dots use dist() together.",
+    proseTitle: "The same question repeated becomes a pattern",
+    proseBody: "One measured relationship creates one behavior. A grid of measured relationships creates a field. That is how distance grows from one interaction into a full generative system.",
+    controls: [
+      { key: "range", label: "Field influence", code: "fieldRange", min: 70, max: 260, step: 1 },
+      { key: "targetX", label: "Target x", code: "targetX", min: 100, max: 520, step: 1 },
+      { key: "targetY", label: "Target y", code: "targetY", min: 90, max: 330, step: 1 }
+    ],
+    presets: [
+      { label: "Centered field", v: { targetX: 410, targetY: 210, range: 150 } },
+      { label: "Wide echo", v: { targetX: 410, targetY: 210, range: 240 } },
+      { label: "Offset pulse", v: { targetX: 270, targetY: 170, range: 150 } },
+      { label: "⚠ Dense wave", v: { targetX: 410, targetY: 210, range: 90 }, isBreak: true }
+    ]
+  }
+};
 
-      els.resetButton.addEventListener("click", () => {
-        state.targetX = 390;
-        state.targetY = 270;
-        state.activeRange = 190;
-        state.pointerX = 190;
-        state.pointerY = 230;
-        updateUI();
-      });
+const canvas = document.getElementById("distance-canvas");
+const ctx = canvas.getContext("2d");
 
-      els.targetXSlider.addEventListener("input", () => {
-        state.targetX = Number(els.targetXSlider.value);
-        updateUI();
-      });
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
 
-      els.targetYSlider.addEventListener("input", () => {
-        state.targetY = Number(els.targetYSlider.value);
-        updateUI();
-      });
+function dist(x1, y1, x2, y2) {
+  return Math.hypot(x2 - x1, y2 - y1);
+}
 
-      els.rangeSlider.addEventListener("input", () => {
-        state.activeRange = Number(els.rangeSlider.value);
-        updateUI();
-      });
+function mapValue(value, inMin, inMax, outMin, outMax) {
+  const t = (value - inMin) / (inMax - inMin);
+  return outMin + t * (outMax - outMin);
+}
 
-      els.presetButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const preset = button.dataset.preset;
-          if (preset === "center") {
-            state.targetX = 390;
-            state.targetY = 270;
-          } else if (preset === "left") {
-            state.targetX = 210;
-            state.targetY = 270;
-          } else if (preset === "corner") {
-            state.targetX = 170;
-            state.targetY = 150;
-          } else if (preset === "wide") {
-            state.activeRange = 300;
-          }
-          updateUI();
-        });
-      });
+function roundedRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
 
-      els.showLabels.addEventListener("change", () => {
-        state.showLabels = els.showLabels.checked;
-      });
+function drawLabel(text, x, y, color) {
+  if (!state.showLabels) return;
+  ctx.save();
+  ctx.font = "700 13px 'DM Sans', sans-serif";
+  const padX = 7;
+  const tw = ctx.measureText(text).width;
+  ctx.fillStyle = "rgba(255, 250, 242, 0.94)";
+  roundedRect(x - padX, y - 18, tw + padX * 2, 24, 9);
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
 
-      els.showCode.addEventListener("change", () => {
-        state.showCode = els.showCode.checked;
-        updateUI();
-      });
+function createToken(className, text) {
+  return `<span class="ct ${className}">${text}</span>`;
+}
 
-      updateUI();
+function getDistance() {
+  return dist(state.pointerX, state.pointerY, state.targetX, state.targetY);
+}
+
+function renderFocusCode() {
+  const d = getDistance();
+  const key = state.changedKey;
+  const flash = (tokenKey, className, text) => createToken(`${className}${key === tokenKey ? " flash" : ""}`, text);
+  let line = "";
+
+  if (state.mode === "measure") {
+    line = `${createToken("kw", "let")} d = ${createToken("fn", "dist")}(mouseX, mouseY, ${flash("targetX", "num", Math.round(state.targetX))}, ${flash("targetY", "num", Math.round(state.targetY))});\n` +
+      `${createToken("cm", "// d is how far apart the pointer and target are")}`;
+  } else if (state.mode === "size") {
+    line = `${createToken("kw", "let")} d = ${createToken("fn", "dist")}(mouseX, mouseY, targetX, targetY);\n` +
+      `${createToken("kw", "let")} size = ${createToken("fn", "map")}(d, 0, ${flash("range", "num", Math.round(state.range))}, 120, 24);\n` +
+      `${createToken("fn", "circle")}(targetX, targetY, ${flash("range", "str", "size")});`;
+  } else if (state.mode === "brightness") {
+    line = `${createToken("kw", "let")} d = ${createToken("fn", "dist")}(mouseX, mouseY, targetX, targetY);\n` +
+      `${createToken("kw", "let")} brightness = ${createToken("fn", "map")}(d, 0, ${flash("range", "num", Math.round(state.range))}, 255, 40);\n` +
+      `${createToken("fn", "fill")}(${flash("range", "str", "brightness")});`;
+  } else if (state.mode === "collision") {
+    line = `${createToken("kw", "let")} d = ${createToken("fn", "dist")}(mouseX, mouseY, targetX, targetY);\n` +
+      `${createToken("kw", "let")} touching = d < mouseRadius + targetRadius;\n` +
+      `${createToken("kw", "if")} (touching) { ${createToken("cm", "/* collision is true */")} }`;
+  } else if (state.mode === "door") {
+    line = `${createToken("kw", "let")} d = ${createToken("fn", "dist")}(mouseX, mouseY, doorX, doorY);\n` +
+      `${createToken("kw", "let")} unlocked = d < ${flash("range", "num", Math.round(state.range))};\n` +
+      `${createToken("kw", "if")} (unlocked) { ${createToken("str", "doorOpen = true")} }`;
+  } else {
+    line = `${createToken("kw", "for")} (${createToken("kw", "let")} x = 80; x < width - 60; x += 34) {\n` +
+      `  ${createToken("kw", "for")} (${createToken("kw", "let")} y = 118; y < height - 44; y += 34) {\n` +
+      `    ${createToken("kw", "let")} d = ${createToken("fn", "dist")}(x, y, targetX, targetY);\n` +
+      `    ${createToken("kw", "let")} size = ${createToken("fn", "map")}(Math.sin(d * 0.05), -1, 1, 4, 22);\n` +
+      `  }\n}`;
+  }
+
+  document.getElementById("focus-code").innerHTML = line;
+  document.getElementById("code-note").textContent = modes[state.mode].note;
+
+  const fullCode = [
+    "function draw() {",
+    "  let d = dist(mouseX, mouseY, targetX, targetY);",
+    state.mode === "size" ? `  let size = map(d, 0, ${Math.round(state.range)}, 120, 24);` : "",
+    state.mode === "brightness" ? `  let brightness = map(d, 0, ${Math.round(state.range)}, 255, 40);` : "",
+    state.mode === "collision" ? "  let touching = d < mouseRadius + targetRadius;" : "",
+    state.mode === "door" ? `  let unlocked = d < ${Math.round(state.range)};` : "",
+    state.mode === "ripple" ? "  // each dot asks dist(x, y, targetX, targetY)" : "",
+    "}"
+  ].filter(Boolean).join("\n");
+  document.getElementById("full-code").textContent = fullCode;
+}
+
+function makeControl(control) {
+  const row = document.createElement("div");
+  row.className = "ctrl-row";
+  row.innerHTML = `
+    <label for="ctrl-${control.key}">
+      ${control.label}
+      <small>${control.code}</small>
+    </label>
+    <span class="val-badge" id="val-${control.key}"></span>
+    <input id="ctrl-${control.key}" type="range" min="${control.min}" max="${control.max}" step="${control.step}" value="${state[control.key]}">
+  `;
+  const input = row.querySelector("input");
+  input.addEventListener("input", () => {
+    state[control.key] = Number(input.value);
+    state.changedKey = control.key;
+    renderUI();
+  });
+  return row;
+}
+
+function renderControls() {
+  const controlsEl = document.getElementById("controls");
+  controlsEl.innerHTML = "";
+  modes[state.mode].controls.forEach((control) => controlsEl.appendChild(makeControl(control)));
+  modes[state.mode].controls.forEach((control) => {
+    document.getElementById(`val-${control.key}`).textContent = Number(state[control.key]).toFixed(control.step < 1 ? 1 : 0);
+  });
+}
+
+function renderPresets() {
+  const area = document.getElementById("presets-area");
+  const mode = modes[state.mode];
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = `<div class="presets-label">Teaching presets</div>`;
+  const row = document.createElement("div");
+  row.className = "preset-row";
+  mode.presets.forEach((preset) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `preset-btn${preset.isBreak ? " break" : ""}`;
+    btn.textContent = preset.label;
+    btn.addEventListener("click", () => {
+      Object.entries(preset.v).forEach(([key, value]) => { state[key] = value; });
+      state.changedKey = Object.keys(preset.v)[0];
+      renderUI();
+    });
+    row.appendChild(btn);
+  });
+  wrapper.appendChild(row);
+  area.innerHTML = "";
+  area.appendChild(wrapper);
+}
+
+function drawSceneBase(w, h) {
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "#fffaf2";
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.strokeStyle = "#ece5d8";
+  ctx.lineWidth = 1;
+  for (let x = 0; x < w; x += 32) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let y = 0; y < h; y += 32) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+}
+
+function drawPointerAndTarget(d) {
+  if (state.showRange) {
+    ctx.save();
+    ctx.strokeStyle = "rgba(122, 94, 168, 0.26)";
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(state.targetX, state.targetY, state.range, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.strokeStyle = "#7a5ea8";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(state.pointerX, state.pointerY);
+  ctx.lineTo(state.targetX, state.targetY);
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.fillStyle = "#315c92";
+  ctx.beginPath();
+  ctx.arc(state.pointerX, state.pointerY, 16, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#f3a340";
+  ctx.beginPath();
+  ctx.arc(state.targetX, state.targetY, 18, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#7b4a0f";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  drawLabel(`pointer`, state.pointerX - 20, state.pointerY - 24, "#315c92");
+  drawLabel(`target`, state.targetX - 18, state.targetY - 28, "#7b4a0f");
+  drawLabel(`d = ${d.toFixed(1)}`, (state.pointerX + state.targetX) / 2 - 28, (state.pointerY + state.targetY) / 2 - 12, "#7a5ea8");
+}
+
+function drawDemoArea(w, h) {
+  const x = 46;
+  const y = h - 122;
+  const width = w - 92;
+  const height = 84;
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  roundedRect(x, y, width, height, 18);
+  ctx.fill();
+  return { x, y, width, height };
+}
+
+function drawMeasureMode(w, h, d) {
+  drawPointerAndTarget(d);
+  const demo = drawDemoArea(w, h);
+  ctx.fillStyle = "#222";
+  ctx.font = "700 17px 'DM Sans', sans-serif";
+  ctx.fillText("Distance readout", demo.x + 18, demo.y + 26);
+  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.fillStyle = "#6b6258";
+  ctx.fillText("dist() returns one number. The rest of your sketch decides what that number means.", demo.x + 18, demo.y + 46);
+  ctx.font = "800 28px 'DM Mono', monospace";
+  ctx.fillStyle = "#7a5ea8";
+  ctx.fillText(`${d.toFixed(1)}`, demo.x + 18, demo.y + 72);
+}
+
+function drawSizeMode(w, h, d) {
+  drawPointerAndTarget(d);
+  const size = clamp(mapValue(d, 0, state.range, 120, 24), 24, 120);
+  const demo = drawDemoArea(w, h);
+  ctx.fillStyle = "#315c92";
+  ctx.beginPath();
+  ctx.arc(demo.x + demo.width * 0.72, demo.y + demo.height / 2, size / 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#222";
+  ctx.font = "700 17px 'DM Sans', sans-serif";
+  ctx.fillText("Mapped size", demo.x + 18, demo.y + 26);
+  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.fillStyle = "#6b6258";
+  ctx.fillText("Near distance → large circle. Far distance → small circle.", demo.x + 18, demo.y + 46);
+  drawLabel(`size = ${size.toFixed(1)}`, demo.x + demo.width * 0.72 - 38, demo.y + demo.height - 10, "#315c92");
+}
+
+function drawBrightnessMode(w, h, d) {
+  drawPointerAndTarget(d);
+  const brightness = clamp(mapValue(d, 0, state.range, 255, 40), 40, 255);
+  const demo = drawDemoArea(w, h);
+  ctx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
+  ctx.beginPath();
+  ctx.arc(demo.x + demo.width * 0.72, demo.y + demo.height / 2, 40, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#222";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = "#222";
+  ctx.font = "700 17px 'DM Sans', sans-serif";
+  ctx.fillText("Mapped brightness", demo.x + 18, demo.y + 26);
+  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.fillStyle = "#6b6258";
+  ctx.fillText("The same distance number can become a glow instead of a size.", demo.x + 18, demo.y + 46);
+  drawLabel(`brightness = ${brightness.toFixed(1)}`, demo.x + demo.width * 0.72 - 54, demo.y + demo.height - 10, "#222");
+}
+
+function drawCollisionMode(w, h, d) {
+  const targetRadius = 32;
+  const pointerRadius = 26;
+  const touching = d < targetRadius + pointerRadius;
+  if (state.showRange) {
+    ctx.save();
+    ctx.strokeStyle = "rgba(122, 94, 168, 0.18)";
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(state.targetX, state.targetY, targetRadius + pointerRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.strokeStyle = "#7a5ea8";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(state.pointerX, state.pointerY);
+  ctx.lineTo(state.targetX, state.targetY);
+  ctx.stroke();
+  ctx.fillStyle = touching ? "#e07a5f" : "#315c92";
+  ctx.beginPath();
+  ctx.arc(state.pointerX, state.pointerY, pointerRadius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = touching ? "#e07a5f" : "#f3a340";
+  ctx.beginPath();
+  ctx.arc(state.targetX, state.targetY, targetRadius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = touching ? "#9b271c" : "#7b4a0f";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  drawLabel(touching ? "collision!" : "not touching", state.targetX - 48, state.targetY + targetRadius + 30, touching ? "#9b271c" : "#315c92");
+  drawLabel(`d < ${targetRadius + pointerRadius}?`, state.targetX + 38, state.targetY - targetRadius - 18, "#2a5e3e");
+
+  const demo = drawDemoArea(w, h);
+  ctx.fillStyle = "#222";
+  ctx.font = "700 17px 'DM Sans', sans-serif";
+  ctx.fillText("Collision threshold", demo.x + 18, demo.y + 26);
+  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.fillStyle = "#6b6258";
+  ctx.fillText("Touching turns true when the center distance is smaller than both radii added together.", demo.x + 18, demo.y + 46);
+  ctx.font = "800 24px 'DM Mono', monospace";
+  ctx.fillStyle = touching ? "#9b271c" : "#315c92";
+  ctx.fillText(touching ? "true" : "false", demo.x + 18, demo.y + 72);
+}
+
+function drawDoorMode(w, h, d) {
+  const unlocked = d < state.range;
+  if (state.showRange) {
+    ctx.save();
+    ctx.strokeStyle = unlocked ? "rgba(129, 178, 154, 0.52)" : "rgba(224, 122, 95, 0.32)";
+    ctx.setLineDash([8, 8]);
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(state.targetX, state.targetY, state.range, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  ctx.strokeStyle = "#7a5ea8";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(state.pointerX, state.pointerY);
+  ctx.lineTo(state.targetX, state.targetY);
+  ctx.stroke();
+
+  ctx.fillStyle = "#315c92";
+  ctx.beginPath();
+  ctx.arc(state.pointerX, state.pointerY, 16, 0, Math.PI * 2);
+  ctx.fill();
+
+  const doorX = state.targetX - 34;
+  const doorY = state.targetY - 56;
+  ctx.fillStyle = unlocked ? "#81b29a" : "#e07a5f";
+  roundedRect(doorX, doorY, 68, 112, 14);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(doorX + 48, state.targetY, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.font = "800 26px 'DM Sans', sans-serif";
+  ctx.fillText(unlocked ? "✓" : "🔒", doorX + 24, doorY + 34);
+  drawLabel(unlocked ? "inside unlock zone" : "outside unlock zone", state.targetX - 58, doorY - 12, unlocked ? "#2a5e3e" : "#9b271c");
+
+  const demo = drawDemoArea(w, h);
+  ctx.fillStyle = "#222";
+  ctx.font = "700 17px 'DM Sans', sans-serif";
+  ctx.fillText("Distance as a real threshold", demo.x + 18, demo.y + 26);
+  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.fillStyle = "#6b6258";
+  ctx.fillText("This is the same math as a trigger zone, collectible pickup, hover state, or alarm radius.", demo.x + 18, demo.y + 46);
+  ctx.font = "800 24px 'DM Mono', monospace";
+  ctx.fillStyle = unlocked ? "#2a5e3e" : "#9b271c";
+  ctx.fillText(unlocked ? "door = unlocked" : "door = locked", demo.x + 18, demo.y + 72);
+}
+
+function drawRippleMode(w, h) {
+  for (let x = 70; x < w - 52; x += 34) {
+    for (let y = 96; y < h - 130; y += 34) {
+      const d = dist(x, y, state.targetX, state.targetY);
+      const ripple = Math.sin((d / Math.max(30, state.range)) * Math.PI * 3);
+      const size = mapValue(ripple, -1, 1, 4, 20);
+      const nearMix = clamp(1 - d / Math.max(state.range, 1), 0, 1);
+      const r = 129 + (224 - 129) * nearMix;
+      const g = 178 + (122 - 178) * nearMix;
+      const b = 154 + (95 - 154) * nearMix;
+      ctx.fillStyle = `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+      ctx.beginPath();
+      ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+      ctx.fill();
     }
+  }
+  ctx.fillStyle = "#f3a340";
+  ctx.beginPath();
+  ctx.arc(state.targetX, state.targetY, 18, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#7b4a0f";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  drawLabel("target", state.targetX - 18, state.targetY - 28, "#7b4a0f");
 
-    function setMode(mode) {
-      state.mode = mode;
-      updateUI();
+  const demo = drawDemoArea(w, h);
+  ctx.fillStyle = "#222";
+  ctx.font = "700 17px 'DM Sans', sans-serif";
+  ctx.fillText("Distance field", demo.x + 18, demo.y + 26);
+  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.fillStyle = "#6b6258";
+  ctx.fillText("Each dot asks dist(x, y, targetX, targetY). Repeating one question across a grid creates a full pattern.", demo.x + 18, demo.y + 46);
+  drawLabel("each dot uses dist()", demo.x + demo.width - 154, demo.y + 70, "#7a5ea8");
+}
+
+function renderCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const displayWidth = canvas.clientWidth || 620;
+  const displayHeight = canvas.clientHeight || 420;
+  canvas.width = Math.round(displayWidth * dpr);
+  canvas.height = Math.round(displayHeight * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const w = displayWidth;
+  const h = displayHeight;
+  const d = getDistance();
+
+  drawSceneBase(w, h);
+
+  if (state.mode === "measure") drawMeasureMode(w, h, d);
+  if (state.mode === "size") drawSizeMode(w, h, d);
+  if (state.mode === "brightness") drawBrightnessMode(w, h, d);
+  if (state.mode === "collision") drawCollisionMode(w, h, d);
+  if (state.mode === "door") drawDoorMode(w, h, d);
+  if (state.mode === "ripple") drawRippleMode(w, h, d);
+}
+
+function renderUI() {
+  const mode = modes[state.mode];
+  document.getElementById("canvas-title").textContent = mode.canvasTitle;
+  document.getElementById("canvas-sub").textContent = mode.canvasSub;
+  document.getElementById("predict-text").textContent = mode.predict;
+  document.getElementById("big-idea-text").innerHTML = mode.big;
+  document.getElementById("bug-text").innerHTML = mode.bug;
+  document.getElementById("try-text").textContent = mode.tryIt;
+  document.getElementById("prose-title").textContent = mode.proseTitle;
+  document.getElementById("prose-body").innerHTML = mode.proseBody;
+  document.querySelectorAll(".tab").forEach((tab) => {
+    const active = tab.dataset.mode === state.mode;
+    tab.setAttribute("aria-selected", String(active));
+    tab.tabIndex = active ? 0 : -1;
+  });
+  document.getElementById("showRangeToggle").checked = state.showRange;
+  document.getElementById("showLabelsToggle").checked = state.showLabels;
+  renderControls();
+  renderPresets();
+  renderFocusCode();
+  renderCanvas();
+}
+
+function setMode(modeName) {
+  state.mode = modeName;
+  state.changedKey = "range";
+  if (modeName === "measure") state.range = 150;
+  if (modeName === "size") state.range = 150;
+  if (modeName === "brightness") state.range = 150;
+  if (modeName === "collision") state.range = 150;
+  if (modeName === "door") state.range = 120;
+  if (modeName === "ripple") state.range = 150;
+  renderUI();
+}
+
+function getCanvasPoint(event) {
+  const rect = canvas.getBoundingClientRect();
+  const x = (event.clientX - rect.left) * (canvas.clientWidth / rect.width);
+  const y = (event.clientY - rect.top) * (canvas.clientHeight / rect.height);
+  return { x, y };
+}
+
+canvas.addEventListener("pointerdown", (event) => {
+  const point = getCanvasPoint(event);
+  const targetDistance = dist(point.x, point.y, state.targetX, state.targetY);
+  if (targetDistance < 28) {
+    state.draggingTarget = true;
+    canvas.setPointerCapture(event.pointerId);
+  } else {
+    state.pointerX = clamp(point.x, 24, 596);
+    state.pointerY = clamp(point.y, 24, 396);
+    state.pointerInside = true;
+    state.changedKey = "targetX";
+    renderCanvas();
+    renderFocusCode();
+  }
+});
+
+canvas.addEventListener("pointermove", (event) => {
+  const point = getCanvasPoint(event);
+  state.pointerInside = true;
+  if (state.draggingTarget) {
+    state.targetX = clamp(point.x, 80, 540);
+    state.targetY = clamp(point.y, 70, 330);
+    state.changedKey = "targetX";
+    renderUI();
+  } else {
+    state.pointerX = clamp(point.x, 24, 596);
+    state.pointerY = clamp(point.y, 24, 396);
+    renderCanvas();
+    renderFocusCode();
+  }
+});
+
+canvas.addEventListener("pointerleave", () => {
+  state.pointerInside = false;
+});
+
+canvas.addEventListener("pointerup", () => {
+  state.draggingTarget = false;
+});
+
+canvas.addEventListener("pointercancel", () => {
+  state.draggingTarget = false;
+});
+
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => setMode(tab.dataset.mode));
+  tab.addEventListener("keydown", (event) => {
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const current = tabs.findIndex((item) => item.dataset.mode === state.mode);
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      setMode(tabs[(current + 1) % tabs.length].dataset.mode);
+      tabs[(current + 1) % tabs.length].focus();
     }
-
-    function updateUI() {
-      const buttons = [
-        [els.modeMeasure, "measure"],
-        [els.modeSize, "size"],
-        [els.modeBrightness, "brightness"],
-        [els.modeCollision, "collision"],
-        [els.modeRipple, "ripple"]
-      ];
-
-      for (const [button, mode] of buttons) {
-        button.classList.toggle("active", state.mode === mode);
-      }
-
-      els.targetXSlider.value = state.targetX;
-      els.targetYSlider.value = state.targetY;
-      els.rangeSlider.value = state.activeRange;
-      els.targetXValue.textContent = String(Math.round(state.targetX));
-      els.targetYValue.textContent = String(Math.round(state.targetY));
-      els.rangeValue.textContent = String(Math.round(state.activeRange));
-      els.showLabels.checked = state.showLabels;
-      els.showCode.checked = state.showCode;
-      els.codeCard.classList.toggle("visible", state.showCode);
-
-      const lessons = {
-        measure: {
-          pill: "dist() measures between two points",
-          title: "dist() measures between two points",
-          text: "dist(x1, y1, x2, y2) returns the distance between two positions. In interactive sketches, that often means “how close is the mouse to something?”",
-          formula: "let d = dist(mouseX, mouseY, targetX, targetY);",
-          question: "Move the mouse closer to the target. What happens to the distance number?",
-          caption: "Move your mouse inside the canvas. dist() measures the distance from the mouse to the target point.",
-          code: `let d = dist(mouseX, mouseY, targetX, targetY);\nline(mouseX, mouseY, targetX, targetY);\ntext(d, 20, 20);`
-        },
-        size: {
-          pill: "Nearness becomes size",
-          title: "Distance can control size",
-          text: "Once distance is a number, map() can translate it into a size. Here closer means larger and farther means smaller.",
-          formula: "let size = map(d, 0, activeRange, 120, 20);",
-          question: "Why does the circle get bigger when the distance gets smaller?",
-          caption: "Distance is being mapped to size. Near means big. Far means small.",
-          code: `let d = dist(mouseX, mouseY, targetX, targetY);\nlet size = map(d, 0, activeRange, 120, 20);\nsize = constrain(size, 20, 120);\ncircle(targetX, targetY, size);`
-        },
-        brightness: {
-          pill: "Nearness becomes brightness",
-          title: "Distance can control brightness",
-          text: "Color values are numbers too. Distance can become brightness, saturation, alpha, or any other visual property.",
-          formula: "let brightness = map(d, 0, activeRange, 255, 40);",
-          question: "How could this idea become a hover effect?",
-          caption: "The target gets brighter as the pointer gets closer. dist() makes the hover feel gradual instead of just on/off.",
-          code: `let d = dist(mouseX, mouseY, targetX, targetY);\nlet brightness = map(d, 0, activeRange, 255, 40);\nbrightness = constrain(brightness, 40, 255);\nfill(brightness);\ncircle(targetX, targetY, 100);`
-        },
-        collision: {
-          pill: "Collision is distance < radii combined",
-          title: "Distance can detect collision",
-          text: "Two circles are touching when the distance between their centers is less than the sum of their radii.",
-          formula: "if (d < r1 + r2) { collision = true; }",
-          question: "When do the two circles count as touching?",
-          caption: "Collision is a distance question: are the centers closer than the two radii added together?",
-          code: `let d = dist(mouseX, mouseY, targetX, targetY);\nlet collision = d < mouseRadius + targetRadius;\n\nif (collision) {\n  fill(225, 29, 72);\n}`
-        },
-        ripple: {
-          pill: "Distance can shape a whole field",
-          title: "Distance can create a ripple field",
-          text: "A loop can measure the distance from many points to the target. Each distance becomes a size, color, or wave value.",
-          formula: "let d = dist(x, y, targetX, targetY);",
-          question: "Why do the shapes form rings around the target?",
-          caption: "Every dot asks the same question: how far am I from the target? That distance creates the pattern.",
-          code: `for (let x = 0; x < width; x += 30) {\n  for (let y = 0; y < height; y += 30) {\n    let d = dist(x, y, targetX, targetY);\n    let size = map(sin(d * 0.05), -1, 1, 4, 22);\n    circle(x, y, size);\n  }\n}`
-        }
-      };
-
-      const lesson = lessons[state.mode];
-      els.modePill.textContent = lesson.pill;
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.formulaBox.textContent = lesson.formula;
-      els.questionText.textContent = lesson.question;
-      els.caption.textContent = lesson.caption;
-      els.codeBox.textContent = lesson.code;
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      setMode(tabs[(current - 1 + tabs.length) % tabs.length].dataset.mode);
+      tabs[(current - 1 + tabs.length) % tabs.length].focus();
     }
+  });
+});
 
-    setupUI();
+document.getElementById("showRangeToggle").addEventListener("change", (event) => {
+  state.showRange = event.target.checked;
+  renderCanvas();
+});
 
-    const sketch = (p) => {
-      let canvas;
-      let holder;
-      let previousWidth = 0;
-      let previousHeight = 0;
-      let draggingTarget = false;
+document.getElementById("showLabelsToggle").addEventListener("change", (event) => {
+  state.showLabels = event.target.checked;
+  renderCanvas();
+});
 
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive visualization of p5.js dist function turning distance into behavior.");
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("DM Sans, system-ui, sans-serif");
-      };
+document.getElementById("fullCodeToggle").addEventListener("click", () => {
+  const body = document.getElementById("full-code");
+  const btn = document.getElementById("fullCodeToggle");
+  const open = body.classList.toggle("open");
+  btn.setAttribute("aria-expanded", String(open));
+  btn.textContent = open ? "▾ Hide full p5.js sketch" : "▸ See full p5.js sketch";
+});
 
-      p.windowResized = () => resizeToHolder();
-
-      p.draw = () => {
-        resizeToHolder();
-        updatePointer();
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-        drawPanelTitle();
-
-        if (state.mode === "measure") drawMeasureMode();
-        if (state.mode === "size") drawSizeMode();
-        if (state.mode === "brightness") drawBrightnessMode();
-        if (state.mode === "collision") drawCollisionMode();
-        if (state.mode === "ripple") drawRippleMode();
-
-        drawReadoutCards();
-      };
-
-      p.mousePressed = () => {
-        const t = getTarget();
-        if (p.dist(p.mouseX, p.mouseY, t.x, t.y) < 32) {
-          draggingTarget = true;
-        }
-      };
-
-      p.mouseDragged = () => {
-        if (draggingTarget) {
-          setTargetFromCanvas(p.mouseX, p.mouseY);
-        }
-      };
-
-      p.mouseReleased = () => {
-        draggingTarget = false;
-      };
-
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-        if (w !== previousWidth || h !== previousHeight) {
-          p.resizeCanvas(w, h);
-          previousWidth = w;
-          previousHeight = h;
-        }
-      }
-
-      function updatePointer() {
-        const inside = p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height;
-        if (inside) {
-          state.pointerX = p.mouseX;
-          state.pointerY = p.mouseY;
-        }
-      }
-
-      function setTargetFromCanvas(x, y) {
-        state.targetX = Math.round(p.constrain(x, 60, p.width - 60));
-        state.targetY = Math.round(p.constrain(y, 86, p.height - 190));
-        els.targetXSlider.value = state.targetX;
-        els.targetYSlider.value = state.targetY;
-        els.targetXValue.textContent = String(state.targetX);
-        els.targetYValue.textContent = String(state.targetY);
-      }
-
-      function getTarget() {
-        return {
-          x: p.constrain(state.targetX, 60, p.width - 60),
-          y: p.constrain(state.targetY, 86, p.height - 190)
-        };
-      }
-
-      function getPointer() {
-        return {
-          x: p.constrain(state.pointerX, 40, p.width - 40),
-          y: p.constrain(state.pointerY, 86, p.height - 190)
-        };
-      }
-
-      function getDistance() {
-        const t = getTarget();
-        const m = getPointer();
-        return p.dist(m.x, m.y, t.x, t.y);
-      }
-
-      function getNearAmount() {
-        const d = getDistance();
-        return p.constrain(1 - d / state.activeRange, 0, 1);
-      }
-
-      function drawSubtleGrid() {
-        p.push();
-        p.stroke(236, 224, 207);
-        p.strokeWeight(1);
-        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
-        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
-        p.pop();
-      }
-
-      function drawPanelTitle() {
-        const titles = {
-          measure: ["Measure Distance", "dist() gives one number: how far apart are these two points?"],
-          size: ["Distance → Size", "Use distance as input, then map it to a visual size."],
-          brightness: ["Distance → Brightness", "Use distance to make proximity feel gradual."],
-          collision: ["Collision", "A collision is a distance comparison."],
-          ripple: ["Ripple Field", "Many points measure their distance from the same target."]
-        };
-        const [title, subtitle] = titles[state.mode];
-        p.push();
-        p.noStroke();
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(22);
-        p.text(title, 24, 38);
-        p.textStyle(p.NORMAL);
-        p.textSize(14);
-        p.fill("#6b6258");
-        p.text(subtitle, 24, 62);
-        p.pop();
-      }
-
-      function drawMeasureMode() {
-        drawActiveRange();
-        drawDistanceLine();
-        drawTarget(64);
-        drawPointerCircle(26, "#0891b2");
-        drawDistanceNumber();
-      }
-
-      function drawSizeMode() {
-        const near = getNearAmount();
-        const size = p.lerp(24, 134, near);
-        drawActiveRange();
-        drawDistanceLine();
-        drawTarget(size);
-        drawPointerCircle(24, "#0891b2");
-        if (state.showLabels) drawLabel(`size = ${size.toFixed(1)}`, getTarget().x - 44, getTarget().y + size / 2 + 24, "#e11d48", 14);
-      }
-
-      function drawBrightnessMode() {
-        const near = getNearAmount();
-        const brightness = p.lerp(48, 255, near);
-        drawActiveRange();
-        drawDistanceLine();
-        const t = getTarget();
-        p.push();
-        p.noStroke();
-        p.fill(brightness, brightness * 0.82, 60);
-        p.circle(t.x, t.y, 120);
-        p.stroke("#222222");
-        p.strokeWeight(2);
-        p.noFill();
-        p.circle(t.x, t.y, 120);
-        p.pop();
-        drawPointerCircle(24, "#0891b2");
-        if (state.showLabels) drawLabel(`brightness = ${brightness.toFixed(0)}`, t.x - 62, t.y + 88, "#f59e0b", 14);
-      }
-
-      function drawCollisionMode() {
-        const t = getTarget();
-        const m = getPointer();
-        const targetRadius = 62;
-        const mouseRadius = 32;
-        const d = getDistance();
-        const collision = d < targetRadius + mouseRadius;
-
-        p.push();
-        p.noFill();
-        p.stroke("#16a34a");
-        p.strokeWeight(2);
-        p.drawingContext.setLineDash([8, 8]);
-        p.circle(t.x, t.y, (targetRadius + mouseRadius) * 2);
-        p.drawingContext.setLineDash([]);
-        p.pop();
-
-        drawDistanceLine();
-
-        p.push();
-        p.noStroke();
-        p.fill(collision ? "#e11d48" : "#f59e0b");
-        p.circle(t.x, t.y, targetRadius * 2);
-        p.fill(collision ? "#ffe4e6" : "#fff7ed");
-        p.circle(t.x, t.y, 18);
-        p.pop();
-
-        drawPointerCircle(mouseRadius * 2, collision ? "#e11d48" : "#0891b2");
-        if (state.showLabels) {
-          drawLabel(collision ? "collision!" : "not touching", t.x - 46, t.y + targetRadius + 30, collision ? "#e11d48" : "#0891b2", 15);
-          drawLabel(`d < ${targetRadius + mouseRadius}?`, t.x + 48, t.y - targetRadius - 14, "#16a34a", 13);
-        }
-      }
-
-      function drawRippleMode() {
-        const t = getTarget();
-        const time = p.frameCount * 0.035;
-        p.push();
-        p.noStroke();
-        for (let x = 72; x < p.width - 56; x += 30) {
-          for (let y = 98; y < p.height - 180; y += 30) {
-            const d = p.dist(x, y, t.x, t.y);
-            const wave = Math.sin(d * 0.055 - time);
-            const size = p.map(wave, -1, 1, 4, 22);
-            const alpha = p.map(d, 0, state.activeRange * 1.7, 230, 55, true);
-            p.fill(124, 58, 237, alpha);
-            p.circle(x, y, size);
-          }
-        }
-        p.pop();
-        drawActiveRange();
-        drawTarget(52);
-        drawPointerCircle(20, "#0891b2");
-        if (state.showLabels) drawLabel("each dot uses dist(x, y, targetX, targetY)", p.width * 0.23, p.height - 196, "#7c3aed", 14);
-      }
-
-      function drawActiveRange() {
-        const t = getTarget();
-        p.push();
-        p.noFill();
-        p.stroke("#16a34a");
-        p.strokeWeight(2);
-        p.drawingContext.setLineDash([8, 8]);
-        p.circle(t.x, t.y, state.activeRange * 2);
-        p.drawingContext.setLineDash([]);
-        if (state.showLabels) drawLabel("active range", t.x + state.activeRange * 0.58, t.y - state.activeRange * 0.58, "#16a34a", 13);
-        p.pop();
-      }
-
-      function drawDistanceLine() {
-        const t = getTarget();
-        const m = getPointer();
-        p.push();
-        p.stroke("#7c3aed");
-        p.strokeWeight(4);
-        p.line(m.x, m.y, t.x, t.y);
-        p.noStroke();
-        if (state.showLabels) drawLabel(`distance = ${getDistance().toFixed(1)}`, (m.x + t.x) / 2 - 48, (m.y + t.y) / 2 - 12, "#7c3aed", 14);
-        p.pop();
-      }
-
-      function drawTarget(size) {
-        const t = getTarget();
-        p.push();
-        p.noStroke();
-        p.fill("#f59e0b");
-        p.circle(t.x, t.y, size);
-        p.fill("#222222");
-        p.circle(t.x, t.y, 8);
-        if (state.showLabels) drawLabel("target", t.x + size / 2 - 8, t.y - 12, "#f59e0b", 13);
-        p.pop();
-      }
-
-      function drawPointerCircle(size, color) {
-        const m = getPointer();
-        p.push();
-        p.noStroke();
-        p.fill(color);
-        p.circle(m.x, m.y, size);
-        p.fill("#ffffff");
-        p.circle(m.x, m.y, 7);
-        if (state.showLabels) drawLabel("pointer", m.x + size / 2 - 6, m.y - 10, color, 13);
-        p.pop();
-      }
-
-      function drawDistanceNumber() {
-        const d = getDistance();
-        const x = p.width * 0.12;
-        const y = p.height * 0.68;
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 235);
-        p.rect(x, y, p.width * 0.76, 88, 20);
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(18);
-        p.text("dist() returns one useful number", x + 22, y + 34);
-        p.fill("#7c3aed");
-        p.textSize(24);
-        p.text(`d = ${d.toFixed(1)}`, x + 22, y + 66);
-        p.fill("#6b6258");
-        p.textStyle(p.NORMAL);
-        p.textSize(13);
-        p.text("That number can become a condition or be mapped into another range.", x + 140, y + 64);
-        p.pop();
-      }
-
-      function drawReadoutCards() {
-        const d = getDistance();
-        const near = getNearAmount();
-        const cards = [
-          { label: "distance", value: d.toFixed(1), color: "#7c3aed" },
-          { label: "near amount", value: `${Math.round(near * 100)}%`, color: "#e11d48" },
-          { label: "active range", value: state.activeRange, color: "#16a34a" }
-        ];
-        const cardW = Math.min(176, (p.width - 70) / cards.length);
-        const y = p.height - 168;
-        const x = 28;
-
-        p.push();
-        for (let i = 0; i < cards.length; i++) {
-          const cx = x + i * (cardW + 10);
-          p.noStroke();
-          p.fill(255, 255, 255, 235);
-          p.rect(cx, y, cardW, 62, 14);
-          p.fill(cards[i].color);
-          p.textStyle(p.BOLD);
-          p.textSize(13);
-          p.text(cards[i].label, cx + 12, y + 22);
-          p.fill("#222222");
-          p.textSize(20);
-          p.text(String(cards[i].value), cx + 12, y + 48);
-        }
-        p.pop();
-      }
-
-      function drawLabel(text, x, y, color, size = 13) {
-        p.push();
-        p.textSize(size);
-        p.textStyle(p.BOLD);
-        const padX = 7;
-        const padY = 4;
-        const tw = p.textWidth(text);
-        p.noStroke();
-        p.fill(255, 250, 242, 238);
-        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
-        p.fill(color);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.text(text, x, y);
-        p.pop();
-      }
-    };
-
-    new p5(sketch);
-  </script>
+window.addEventListener("resize", renderCanvas);
+renderUI();
+</script>
 </body>
 </html>

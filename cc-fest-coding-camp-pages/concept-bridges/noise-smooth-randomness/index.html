@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -286,8 +286,152 @@
 
       .workspace { height: 540px; }
     }
-  </style>
-  <link rel="stylesheet" href="../concept-bridge.css" />
+  
+  /* ── Bridge improvement additions ─────────────────────────────── */
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+  }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2a5e3e;
+    background: #eef8f2;
+    border: 1px solid #b8dcc8;
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: rgba(255,255,255,0.55);
+  }
+  .ba-col { padding: 14px 18px; }
+  .ba-col:first-child {
+    background: rgba(0,0,0,0.025);
+    border-right: 1px solid var(--line, #ded2c1);
+  }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #9e9789;
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: #2a5e3e; }
+  .ba-text { font-size: 0.9rem; line-height: 1.5; }
+  .predict-box {
+    background: #fef9ee;
+    border: 1px solid #efd09e;
+    border-radius: 10px;
+    padding: 11px 14px;
+    margin-bottom: 12px;
+  }
+  .predict-box .pbox-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .predict-box .pbox-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .callout-mistake {
+    background: #fff3e6;
+    border: 1px solid #edbd83;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0 0;
+  }
+  .callout-mistake .cm-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .callout-mistake .cm-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .pathways-section {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 32px 20px 8px;
+  }
+  .pathways-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9e9789;
+    margin-bottom: 12px;
+  }
+  .path-links { display: grid; gap: 8px; max-width: 820px; }
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--ink, #222);
+    background: rgba(255,250,242,0.92);
+    transition: border-color 0.14s ease, background 0.14s ease;
+    font-family: inherit;
+  }
+  .path-link:hover {
+    border-color: var(--accent, #2563eb);
+    background: rgba(230,240,255,0.6);
+  }
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9e9789;
+    flex-shrink: 0;
+    min-width: 82px;
+  }
+  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .bottom-nav {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 18px 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid var(--line, #ded2c1);
+  }
+  .bottom-nav a {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6b6258;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  .bottom-nav a:hover { color: var(--accent, #2563eb); }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .bottom-nav { flex-direction: column; }
+  }
+</style>
+  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -299,11 +443,31 @@
       A concept bridge for <strong>noise()</strong>. random() jumps because each value is independent.
       noise() changes smoothly because nearby inputs produce nearby outputs.
     </p>
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">smooth motion</span>
+    <span class="unlock-pill">terrain generation</span>
+    <span class="unlock-pill">organic animation</span>
+    <span class="unlock-pill">flowing patterns</span>
+  </div>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text">noise() is like random() but different somehow — I'm not sure when to use it</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text">Nearby inputs produce nearby outputs — that's why noise flows and random() jumps</div>
+    </div>
+  </section>
   </header>
 
   <main>
     <section class="controls" aria-label="Explorer controls">
-      <div class="row">
+            <div class="predict-box">
+        <span class="pbox-label">Before you interact — predict first</span>
+        <span class="pbox-body">Before you change the noise scale — what do you think will happen to the smoothness of the purple curve?</span>
+      </div>
+<div class="row">
         <button id="mode-compare" class="active">Random vs Noise</button>
         <button id="mode-input">Input → Output</button>
         <button id="mode-walker">Smooth Walker</button>
@@ -311,6 +475,9 @@
         <button id="mode-field">2D Field</button>
         <button id="play-button">⏸ Pause</button>
         <button id="reset-button">New Seed</button>
+        <button id="terrain-left" style="display:none;">← Fly Left</button>
+        <button id="terrain-right" style="display:none;">Fly Right →</button>
+        <button id="terrain-landmark" style="display:none;">Mark Landmark</button>
         <span id="mode-pill" class="pill">random jumps, noise flows</span>
       </div>
 
@@ -406,7 +573,11 @@ let y = map(n, 0, 1, height, 0);</code></pre>
       showCode: false,
       time: 0,
       seed: 12,
-      walkerTrail: []
+      walkerTrail: [],
+      terrainScrollX: 0,
+      terrainLandmarks: [],
+      terrainDragStart: null,
+      terrainScrollStart: null
     };
 
     const els = {};
@@ -419,6 +590,9 @@ let y = map(n, 0, 1, height, 0);</code></pre>
       els.modeField = document.querySelector("#mode-field");
       els.playButton = document.querySelector("#play-button");
       els.resetButton = document.querySelector("#reset-button");
+      els.terrainLeft = document.querySelector("#terrain-left");
+      els.terrainRight = document.querySelector("#terrain-right");
+      els.terrainLandmark = document.querySelector("#terrain-landmark");
       els.modePill = document.querySelector("#mode-pill");
       els.scaleSlider = document.querySelector("#scale-slider");
       els.speedSlider = document.querySelector("#speed-slider");
@@ -453,7 +627,24 @@ let y = map(n, 0, 1, height, 0);</code></pre>
         state.seed = Math.floor(Math.random() * 10000);
         state.time = 0;
         state.walkerTrail = [];
+        state.terrainScrollX = 0;
+        state.terrainLandmarks = [];
         updateUI();
+      });
+
+      els.terrainLeft.addEventListener("click", () => {
+        state.terrainScrollX -= 80;
+        updateUI();
+      });
+
+      els.terrainRight.addEventListener("click", () => {
+        state.terrainScrollX += 80;
+        updateUI();
+      });
+
+      els.terrainLandmark.addEventListener("click", () => {
+        // Will be handled inside sketch via stored mouseX
+        state._placeLandmarkNext = true;
       });
 
       els.scaleSlider.addEventListener("input", () => {
@@ -514,6 +705,10 @@ let y = map(n, 0, 1, height, 0);</code></pre>
       }
 
       els.playButton.textContent = state.running ? "⏸ Pause" : "▶ Play";
+      const isTerrainMode = state.mode === "terrain";
+      els.terrainLeft.style.display = isTerrainMode ? "" : "none";
+      els.terrainRight.style.display = isTerrainMode ? "" : "none";
+      els.terrainLandmark.style.display = isTerrainMode ? "" : "none";
       els.scaleSlider.value = state.scale;
       els.speedSlider.value = state.speed;
       els.samplesSlider.value = state.samples;
@@ -554,13 +749,13 @@ let y = map(n, 0, 1, height, 0);</code></pre>
           code: `let x = map(noise(t), 0, 1, 0, width);\nlet y = map(noise(t + 1000), 0, 1, 0, height);\nt += ${state.speed.toFixed(3)};`
         },
         terrain: {
-          pill: "1D noise becomes terrain",
-          title: "noise() can draw terrain",
-          text: "For each x-position, ask noise() for a height. Because nearby x-values produce nearby outputs, the terrain becomes smooth.",
-          formula: `height = map(noise(x * ${state.scale.toFixed(3)}), 0, 1, low, high)`,
-          question: "What changes when the noise scale gets larger?",
-          caption: "Terrain is just many noise values connected together across x positions.",
-          code: `beginShape();\nfor (let x = 0; x < width; x++) {\n  let n = noise(x * ${state.scale.toFixed(3)});\n  let y = map(n, 0, 1, 320, 80);\n  vertex(x, y);\n}\nendShape();`
+          pill: "1D noise becomes scrollable terrain",
+          title: "noise() terrain is deterministic",
+          text: "Fly left or right — the same mountains stay in the same place. The same x-input always gives the same height. Mark a landmark and scroll away: it's still there when you come back.",
+          formula: `noise(x * ${state.scale.toFixed(3)}) — same x always → same y`,
+          question: "Scroll far right, then scroll back. Are the same peaks and valleys in the same place?",
+          caption: `Scrolled ${state.terrainScrollX} units. The terrain is deterministic — same input always gives same output. ${state.terrainLandmarks.length > 0 ? state.terrainLandmarks.length + " landmark(s) planted." : "Plant a landmark to prove it."}`,
+          code: `// Same x → same height, always\nlet n = noise((x + scrollX) * ${state.scale.toFixed(3)});\nlet y = map(n, 0, 1, low, high);\n// random() would look different every frame`
         },
         field: {
           pill: "2D noise becomes texture or flow",
@@ -599,11 +794,34 @@ let y = map(n, 0, 1, height, 0);</code></pre>
         canvas.elt.setAttribute("role", "img");
         canvas.elt.setAttribute("aria-label", "Interactive visualization of p5.js noise as smooth randomness compared with random.");
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("DM Sans, system-ui, sans-serif");
+        p.textFont("Inter, system-ui, sans-serif");
         p.noiseSeed(state.seed);
       };
 
       p.windowResized = () => resizeToHolder();
+
+      p.mousePressed = () => {
+        if (state.mode === "terrain") {
+          if (p.mouseX >= _terrainPanelX && p.mouseX <= _terrainPanelX + _terrainPanelW &&
+              p.mouseY >= _terrainPanelY && p.mouseY <= _terrainPanelY + _terrainPanelH) {
+            _terrainMouseDown = true;
+            state.terrainDragStart = p.mouseX;
+            state.terrainScrollStart = state.terrainScrollX;
+          }
+        }
+      };
+
+      p.mouseDragged = () => {
+        if (state.mode === "terrain" && _terrainMouseDown) {
+          const dx = p.mouseX - state.terrainDragStart;
+          state.terrainScrollX = Math.max(0, state.terrainScrollStart - dx);
+          updateUI();
+        }
+      };
+
+      p.mouseReleased = () => {
+        _terrainMouseDown = false;
+      };
 
       p.draw = () => {
         resizeToHolder();
@@ -648,7 +866,7 @@ let y = map(n, 0, 1, height, 0);</code></pre>
           compare: ["Random vs Noise", "Random jumps. Noise changes smoothly."],
           input: ["Input → Output", "noise() turns an input coordinate into a smooth value."],
           walker: ["Smooth Walker", "Use time as the input to create organic motion."],
-          terrain: ["Terrain", "Connect many noise values across x positions."],
+          terrain: ["Terrain (Scrollable)", "Scroll to prove the same x always gives the same height."],
           field: ["2D Field", "Use x, y, and time to create smooth textures."]
         };
         const [title, subtitle] = titles[state.mode];
@@ -756,46 +974,133 @@ let y = map(n, 0, 1, height, 0);</code></pre>
         p.pop();
       }
 
+      // Store terrain geometry for landmark placement and drag
+      let _terrainPanelX = 0, _terrainPanelY = 0, _terrainPanelW = 0, _terrainPanelH = 0;
+      let _terrainMouseDown = false;
+
+      function terrainNoiseY(worldX, panelY, panelH) {
+        const n = p.noise(worldX * state.scale);
+        return p.map(n, 0, 1, panelY + panelH * 0.88, panelY + panelH * 0.18);
+      }
+
       function drawTerrainMode() {
         const panelX = p.width * 0.08;
         const panelY = p.height * 0.15;
         const panelW = p.width * 0.84;
-        const panelH = p.height * 0.50;
+        const panelH = p.height * 0.46;
+        _terrainPanelX = panelX; _terrainPanelY = panelY;
+        _terrainPanelW = panelW; _terrainPanelH = panelH;
         drawPanel(panelX, panelY, panelW, panelH);
 
+        // Handle landmark placement request
+        if (state._placeLandmarkNext) {
+          state._placeLandmarkNext = false;
+          const worldMouseX = p.mouseX - panelX + state.terrainScrollX;
+          // Store world coordinate
+          const flagColors = ["#e11d48","#2563eb","#f59e0b","#16a34a","#7c3aed"];
+          state.terrainLandmarks.push({
+            worldX: worldMouseX,
+            color: flagColors[state.terrainLandmarks.length % flagColors.length]
+          });
+          updateUI();
+        }
+
         p.push();
+        // Sky
         p.noStroke();
         p.fill(219, 234, 254, 160);
-        p.rect(panelX + 1, panelY + 1, panelW - 2, panelH * 0.58, 22, 22, 0, 0);
+        p.rect(panelX + 1, panelY + 1, panelW - 2, panelH * 0.65, 22, 22, 0, 0);
 
+        // Clip to panel (use rect for max browser compatibility)
+        p.drawingContext.save();
+        p.drawingContext.beginPath();
+        p.drawingContext.rect(panelX, panelY, panelW, panelH);
+        p.drawingContext.clip();
+
+        // Terrain fill
         p.fill(22, 163, 74, 170);
         p.beginShape();
         p.vertex(panelX, panelY + panelH);
-        for (let i = 0; i <= state.samples; i++) {
-          const t = i / state.samples;
-          const x = panelX + t * panelW;
-          const n = p.noise(i * state.scale + state.time * 0.35);
-          const y = p.map(n, 0, 1, panelY + panelH * 0.88, panelY + panelH * 0.18);
+        for (let px = 0; px <= panelW; px += 2) {
+          const worldX = px + state.terrainScrollX;
+          const x = panelX + px;
+          const y = terrainNoiseY(worldX, panelY, panelH);
           p.vertex(x, y);
         }
         p.vertex(panelX + panelW, panelY + panelH);
         p.endShape(p.CLOSE);
 
+        // Terrain line
         p.noFill();
         p.stroke("#16a34a");
         p.strokeWeight(3);
         p.beginShape();
-        for (let i = 0; i <= state.samples; i++) {
-          const t = i / state.samples;
-          const x = panelX + t * panelW;
-          const n = p.noise(i * state.scale + state.time * 0.35);
-          const y = p.map(n, 0, 1, panelY + panelH * 0.88, panelY + panelH * 0.18);
+        for (let px = 0; px <= panelW; px += 2) {
+          const worldX = px + state.terrainScrollX;
+          const x = panelX + px;
+          const y = terrainNoiseY(worldX, panelY, panelH);
           p.vertex(x, y);
         }
         p.endShape();
 
-        if (state.showLabels) drawLabel("many connected noise values become terrain", panelX + 24, panelY + 34, "#16a34a", 14);
+        // Landmarks
+        for (const lm of state.terrainLandmarks) {
+          const screenX = panelX + lm.worldX - state.terrainScrollX;
+          if (screenX >= panelX - 10 && screenX <= panelX + panelW + 10) {
+            const groundY = terrainNoiseY(lm.worldX, panelY, panelH);
+            // Flag pole
+            p.stroke(lm.color);
+            p.strokeWeight(3);
+            p.line(screenX, groundY - 2, screenX, groundY - 44);
+            // Flag
+            p.noStroke();
+            p.fill(lm.color);
+            p.triangle(screenX, groundY - 44, screenX + 20, groundY - 36, screenX, groundY - 28);
+          }
+        }
+
+        p.drawingContext.restore();
         p.pop();
+
+        // Scroll position indicator bar
+        const barY = panelY + panelH + 12;
+        p.push();
+        p.noStroke();
+        p.fill("#e6dac8");
+        p.rect(panelX, barY, panelW, 10, 5);
+        const maxScroll = 2000;
+        const scrollT = Math.max(0, Math.min(1, state.terrainScrollX / maxScroll));
+        p.fill("#16a34a");
+        p.rect(panelX + scrollT * panelW * 0.8, barY, panelW * 0.2, 10, 5);
+        p.pop();
+
+        // random() preview strip below
+        const randY = panelY + panelH + 30;
+        const randH = 44;
+        p.push();
+        p.noStroke();
+        p.fill(255, 255, 255, 200);
+        p.rect(panelX, randY, panelW, randH, 8);
+        p.noFill();
+        p.stroke("#e11d48");
+        p.strokeWeight(2);
+        p.beginShape();
+        for (let px = 0; px < panelW; px += 4) {
+          const rv = pseudoRandom(px + p.frameCount * 7 + state.seed);
+          p.vertex(panelX + px, randY + p.map(rv, 0, 1, randH - 6, 6));
+        }
+        p.endShape();
+        if (state.showLabels) {
+          drawLabel("random() would look like this — different every frame", panelX + 14, randY + 14, "#e11d48", 12);
+        }
+        p.pop();
+
+        // Labels
+        if (state.showLabels) {
+          drawLabel(`noise(x * scale) — same x always → same y`, panelX + 24, panelY + 34, "#16a34a", 14);
+          drawLabel(`scrolled ${state.terrainScrollX.toFixed(0)} units`, panelX + panelW - 160, panelY + 34, "#6b6258", 13);
+          drawLabel("drag canvas to scroll", panelX + panelW / 2 - 50, panelY + panelH - 16, "#6b6258", 13);
+        }
       }
 
       function drawFieldMode() {

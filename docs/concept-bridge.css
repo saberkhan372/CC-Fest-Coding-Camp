@@ -1,0 +1,42 @@
+/* Shared design system for concept bridge pages */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --ink: #2c2a26;
+  --ink-light: #6b6760;
+  --accent: #c8391d;
+  --accent-green: #2d6a4f;
+  --panel: #fff;
+  --bg: #faf6f0;
+  --line: #e8dfd2;
+  --radius: 14px;
+  --shadow: 0 2px 12px rgba(44,42,38,.07);
+  --mono: "DM Mono", ui-monospace, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.2;
+}
+
+code, pre, .mono {
+  font-family: var(--mono);
+}
+
+a { color: var(--accent-green); }
+a:hover { color: var(--accent); }

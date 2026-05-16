@@ -25,7 +25,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
@@ -234,6 +234,116 @@
     .code-card { display: none; }
     .code-card.visible { display: block; }
 
+    /* Edit the Table mode */
+    .table-editor-wrap {
+      display: none;
+      grid-column: 1 / -1;
+      gap: 18px;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+    .table-editor-wrap.visible {
+      display: grid;
+    }
+    .editable-table-card {
+      background: rgba(255,250,242,0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .editable-table-card h2 {
+      margin: 0 0 14px;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+    .editable-table-card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.93rem;
+    }
+    .editable-table-card th {
+      text-align: left;
+      padding: 8px 10px;
+      background: #f1f5f9;
+      border: 1px solid var(--line);
+      font-size: 0.83rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .editable-table-card td {
+      padding: 0;
+      border: 1px solid var(--line);
+    }
+    .editable-table-card td input {
+      width: 100%;
+      border: none;
+      outline: none;
+      padding: 9px 10px;
+      font-size: 0.93rem;
+      font-family: inherit;
+      background: white;
+      color: var(--ink);
+    }
+    .editable-table-card td input:focus {
+      background: #eff6ff;
+    }
+    .editable-table-card td.color-cell input[type="color"] {
+      padding: 2px 4px;
+      width: 48px;
+      height: 36px;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    .editable-table-card td.color-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .editable-table-card td.color-cell input[type="text"] {
+      flex: 1;
+    }
+    .table-caption {
+      margin-top: 14px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.5;
+    }
+    .table-code-card {
+      background: rgba(255,250,242,0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .table-code-card h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+    .table-code-card pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 0.83rem;
+      line-height: 1.5;
+      padding: 14px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow-x: auto;
+    }
+    .table-preview-canvas {
+      margin-top: 16px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: white;
+    }
+    .table-preview-canvas canvas { display: block; }
+
     pre {
       margin: 0;
       white-space: pre-wrap;
@@ -250,8 +360,152 @@
 
     @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
     @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
-  </style>
-  <link rel="stylesheet" href="../concept-bridge.css" />
+  
+  /* ── Bridge improvement additions ─────────────────────────────── */
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+  }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2a5e3e;
+    background: #eef8f2;
+    border: 1px solid #b8dcc8;
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: rgba(255,255,255,0.55);
+  }
+  .ba-col { padding: 14px 18px; }
+  .ba-col:first-child {
+    background: rgba(0,0,0,0.025);
+    border-right: 1px solid var(--line, #ded2c1);
+  }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #9e9789;
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: #2a5e3e; }
+  .ba-text { font-size: 0.9rem; line-height: 1.5; }
+  .predict-box {
+    background: #fef9ee;
+    border: 1px solid #efd09e;
+    border-radius: 10px;
+    padding: 11px 14px;
+    margin-bottom: 12px;
+  }
+  .predict-box .pbox-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .predict-box .pbox-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .callout-mistake {
+    background: #fff3e6;
+    border: 1px solid #edbd83;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0 0;
+  }
+  .callout-mistake .cm-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .callout-mistake .cm-body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .pathways-section {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 32px 20px 8px;
+  }
+  .pathways-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9e9789;
+    margin-bottom: 12px;
+  }
+  .path-links { display: grid; gap: 8px; max-width: 820px; }
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line, #ded2c1);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--ink, #222);
+    background: rgba(255,250,242,0.92);
+    transition: border-color 0.14s ease, background 0.14s ease;
+    font-family: inherit;
+  }
+  .path-link:hover {
+    border-color: var(--accent, #2563eb);
+    background: rgba(230,240,255,0.6);
+  }
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9e9789;
+    flex-shrink: 0;
+    min-width: 82px;
+  }
+  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .bottom-nav {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 18px 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid var(--line, #ded2c1);
+  }
+  .bottom-nav a {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6b6258;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  .bottom-nav a:hover { color: var(--accent, #2563eb); }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .bottom-nav { flex-direction: column; }
+  }
+</style>
+  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
   <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
@@ -263,18 +517,39 @@
       A concept bridge for <strong>preload()</strong>, <strong>loadTable()</strong>, <strong>loadJSON()</strong>, rows, columns, and data visualization.
       A sketch can read data from outside the code and turn it into shapes.
     </p>
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">data visualization</span>
+    <span class="unlock-pill">map() for scaling</span>
+    <span class="unlock-pill">bar charts</span>
+    <span class="unlock-pill">real-world data in p5</span>
+  </div>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text">Data visualization requires special libraries — p5.js is just for drawing shapes</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text">Any number can drive any visual property — <code>map()</code> connects raw data to pixel space</div>
+    </div>
+  </section>
   </header>
 
   <main>
     <section class="controls" aria-label="Explorer controls">
-      <div class="row">
-        <button id="mode-file" class="active">External File</button>
+            <div class="predict-box">
+        <span class="pbox-label">Before you interact — predict first</span>
+        <span class="pbox-body">Before you see the data drawn — will the bars use the raw data values or scaled ones?</span>
+      </div>
+<div class="row">
+        <button id="mode-edittable" class="active">Edit the Table</button>
+        <button id="mode-file">External File</button>
         <button id="mode-table">Table Rows</button>
         <button id="mode-column">Columns</button>
         <button id="mode-map">Map to Visuals</button>
         <button id="mode-json">JSON Shape</button>
         <button id="reset-button">Reset Data</button>
-        <span id="mode-pill" class="pill">data file → sketch</span>
+        <span id="mode-pill" class="pill">edit data → see drawing change</span>
       </div>
 
       <div class="row">
@@ -305,7 +580,87 @@
       </div>
     </section>
 
-    <section class="workspace">
+    <!-- Edit the Table mode: full-width row -->
+    <div class="table-editor-wrap visible" id="table-editor-section" style="grid-column:1/-1;">
+      <div class="editable-table-card">
+        <h2>Edit the spreadsheet — watch the chart update live</h2>
+        <table id="live-data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Value (0–100)</th>
+              <th>Color</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" class="tbl-name" value="Week 1" /></td>
+              <td><input type="number" class="tbl-value" value="42" min="0" max="100" /></td>
+              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
+                <input type="color" class="tbl-color-picker" value="#c8391d" />
+                <input type="text" class="tbl-color-text" value="#c8391d" style="flex:1;padding:9px 6px;" />
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text" class="tbl-name" value="Week 2" /></td>
+              <td><input type="number" class="tbl-value" value="67" min="0" max="100" /></td>
+              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
+                <input type="color" class="tbl-color-picker" value="#f5a800" />
+                <input type="text" class="tbl-color-text" value="#f5a800" style="flex:1;padding:9px 6px;" />
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text" class="tbl-name" value="Week 3" /></td>
+              <td><input type="number" class="tbl-value" value="55" min="0" max="100" /></td>
+              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
+                <input type="color" class="tbl-color-picker" value="#2d6a4f" />
+                <input type="text" class="tbl-color-text" value="#2d6a4f" style="flex:1;padding:9px 6px;" />
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text" class="tbl-name" value="Week 4" /></td>
+              <td><input type="number" class="tbl-value" value="81" min="0" max="100" /></td>
+              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
+                <input type="color" class="tbl-color-picker" value="#315c92" />
+                <input type="text" class="tbl-color-text" value="#315c92" style="flex:1;padding:9px 6px;" />
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text" class="tbl-name" value="Week 5" /></td>
+              <td><input type="number" class="tbl-value" value="73" min="0" max="100" /></td>
+              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
+                <input type="color" class="tbl-color-picker" value="#7149a3" />
+                <input type="text" class="tbl-color-text" value="#7149a3" style="flex:1;padding:9px 6px;" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">
+          This is exactly what happens when your code reads from a real CSV: change the file → change the drawing.
+        </p>
+      </div>
+
+      <div class="table-code-card">
+        <h2>The chart updates from your table</h2>
+        <div class="table-preview-canvas">
+          <canvas id="table-preview-canvas" width="480" height="260"></canvas>
+        </div>
+        <p style="margin:14px 0 8px;font-size:0.88rem;color:var(--muted);">The p5.js code that would read this from a CSV file:</p>
+        <pre id="live-code-snippet">function preload() {
+  table = loadTable("data.csv", "csv", "header");
+}
+function draw() {
+  for (let i = 0; i &lt; table.getRowCount(); i++) {
+    let val = table.getNum(i, "Value");
+    let h = map(val, 0, 100, 0, 300);
+    fill(table.getString(i, "Color"));
+    rect(x, height - h, barW, h);
+  }
+}</pre>
+      </div>
+    </div>
+
+    <section class="workspace" id="main-workspace" style="display:none;">
       <div id="sketch-holder"></div>
       <div id="canvas-caption" class="canvas-caption">
         preload() gets external data ready before setup() and draw() try to use it.
@@ -400,7 +755,7 @@
     };
 
     const state = {
-      mode: "file",
+      mode: "edittable",
       datasetKey: "weather",
       selectedRow: 2,
       visualScale: 1,
@@ -428,7 +783,88 @@
     function firstNumericColumn() { return data().columns.find(c => typeof data().rows[0][c] === "number"); }
     function labelColumn() { return data().columns.find(c => typeof data().rows[0][c] === "string"); }
 
+    // ---- Live editable table preview canvas ----
+    function getTableData() {
+      const names = Array.from(document.querySelectorAll(".tbl-name")).map(i => i.value);
+      const values = Array.from(document.querySelectorAll(".tbl-value")).map(i => Number(i.value) || 0);
+      const colors = Array.from(document.querySelectorAll(".tbl-color-text")).map(i => i.value || "#888");
+      return names.map((n, i) => ({ name: n, value: values[i], color: colors[i] }));
+    }
+
+    function drawTablePreview() {
+      const canvas = document.getElementById("table-preview-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const rows = getTableData();
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#fffaf2";
+      ctx.fillRect(0, 0, W, H);
+
+      const maxVal = Math.max(...rows.map(r => r.value), 1);
+      const baseline = H - 44;
+      const barCount = rows.length;
+      const totalBarW = W - 60;
+      const barW = totalBarW / barCount;
+      const maxH = baseline - 28;
+
+      for (let i = 0; i < rows.length; i++) {
+        const { name, value, color } = rows[i];
+        const bh = (value / 100) * maxH;
+        const bx = 30 + i * barW;
+        ctx.fillStyle = color;
+        const rx = bx + barW * 0.1;
+        const rw = barW * 0.8;
+        const ry = baseline - bh;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(rx, ry, rw, bh, [6, 6, 0, 0]);
+        } else {
+          ctx.rect(rx, ry, rw, bh);
+        }
+        ctx.fill();
+        // value label
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 12px Inter, system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(value, rx + rw / 2, ry - 6);
+        // name label
+        ctx.fillStyle = "#6b6258";
+        ctx.font = "11px Inter, system-ui, sans-serif";
+        ctx.fillText(name, rx + rw / 2, baseline + 16);
+      }
+      // baseline
+      ctx.strokeStyle = "#ded2c1";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(20, baseline);
+      ctx.lineTo(W - 20, baseline);
+      ctx.stroke();
+    }
+
+    function setupTableEditor() {
+      // Wire up color pickers ↔ text inputs
+      document.querySelectorAll(".tbl-color-picker").forEach((picker, i) => {
+        const textInput = document.querySelectorAll(".tbl-color-text")[i];
+        picker.addEventListener("input", () => {
+          textInput.value = picker.value;
+          drawTablePreview();
+        });
+        textInput.addEventListener("input", () => {
+          if (/^#[0-9a-fA-F]{6}$/.test(textInput.value)) {
+            picker.value = textInput.value;
+          }
+          drawTablePreview();
+        });
+      });
+      document.querySelectorAll(".tbl-name, .tbl-value").forEach(input => {
+        input.addEventListener("input", drawTablePreview);
+      });
+      drawTablePreview();
+    }
+
     function setupUI() {
+      els.modeEditTable = document.querySelector("#mode-edittable");
       els.modeFile = document.querySelector("#mode-file");
       els.modeTable = document.querySelector("#mode-table");
       els.modeColumn = document.querySelector("#mode-column");
@@ -452,7 +888,10 @@
       els.caption = document.querySelector("#canvas-caption");
       els.codeCard = document.querySelector("#code-card");
       els.codeBox = document.querySelector("#code-box");
+      els.tableEditorSection = document.querySelector("#table-editor-section");
+      els.mainWorkspace = document.querySelector("#main-workspace");
 
+      els.modeEditTable.addEventListener("click", () => setMode("edittable"));
       els.modeFile.addEventListener("click", () => setMode("file"));
       els.modeTable.addEventListener("click", () => setMode("table"));
       els.modeColumn.addEventListener("click", () => setMode("column"));
@@ -481,15 +920,27 @@
       els.showLabels.addEventListener("change", () => { state.showLabels = els.showLabels.checked; });
       els.showCode.addEventListener("change", () => { state.showCode = els.showCode.checked; updateUI(); });
 
+      setupTableEditor();
       updateUI();
     }
 
     function setMode(mode) { state.mode = mode; updateUI(); }
 
     function updateUI() {
-      const buttons = [[els.modeFile,"file"],[els.modeTable,"table"],[els.modeColumn,"column"],[els.modeMap,"map"],[els.modeJson,"json"]];
+      const isEditTable = state.mode === "edittable";
+      els.tableEditorSection.classList.toggle("visible", isEditTable);
+      els.tableEditorSection.style.display = isEditTable ? "grid" : "none";
+      els.mainWorkspace.style.display = isEditTable ? "none" : "block";
+
+      const buttons = [[els.modeEditTable,"edittable"],[els.modeFile,"file"],[els.modeTable,"table"],[els.modeColumn,"column"],[els.modeMap,"map"],[els.modeJson,"json"]];
       for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
       els.datasetButtons.forEach(button => button.classList.toggle("active", button.dataset.dataset === state.datasetKey));
+
+      if (isEditTable) {
+        els.modePill.textContent = "edit data → see drawing change";
+        drawTablePreview();
+        return;
+      }
 
       els.rowSlider.max = String(data().rows.length - 1);
       els.rowSlider.value = state.selectedRow;
@@ -577,10 +1028,11 @@
         canvas.elt.setAttribute("role", "img");
         canvas.elt.setAttribute("aria-label", "Interactive visualization of loading data and turning rows and columns into drawings in p5.js.");
         p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("DM Sans, system-ui, sans-serif");
+        p.textFont("Inter, system-ui, sans-serif");
       };
       p.windowResized = () => resizeToHolder();
       p.draw = () => {
+        if (state.mode === "edittable") return;
         resizeToHolder();
         p.background(255, 250, 242);
         drawSubtleGrid();

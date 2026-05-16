@@ -1,984 +1,1315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conditionals: Code Makes Choices</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --if: #7c3aed;
-      --true: #16a34a;
-      --false: #e11d48;
-      --compare: #0891b2;
-      --choice: #f59e0b;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conditionals: Code Makes Choices</title>
+<link rel="stylesheet" href="../concept-bridge.css">
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #315c92;
+    --accent-bg: #eef4fc;
+    --if: #7a5ea8;
+    --true: #81b29a;
+    --false: #e07a5f;
+    --choice: #f3a340;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 940px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 780px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .controls,
-    .workspace,
-    .side-panel {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-    }
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 22px;
+  }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      user-select: none;
-    }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: var(--paper);
+  }
 
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--faint);
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
 
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
+  }
 
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
+  .main-left {
+    display: grid;
+    gap: 18px;
+    align-content: start;
+    min-width: 0;
+  }
 
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
 
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 104px minmax(150px, 1fr) 76px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(390px, 100%);
-    }
+  .canvas-panel { overflow: hidden; }
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
 
-    label,
-    .value-label,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
 
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
+  #conditionals-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+    cursor: ew-resize;
+  }
 
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
 
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
+  .ctrl-panel { padding: 16px; }
 
-    #sketch-holder canvas { display: block; }
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
 
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
 
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #edf4ff; border-color: #90b4e2; }
 
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
+  .tab .step {
+    display: block;
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
 
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
+  .tab[aria-selected="true"] .step { color: var(--accent); }
 
-    .card h2 { font-size: 1.15rem; }
-    .card h3 { font-size: 1rem; }
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(49,92,146,0.35);
+    outline-offset: 2px;
+  }
 
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
 
-    .card p { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
+  .box-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
 
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      white-space: pre-wrap;
-    }
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
 
-    .legend {
-      display: grid;
-      gap: 8px;
-    }
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
 
-    .legend-item {
-      display: grid;
-      grid-template-columns: 16px 1fr;
-      gap: 8px;
-      align-items: center;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
+  }
 
-    .swatch {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-    }
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
+    display: block;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
 
-    .swatch.if { background: var(--if); }
-    .swatch.true { background: var(--true); }
-    .swatch.false { background: var(--false); }
-    .swatch.compare { background: var(--compare); }
-    .swatch.choice { background: var(--choice); }
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 42px;
+    text-align: center;
+  }
 
-    .code-card { display: none; }
-    .code-card.visible { display: block; }
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
+  }
 
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
 
-    .note {
-      font-size: 0.86rem;
-      color: var(--muted);
-    }
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 
-    @media (max-width: 980px) {
-      main { grid-template-columns: 1fr; }
-      .workspace { height: 590px; }
-    }
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
 
-    @media (max-width: 600px) {
-      header, main { padding-left: 12px; padding-right: 12px; }
-      .slider-wrap { grid-template-columns: 1fr; gap: 4px; }
-      .workspace { height: 540px; }
-    }
-  </style>
-  <link rel="stylesheet" href="../concept-bridge.css" />
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 0; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 760px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
+  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--faint);
+    flex-shrink: 0;
+    min-width: 88px;
+  }
+
+  .path-link:hover .path-link-type { color: var(--accent); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
+  .bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
+  }
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; }
+  .bottom-nav a:hover { color: var(--accent); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .main-left { gap: 18px; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
+    .bottom-nav { flex-direction: column; }
+  }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
+</style>
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · Programming fundamentals</p>
+  <h1>Conditionals: Code Makes Choices</h1>
+  <p class="subtitle">
+    A concept bridge for <code>if</code>, <code>else if</code>, <code>else</code>, comparison operators, Boolean values, and combined conditions.
+    A conditional asks a question each frame, then chooses what happens next based on the answer.
+  </p>
+
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">true / false thinking</span>
+    <span class="unlock-pill">threshold triggers</span>
+    <span class="unlock-pill">branching behavior</span>
+    <span class="unlock-pill">AND / OR logic</span>
+    <span class="unlock-pill">interactive game rules</span>
   </div>
-  <header>
-    <h1>Conditionals: Code Makes Choices</h1>
-    <p class="subtitle">
-      A concept bridge for <strong>if</strong>, <strong>else if</strong>, <strong>else</strong>, comparison operators, Boolean values, and combining conditions.
-      A conditional lets the sketch choose what happens based on the current situation.
-    </p>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-      <div class="row">
-        <button id="mode-if" class="active">if</button>
-        <button id="mode-ifelse">if / else</button>
-        <button id="mode-elseif">else if</button>
-        <button id="mode-compare">Comparisons</button>
-        <button id="mode-andor">AND / OR</button>
-        <button id="reset-button">Reset</button>
-        <span id="mode-pill" class="pill">if condition is true, run code</span>
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text"><code>if</code> is just a code grammar rule you memorize: write the brackets correctly and hope it works.</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text"><code>if</code> becomes a live question. Your sketch keeps asking what is true right now, then chooses a branch from that answer.</div>
+    </div>
+  </section>
+
+  <section class="main-grid" aria-label="Interactive conditionals concept bridge">
+    <div class="main-left">
+      <article class="panel canvas-panel">
+        <div class="canvas-bar">
+          <div class="canvas-bar-title" id="canvas-title">if: a threshold turns a question into a branch</div>
+          <div class="canvas-bar-sub" id="canvas-sub">Drag the ball and threshold to see the condition flip from false to true.</div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="conditionals-canvas" width="620" height="420" aria-label="Interactive conditionals visualization"></canvas>
+          <div class="touch-hint">Touch and drag the ball or threshold, then use the controls on the right to explore.</div>
+        </div>
+      </article>
+
+      <section class="prose-section">
+        <h2 id="prose-title">A condition is a question your sketch keeps asking</h2>
+        <p id="prose-body">The condition might be “is the ball past this line?”, “is the player touching the goal?”, or “are both of these things true?”. The answer becomes a branch: do this, do that, or do nothing.</p>
+      </section>
+
+      <div class="legend" aria-label="conditionals concept legend">
+        <div class="legend-item"><span class="swatch" style="background:#7a5ea8"></span>condition / decision</div>
+        <div class="legend-item"><span class="swatch" style="background:#81b29a"></span>true path</div>
+        <div class="legend-item"><span class="swatch" style="background:#e07a5f"></span>false path</div>
+        <div class="legend-item"><span class="swatch" style="background:#f3a340"></span>ball / choice</div>
+        <div class="legend-item"><span class="swatch" style="background:#315c92"></span>threshold / comparison</div>
       </div>
 
-      <div class="row">
-        <div class="slider-wrap">
-          <label for="x-slider">Ball x</label>
-          <input id="x-slider" type="range" min="50" max="750" value="260" step="1" />
-          <span id="x-value" class="value-label">260</span>
+      <section class="pathways" aria-label="Practice and remix links">
+        <div class="pathways-title">What's next</div>
+        <div class="path-links">
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/if-else-decision-studio/" class="path-link">
+            <span class="path-link-type">Practice →</span>
+            <span class="path-link-name">If / Else Decision Studio — use conditionals in a full workshop tool with more examples</span>
+            <span class="path-link-arrow">›</span>
+          </a>
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/simple-collision-game/" class="path-link">
+            <span class="path-link-type">Remix →</span>
+            <span class="path-link-name">Simple Collision Game Seed — use one distance or threshold check to control game rules</span>
+            <span class="path-link-arrow">›</span>
+          </a>
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/state-machines-sketches-have-modes/" class="path-link">
+            <span class="path-link-type">Related →</span>
+            <span class="path-link-name">State Machines: Sketches Have Modes — combine many conditionals into larger game or app flow</span>
+            <span class="path-link-arrow">›</span>
+          </a>
         </div>
-        <div class="slider-wrap">
-          <label for="threshold-slider">Threshold</label>
-          <input id="threshold-slider" type="range" min="120" max="660" value="400" step="1" />
-          <span id="threshold-value" class="value-label">400</span>
-        </div>
-        <div class="slider-wrap">
-          <label for="size-slider">Size</label>
-          <input id="size-slider" type="range" min="20" max="160" value="78" step="1" />
-          <span id="size-value" class="value-label">78</span>
-        </div>
+      </section>
+    </div>
+
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="conditionals modes">
+        <button class="tab" role="tab" data-mode="if" aria-selected="true" tabindex="0">if<span class="step">1 of 5</span></button>
+        <button class="tab" role="tab" data-mode="ifelse" aria-selected="false" tabindex="-1">if / else<span class="step">2 of 5</span></button>
+        <button class="tab" role="tab" data-mode="elseif" aria-selected="false" tabindex="-1">else if<span class="step">3 of 5</span></button>
+        <button class="tab" role="tab" data-mode="compare" aria-selected="false" tabindex="-1">Compare<span class="step">4 of 5</span></button>
+        <button class="tab" role="tab" data-mode="andor" aria-selected="false" tabindex="-1">AND / OR<span class="step">5 of 5</span></button>
+      </nav>
+
+      <div class="predict">
+        <span class="box-label">Predict before changing</span>
+        <span class="box-body" id="predict-text">Before you move the ball, exactly when do you think the condition should turn true: when the center crosses the threshold, or when any edge touches it?</span>
       </div>
 
-      <div class="row">
-        <span class="preset-label">Presets:</span>
-        <button class="preset-button" data-preset="left">left</button>
-        <button class="preset-button" data-preset="middle">middle</button>
-        <button class="preset-button" data-preset="right">right</button>
-        <button class="preset-button" data-preset="small">small</button>
-        <button class="preset-button" data-preset="large">large</button>
-        <label class="toggle-label"><input id="animate-toggle" type="checkbox" />Animate ball</label>
-        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
+      <div class="ctrl-group" id="controls"></div>
+      <div id="presets-area"></div>
+
+      <div class="switches">
+        <label class="sw"><input type="checkbox" id="showLabelsToggle" checked> Show labels</label>
+        <label class="sw"><input type="checkbox" id="animateToggle"> Animate ball</label>
       </div>
-    </section>
 
-    <section class="workspace">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        A condition is a question with a true or false answer. If the answer is true, the code inside runs.
+      <div class="code-section">
+        <div class="code-header"><span>Live code</span><span id="code-note">A conditional checks what is true right now.</span></div>
+        <div class="code-focus-line mono" id="focus-code"></div>
+        <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">▸ See full p5.js sketch</button>
+        <div class="full-code-body mono" id="full-code"></div>
       </div>
-    </section>
 
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">if asks a true/false question</h2>
-        <p id="lesson-text">
-          An if statement checks a condition. If the condition is true, the code inside the curly braces runs. If it is false, that code is skipped.
-        </p>
-        <span id="formula-box" class="formula">if (x > 400) {
-  fill("red");
-}</span>
-      </section>
+      <div class="callout big-idea">
+        <span class="box-label">Big idea</span>
+        <span class="box-body" id="big-idea-text"></span>
+      </div>
 
-      <section class="card">
-        <h3>Big idea</h3>
-        <p><strong>Condition:</strong> a true/false question.</p>
-        <p><strong>Comparison:</strong> checks values with <code>&gt;</code>, <code>&lt;</code>, <code>===</code>, etc.</p>
-        <p><strong>Branch:</strong> the path the program takes.</p>
-        <p><strong>AND / OR:</strong> combines multiple conditions.</p>
-      </section>
+      <div class="callout bug">
+        <span class="box-label">⚠ Common mistake</span>
+        <span class="box-body" id="bug-text"></span>
+      </div>
 
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch if"></span><span>if statement / decision</span></div>
-          <div class="legend-item"><span class="swatch true"></span><span>true path</span></div>
-          <div class="legend-item"><span class="swatch false"></span><span>false path</span></div>
-          <div class="legend-item"><span class="swatch compare"></span><span>comparison value</span></div>
-          <div class="legend-item"><span class="swatch choice"></span><span>chosen behavior</span></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">Move the ball across the threshold. When does the condition become true?</p>
-      </section>
-
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code id="code-box">if (x > 400) {
-  fill("red");
-}</code></pre>
-        <p class="note">
-          Use <code>===</code> to compare equality in JavaScript. A single <code>=</code> assigns a value; it does not ask a question.
-        </p>
-      </section>
+      <div class="callout try">
+        <span class="box-label">Try this</span>
+        <span class="box-body" id="try-text"></span>
+      </div>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    const state = {
-      mode: "if",
-      x: 260,
-      threshold: 400,
-      size: 78,
-      animate: false,
-      direction: 1,
-      showLabels: true,
-      showCode: false
-    };
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/">← Previous: Distance Becomes Behavior</a>
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/modulo-counting-in-cycles/">Next: Modulo: Counting in Cycles →</a>
+  </nav>
+</main>
 
-    const els = {};
+<script>
+'use strict';
 
-    function setupUI() {
-      els.modeIf = document.querySelector("#mode-if");
-      els.modeIfElse = document.querySelector("#mode-ifelse");
-      els.modeElseIf = document.querySelector("#mode-elseif");
-      els.modeCompare = document.querySelector("#mode-compare");
-      els.modeAndOr = document.querySelector("#mode-andor");
-      els.resetButton = document.querySelector("#reset-button");
-      els.modePill = document.querySelector("#mode-pill");
-      els.xSlider = document.querySelector("#x-slider");
-      els.thresholdSlider = document.querySelector("#threshold-slider");
-      els.sizeSlider = document.querySelector("#size-slider");
-      els.xValue = document.querySelector("#x-value");
-      els.thresholdValue = document.querySelector("#threshold-value");
-      els.sizeValue = document.querySelector("#size-value");
-      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
-      els.animateToggle = document.querySelector("#animate-toggle");
-      els.showLabels = document.querySelector("#show-labels");
-      els.showCode = document.querySelector("#show-code");
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.formulaBox = document.querySelector("#formula-box");
-      els.questionText = document.querySelector("#question-text");
-      els.caption = document.querySelector("#canvas-caption");
-      els.codeCard = document.querySelector("#code-card");
-      els.codeBox = document.querySelector("#code-box");
+const state = {
+  mode: "if",
+  x: 250,
+  threshold: 380,
+  size: 74,
+  animate: false,
+  direction: 1,
+  showLabels: true,
+  draggingBall: false,
+  draggingThreshold: false,
+  changedKey: "x"
+};
 
-      els.modeIf.addEventListener("click", () => setMode("if"));
-      els.modeIfElse.addEventListener("click", () => setMode("ifelse"));
-      els.modeElseIf.addEventListener("click", () => setMode("elseif"));
-      els.modeCompare.addEventListener("click", () => setMode("compare"));
-      els.modeAndOr.addEventListener("click", () => setMode("andor"));
+const modes = {
+  if: {
+    canvasTitle: "if: a threshold turns a question into a branch",
+    canvasSub: "Drag the ball and threshold to see the condition flip from false to true.",
+    predict: "Before you move the ball, exactly when do you think the condition should turn true: when the center crosses the threshold, or when any edge touches it?",
+    big: "A basic <code>if</code> asks one true/false question. If the answer is true, the code inside runs. If it is false, that branch is skipped.",
+    bug: "A common mistake is expecting the branch to remember the last answer. It does not. In <code>draw()</code>, the condition is checked again every frame.",
+    tryIt: "Put the ball exactly on the threshold, then move it one step left and one step right. When does the branch change?",
+    note: "if checks one question.",
+    proseTitle: "A condition becomes a branch",
+    proseBody: "The question might be simple: is x greater than this threshold? The answer becomes a path. False means one outcome. True means another.",
+    controls: [
+      { key: "x", label: "Ball x", code: "x", min: 110, max: 510, step: 1 },
+      { key: "threshold", label: "Threshold", code: "thresholdX", min: 140, max: 500, step: 1 },
+      { key: "size", label: "Ball size", code: "ballSize", min: 36, max: 140, step: 1 }
+    ],
+    presets: [
+      { label: "Before line", v: { x: 250, threshold: 380, size: 74 } },
+      { label: "At line", v: { x: 380, threshold: 380, size: 74 } },
+      { label: "Past line", v: { x: 470, threshold: 380, size: 74 } },
+      { label: "⚠ Giant ball", v: { x: 360, threshold: 380, size: 132 }, isBreak: true }
+    ]
+  },
+  ifelse: {
+    canvasTitle: "if / else: exactly one of two branches runs",
+    canvasSub: "When the question is false, the else branch takes over.",
+    predict: "If the question is false, what should the sketch do instead of doing nothing?",
+    big: "<code>if / else</code> creates a fork in the road. One branch runs when the condition is true. The other runs when it is false.",
+    bug: "A common mistake is thinking both branches can run. In <code>if / else</code>, exactly one branch happens each time the question is checked.",
+    tryIt: "Set the ball right on the threshold, then move it slightly. Which branch feels like the default state?",
+    note: "if / else chooses between two paths.",
+    proseTitle: "False is still a result",
+    proseBody: "A false answer is not “nothing happened.” It is often the cue for an alternate branch. That is what makes hover states, alarms, and UI responses feel complete.",
+    controls: [
+      { key: "x", label: "Ball x", code: "x", min: 110, max: 510, step: 1 },
+      { key: "threshold", label: "Threshold", code: "thresholdX", min: 140, max: 500, step: 1 },
+      { key: "size", label: "Ball size", code: "ballSize", min: 36, max: 140, step: 1 }
+    ],
+    presets: [
+      { label: "False branch", v: { x: 250, threshold: 380, size: 74 } },
+      { label: "True branch", v: { x: 470, threshold: 380, size: 74 } },
+      { label: "Shift threshold", v: { x: 340, threshold: 300, size: 74 } },
+      { label: "⚠ Edge case", v: { x: 300, threshold: 300, size: 74 }, isBreak: true }
+    ]
+  },
+  elseif: {
+    canvasTitle: "else if: one value can fall into multiple categories",
+    canvasSub: "Left, middle, and right are just ordered conditions.",
+    predict: "If the first condition is false, what question should the sketch ask next to sort the ball into the right category?",
+    big: "<code>else if</code> lets a sketch ask another question only if the previous one was false. This is how one value gets sorted into categories.",
+    bug: "A common mistake is writing overlapping conditions in the wrong order. The first true branch wins, so order matters.",
+    tryIt: "Move the threshold and watch how the category zones shift. Which branch gets checked first?",
+    note: "else if creates categories.",
+    proseTitle: "Order matters in a chain of conditions",
+    proseBody: "A chain of conditions is not a list of equal checks. It is a sequence. The sketch stops at the first true branch it finds.",
+    controls: [
+      { key: "x", label: "Ball x", code: "x", min: 110, max: 510, step: 1 },
+      { key: "threshold", label: "Middle center", code: "middleX", min: 180, max: 440, step: 1 },
+      { key: "size", label: "Ball size", code: "ballSize", min: 36, max: 140, step: 1 }
+    ],
+    presets: [
+      { label: "Left zone", v: { x: 220, threshold: 340, size: 74 } },
+      { label: "Middle zone", v: { x: 340, threshold: 340, size: 74 } },
+      { label: "Right zone", v: { x: 470, threshold: 340, size: 74 } },
+      { label: "⚠ Tight zones", v: { x: 340, threshold: 300, size: 74 }, isBreak: true }
+    ]
+  },
+  compare: {
+    canvasTitle: "Comparisons: each expression becomes true or false",
+    canvasSub: "A conditional is built out of smaller true/false checks.",
+    predict: "Which of these do you think should be true right now: x > threshold, x < threshold, or size > 90?",
+    big: "Comparisons are the raw materials of conditionals. Each one evaluates to true or false before the sketch decides anything else.",
+    bug: "A common mistake is confusing <code>=</code> with <code>===</code>. One assigns a value. The other asks whether two values are equal.",
+    tryIt: "Set the ball exactly on the line and see which comparisons turn false, even though the ball looks like it has reached the threshold.",
+    note: "Comparisons produce Booleans.",
+    proseTitle: "Questions first, branches second",
+    proseBody: "Before a branch can run, the sketch needs a Boolean answer. Comparisons are how it gets that answer.",
+    controls: [
+      { key: "x", label: "Ball x", code: "x", min: 110, max: 510, step: 1 },
+      { key: "threshold", label: "Threshold", code: "thresholdX", min: 140, max: 500, step: 1 },
+      { key: "size", label: "Ball size", code: "ballSize", min: 36, max: 140, step: 1 }
+    ],
+    presets: [
+      { label: "Left + small", v: { x: 250, threshold: 380, size: 48 } },
+      { label: "Right + small", v: { x: 470, threshold: 380, size: 48 } },
+      { label: "Right + large", v: { x: 470, threshold: 380, size: 118 } },
+      { label: "⚠ Equal line", v: { x: 380, threshold: 380, size: 90 }, isBreak: true }
+    ]
+  },
+  andor: {
+    canvasTitle: "AND / OR: multiple conditions can overlap",
+    canvasSub: "The overlap makes AND visible. Either region being active makes OR visible.",
+    predict: "Before dragging the ball, where do you think AND should turn true: anywhere on the right, anywhere with a large ball, or only where both are true together?",
+    big: "<code>&&</code> means every condition must be true. <code>||</code> means at least one condition is enough. The overlap is what makes AND different.",
+    bug: "A common mistake is thinking AND means “check these one after another.” It really means “all of these must be true at the same time.”",
+    tryIt: "Make the ball large but keep it left of the line. Which combined condition is true now: AND, OR, both, or neither?",
+    note: "AND / OR combine conditions.",
+    proseTitle: "Overlap is the mental model for AND",
+    proseBody: "One region means “ball is right of the threshold.” Another means “ball is large.” Only their intersection makes AND true. Either region makes OR true.",
+    controls: [
+      { key: "x", label: "Ball x", code: "x", min: 110, max: 510, step: 1 },
+      { key: "threshold", label: "Threshold", code: "thresholdX", min: 140, max: 500, step: 1 },
+      { key: "size", label: "Ball size", code: "ballSize", min: 36, max: 140, step: 1 }
+    ],
+    presets: [
+      { label: "Neither", v: { x: 250, threshold: 380, size: 48 } },
+      { label: "Only right", v: { x: 470, threshold: 380, size: 48 } },
+      { label: "Only large", v: { x: 250, threshold: 380, size: 118 } },
+      { label: "AND zone", v: { x: 470, threshold: 380, size: 118 } }
+    ]
+  }
+};
 
-      els.xSlider.addEventListener("input", () => {
-        state.x = Number(els.xSlider.value);
-        state.animate = false;
-        updateUI();
-      });
+const canvas = document.getElementById("conditionals-canvas");
+const ctx = canvas.getContext("2d");
 
-      els.thresholdSlider.addEventListener("input", () => {
-        state.threshold = Number(els.thresholdSlider.value);
-        updateUI();
-      });
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
 
-      els.sizeSlider.addEventListener("input", () => {
-        state.size = Number(els.sizeSlider.value);
-        updateUI();
-      });
+function roundedRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
 
-      els.animateToggle.addEventListener("change", () => {
-        state.animate = els.animateToggle.checked;
-      });
+function drawLabel(text, x, y, color) {
+  if (!state.showLabels) return;
+  ctx.save();
+  ctx.font = "700 13px 'DM Sans', sans-serif";
+  const padX = 7;
+  const tw = ctx.measureText(text).width;
+  ctx.fillStyle = "rgba(255, 250, 242, 0.94)";
+  roundedRect(x - padX, y - 18, tw + padX * 2, 24, 9);
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
 
-      els.showLabels.addEventListener("change", () => {
-        state.showLabels = els.showLabels.checked;
-      });
+function createToken(className, text) {
+  return `<span class="ct ${className}">${text}</span>`;
+}
 
-      els.showCode.addEventListener("change", () => {
-        state.showCode = els.showCode.checked;
-        updateUI();
-      });
+function getConditions() {
+  const right = state.x > state.threshold;
+  const left = state.x < state.threshold;
+  const equalish = Math.abs(state.x - state.threshold) < 2;
+  const large = state.size > 90;
+  const small = state.size < 55;
+  const leftBound = state.threshold - 70;
+  const rightBound = state.threshold + 70;
+  const middle = state.x >= leftBound && state.x <= rightBound;
+  const andTrue = right && large;
+  const orTrue = right || large;
+  return { right, left, equalish, large, small, leftBound, rightBound, middle, andTrue, orTrue };
+}
 
-      els.resetButton.addEventListener("click", () => {
-        state.x = 260;
-        state.threshold = 400;
-        state.size = 78;
-        state.animate = false;
-        updateUI();
-      });
+function renderFocusCode() {
+  const c = getConditions();
+  const key = state.changedKey;
+  const flash = (tokenKey, className, text) => createToken(`${className}${key === tokenKey ? " flash" : ""}`, text);
+  let line = "";
 
-      els.presetButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const preset = button.dataset.preset;
-          if (preset === "left") state.x = 180;
-          if (preset === "middle") state.x = state.threshold;
-          if (preset === "right") state.x = 610;
-          if (preset === "small") state.size = 42;
-          if (preset === "large") state.size = 130;
-          state.animate = false;
-          updateUI();
-        });
-      });
+  if (state.mode === "if") {
+    line = `${createToken("kw", "if")} (x > ${flash("threshold", "num", Math.round(state.threshold))}) {\n` +
+      `  ${createToken("fn", "fill")}(${createToken("str", "\"red\"")});\n` +
+      `}`;
+  } else if (state.mode === "ifelse") {
+    line = `${createToken("kw", "if")} (x > ${flash("threshold", "num", Math.round(state.threshold))}) {\n` +
+      `  ${createToken("fn", "fill")}(${createToken("str", "\"red\"")});\n` +
+      `} ${createToken("kw", "else")} {\n` +
+      `  ${createToken("fn", "fill")}(${createToken("str", "\"blue\"")});\n` +
+      `}`;
+  } else if (state.mode === "elseif") {
+    const leftBound = Math.round(c.leftBound);
+    const rightBound = Math.round(c.rightBound);
+    line = `${createToken("kw", "if")} (x < ${flash("threshold", "num", leftBound)}) {\n` +
+      `  zone = ${createToken("str", "\"left\"")};\n` +
+      `} ${createToken("kw", "else if")} (x <= ${createToken("num", rightBound)}) {\n` +
+      `  zone = ${createToken("str", "\"middle\"")};\n` +
+      `} ${createToken("kw", "else")} {\n` +
+      `  zone = ${createToken("str", "\"right\"")};\n` +
+      `}`;
+  } else if (state.mode === "compare") {
+    line = `${createToken("kw", "let")} isRight = x > ${flash("threshold", "num", Math.round(state.threshold))};\n` +
+      `${createToken("kw", "let")} isLarge = size > ${flash("size", "num", 90)};\n` +
+      `${createToken("kw", "let")} isEqual = x === threshold;`;
+  } else {
+    line = `${createToken("kw", "let")} rightSide = x > ${flash("threshold", "num", Math.round(state.threshold))};\n` +
+      `${createToken("kw", "let")} largeBall = size > ${flash("size", "num", 90)};\n` +
+      `${createToken("kw", "if")} (rightSide ${createToken("kw", "&&")} largeBall) {\n` +
+      `  state = ${createToken("str", "\"AND\"")};\n` +
+      `}`;
+  }
 
-      updateUI();
+  document.getElementById("focus-code").innerHTML = line;
+  document.getElementById("code-note").textContent = modes[state.mode].note;
+
+  const fullCode = [
+    "function draw() {",
+    state.mode === "compare"
+      ? `  let isRight = x > ${Math.round(state.threshold)};`
+      : `  if (x > ${Math.round(state.threshold)}) {`,
+    state.mode === "if" ? "    fill(225, 29, 72);" : "",
+    state.mode === "ifelse" ? "    fill(225, 29, 72);\n  } else {\n    fill(8, 145, 178);" : "",
+    state.mode === "andor" ? `  let special = x > ${Math.round(state.threshold)} && size > 90;` : "",
+    "}"
+  ].filter(Boolean).join("\n");
+  document.getElementById("full-code").textContent = fullCode;
+}
+
+function makeControl(control) {
+  const row = document.createElement("div");
+  row.className = "ctrl-row";
+  row.innerHTML = `
+    <label for="ctrl-${control.key}">
+      ${control.label}
+      <small>${control.code}</small>
+    </label>
+    <span class="val-badge" id="val-${control.key}"></span>
+    <input id="ctrl-${control.key}" type="range" min="${control.min}" max="${control.max}" step="${control.step}" value="${state[control.key]}">
+  `;
+  const input = row.querySelector("input");
+  input.addEventListener("input", () => {
+    state[control.key] = Number(input.value);
+    state.changedKey = control.key;
+    if (control.key === "x") state.animate = false;
+    renderUI();
+  });
+  return row;
+}
+
+function renderControls() {
+  const controlsEl = document.getElementById("controls");
+  controlsEl.innerHTML = "";
+  modes[state.mode].controls.forEach((control) => controlsEl.appendChild(makeControl(control)));
+  modes[state.mode].controls.forEach((control) => {
+    document.getElementById(`val-${control.key}`).textContent = Number(state[control.key]).toFixed(control.step < 1 ? 1 : 0);
+  });
+}
+
+function renderPresets() {
+  const area = document.getElementById("presets-area");
+  const mode = modes[state.mode];
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = `<div class="presets-label">Teaching presets</div>`;
+  const row = document.createElement("div");
+  row.className = "preset-row";
+  mode.presets.forEach((preset) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `preset-btn${preset.isBreak ? " break" : ""}`;
+    btn.textContent = preset.label;
+    btn.addEventListener("click", () => {
+      Object.entries(preset.v).forEach(([key, value]) => { state[key] = value; });
+      state.changedKey = Object.keys(preset.v)[0];
+      state.animate = false;
+      document.getElementById("animateToggle").checked = false;
+      renderUI();
+    });
+    row.appendChild(btn);
+  });
+  wrapper.appendChild(row);
+  area.innerHTML = "";
+  area.appendChild(wrapper);
+}
+
+function drawSceneBase(w, h) {
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "#fffaf2";
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.strokeStyle = "#ece5d8";
+  ctx.lineWidth = 1;
+  for (let x = 0; x < w; x += 32) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let y = 0; y < h; y += 32) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+}
+
+function stageMetrics(w, h) {
+  return {
+    x: 60,
+    y: 90,
+    width: w - 120,
+    height: h - 190,
+    centerY: 220
+  };
+}
+
+function mapBallX(stage) {
+  return stage.x + ((state.x - 110) / 400) * stage.width;
+}
+
+function mapThresholdX(stage) {
+  return stage.x + ((state.threshold - 140) / 360) * stage.width;
+}
+
+function drawThreshold(stage) {
+  const tx = mapThresholdX(stage);
+  ctx.save();
+  ctx.strokeStyle = "#315c92";
+  ctx.lineWidth = 4;
+  ctx.setLineDash([8, 7]);
+  ctx.beginPath();
+  ctx.moveTo(tx, stage.y + 14);
+  ctx.lineTo(tx, stage.y + stage.height - 14);
+  ctx.stroke();
+  ctx.restore();
+  drawLabel(`threshold = ${Math.round(state.threshold)}`, tx + 10, stage.y + 34, "#315c92");
+}
+
+function drawBall(stage, fillStyle, text) {
+  const x = mapBallX(stage);
+  const y = stage.centerY;
+  ctx.fillStyle = fillStyle;
+  ctx.beginPath();
+  ctx.arc(x, y, state.size / 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#5b4634";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  drawLabel(`x = ${Math.round(state.x)}`, x - 24, y + state.size / 2 + 26, fillStyle);
+  if (text) drawLabel(text, x - 28, y - state.size / 2 - 18, fillStyle);
+}
+
+function drawDecisionCard(stage, conditionText, result, trueText, falseText) {
+  const x = stage.x + 16;
+  const y = stage.y + 16;
+  const w = 220;
+  const h = 92;
+  ctx.fillStyle = "rgba(255,255,255,0.94)";
+  roundedRect(x, y, w, h, 18);
+  ctx.fill();
+  ctx.fillStyle = "#222";
+  ctx.font = "800 15px 'DM Sans', sans-serif";
+  ctx.fillText("Condition", x + 14, y + 24);
+  ctx.font = "700 14px 'DM Mono', monospace";
+  ctx.fillStyle = "#7a5ea8";
+  ctx.fillText(conditionText, x + 14, y + 48);
+  ctx.font = "800 14px 'DM Sans', sans-serif";
+  ctx.fillStyle = result ? "#2a5e3e" : "#9b271c";
+  ctx.fillText(result ? "true" : "false", x + 14, y + 72);
+  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.fillStyle = "#6b6258";
+  ctx.fillText(result ? trueText : falseText, x + 72, y + 72);
+}
+
+function drawFooterPanel(w, h, title, detail, value, color) {
+  const x = 46;
+  const y = h - 122;
+  const width = w - 92;
+  const height = 84;
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  roundedRect(x, y, width, height, 18);
+  ctx.fill();
+  ctx.fillStyle = "#222";
+  ctx.font = "700 17px 'DM Sans', sans-serif";
+  ctx.fillText(title, x + 18, y + 26);
+  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.fillStyle = "#6b6258";
+  ctx.fillText(detail, x + 18, y + 46);
+  ctx.font = "800 24px 'DM Mono', monospace";
+  ctx.fillStyle = color;
+  ctx.fillText(value, x + 18, y + 72);
+}
+
+function drawIfMode(w, h) {
+  const stage = stageMetrics(w, h);
+  drawThreshold(stage);
+  const right = getConditions().right;
+  drawBall(stage, right ? "#e07a5f" : "#81b29a", right ? "true branch" : "still false");
+  drawDecisionCard(stage, `x > ${Math.round(state.threshold)}`, right, "run branch", "skip branch");
+  drawFooterPanel(w, h, "Threshold check", "The condition becomes true once the ball center moves past the line.", right ? "true" : "false", right ? "#2a5e3e" : "#9b271c");
+}
+
+function drawIfElseMode(w, h) {
+  const stage = stageMetrics(w, h);
+  drawThreshold(stage);
+  const right = getConditions().right;
+  drawBall(stage, right ? "#e07a5f" : "#315c92", right ? "if branch" : "else branch");
+  drawDecisionCard(stage, `x > ${Math.round(state.threshold)}`, right, "fill red", "fill blue");
+  drawFooterPanel(w, h, "One of two paths", "False does not mean “nothing.” It means the else branch runs.", right ? "if branch" : "else branch", right ? "#9b271c" : "#315c92");
+}
+
+function drawElseIfMode(w, h) {
+  const stage = stageMetrics(w, h);
+  const c = getConditions();
+  const leftBoundX = stage.x + (((c.leftBound - 110) / 400) * stage.width);
+  const rightBoundX = stage.x + (((c.rightBound - 110) / 400) * stage.width);
+  ctx.fillStyle = "rgba(129, 178, 154, 0.18)";
+  ctx.fillRect(stage.x, stage.y + 14, leftBoundX - stage.x, stage.height - 28);
+  ctx.fillStyle = "rgba(243, 163, 64, 0.16)";
+  ctx.fillRect(leftBoundX, stage.y + 14, rightBoundX - leftBoundX, stage.height - 28);
+  ctx.fillStyle = "rgba(224, 122, 95, 0.18)";
+  ctx.fillRect(rightBoundX, stage.y + 14, stage.x + stage.width - rightBoundX, stage.height - 28);
+
+  ctx.strokeStyle = "#315c92";
+  ctx.setLineDash([8, 7]);
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(leftBoundX, stage.y + 14);
+  ctx.lineTo(leftBoundX, stage.y + stage.height - 14);
+  ctx.moveTo(rightBoundX, stage.y + 14);
+  ctx.lineTo(rightBoundX, stage.y + stage.height - 14);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  const zone = state.x < c.leftBound ? "left" : state.x <= c.rightBound ? "middle" : "right";
+  const color = zone === "left" ? "#81b29a" : zone === "middle" ? "#f3a340" : "#e07a5f";
+  drawBall(stage, color, zone);
+  drawDecisionCard(stage, "left / middle / right", true, "first true zone wins", ""); 
+  drawFooterPanel(w, h, "Ordered categories", "else if checks the next condition only if the previous one was false.", zone, color);
+}
+
+function drawCompareMode(w, h) {
+  const stage = stageMetrics(w, h);
+  drawThreshold(stage);
+  drawBall(stage, "#f3a340", "look at the booleans");
+  const c = getConditions();
+  const rows = [
+    [`x > ${Math.round(state.threshold)}`, c.right],
+    [`x < ${Math.round(state.threshold)}`, c.left],
+    [`x === threshold`, c.equalish],
+    [`size > 90`, c.large]
+  ];
+  ctx.fillStyle = "rgba(255,255,255,0.94)";
+  roundedRect(stage.x + 16, stage.y + 16, 260, 138, 18);
+  ctx.fill();
+  ctx.fillStyle = "#222";
+  ctx.font = "800 15px 'DM Sans', sans-serif";
+  ctx.fillText("Comparison readout", stage.x + 14 + 16, stage.y + 16 + 24);
+  ctx.font = "13px 'DM Mono', monospace";
+  rows.forEach((row, index) => {
+    const y = stage.y + 56 + index * 22;
+    ctx.fillStyle = "#6b6258";
+    ctx.fillText(row[0], stage.x + 30, y);
+    ctx.fillStyle = row[1] ? "#2a5e3e" : "#9b271c";
+    ctx.fillText(row[1] ? "true" : "false", stage.x + 200, y);
+  });
+  drawFooterPanel(w, h, "Comparisons become Booleans", "Conditionals are built from these smaller true/false questions.", `${rows.filter((row) => row[1]).length} true`, "#315c92");
+}
+
+function drawAndOrMode(w, h) {
+  const stage = stageMetrics(w, h);
+  const c = getConditions();
+  const thresholdX = mapThresholdX(stage);
+  const sizeY = stage.centerY - 38;
+
+  ctx.fillStyle = "rgba(129, 178, 154, 0.18)";
+  ctx.fillRect(thresholdX, stage.y + 18, stage.x + stage.width - thresholdX, stage.height - 36);
+
+  ctx.fillStyle = "rgba(224, 122, 95, 0.18)";
+  roundedRect(stage.x + 18, stage.y + 18, stage.width - 36, sizeY - stage.y + 18, 18);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(122, 94, 168, 0.2)";
+  ctx.fillRect(thresholdX, stage.y + 18, stage.x + stage.width - thresholdX, sizeY - stage.y + 18);
+
+  ctx.strokeStyle = "#315c92";
+  ctx.setLineDash([8, 7]);
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(thresholdX, stage.y + 14);
+  ctx.lineTo(thresholdX, stage.y + stage.height - 14);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.strokeStyle = "#e07a5f";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(stage.x + 18, sizeY);
+  ctx.lineTo(stage.x + stage.width - 18, sizeY);
+  ctx.stroke();
+
+  drawLabel("x > threshold", thresholdX + 8, stage.y + 34, "#315c92");
+  drawLabel("size > 90", stage.x + 24, sizeY - 12, "#9b271c");
+  drawLabel("AND zone", thresholdX + 16, sizeY - 18, "#7a5ea8");
+
+  const color = c.andTrue ? "#7a5ea8" : c.orTrue ? "#f3a340" : "#c1b5a4";
+  drawBall(stage, color, c.andTrue ? "AND" : c.orTrue ? "OR" : "neither");
+  drawFooterPanel(
+    w,
+    h,
+    "Combined conditions",
+    "The overlap makes AND visible. Either highlighted region makes OR true.",
+    c.andTrue ? "AND = true" : c.orTrue ? "OR = true" : "both false",
+    c.andTrue ? "#7a5ea8" : c.orTrue ? "#9b271c" : "#6b6258"
+  );
+}
+
+function mapThresholdX(stage) {
+  return stage.x + ((state.threshold - 140) / 360) * stage.width;
+}
+
+function renderCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const displayWidth = canvas.clientWidth || 620;
+  const displayHeight = canvas.clientHeight || 420;
+  canvas.width = Math.round(displayWidth * dpr);
+  canvas.height = Math.round(displayHeight * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const w = displayWidth;
+  const h = displayHeight;
+  drawSceneBase(w, h);
+  if (state.mode === "if") drawIfMode(w, h);
+  if (state.mode === "ifelse") drawIfElseMode(w, h);
+  if (state.mode === "elseif") drawElseIfMode(w, h);
+  if (state.mode === "compare") drawCompareMode(w, h);
+  if (state.mode === "andor") drawAndOrMode(w, h);
+}
+
+function renderUI() {
+  const mode = modes[state.mode];
+  document.getElementById("canvas-title").textContent = mode.canvasTitle;
+  document.getElementById("canvas-sub").textContent = mode.canvasSub;
+  document.getElementById("predict-text").textContent = mode.predict;
+  document.getElementById("big-idea-text").innerHTML = mode.big;
+  document.getElementById("bug-text").innerHTML = mode.bug;
+  document.getElementById("try-text").textContent = mode.tryIt;
+  document.getElementById("prose-title").textContent = mode.proseTitle;
+  document.getElementById("prose-body").innerHTML = mode.proseBody;
+  document.querySelectorAll(".tab").forEach((tab) => {
+    const active = tab.dataset.mode === state.mode;
+    tab.setAttribute("aria-selected", String(active));
+    tab.tabIndex = active ? 0 : -1;
+  });
+  document.getElementById("showLabelsToggle").checked = state.showLabels;
+  document.getElementById("animateToggle").checked = state.animate;
+  renderControls();
+  renderPresets();
+  renderFocusCode();
+  renderCanvas();
+}
+
+function setMode(modeName) {
+  state.mode = modeName;
+  state.changedKey = "x";
+  renderUI();
+}
+
+function getCanvasPoint(event) {
+  const rect = canvas.getBoundingClientRect();
+  const x = (event.clientX - rect.left) * (canvas.clientWidth / rect.width);
+  const y = (event.clientY - rect.top) * (canvas.clientHeight / rect.height);
+  return { x, y };
+}
+
+canvas.addEventListener("pointerdown", (event) => {
+  const point = getCanvasPoint(event);
+  const stage = stageMetrics(canvas.clientWidth || 620, canvas.clientHeight || 420);
+  const ballX = mapBallX(stage);
+  const thresholdX = mapThresholdX(stage);
+  if (Math.abs(point.x - ballX) < state.size / 2 + 8 && Math.abs(point.y - stage.centerY) < state.size / 2 + 8) {
+    state.draggingBall = true;
+    canvas.setPointerCapture(event.pointerId);
+  } else if (Math.abs(point.x - thresholdX) < 16) {
+    state.draggingThreshold = true;
+    canvas.setPointerCapture(event.pointerId);
+  }
+});
+
+canvas.addEventListener("pointermove", (event) => {
+  const point = getCanvasPoint(event);
+  const stage = stageMetrics(canvas.clientWidth || 620, canvas.clientHeight || 420);
+  if (state.draggingBall) {
+    const t = clamp((point.x - stage.x) / stage.width, 0, 1);
+    state.x = 110 + t * 400;
+    state.changedKey = "x";
+    renderUI();
+  } else if (state.draggingThreshold) {
+    const t = clamp((point.x - stage.x) / stage.width, 0, 1);
+    state.threshold = 140 + t * 360;
+    state.changedKey = "threshold";
+    renderUI();
+  }
+});
+
+canvas.addEventListener("pointerup", () => {
+  state.draggingBall = false;
+  state.draggingThreshold = false;
+});
+
+canvas.addEventListener("pointercancel", () => {
+  state.draggingBall = false;
+  state.draggingThreshold = false;
+});
+
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => setMode(tab.dataset.mode));
+  tab.addEventListener("keydown", (event) => {
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const current = tabs.findIndex((item) => item.dataset.mode === state.mode);
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      setMode(tabs[(current + 1) % tabs.length].dataset.mode);
+      tabs[(current + 1) % tabs.length].focus();
     }
-
-    function setMode(mode) {
-      state.mode = mode;
-      updateUI();
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      setMode(tabs[(current - 1 + tabs.length) % tabs.length].dataset.mode);
+      tabs[(current - 1 + tabs.length) % tabs.length].focus();
     }
+  });
+});
 
-    function conditions() {
-      return {
-        rightOfThreshold: state.x > state.threshold,
-        leftOfThreshold: state.x < state.threshold,
-        equalThreshold: Math.abs(state.x - state.threshold) < 4,
-        large: state.size > 90,
-        small: state.size < 55,
-        insideZone: state.x > state.threshold - 110 && state.x < state.threshold + 110,
-        special: state.x > state.threshold && state.size > 90
-      };
+document.getElementById("showLabelsToggle").addEventListener("change", (event) => {
+  state.showLabels = event.target.checked;
+  renderCanvas();
+});
+
+document.getElementById("animateToggle").addEventListener("change", (event) => {
+  state.animate = event.target.checked;
+});
+
+document.getElementById("fullCodeToggle").addEventListener("click", () => {
+  const body = document.getElementById("full-code");
+  const btn = document.getElementById("fullCodeToggle");
+  const open = body.classList.toggle("open");
+  btn.setAttribute("aria-expanded", String(open));
+  btn.textContent = open ? "▾ Hide full p5.js sketch" : "▸ See full p5.js sketch";
+});
+
+function tick() {
+  if (state.animate) {
+    state.x += state.direction * 1.8;
+    if (state.x >= 510) {
+      state.x = 510;
+      state.direction = -1;
     }
-
-    function updateUI() {
-      const buttons = [
-        [els.modeIf, "if"],
-        [els.modeIfElse, "ifelse"],
-        [els.modeElseIf, "elseif"],
-        [els.modeCompare, "compare"],
-        [els.modeAndOr, "andor"]
-      ];
-      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
-
-      els.xSlider.value = state.x;
-      els.thresholdSlider.value = state.threshold;
-      els.sizeSlider.value = state.size;
-      els.xValue.textContent = String(Math.round(state.x));
-      els.thresholdValue.textContent = String(Math.round(state.threshold));
-      els.sizeValue.textContent = String(Math.round(state.size));
-      els.animateToggle.checked = state.animate;
-      els.showLabels.checked = state.showLabels;
-      els.showCode.checked = state.showCode;
-      els.codeCard.classList.toggle("visible", state.showCode);
-
-      const c = conditions();
-      const lessons = {
-        if: {
-          pill: "if condition is true, run code",
-          title: "if asks a true/false question",
-          text: "An if statement checks a condition. If the condition is true, the code inside the curly braces runs. If it is false, that code is skipped.",
-          formula: `if (x > ${Math.round(state.threshold)}) {\n  fill("red");\n}`,
-          question: "Move the ball across the threshold. When does the condition become true?",
-          caption: `The question is: x > ${Math.round(state.threshold)}? The answer is ${c.rightOfThreshold ? "true" : "false"}.`,
-          code: `if (x > ${Math.round(state.threshold)}) {\n  fill(225, 29, 72);\n}\n\ncircle(x, y, size);`
-        },
-        ifelse: {
-          pill: "if / else chooses between two paths",
-          title: "if / else chooses one of two branches",
-          text: "if / else gives the sketch two possible paths. If the condition is true, do the first thing. Otherwise, do the other thing.",
-          formula: `if (x > ${Math.round(state.threshold)}) {\n  fill("red");\n} else {\n  fill("blue");\n}`,
-          question: "Which branch runs when the condition is false?",
-          caption: "if / else is a fork in the road: exactly one of the two branches runs.",
-          code: `if (x > ${Math.round(state.threshold)}) {\n  fill(225, 29, 72);\n} else {\n  fill(8, 145, 178);\n}\n\ncircle(x, y, size);`
-        },
-        elseif: {
-          pill: "else if checks another question",
-          title: "else if creates multiple categories",
-          text: "else if lets the sketch test another condition if the first one was false. This is useful for categories like left, middle, right or small, medium, large.",
-          formula: `if (x < ${Math.round(state.threshold - 80)}) {\n  mood = "left";\n} else if (x < ${Math.round(state.threshold + 80)}) {\n  mood = "middle";\n} else {\n  mood = "right";\n}`,
-          question: "Why does only one category get chosen?",
-          caption: "The sketch checks the questions in order and uses the first true branch it finds.",
-          code: `if (x < ${Math.round(state.threshold - 80)}) {\n  fill(8, 145, 178);\n} else if (x < ${Math.round(state.threshold + 80)}) {\n  fill(245, 158, 11);\n} else {\n  fill(225, 29, 72);\n}`
-        },
-        compare: {
-          pill: "comparisons produce true or false",
-          title: "Comparisons are true/false questions",
-          text: "A comparison like x > threshold or size === 80 evaluates to a Boolean value: true or false.",
-          formula: `x > threshold  → ${c.rightOfThreshold}\nsize > 90     → ${c.large}\nx === threshold → ${c.equalThreshold}`,
-          question: "Which comparisons are true right now? Which are false?",
-          caption: "Comparisons are the questions that conditionals use to make decisions.",
-          code: `let isRight = x > ${Math.round(state.threshold)};\nlet isLarge = size > 90;\nlet isSmall = size < 55;`
-        },
-        andor: {
-          pill: "AND / OR combine conditions",
-          title: "AND / OR combine true/false questions",
-          text: "&& means both conditions must be true. || means at least one condition must be true.",
-          formula: `(x > ${Math.round(state.threshold)}) && (size > 90) → ${c.special}\n\n(x < ${Math.round(state.threshold)}) || (size > 90) → ${c.leftOfThreshold || c.large}`,
-          question: "When do both parts of the AND condition become true?",
-          caption: "Use AND when every requirement must be true. Use OR when any one requirement is enough.",
-          code: `if (x > ${Math.round(state.threshold)} && size > 90) {\n  fill(22, 163, 74);\n}\n\nif (x < ${Math.round(state.threshold)} || size > 90) {\n  strokeWeight(6);\n}`
-        }
-      };
-
-      const lesson = lessons[state.mode];
-      els.modePill.textContent = lesson.pill;
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.formulaBox.textContent = lesson.formula;
-      els.questionText.textContent = lesson.question;
-      els.caption.textContent = lesson.caption;
-      els.codeBox.textContent = lesson.code;
+    if (state.x <= 110) {
+      state.x = 110;
+      state.direction = 1;
     }
+    state.changedKey = "x";
+    renderUI();
+  }
+  requestAnimationFrame(tick);
+}
 
-    setupUI();
-
-    const sketch = (p) => {
-      let canvas;
-      let holder;
-      let previousWidth = 0;
-      let previousHeight = 0;
-
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive visualization of conditionals, comparisons, booleans, if else and and or in p5.js.");
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("DM Sans, system-ui, sans-serif");
-      };
-
-      p.windowResized = () => resizeToHolder();
-
-      p.draw = () => {
-        resizeToHolder();
-        if (state.animate) animateBall();
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-        drawPanelTitle();
-
-        if (state.mode === "if") drawIfMode();
-        if (state.mode === "ifelse") drawIfElseMode();
-        if (state.mode === "elseif") drawElseIfMode();
-        if (state.mode === "compare") drawCompareMode();
-        if (state.mode === "andor") drawAndOrMode();
-
-        drawReadoutCards();
-      };
-
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-        if (w !== previousWidth || h !== previousHeight) {
-          p.resizeCanvas(w, h);
-          previousWidth = w;
-          previousHeight = h;
-        }
-      }
-
-      function animateBall() {
-        state.x += state.direction * 2.2;
-        if (state.x > 720) {
-          state.x = 720;
-          state.direction = -1;
-        }
-        if (state.x < 80) {
-          state.x = 80;
-          state.direction = 1;
-        }
-        els.xSlider.value = state.x;
-        els.xValue.textContent = String(Math.round(state.x));
-      }
-
-      function drawSubtleGrid() {
-        p.push();
-        p.stroke(236, 224, 207);
-        p.strokeWeight(1);
-        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
-        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
-        p.pop();
-      }
-
-      function drawPanelTitle() {
-        const titles = {
-          if: ["if", "Ask one true/false question."],
-          ifelse: ["if / else", "Choose between two possible paths."],
-          elseif: ["else if", "Choose among multiple categories."],
-          compare: ["Comparisons", "Comparison expressions become true or false."],
-          andor: ["AND / OR", "Combine multiple conditions."]
-        };
-        const [title, subtitle] = titles[state.mode];
-        p.push();
-        p.noStroke();
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(22);
-        p.text(title, 24, 38);
-        p.textStyle(p.NORMAL);
-        p.textSize(14);
-        p.fill("#6b6258");
-        p.text(subtitle, 24, 62);
-        p.pop();
-      }
-
-      function getStage() {
-        return { x: p.width * 0.08, y: p.height * 0.15, w: p.width * 0.84, h: p.height * 0.50 };
-      }
-
-      function drawStage() {
-        const s = getStage();
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 235);
-        p.rect(s.x, s.y, s.w, s.h, 24);
-        p.pop();
-        return s;
-      }
-
-      function mapX(value) {
-        const s = getStage();
-        return p.map(value, 50, 750, s.x + 40, s.x + s.w - 40);
-      }
-
-      function drawThresholdLine(label = "threshold") {
-        const s = getStage();
-        const tx = mapX(state.threshold);
-        p.push();
-        p.stroke("#0891b2");
-        p.strokeWeight(4);
-        p.drawingContext.setLineDash([8, 7]);
-        p.line(tx, s.y + 22, tx, s.y + s.h - 22);
-        p.drawingContext.setLineDash([]);
-        if (state.showLabels) drawLabel(`${label}: ${Math.round(state.threshold)}`, tx + 12, s.y + 42, "#0891b2", 13);
-        p.pop();
-      }
-
-      function drawBall(color, strokeColor = null) {
-        const s = getStage();
-        const x = mapX(state.x);
-        const y = s.y + s.h * 0.53;
-        p.push();
-        p.noStroke();
-        p.fill(color);
-        p.circle(x, y, state.size);
-        if (strokeColor) {
-          p.noFill();
-          p.stroke(strokeColor);
-          p.strokeWeight(6);
-          p.circle(x, y, state.size + 12);
-        }
-        p.fill("#ffffff");
-        p.circle(x + state.size * 0.12, y - state.size * 0.12, Math.max(8, state.size * 0.18));
-        p.fill("#222222");
-        p.circle(x + state.size * 0.16, y - state.size * 0.12, Math.max(4, state.size * 0.08));
-        if (state.showLabels) drawLabel(`x = ${Math.round(state.x)}`, x - 25, y + state.size / 2 + 26, color, 13);
-        p.pop();
-      }
-
-      function drawIfMode() {
-        const s = drawStage();
-        drawThresholdLine();
-        const isTrue = state.x > state.threshold;
-        drawBall(isTrue ? "#e11d48" : "#d8cbbb");
-        drawDecisionCard(s.x + 24, s.y + 28, `x > ${Math.round(state.threshold)}`, isTrue, "if true: fill red", "if false: skip fill red");
-      }
-
-      function drawIfElseMode() {
-        const s = drawStage();
-        drawThresholdLine();
-        const isTrue = state.x > state.threshold;
-        drawBall(isTrue ? "#e11d48" : "#0891b2");
-        drawDecisionCard(s.x + 24, s.y + 28, `x > ${Math.round(state.threshold)}`, isTrue, "true branch: red", "else branch: blue");
-        drawBranchPath(isTrue);
-      }
-
-      function drawElseIfMode() {
-        const s = drawStage();
-        const leftBoundary = state.threshold - 80;
-        const rightBoundary = state.threshold + 80;
-        const leftX = mapX(leftBoundary);
-        const rightX = mapX(rightBoundary);
-        p.push();
-        p.noStroke();
-        p.fill(8, 145, 178, 32);
-        p.rect(s.x + 18, s.y + 20, leftX - s.x - 18, s.h - 40, 14);
-        p.fill(245, 158, 11, 42);
-        p.rect(leftX, s.y + 20, rightX - leftX, s.h - 40, 14);
-        p.fill(225, 29, 72, 32);
-        p.rect(rightX, s.y + 20, s.x + s.w - rightX - 18, s.h - 40, 14);
-        p.pop();
-
-        p.push();
-        p.stroke("#0891b2");
-        p.strokeWeight(3);
-        p.line(leftX, s.y + 20, leftX, s.y + s.h - 20);
-        p.line(rightX, s.y + 20, rightX, s.y + s.h - 20);
-        p.pop();
-
-        let color = "#f59e0b";
-        let zone = "middle";
-        if (state.x < leftBoundary) {
-          color = "#0891b2";
-          zone = "left";
-        } else if (state.x < rightBoundary) {
-          color = "#f59e0b";
-          zone = "middle";
-        } else {
-          color = "#e11d48";
-          zone = "right";
-        }
-        drawBall(color);
-        if (state.showLabels) {
-          drawLabel("left", s.x + 34, s.y + 42, "#0891b2", 14);
-          drawLabel("middle", leftX + 24, s.y + 42, "#f59e0b", 14);
-          drawLabel("right", rightX + 24, s.y + 42, "#e11d48", 14);
-          drawLabel(`chosen branch: ${zone}`, s.x + 24, s.y + s.h - 26, color, 15);
-        }
-      }
-
-      function drawCompareMode() {
-        const s = drawStage();
-        drawThresholdLine();
-        drawBall("#f59e0b");
-        const c = conditions();
-        const rows = [
-          { text: `x > ${Math.round(state.threshold)}`, value: c.rightOfThreshold },
-          { text: `x < ${Math.round(state.threshold)}`, value: c.leftOfThreshold },
-          { text: `x ≈ ${Math.round(state.threshold)}`, value: c.equalThreshold },
-          { text: `size > 90`, value: c.large },
-          { text: `size < 55`, value: c.small }
-        ];
-        drawComparisonTable(s.x + 28, s.y + 28, rows);
-      }
-
-      function drawAndOrMode() {
-        const s = drawStage();
-        drawThresholdLine();
-        const c = conditions();
-        const andTrue = c.rightOfThreshold && c.large;
-        const orTrue = c.leftOfThreshold || c.large;
-        let color = "#d8cbbb";
-        if (andTrue) color = "#16a34a";
-        else if (orTrue) color = "#f59e0b";
-        drawBall(color, andTrue ? "#16a34a" : null);
-        drawLogicGates(s.x + 28, s.y + 26, andTrue, orTrue);
-        if (state.showLabels) {
-          drawLabel(andTrue ? "AND is true: special state" : orTrue ? "OR is true: warning state" : "no combined condition is true", s.x + 28, s.y + s.h - 28, color === "#d8cbbb" ? "#6b6258" : color, 14);
-        }
-      }
-
-      function drawDecisionCard(x, y, question, result, trueText, falseText) {
-        p.push();
-        p.noStroke();
-        p.fill(255, 250, 242, 245);
-        p.rect(x, y, 250, 142, 18);
-        p.stroke("#7c3aed");
-        p.strokeWeight(2.5);
-        p.noFill();
-        p.rect(x, y, 250, 142, 18);
-        p.noStroke();
-        p.fill("#7c3aed");
-        p.textStyle(p.BOLD);
-        p.textSize(15);
-        p.text("condition", x + 16, y + 26);
-        p.fill("#222222");
-        p.textSize(18);
-        p.text(question + "?", x + 16, y + 58);
-        p.fill(result ? "#16a34a" : "#e11d48");
-        p.textSize(22);
-        p.text(result ? "true" : "false", x + 16, y + 92);
-        p.textSize(12);
-        p.fill(result ? "#16a34a" : "#e11d48");
-        p.text(result ? trueText : falseText, x + 16, y + 120);
-        p.pop();
-      }
-
-      function drawBranchPath(isTrue) {
-        const s = getStage();
-        const y = s.y + s.h * 0.23;
-        p.push();
-        p.stroke(isTrue ? "#16a34a" : "#e11d48");
-        p.strokeWeight(4);
-        p.line(s.x + 300, y, s.x + 420, isTrue ? y - 32 : y + 32);
-        p.noStroke();
-        p.fill(isTrue ? "#16a34a" : "#e11d48");
-        p.circle(s.x + 430, isTrue ? y - 32 : y + 32, 18);
-        if (state.showLabels) drawLabel(isTrue ? "true path" : "else path", s.x + 440, isTrue ? y - 26 : y + 38, isTrue ? "#16a34a" : "#e11d48", 13);
-        p.pop();
-      }
-
-      function drawComparisonTable(x, y, rows) {
-        const w = 250;
-        const rowH = 31;
-        const h = 48 + rows.length * rowH;
-        p.push();
-        p.noStroke();
-        p.fill(255, 250, 242, 245);
-        p.rect(x, y, w, h, 18);
-        p.stroke("#0891b2");
-        p.strokeWeight(2.5);
-        p.noFill();
-        p.rect(x, y, w, h, 18);
-        p.noStroke();
-        p.fill("#0891b2");
-        p.textStyle(p.BOLD);
-        p.textSize(15);
-        p.text("comparisons", x + 16, y + 26);
-        for (let i = 0; i < rows.length; i++) {
-          const yy = y + 58 + i * rowH;
-          p.fill("#334155");
-          p.textSize(13);
-          p.text(rows[i].text, x + 16, yy);
-          p.fill(rows[i].value ? "#16a34a" : "#e11d48");
-          p.textStyle(p.BOLD);
-          p.text(rows[i].value ? "true" : "false", x + 166, yy);
-          p.textStyle(p.NORMAL);
-        }
-        p.pop();
-      }
-
-      function drawLogicGates(x, y, andTrue, orTrue) {
-        const rows = [
-          { label: `(x > ${Math.round(state.threshold)}) && (size > 90)`, value: andTrue, name: "AND" },
-          { label: `(x < ${Math.round(state.threshold)}) || (size > 90)`, value: orTrue, name: "OR" }
-        ];
-        const w = 330;
-        const h = 142;
-        p.push();
-        p.noStroke();
-        p.fill(255, 250, 242, 245);
-        p.rect(x, y, w, h, 18);
-        p.stroke("#7c3aed");
-        p.strokeWeight(2.5);
-        p.noFill();
-        p.rect(x, y, w, h, 18);
-        p.noStroke();
-        p.fill("#7c3aed");
-        p.textStyle(p.BOLD);
-        p.textSize(15);
-        p.text("combined conditions", x + 16, y + 26);
-        for (let i = 0; i < rows.length; i++) {
-          const yy = y + 62 + i * 46;
-          p.fill(rows[i].value ? "#dcfce7" : "#ffe4e6");
-          p.rect(x + 14, yy - 22, w - 28, 34, 12);
-          p.fill(rows[i].value ? "#16a34a" : "#e11d48");
-          p.textStyle(p.BOLD);
-          p.text(rows[i].name, x + 24, yy);
-          p.fill("#334155");
-          p.textStyle(p.NORMAL);
-          p.textSize(12);
-          p.text(rows[i].label, x + 76, yy);
-          p.fill(rows[i].value ? "#16a34a" : "#e11d48");
-          p.textStyle(p.BOLD);
-          p.text(rows[i].value ? "true" : "false", x + w - 62, yy);
-        }
-        p.pop();
-      }
-
-      function drawReadoutCards() {
-        const c = conditions();
-        const cards = [
-          { label: "x", value: Math.round(state.x), color: "#0891b2" },
-          { label: "condition", value: c.rightOfThreshold ? "true" : "false", color: c.rightOfThreshold ? "#16a34a" : "#e11d48" },
-          { label: "size > 90", value: c.large ? "true" : "false", color: c.large ? "#16a34a" : "#e11d48" }
-        ];
-        const cardW = Math.min(176, (p.width - 70) / cards.length);
-        const y = p.height - 168;
-        const x = 28;
-        p.push();
-        for (let i = 0; i < cards.length; i++) {
-          const cx = x + i * (cardW + 10);
-          p.noStroke();
-          p.fill(255, 255, 255, 235);
-          p.rect(cx, y, cardW, 62, 14);
-          p.fill(cards[i].color);
-          p.textStyle(p.BOLD);
-          p.textSize(13);
-          p.text(cards[i].label, cx + 12, y + 22);
-          p.fill("#222222");
-          p.textSize(18);
-          p.text(String(cards[i].value), cx + 12, y + 48);
-        }
-        p.pop();
-      }
-
-      function drawLabel(text, x, y, color, size = 13) {
-        p.push();
-        p.textSize(size);
-        p.textStyle(p.BOLD);
-        const padX = 7;
-        const padY = 4;
-        const tw = p.textWidth(text);
-        p.noStroke();
-        p.fill(255, 250, 242, 238);
-        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
-        p.fill(color);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.text(text, x, y);
-        p.pop();
-      }
-    };
-
-    new p5(sketch);
-  </script>
+window.addEventListener("resize", renderCanvas);
+renderUI();
+requestAnimationFrame(tick);
+</script>
 </body>
 </html>
