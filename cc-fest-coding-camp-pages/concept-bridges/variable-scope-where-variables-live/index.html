@@ -231,6 +231,20 @@
     margin-top: 1px;
   }
   .tab[aria-selected="true"] .step { color: var(--accent-dark); }
+  .tab-progress {
+    height: 3px;
+    background: #ede8df;
+    border-radius: 2px;
+    margin: -4px 0 6px;
+    overflow: hidden;
+  }
+  .tab-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
 
   .tab:focus-visible,
   .preset-btn:focus-visible,
@@ -329,6 +343,22 @@
   }
 
   .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .snapshot-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border: 1.5px solid var(--rule, #d8d0c4);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink, #23201c);
+    font: 600 0.76rem/1 "DM Sans", system-ui, sans-serif;
+    cursor: pointer;
+    margin-bottom: 8px;
+    align-self: flex-start;
+  }
+  .snapshot-btn:hover { border-color: var(--accent); color: var(--accent-dark, var(--accent)); background: var(--accent-bg, #fffbf2); }
+
   .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
   .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
 
@@ -549,6 +579,8 @@
         <button class="tab" role="tab" id="tab-setupdraw" data-mode="setupdraw" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">setup vs draw<span class="step">4 of 5</span></button>
         <button class="tab" role="tab" id="tab-lifetime" data-mode="lifetime" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Lifetime<span class="step">5 of 5</span></button>
       </nav>
+      <div class="tab-progress" aria-hidden="true"><div class="tab-progress-fill" id="tab-progress-fill"></div></div>
+
 
       <div id="bridge-panel" role="tabpanel" aria-live="polite">
         <div class="predict">
@@ -557,6 +589,7 @@
         </div>
 
         <div class="ctrl-group" id="controls"></div>
+        <button class="snapshot-btn" id="snapshotBtn" type="button" title="Save canvas + code + Big Idea as PNG">📷 Save snapshot</button>
         <div id="presets-area"></div>
 
         <div class="code-section">
@@ -1440,6 +1473,103 @@ document.getElementById('fullCodeToggle').addEventListener('click', function() {
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 setMode('reset');
+
+// Tab progress bar
+(function() {
+  function updateProgress() {
+    var tabs = document.querySelectorAll('[role="tab"]');
+    var fill = document.getElementById('tab-progress-fill');
+    if (!fill || !tabs.length) return;
+    var idx = Array.from(tabs).findIndex(function(t) { return t.getAttribute('aria-selected') === 'true'; });
+    if (idx < 0) idx = 0;
+    fill.style.width = ((idx + 1) / tabs.length * 100) + '%';
+  }
+  var tl = document.querySelector('[role="tablist"]');
+  if (tl) tl.addEventListener('click', function() { setTimeout(updateProgress, 0); });
+  updateProgress();
+})();
+
+
+// ── Snapshot export ───────────────────────────────────────────────────────────
+(function() {
+  var btn = document.getElementById('snapshotBtn');
+  if (!btn) return;
+
+  function wrapText(ctx, text, x, y, maxW, lineH) {
+    var words = text.split(' ');
+    var line = '';
+    for (var i = 0; i < words.length; i++) {
+      var test = line + words[i] + ' ';
+      if (ctx.measureText(test).width > maxW && i > 0) {
+        ctx.fillText(line, x, y);
+        line = words[i] + ' ';
+        y += lineH;
+      } else {
+        line = test;
+      }
+    }
+    if (line.trim()) ctx.fillText(line, x, y);
+  }
+
+  btn.addEventListener('click', function() {
+    var bridgeCanvas = document.querySelector('canvas');
+    if (!bridgeCanvas) return;
+
+    var cw = bridgeCanvas.width;
+    var ch = bridgeCanvas.height;
+    var panelH = 100;
+
+    var out = document.createElement('canvas');
+    out.width = cw;
+    out.height = ch + panelH;
+    var oc = out.getContext('2d');
+
+    // Bridge canvas
+    oc.drawImage(bridgeCanvas, 0, 0);
+
+    // Text panel
+    oc.fillStyle = '#faf7f2';
+    oc.fillRect(0, ch, cw, panelH);
+    oc.strokeStyle = '#ddd8cc';
+    oc.lineWidth = 1;
+    oc.beginPath(); oc.moveTo(0, ch); oc.lineTo(cw, ch); oc.stroke();
+
+    // Code focus line
+    var focusEl = document.querySelector('.code-focus, .focus-line, [id*="focus"]');
+    if (!focusEl) focusEl = document.querySelector('.ct');
+    var focusText = focusEl ? focusEl.closest('.code-focus, .focus-line, pre, code') ? focusEl.closest('.code-focus, .focus-line, pre, code').textContent.trim().slice(0, 120) : focusEl.textContent.trim().slice(0, 120) : '';
+    if (focusText) {
+      oc.font = '600 12px "DM Mono", monospace';
+      oc.fillStyle = '#2a4a6a';
+      oc.textBaseline = 'top';
+      oc.fillText(focusText.slice(0, 100), 14, ch + 12, cw - 28);
+    }
+
+    // Big Idea text
+    var bigEl = document.getElementById('big-idea-text');
+    var bigText = bigEl ? bigEl.textContent.trim() : '';
+    if (bigText) {
+      oc.font = '400 11px "DM Sans", sans-serif';
+      oc.fillStyle = '#4a4535';
+      wrapText(oc, bigText, 14, ch + 36, cw - 28, 15);
+    }
+
+    // Watermark
+    oc.font = '400 10px "DM Sans", sans-serif';
+    oc.fillStyle = '#aaa9a0';
+    oc.textAlign = 'right';
+    oc.textBaseline = 'bottom';
+    oc.fillText('CC Fest Coding Camp', cw - 12, ch + panelH - 8);
+
+    // Download
+    var link = document.createElement('a');
+    var h1 = document.querySelector('h1');
+    link.download = 'ccfest-' + (h1 ? h1.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30) : 'bridge') + '.png';
+    link.href = out.toDataURL('image/png');
+    link.click();
+  });
+})();
+
 </script>
 </body>
 </html>
