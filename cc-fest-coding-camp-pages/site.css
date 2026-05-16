@@ -998,9 +998,13 @@ body.search-active #starter-sketches{
   display:none;
 }
 
-/* Solo station (1 card): don't create empty column gaps */
-.station[data-solo]:not(#station-support) .tool-grid{
+/* Small stations: avoid awkward empty columns without forcing everything into one stack */
+.station[data-card-count="1"]:not(#station-support) .tool-grid{
   grid-template-columns:minmax(0,380px);
+}
+
+.station[data-card-count="2"] .tool-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
 }
 
 .station-peek-btn{

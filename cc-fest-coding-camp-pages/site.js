@@ -186,10 +186,17 @@
       openByDefault: false
     });
 
+    const totalCards = grid.querySelectorAll(".tool-card").length;
     const previewCount = 3;
-    const remaining = grid.querySelectorAll(".tool-card").length - previewCount;
+    const remaining = totalCards - previewCount;
+    if (totalCards === 1) {
+      station.setAttribute("data-card-count", "1");
+    } else if (totalCards === 2) {
+      station.setAttribute("data-card-count", "2");
+    } else {
+      station.removeAttribute("data-card-count");
+    }
     if (remaining <= 0) {
-      station.setAttribute("data-solo", "");
       return;
     }
     const trigger = document.createElement("div");
