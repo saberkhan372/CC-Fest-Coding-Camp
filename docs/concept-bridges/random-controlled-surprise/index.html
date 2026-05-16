@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../concept-bridge.css">
+<title>random(): Controlled Surprise</title>
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #9b3f1f;
+    --accent-dark: #6b2510;
+    --accent-bg: #fff0eb;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--accent-dark); }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
+
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 22px;
+  }
+
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: var(--paper);
+  }
+
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
+
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--faint);
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .canvas-panel { overflow: hidden; }
+
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
+
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
+
+  #rand-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
+
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
+
+  .ctrl-panel { padding: 16px; }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
+
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #fff2dc; border-color: #e0a050; }
+
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
+
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(155,63,31,0.4);
+    outline-offset: 2px;
+  }
+
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .box-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
+
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
+
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
+  }
+
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
+    display: block;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 42px;
+    text-align: center;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
+  }
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: color var(--transition);
+  }
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 22px; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 720px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
+  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--faint);
+    flex-shrink: 0;
+    min-width: 88px;
+  }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
+  .bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
+  }
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color var(--transition); }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .tabs { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
+    .bottom-nav { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · Math &amp; Motion</p>
+  <h1>random(): Controlled Surprise</h1>
+  <p class="subtitle">
+    A concept bridge for <code>random()</code>. You choose the range — the computer chooses one value from inside it.
+    Every call gives a different result.
+  </p>
+
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">generative art</span>
+    <span class="unlock-pill">variation</span>
+    <span class="unlock-pill">organic feel</span>
+    <span class="unlock-pill">randomized position/color/size</span>
+    <span class="unlock-pill">procedural design</span>
+  </div>
+
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text">"random() just gives me random numbers. I don't see how to use it for anything specific."</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text">"random(min, max) gives a number inside any range you choose. Call it once for a permanent random value; call it in draw() for continuous variation."</div>
+    </div>
+  </section>
+
+  <section class="main-grid" aria-label="Interactive random() concept bridge">
+    <article class="panel canvas-panel">
+      <div class="canvas-bar">
+        <div class="canvas-bar-title" id="canvas-title">Range: random(min, max) lands inside your chosen zone</div>
+        <div class="canvas-bar-sub" id="canvas-sub">Set the min and max, then roll to see where the value lands on the number line.</div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="rand-canvas" width="620" height="380" aria-label="Interactive random() visualization"></canvas>
+        <div class="touch-hint">Use the controls on the right to explore.</div>
+      </div>
+    </article>
+
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="random() concept tabs">
+        <button class="tab" role="tab" id="tab-range" data-mode="range" aria-selected="true" aria-controls="rand-panel" tabindex="0">Range<span class="step">1 of 4</span></button>
+        <button class="tab" role="tab" id="tab-oncevsdraw" data-mode="oncevsdraw" aria-selected="false" aria-controls="rand-panel" tabindex="-1">Once vs draw()<span class="step">2 of 4</span></button>
+        <button class="tab" role="tab" id="tab-integer" data-mode="integer" aria-selected="false" aria-controls="rand-panel" tabindex="-1">Integer<span class="step">3 of 4</span></button>
+        <button class="tab" role="tab" id="tab-seed" data-mode="seed" aria-selected="false" aria-controls="rand-panel" tabindex="-1">Seed<span class="step">4 of 4</span></button>
+      </nav>
+
+      <div id="rand-panel" role="tabpanel" aria-live="polite">
+        <div class="predict">
+          <span class="box-label">Predict before changing</span>
+          <span class="box-body" id="predict-text">If min=100 and max=150 — can you ever get a value of 99? Of 151?</span>
+        </div>
+
+        <div class="ctrl-group" id="controls"></div>
+        <div id="presets-area"></div>
+
+        <div class="code-section">
+          <div class="code-header"><span>Live code</span><span id="code-note">random(min, max) returns a decimal in range.</span></div>
+          <div class="code-focus-line mono" id="focus-code"></div>
+          <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">&#9658; See full p5.js sketch</button>
+          <div class="full-code-body mono" id="full-code"></div>
+        </div>
+
+        <div class="callout big-idea">
+          <span class="box-label">Big idea</span>
+          <span class="box-body" id="big-idea-text">random(min, max) returns a decimal number &ge; min and &lt; max. The range is half-open: min is possible, max is never returned.</span>
+        </div>
+
+        <div class="callout bug">
+          <span class="box-label">&#9888; Common mistake</span>
+          <span class="box-body" id="bug-text">random() with no arguments returns 0.0&ndash;1.0. random(255) returns 0&ndash;255. random(255, 0) with max &lt; min silently reverses the range in p5.js.</span>
+        </div>
+
+        <div class="callout try">
+          <span class="box-label">Try this</span>
+          <span class="box-body" id="try-text">Set min and max to the same value. What happens? Now make the range very small (like 100 to 101). How often do you get the same value twice?</span>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="prose-section">
+    <h2>You choose the range; the computer chooses the value</h2>
+    <p><code>random()</code> is a tool for designed surprise. You provide the boundaries — a range, a set of choices, a grid size — and <code>random()</code> picks something inside them. The result is unpredictable but controlled.</p>
+    <p>Call it once in <code>setup()</code> for permanent randomness. Call it in <code>draw()</code> for continuous variation. Use <code>floor()</code> to convert decimals into integer indices. Use <code>randomSeed()</code> when you want the same surprise every time.</p>
+  </section>
+
+  <div class="legend" aria-label="random() legend">
+    <div class="legend-item"><span class="swatch" style="background:#e03030;border-color:#a02020"></span> random value</div>
+    <div class="legend-item"><span class="swatch" style="background:rgba(155,63,31,0.22);border-color:#9b3f1f"></span> range zone</div>
+    <div class="legend-item"><span class="swatch" style="background:#f0a870;border-color:#c07830"></span> floor() output</div>
+    <div class="legend-item"><span class="swatch" style="background:#8b5cf6;border-color:#6b3cc6"></span> seed (locked)</div>
+    <div class="legend-item"><span class="swatch" style="background:#ede;border-color:#bbb"></span> true random (open)</div>
+  </div>
+
+  <section class="pathways" aria-label="Practice and remix links">
+    <div class="pathways-title">What's next</div>
+    <div class="path-links">
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
+        <span class="path-link-type">Practice &#8594;</span>
+        <span class="path-link-name">Look for noise, randomness, or generative tools in the workshop library</span>
+        <span class="path-link-arrow">&#8250;</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
+        <span class="path-link-type">Remix &#8594;</span>
+        <span class="path-link-name">Take a starter sketch and randomize one property (size, color, or position) using random()</span>
+        <span class="path-link-arrow">&#8250;</span>
+      </a>
+      <a href="../noise-smooth-randomness/" class="path-link">
+        <span class="path-link-type">Related &#8594;</span>
+        <span class="path-link-name">Noise: Smooth Randomness — use noise() when you want randomness that flows smoothly</span>
+        <span class="path-link-arrow">&#8250;</span>
+      </a>
+    </div>
+  </section>
+
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">&#8592; All bridges</a>
+    <a href="../noise-smooth-randomness/">Next: Noise: Smooth Randomness &#8594;</a>
+  </nav>
+</main>
+
+<script>
+'use strict';
+
+// ─── Canvas setup ─────────────────────────────────────────────────────────────
+const canvas = document.getElementById('rand-canvas');
+const ctx = canvas.getContext('2d');
+
+function W() { return canvas.width; }
+function H() { return canvas.height; }
+function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+
+// ─── State ────────────────────────────────────────────────────────────────────
+const state = {
+  mode: 'range',
+  rangeMin: 0,
+  rangeMax: 255,
+  rangeRolls: [],
+  rangeLastRoll: null,
+  onvdFrozen: false,
+  onvdFps: 30,
+  onvdSetupCircles: [],
+  onvdDrawCircles: [],
+  intN: 4,
+  intGrid: [],
+  seedValue: 42,
+  seedApplied: false,
+  seedCircles: []
+};
+
+// ─── Animation ────────────────────────────────────────────────────────────────
+let rafId = null;
+let onvdFrameCount = 0;
+
+function stopAnim() {
+  if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+}
+
+// ─── Drawing helpers ──────────────────────────────────────────────────────────
+function roundRect(x, y, w, h, r) {
+  const rad = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rad, y);
+  ctx.lineTo(x + w - rad, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rad);
+  ctx.lineTo(x + w, y + h - rad);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
+  ctx.lineTo(x + rad, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - rad);
+  ctx.lineTo(x, y + rad);
+  ctx.quadraticCurveTo(x, y, x + rad, y);
+  ctx.closePath();
+}
+
+function fillRR(x, y, w, h, r, fill, strk, sw) {
+  roundRect(x, y, w, h, r);
+  ctx.fillStyle = fill;
+  ctx.fill();
+  if (strk && sw) { ctx.lineWidth = sw; ctx.strokeStyle = strk; ctx.stroke(); }
+}
+
+function canvasText(text, x, y, opts = {}) {
+  const { size = 13, weight = '700', color = '#1d1b18', align = 'left', maxW } = opts;
+  ctx.save();
+  ctx.font = `${weight} ${size}px "DM Sans", system-ui, sans-serif`;
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  if (maxW) ctx.fillText(text, x, y, maxW);
+  else ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+function monoText(text, x, y, opts = {}) {
+  const { size = 12, weight = '600', color = '#e8e4da', align = 'left' } = opts;
+  ctx.save();
+  ctx.font = `${weight} ${size}px "DM Mono", ui-monospace, Menlo, monospace`;
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+// ─── Simple seeded PRNG (mulberry32) ─────────────────────────────────────────
+function mulberry32(seed) {
+  let s = seed;
+  return function() {
+    s |= 0; s = s + 0x6D2B79F5 | 0;
+    let t = Math.imul(s ^ s >>> 15, 1 | s);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// ─── Tab 1: Range ─────────────────────────────────────────────────────────────
+const RANGE_TRACK_X = 40;
+const RANGE_TRACK_W = 540;
+const RANGE_TRACK_Y = 200;
+
+function valToX(v) {
+  return RANGE_TRACK_X + (v / 255) * RANGE_TRACK_W;
+}
+
+function renderRange() {
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W(), H());
+  fillRR(12, 12, W() - 24, H() - 24, 14, '#fffdf7', '#ded4c3', 1.5);
+
+  const mn = state.rangeMin;
+  const mx = state.rangeMax;
+  const mnX = valToX(mn);
+  const mxX = valToX(mx);
+
+  // Number line track
+  fillRR(RANGE_TRACK_X, RANGE_TRACK_Y - 8, RANGE_TRACK_W, 16, 8, '#ede8df', '#ccc', 1);
+
+  // Zone highlight
+  const zoneX = mnX;
+  const zoneW = mxX - mnX;
+  if (zoneW > 0) {
+    fillRR(zoneX, RANGE_TRACK_Y - 10, zoneW, 20, 6, 'rgba(155,63,31,0.18)', '#9b3f1f', 1.5);
+  }
+
+  // Tick marks
+  [0, 51, 102, 153, 204, 255].forEach(v => {
+    const tx = valToX(v);
+    ctx.strokeStyle = '#bbb';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(tx, RANGE_TRACK_Y + 10);
+    ctx.lineTo(tx, RANGE_TRACK_Y + 22);
+    ctx.stroke();
+    canvasText(String(v), tx, RANGE_TRACK_Y + 36, { align: 'center', size: 10, color: '#9e9789' });
+  });
+
+  // Min/max labels
+  if (zoneW > 0) {
+    canvasText(String(mn), mnX, RANGE_TRACK_Y - 18, { align: 'center', size: 11, weight: '800', color: '#9b3f1f' });
+    canvasText(String(mx), mxX, RANGE_TRACK_Y - 18, { align: 'center', size: 11, weight: '800', color: '#9b3f1f' });
+  }
+  canvasText('0', RANGE_TRACK_X, RANGE_TRACK_Y + 52, { align: 'center', size: 10, color: '#bbb' });
+  canvasText('255', RANGE_TRACK_X + RANGE_TRACK_W, RANGE_TRACK_Y + 52, { align: 'center', size: 10, color: '#bbb', align: 'right' });
+
+  // Accumulated dots
+  state.rangeRolls.forEach(roll => {
+    const rx = valToX(roll);
+    ctx.beginPath();
+    ctx.arc(rx, RANGE_TRACK_Y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(155,63,31,0.55)';
+    ctx.fill();
+  });
+
+  // Last roll dot (large, with label)
+  if (state.rangeLastRoll !== null) {
+    const rx = valToX(state.rangeLastRoll);
+    ctx.beginPath();
+    ctx.arc(rx, RANGE_TRACK_Y, 10, 0, Math.PI * 2);
+    ctx.fillStyle = '#e03030';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(rx, RANGE_TRACK_Y, 10, 0, Math.PI * 2);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Value label
+    fillRR(rx - 40, RANGE_TRACK_Y - 60, 80, 28, 6, '#fff', '#e03030', 1.5);
+    canvasText(state.rangeLastRoll.toFixed(1), rx, RANGE_TRACK_Y - 41, { align: 'center', size: 12, weight: '800', color: '#e03030' });
+    ctx.strokeStyle = '#e03030';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(rx, RANGE_TRACK_Y - 32);
+    ctx.lineTo(rx, RANGE_TRACK_Y - 10);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Header
+  canvasText('Number line: 0 to 255', W() / 2, 50, { align: 'center', size: 13, weight: '800', color: '#1d1b18' });
+  canvasText(`Range zone: random(${mn}, ${mx})`, W() / 2, 70, { align: 'center', size: 11, color: '#9b3f1f' });
+  canvasText(`Rolls accumulated: ${state.rangeRolls.length}`, W() / 2, 88, { align: 'center', size: 10, color: '#9e9789' });
+
+  // Code
+  fillRR(12, H() - 62, W() - 24, 48, 8, '#1e1e2a', null, 0);
+  monoText(`random(${mn}, ${mx})  // returns a decimal in [${mn}, ${mx})`, 24, H() - 44, { size: 10, color: '#7dafe0' });
+  monoText(`// min=${mn} is possible · max=${mx} is never returned`, 24, H() - 28, { size: 10, color: '#6a6a7a' });
+  monoText(`// last roll: ${state.rangeLastRoll !== null ? state.rangeLastRoll.toFixed(3) : 'none yet'}`, 24, H() - 14, { size: 10, color: '#f0a870' });
+
+  // Update spans
+  const mnEl = document.getElementById('v-mn');
+  const mxEl = document.getElementById('v-mx');
+  if (mnEl) mnEl.textContent = mn;
+  if (mxEl) mxEl.textContent = mx;
+}
+
+function doRoll() {
+  const mn = state.rangeMin;
+  const mx = state.rangeMax;
+  if (mx <= mn) { state.rangeLastRoll = mn; }
+  else { state.rangeLastRoll = mn + Math.random() * (mx - mn); }
+  state.rangeRolls.push(state.rangeLastRoll);
+  if (state.rangeRolls.length > 60) state.rangeRolls.shift();
+  renderRange();
+}
+
+function clearRolls() {
+  state.rangeRolls = [];
+  state.rangeLastRoll = null;
+  renderRange();
+}
+
+// ─── Tab 2: Once vs draw() ────────────────────────────────────────────────────
+const ONVD_COLORS = [
+  [230, 100, 60],
+  [60, 150, 200],
+  [80, 190, 120],
+  [200, 160, 60],
+  [140, 80, 200]
+];
+
+function makeOnvdSetup() {
+  state.onvdSetupCircles = Array.from({ length: 5 }, () => ({
+    x: 30 + Math.random() * (W() / 2 - 80),
+    y: 60 + Math.random() * (H() - 120),
+    r: 14 + Math.random() * 22,
+    c: ONVD_COLORS[Math.floor(Math.random() * ONVD_COLORS.length)]
+  }));
+}
+
+function makeOnvdDraw() {
+  state.onvdDrawCircles = Array.from({ length: 5 }, () => ({
+    x: W() / 2 + 10 + Math.random() * (W() / 2 - 80),
+    y: 60 + Math.random() * (H() - 120),
+    r: 14 + Math.random() * 22,
+    c: ONVD_COLORS[Math.floor(Math.random() * ONVD_COLORS.length)]
+  }));
+}
+
+function renderOnvd() {
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W(), H());
+
+  const half = W() / 2;
+
+  // Left panel — setup()
+  fillRR(8, 8, half - 12, H() - 16, 14, '#fffdf7', '#4478c4', 2);
+  canvasText('random() in setup()', half / 2, 34, { align: 'center', weight: '800', size: 12, color: '#4478c4' });
+  canvasText('positions fixed forever', half / 2, 50, { align: 'center', size: 10, color: '#9e9789' });
+
+  state.onvdSetupCircles.forEach(c => {
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${c.c[0]},${c.c[1]},${c.c[2]},0.85)`;
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  canvasText('setup() called once', half / 2, H() - 24, { align: 'center', size: 10, color: '#4478c4', weight: '800' });
+
+  // Right panel — draw()
+  fillRR(half + 4, 8, half - 12, H() - 16, 14, '#fffdf7', '#9b3f1f', 2);
+  canvasText(state.onvdFrozen ? 'random() in draw() (FROZEN)' : 'random() in draw()', half + half / 2, 34, { align: 'center', weight: '800', size: 12, color: '#9b3f1f' });
+  canvasText(state.onvdFrozen ? 'paused' : 'flickering every frame', half + half / 2, 50, { align: 'center', size: 10, color: '#9e9789' });
+
+  state.onvdDrawCircles.forEach(c => {
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${c.c[0]},${c.c[1]},${c.c[2]},0.85)`;
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  canvasText(`draw() calls: ${onvdFrameCount}`, half + half / 2, H() - 24, { align: 'center', size: 10, color: '#9b3f1f', weight: '800' });
+}
+
+function tickOnvd() {
+  onvdFrameCount++;
+  if (!state.onvdFrozen && onvdFrameCount % Math.max(1, Math.round(60 / state.onvdFps)) === 0) {
+    makeOnvdDraw();
+  }
+  renderOnvd();
+  rafId = requestAnimationFrame(tickOnvd);
+}
+
+// ─── Tab 3: Integer ───────────────────────────────────────────────────────────
+const INT_PALETTE = [
+  ['#e07050', '#c04030'],
+  ['#4478c4', '#2858a4'],
+  ['#60b870', '#3a9850'],
+  ['#d4a030', '#a47810'],
+  ['#9058c0', '#7038a0'],
+  ['#e08050', '#c06030'],
+  ['#50a8b0', '#308890'],
+  ['#d05880', '#a03860']
+];
+
+function makeIntGrid() {
+  const n = state.intN;
+  state.intGrid = Array.from({ length: 24 }, () => Math.floor(Math.random() * n));
+}
+
+function renderInteger() {
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W(), H());
+  fillRR(12, 12, W() - 24, H() - 24, 14, '#fffdf7', '#ded4c3', 1.5);
+
+  const n = state.intN;
+  const cols = 6;
+  const rows = 4;
+  const cellW = (W() - 60) / cols;
+  const cellH = 52;
+  const startX = 30;
+  const startY = 56;
+
+  canvasText(`floor(random(${n})) — integer 0 to ${n - 1}`, W() / 2, 36, { align: 'center', size: 12, weight: '800', color: '#1d1b18' });
+
+  state.intGrid.forEach((v, idx) => {
+    const col = idx % cols;
+    const row = Math.floor(idx / cols);
+    const cx = startX + col * cellW;
+    const cy = startY + row * (cellH + 4);
+    const pal = INT_PALETTE[v % INT_PALETTE.length];
+    fillRR(cx, cy, cellW - 4, cellH, 8, pal[0], pal[1], 1.5);
+    canvasText(String(v), cx + (cellW - 4) / 2, cy + 22, { align: 'center', size: 16, weight: '800', color: '#fff' });
+    // Show floor operation for first row
+    if (row === 0) {
+      const dec = (v + Math.random()).toFixed(2);
+      canvasText(`floor(${dec})`, cx + (cellW - 4) / 2, cy + cellH - 6, { align: 'center', size: 9, color: 'rgba(255,255,255,0.8)' });
+    }
+  });
+
+  // Floor operation diagram
+  const diagY = startY + rows * (cellH + 4) + 12;
+  fillRR(30, diagY, W() - 60, 52, 8, '#1e1e2a', null, 0);
+  monoText(`floor(random(${n}))`, 44, diagY + 18, { size: 11, color: '#7dafe0' });
+  monoText('// random() → 2.734...', 44, diagY + 34, { size: 11, color: '#6a6a7a' });
+  monoText(`// floor()  → 2  (integer 0–${n - 1})`, 44 + 220, diagY + 34, { size: 11, color: '#f0a870' });
+
+  const vnEl = document.getElementById('v-n');
+  if (vnEl) vnEl.textContent = n;
+}
+
+// ─── Tab 4: Seed ──────────────────────────────────────────────────────────────
+function generateSeedCircles(seed) {
+  const rng = mulberry32(seed);
+  return Array.from({ length: 80 }, () => ({
+    x: 30 + rng() * (W() - 60),
+    y: 30 + rng() * (H() - 100),
+    r: 5 + rng() * 18,
+    hue: Math.floor(rng() * 360),
+    alpha: 0.4 + rng() * 0.5
+  }));
+}
+
+function generateTrueCircles() {
+  return Array.from({ length: 80 }, () => ({
+    x: 30 + Math.random() * (W() - 60),
+    y: 30 + Math.random() * (H() - 100),
+    r: 5 + Math.random() * 18,
+    hue: Math.floor(Math.random() * 360),
+    alpha: 0.4 + Math.random() * 0.5
+  }));
+}
+
+function hslToRgb(h, s, l) {
+  s /= 100; l /= 100;
+  const k = n => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+}
+
+function renderSeed() {
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W(), H());
+  fillRR(12, 12, W() - 24, H() - 110, 14, '#1e1e2a', null, 0);
+
+  state.seedCircles.forEach(c => {
+    const [r, g, b] = hslToRgb(c.hue, 70, 60);
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${r},${g},${b},${c.alpha})`;
+    ctx.fill();
+  });
+
+  // Overlay info
+  const infoY = H() - 100;
+  fillRR(12, infoY, W() - 24, 86, 10, '#fffdf7', '#ded4c3', 1.5);
+
+  if (state.seedApplied) {
+    canvasText(`Seed: ${state.seedValue} — same layout every time`, W() / 2, infoY + 20, { align: 'center', size: 12, weight: '800', color: '#8b5cf6' });
+    canvasText('randomSeed(' + state.seedValue + ') applied in setup()', W() / 2, infoY + 38, { align: 'center', size: 11, color: '#6b4c96' });
+    canvasText('Regenerate — always the same result with this seed', W() / 2, infoY + 54, { align: 'center', size: 10, color: '#9e9789' });
+  } else {
+    canvasText('No seed — true random: different every time', W() / 2, infoY + 20, { align: 'center', size: 12, weight: '800', color: '#9b3f1f' });
+    canvasText('Each regeneration gives a unique layout', W() / 2, infoY + 38, { align: 'center', size: 11, color: '#6d675f' });
+    canvasText('Try applying a seed to lock the sequence', W() / 2, infoY + 54, { align: 'center', size: 10, color: '#9e9789' });
+  }
+
+  fillRR(12, infoY + 66, W() - 24, 20, 6, state.seedApplied ? '#f0ebff' : '#fff0eb', state.seedApplied ? '#8b5cf6' : '#9b3f1f', 1.5);
+  monoText(state.seedApplied ? `randomSeed(${state.seedValue}); // same surprise every time` : `// no seed — Math.random() sequence changes each run`, 24, infoY + 80, { size: 10, color: state.seedApplied ? '#c9a0f0' : '#f0a870' });
+
+  const vsEl = document.getElementById('v-seed');
+  if (vsEl) vsEl.textContent = state.seedValue;
+}
+
+function applySeed() {
+  state.seedApplied = true;
+  state.seedCircles = generateSeedCircles(state.seedValue);
+  renderSeed();
+}
+
+function randomizeSeed() {
+  state.seedValue = Math.floor(Math.random() * 9999) + 1;
+  state.seedApplied = true;
+  state.seedCircles = generateSeedCircles(state.seedValue);
+  const inp = document.getElementById('sl-seed-input');
+  if (inp) inp.value = state.seedValue;
+  const badge = document.getElementById('vb-seed');
+  if (badge) badge.textContent = state.seedValue;
+  updateCode();
+  renderSeed();
+}
+
+function clearSeed() {
+  state.seedApplied = false;
+  state.seedCircles = generateTrueCircles();
+  renderSeed();
+}
+
+// ─── Mode definitions ─────────────────────────────────────────────────────────
+const modes = {
+  range: {
+    canvasTitle: 'Range: random(min, max) lands inside your chosen zone',
+    canvasSub: 'Set the min and max, then roll to see where the value lands on the number line.',
+    predict: 'If min=100 and max=150 — can you ever get a value of 99? Of 151?',
+    big: 'random(min, max) returns a decimal number ≥ min and < max. The range is half-open: min is possible, max is never returned.',
+    bug: 'random() with no arguments returns 0.0–1.0. random(255) returns 0–255. random(255, 0) with max < min silently reverses the range in p5.js.',
+    tryIt: 'Set min and max to the same value. What happens? Now make the range very small (like 100 to 101). How often do you get the same value twice?',
+    note: 'random(min, max) returns a decimal in range.',
+    focusHTML: () => `random(<span class="ct num" id="v-mn">${state.rangeMin}</span>, <span class="ct num" id="v-mx">${state.rangeMax}</span>)`,
+    fullCode: () => `let x = random(0, width);\nlet y = random(0, height);\ncircle(x, y, 20);`,
+    controls: [
+      { key: 'rangeMin', label: 'Min', hint: '· random(min, max)', min: 0, max: 200, step: 1 },
+      { key: 'rangeMax', label: 'Max', hint: '· random(min, max)', min: 55, max: 255, step: 1 }
+    ],
+    presets: [
+      { label: 'Full range (0–255)', v: { rangeMin: 0, rangeMax: 255 } },
+      { label: 'Narrow (100–150)', v: { rangeMin: 100, rangeMax: 150 } },
+      { label: '⚠ Same min=max', v: { rangeMin: 128, rangeMax: 128 }, isBreak: true }
+    ],
+    extraButtons: [
+      { id: 'btn-roll', label: 'Roll', action: () => doRoll() },
+      { id: 'btn-roll-10', label: 'Roll ×10', action: () => { for (let i = 0; i < 10; i++) doRoll(); } },
+      { id: 'btn-clear', label: 'Clear', action: () => clearRolls() }
+    ],
+    startAnim: () => { renderRange(); }
+  },
+  oncevsdraw: {
+    canvasTitle: 'Once vs Every Frame: where you call random() matters',
+    canvasSub: 'Left: random() in setup() — fixed forever. Right: random() in draw() — new positions every frame.',
+    predict: 'Which side would you use to make a starfield? Which would you use to make a snowstorm?',
+    big: 'Call random() in setup() for things that should be random once and then stay. Call random() in draw() for things that should change every frame.',
+    bug: 'Calling random() in draw() for a "background color" means it flickers wildly every frame — 60 random colors per second. Store the random color in a global variable set in setup().',
+    tryIt: 'Move the "freeze" toggle. Can you see individual frames when they\'re slow enough? What does each frame look like?',
+    note: 'Placement of random() controls when it fires.',
+    focusHTML: () => `circle(<span class="ct fn">random</span>(width), <span class="ct fn">random</span>(height), 30); <span class="ct cm">// new each frame</span>`,
+    fullCode: () => `let stars = [];\nfunction setup() {\n  for (let i = 0; i < 100; i++) {\n    stars.push({ x: random(width), y: random(height) });\n  }\n}\nfunction draw() {\n  background(0);\n  for (let s of stars) circle(s.x, s.y, 2);\n}`,
+    controls: [
+      { key: 'onvdFps', label: 'Draw speed (fps)', hint: '· right panel update rate', min: 1, max: 60, step: 1 }
+    ],
+    presets: [
+      { label: 'Fast (60fps)', v: { onvdFps: 60, onvdFrozen: false } },
+      { label: 'Slow (4fps)', v: { onvdFps: 4, onvdFrozen: false } },
+      { label: '⚠ Frozen (0fps)', v: { onvdFrozen: true }, isBreak: true }
+    ],
+    extraButtons: [
+      { id: 'btn-freeze', label: () => state.onvdFrozen ? 'Unfreeze right side' : 'Freeze right side', action: () => { state.onvdFrozen = !state.onvdFrozen; const btn = document.getElementById('btn-freeze'); if (btn) btn.textContent = state.onvdFrozen ? 'Unfreeze right side' : 'Freeze right side'; } },
+      { id: 'btn-new-setup', label: 'Re-run setup()', action: () => { makeOnvdSetup(); renderOnvd(); } }
+    ],
+    startAnim: () => {
+      makeOnvdSetup();
+      makeOnvdDraw();
+      onvdFrameCount = 0;
+      rafId = requestAnimationFrame(tickOnvd);
+    }
+  },
+  integer: {
+    canvasTitle: 'Integer: floor(random(N)) gives whole numbers 0 to N-1',
+    canvasSub: 'random() always returns a decimal. floor() chops it to a whole number for array indexing.',
+    predict: 'With floor(random(6)) — can you ever get 6? Can you get 0?',
+    big: 'random() always returns a decimal. Use floor() to convert to an integer — essential for array indexing, dice rolls, and picking from a list.',
+    bug: 'round(random(5)) gives 0–5 but the ends (0 and 5) appear half as often as the middle values — the distribution is not uniform. Always use floor(random(N)) for indexing.',
+    tryIt: 'Set color count to 2. How long before you get 3 cells of the same color in a row? Is that what you\'d expect?',
+    note: 'floor(random(N)) gives integer 0 to N−1.',
+    focusHTML: () => `floor(<span class="ct fn">random</span>(<span class="ct num" id="v-n">${state.intN}</span>)) <span class="ct cm">// integer 0–${state.intN - 1}</span>`,
+    fullCode: () => `let colors = ['red','blue','green','yellow'];\n\nfunction draw() {\n  let idx = floor(random(colors.length)); // 0–3\n  fill(colors[idx]);\n  rect(random(width), random(height), 40, 40);\n}`,
+    controls: [
+      { key: 'intN', label: 'Color count (N)', hint: '· floor(random(N))', min: 2, max: 8, step: 1 }
+    ],
+    presets: [
+      { label: 'N=2 (binary)', v: { intN: 2 }, action: () => makeIntGrid() },
+      { label: 'N=4 (default)', v: { intN: 4 }, action: () => makeIntGrid() },
+      { label: 'N=8 (full)', v: { intN: 8 }, action: () => makeIntGrid() }
+    ],
+    extraButtons: [
+      { id: 'btn-roll-all', label: 'Roll all', action: () => { makeIntGrid(); renderInteger(); } },
+      { id: 'btn-roll-one', label: 'Roll one', action: () => { const idx = Math.floor(Math.random() * state.intGrid.length); state.intGrid[idx] = Math.floor(Math.random() * state.intN); renderInteger(); } }
+    ],
+    startAnim: () => { makeIntGrid(); renderInteger(); }
+  },
+  seed: {
+    canvasTitle: 'Seed: randomSeed() makes randomness reproducible',
+    canvasSub: 'Same seed = same layout every time. Change the seed to get a different but repeatable result.',
+    predict: 'If you set randomSeed(42) and run the sketch 100 times — will you always get the same positions?',
+    big: 'randomSeed() locks the random sequence to a specific starting point. Same seed = reproducible result. This is how generative artists share "editions" of their work.',
+    bug: 'Calling randomSeed() inside draw() resets the sequence every frame — the "random" values will be the same every frame. Set seed once, in setup().',
+    tryIt: 'Find a seed that makes a composition you like. Write it down. Share it with someone — can they reproduce your exact layout?',
+    note: 'randomSeed() makes random reproducible.',
+    focusHTML: () => `<span class="ct fn">randomSeed</span>(<span class="ct num" id="v-seed">${state.seedValue}</span>); <span class="ct cm">// same seed → same result</span>`,
+    fullCode: () => `function setup() {\n  randomSeed(${state.seedValue}); // set once, in setup\n  for (let i = 0; i < 80; i++) {\n    let x = random(width);\n    let y = random(height);\n    let r = random(5, 22);\n    circle(x, y, r * 2);\n  }\n}`,
+    controls: [],
+    presets: [
+      { label: 'Apply seed 42', v: { seedValue: 42 }, action: () => applySeed() },
+      { label: 'Random seed', v: {}, action: () => randomizeSeed() },
+      { label: '⚠ No seed (true random)', v: {}, action: () => clearSeed(), isBreak: true }
+    ],
+    extraButtons: [
+      { id: 'btn-apply-seed', label: 'Apply seed', action: () => applySeed() },
+      { id: 'btn-rand-seed', label: 'Random seed', action: () => randomizeSeed() },
+      { id: 'btn-clear-seed', label: 'Clear seed', action: () => clearSeed() }
+    ],
+    seedInput: true,
+    startAnim: () => {
+      state.seedCircles = state.seedApplied
+        ? generateSeedCircles(state.seedValue)
+        : generateTrueCircles();
+      renderSeed();
+    }
+  }
+};
+
+// ─── UI builders ──────────────────────────────────────────────────────────────
+function escapeHTML(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function updateCode() {
+  const mode = modes[state.mode];
+  const focusEl = document.getElementById('focus-code');
+  const fullEl = document.getElementById('full-code');
+  if (focusEl) focusEl.innerHTML = mode.focusHTML();
+  if (fullEl) fullEl.innerHTML = escapeHTML(mode.fullCode());
+  const codeNote = document.getElementById('code-note');
+  if (codeNote) codeNote.textContent = mode.note;
+}
+
+function buildControls() {
+  const controlsEl = document.getElementById('controls');
+  controlsEl.innerHTML = '';
+  const mode = modes[state.mode];
+
+  // Seed input for seed tab
+  if (mode.seedInput) {
+    const row = document.createElement('div');
+    row.className = 'ctrl-row';
+    row.innerHTML = `
+      <div>
+        <label for="sl-seed-input">Seed value<small>· 1 to 9999</small></label>
+      </div>
+      <span class="val-badge mono" id="vb-seed">${state.seedValue}</span>
+      <input id="sl-seed-input" type="range" min="1" max="9999" step="1" value="${state.seedValue}" aria-label="Seed value">
+    `;
+    controlsEl.appendChild(row);
+    const slider = row.querySelector('input');
+    slider.addEventListener('input', e => {
+      state.seedValue = Number(e.target.value);
+      const badge = document.getElementById('vb-seed');
+      if (badge) badge.textContent = state.seedValue;
+      updateCode();
+    });
+  }
+
+  if (mode.controls) {
+    mode.controls.forEach(ctrl => {
+      const row = document.createElement('div');
+      row.className = 'ctrl-row';
+      row.innerHTML = `
+        <div>
+          <label for="sl_${ctrl.key}">${ctrl.label}<small>${ctrl.hint || ''}</small></label>
+        </div>
+        <span class="val-badge mono" id="vb_${ctrl.key}">${state[ctrl.key]}</span>
+        <input id="sl_${ctrl.key}" type="range" min="${ctrl.min}" max="${ctrl.max}" step="${ctrl.step}" value="${state[ctrl.key]}" aria-label="${ctrl.label}">
+      `;
+      controlsEl.appendChild(row);
+
+      const slider = row.querySelector('input');
+      slider.addEventListener('input', e => {
+        state[ctrl.key] = Number(e.target.value);
+        const badge = document.getElementById(`vb_${ctrl.key}`);
+        if (badge) badge.textContent = state[ctrl.key];
+        updateCode();
+      });
+    });
+  }
+
+  if (mode.extraButtons) {
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;';
+    mode.extraButtons.forEach(btnDef => {
+      const btn = document.createElement('button');
+      btn.className = 'preset-btn';
+      btn.type = 'button';
+      btn.id = btnDef.id;
+      btn.textContent = typeof btnDef.label === 'function' ? btnDef.label() : btnDef.label;
+      btn.addEventListener('click', btnDef.action);
+      btnRow.appendChild(btn);
+    });
+    controlsEl.appendChild(btnRow);
+  }
+}
+
+function buildPresets() {
+  const area = document.getElementById('presets-area');
+  area.innerHTML = '';
+  const mode = modes[state.mode];
+  if (!mode.presets || mode.presets.length === 0) return;
+
+  const lbl = document.createElement('div');
+  lbl.className = 'presets-label';
+  lbl.textContent = 'Try these';
+  area.appendChild(lbl);
+
+  const row = document.createElement('div');
+  row.className = 'preset-row';
+  mode.presets.forEach(preset => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn' + (preset.isBreak ? ' break' : '');
+    btn.type = 'button';
+    btn.textContent = preset.label;
+    btn.addEventListener('click', () => {
+      if (preset.v) Object.entries(preset.v).forEach(([k, v]) => { state[k] = v; });
+      if (preset.action) preset.action();
+      buildControls();
+      updateCode();
+    });
+    row.appendChild(btn);
+  });
+  area.appendChild(row);
+}
+
+function setText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+function setMode(modeName) {
+  stopAnim();
+  state.mode = modeName;
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    const active = tab.dataset.mode === modeName;
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    tab.tabIndex = active ? 0 : -1;
+  });
+
+  const mode = modes[modeName];
+  setText('canvas-title', mode.canvasTitle);
+  setText('canvas-sub', mode.canvasSub);
+  setText('predict-text', mode.predict);
+  setText('big-idea-text', mode.big);
+  setText('bug-text', mode.bug);
+  setText('try-text', mode.tryIt);
+
+  buildControls();
+  buildPresets();
+  updateCode();
+
+  if (mode.startAnim) mode.startAnim();
+}
+
+function selectAdjacentTab(direction) {
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const currentIndex = tabs.findIndex(tab => tab.dataset.mode === state.mode);
+  const nextIndex = (currentIndex + direction + tabs.length) % tabs.length;
+  tabs[nextIndex].focus();
+  setMode(tabs[nextIndex].dataset.mode);
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => setMode(tab.dataset.mode));
+  tab.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); selectAdjacentTab(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); selectAdjacentTab(-1); }
+    if (e.key === 'Home') { e.preventDefault(); const first = document.querySelector('.tab'); first.focus(); setMode(first.dataset.mode); }
+    if (e.key === 'End') { e.preventDefault(); const tabs = document.querySelectorAll('.tab'); const last = tabs[tabs.length - 1]; last.focus(); setMode(last.dataset.mode); }
+  });
+});
+
+document.getElementById('fullCodeToggle').addEventListener('click', function() {
+  const fullEl = document.getElementById('full-code');
+  const open = fullEl.classList.toggle('open');
+  this.textContent = open ? '&#9660; Hide full sketch' : '&#9658; See full p5.js sketch';
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) updateCode();
+});
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+setMode('range');
+</script>
+</body>
+</html>

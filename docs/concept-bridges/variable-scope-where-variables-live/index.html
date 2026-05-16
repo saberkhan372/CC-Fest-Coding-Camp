@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../concept-bridge.css">
+<title>Variable Scope: Where Variables Live</title>
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #c8860a;
+    --accent-dark: #8a5c00;
+    --accent-bg: #fff8e6;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--accent-dark); }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
+
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .unlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 22px;
+  }
+
+  .unlock-pill {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: var(--paper);
+  }
+
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
+
+  .ba-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--faint);
+    margin-bottom: 5px;
+  }
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .canvas-panel { overflow: hidden; }
+
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
+
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
+
+  #scope-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
+
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
+
+  .ctrl-panel { padding: 16px; }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
+
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #fff2dc; border-color: #e0a050; }
+
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
+
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(200,134,10,0.4);
+    outline-offset: 2px;
+  }
+
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .box-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
+
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
+
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
+  }
+
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
+    display: block;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 42px;
+    text-align: center;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
+  }
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: color var(--transition);
+  }
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 22px; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 720px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
+  .path-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
+  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
+  .path-link-type {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--faint);
+    flex-shrink: 0;
+    min-width: 88px;
+  }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
+  .path-link-name { font-size: 0.9rem; font-weight: 700; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
+  .bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
+  }
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color var(--transition); }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .before-after { grid-template-columns: 1fr; }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
+    .bottom-nav { flex-direction: column; }
+  }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · Foundations</p>
+  <h1>Variable Scope: Where Variables Live</h1>
+  <p class="subtitle">
+    A concept bridge for understanding where to declare variables in p5.js.
+    Where you create a variable controls where it can be used and how long it remembers its value.
+  </p>
+
+  <div class="unlocks" aria-label="What this bridge unlocks">
+    <span class="unlock-pill">animation state</span>
+    <span class="unlock-pill">persistent counters</span>
+    <span class="unlock-pill">global vs local</span>
+    <span class="unlock-pill">debugging errors</span>
+    <span class="unlock-pill">organized sketches</span>
+  </div>
+
+  <section class="before-after" aria-label="Before and after mental model">
+    <div class="ba-col">
+      <div class="ba-label">Before this bridge, you might think</div>
+      <div class="ba-text">"I keep getting 'x is not defined' errors. And my counter always shows 0 even though I wrote x++."</div>
+    </div>
+    <div class="ba-col">
+      <div class="ba-label">After this bridge</div>
+      <div class="ba-text">"A variable declared inside draw() resets to its starting value every frame. Declare it outside all functions to make it remember."</div>
+    </div>
+  </section>
+
+  <section class="main-grid" aria-label="Interactive variable scope concept bridge">
+    <article class="panel canvas-panel">
+      <div class="canvas-bar">
+        <div class="canvas-bar-title" id="canvas-title">Reset: variables inside draw() always start fresh</div>
+        <div class="canvas-bar-sub" id="canvas-sub">A variable declared inside draw() is created new on every frame and disappears when the frame ends.</div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="scope-canvas" width="620" height="380" aria-label="Interactive variable scope visualization"></canvas>
+        <div class="touch-hint">Use the controls on the right to explore.</div>
+      </div>
+    </article>
+
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="Variable scope tabs">
+        <button class="tab" role="tab" id="tab-reset" data-mode="reset" aria-selected="true" aria-controls="bridge-panel" tabindex="0">Reset<span class="step">1 of 5</span></button>
+        <button class="tab" role="tab" id="tab-global" data-mode="global" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Global<span class="step">2 of 5</span></button>
+        <button class="tab" role="tab" id="tab-blocks" data-mode="blocks" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Blocks<span class="step">3 of 5</span></button>
+        <button class="tab" role="tab" id="tab-setupdraw" data-mode="setupdraw" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">setup vs draw<span class="step">4 of 5</span></button>
+        <button class="tab" role="tab" id="tab-lifetime" data-mode="lifetime" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Lifetime<span class="step">5 of 5</span></button>
+      </nav>
+
+      <div id="bridge-panel" role="tabpanel" aria-live="polite">
+        <div class="predict">
+          <span class="box-label">Predict before changing</span>
+          <span class="box-body" id="predict-text">If you write let count = 0 inside draw() and then count++, what will count equal on frame 100?</span>
+        </div>
+
+        <div class="ctrl-group" id="controls"></div>
+        <div id="presets-area"></div>
+
+        <div class="code-section">
+          <div class="code-header"><span>Live code</span><span id="code-note">Variables inside draw() reset each frame.</span></div>
+          <div class="code-focus-line mono" id="focus-code"></div>
+          <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">&#9658; See full p5.js sketch</button>
+          <div class="full-code-body mono" id="full-code"></div>
+        </div>
+
+        <div class="callout big-idea">
+          <span class="box-label">Big idea</span>
+          <span class="box-body" id="big-idea-text">Variables declared with let inside draw() are created fresh every frame and destroyed when that frame ends. They have no memory.</span>
+        </div>
+
+        <div class="callout bug">
+          <span class="box-label">&#9888; Common mistake</span>
+          <span class="box-body" id="bug-text">The most common beginner mistake: declaring a counter or position variable inside draw(). It always resets — nothing moves, nothing accumulates.</span>
+        </div>
+
+        <div class="callout try">
+          <span class="box-label">Try this</span>
+          <span class="box-body" id="try-text">Look at the right counter growing. Now imagine if that variable was inside draw(). Would the ball ever reach the right side of the canvas?</span>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="prose-section">
+    <h2>Declare variables where they need to live</h2>
+    <p>Every variable has a scope — the region of code where it exists. Variables declared with <code>let</code> inside a function only exist during that function call. Variables declared inside a <code>for</code> loop only exist during the loop. Variables declared outside all functions (global scope) persist for the entire sketch.</p>
+    <p>The most important rule for p5.js: if a value needs to survive from one frame to the next — position, score, color, state — declare it globally.</p>
+  </section>
+
+  <div class="legend" aria-label="Variable scope legend">
+    <div class="legend-item"><span class="swatch" style="background:transparent;border:2.5px solid #c8860a"></span> global scope</div>
+    <div class="legend-item"><span class="swatch" style="background:transparent;border:2.5px solid #4478c4"></span> draw() scope</div>
+    <div class="legend-item"><span class="swatch" style="background:transparent;border:2.5px solid #8b5cf6"></span> loop scope</div>
+    <div class="legend-item"><span class="swatch" style="background:#6bbf7e;border-color:#4a9a5e"></span> variable alive</div>
+    <div class="legend-item"><span class="swatch" style="background:#e0d8cc;border-color:#bbb"></span> variable dead</div>
+  </div>
+
+  <section class="pathways" aria-label="Practice and remix links">
+    <div class="pathways-title">What's next</div>
+    <div class="path-links">
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
+        <span class="path-link-type">Practice &#8594;</span>
+        <span class="path-link-name">Look for the Variable Playground tool in the workshop library</span>
+        <span class="path-link-arrow">&#8250;</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
+        <span class="path-link-type">Remix &#8594;</span>
+        <span class="path-link-name">Take a starter sketch and identify which variables need to be global vs local</span>
+        <span class="path-link-arrow">&#8250;</span>
+      </a>
+      <a href="../state-machines-sketches-have-modes/" class="path-link">
+        <span class="path-link-type">Related &#8594;</span>
+        <span class="path-link-name">State Machines: Sketches Have Modes — global state variables power mode switching</span>
+        <span class="path-link-arrow">&#8250;</span>
+      </a>
+    </div>
+  </section>
+
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">&#8592; All bridges</a>
+    <a href="../arrays-loops-as-system/">Next: Arrays + Loops: A System &#8594;</a>
+  </nav>
+</main>
+
+<script>
+'use strict';
+
+// ─── Shared state ────────────────────────────────────────────────────────────
+const state = {
+  mode: 'reset',
+  speed: 3,
+  globalSpeed: 2,
+  blocksStep: 0,
+  blocksAutoPlay: false,
+  setupFixed: false,
+  lifetimePlaying: true,
+  lifetimeSpeed: 1,
+  lifetimeT: 0
+};
+
+const canvas = document.getElementById('scope-canvas');
+const ctx = canvas.getContext('2d');
+
+// ─── Animation loop ───────────────────────────────────────────────────────────
+let rafId = null;
+let insideCount = 0;
+let outsideCount = 0;
+let globalX = 0;
+let globalBallFrame = 0;
+let blocksAutoTimer = null;
+
+function stopAnim() {
+  if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  if (blocksAutoTimer !== null) { clearInterval(blocksAutoTimer); blocksAutoTimer = null; }
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+function W() { return canvas.width; }
+function H() { return canvas.height; }
+
+function roundRect(x, y, w, h, r) {
+  const rad = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rad, y);
+  ctx.lineTo(x + w - rad, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rad);
+  ctx.lineTo(x + w, y + h - rad);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
+  ctx.lineTo(x + rad, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - rad);
+  ctx.lineTo(x, y + rad);
+  ctx.quadraticCurveTo(x, y, x + rad, y);
+  ctx.closePath();
+}
+
+function fillRR(x, y, w, h, r, fill, strk, sw) {
+  roundRect(x, y, w, h, r);
+  ctx.fillStyle = fill;
+  ctx.fill();
+  if (strk && sw) { ctx.lineWidth = sw; ctx.strokeStyle = strk; ctx.stroke(); }
+}
+
+function canvasText(text, x, y, opts = {}) {
+  const { size = 13, weight = '700', color = '#1d1b18', align = 'left', maxW } = opts;
+  ctx.save();
+  ctx.font = `${weight} ${size}px "DM Sans", system-ui, sans-serif`;
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  if (maxW) ctx.fillText(text, x, y, maxW);
+  else ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+function monoText(text, x, y, opts = {}) {
+  const { size = 12, weight = '600', color = '#e8e4da', align = 'left' } = opts;
+  ctx.save();
+  ctx.font = `${weight} ${size}px "DM Mono", ui-monospace, Menlo, monospace`;
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+// ─── Tab 1: Reset ─────────────────────────────────────────────────────────────
+function renderReset() {
+  // Background
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W(), H());
+
+  const half = W() / 2;
+  const pad = 12;
+
+  // Left panel — inside draw()
+  fillRR(pad, pad, half - pad * 1.5, H() - pad * 2, 14, '#fffdf7', '#4478c4', 2);
+  canvasText('Inside draw()', half / 2, 34, { align: 'center', weight: '800', size: 13, color: '#4478c4' });
+  canvasText('let count = 0 → resets every frame', half / 2, 52, { align: 'center', size: 11, color: '#6d675f' });
+
+  // Left counter — always shows 1 (counts inside draw resets)
+  const leftCountDisplay = 1;
+  fillRR(half / 2 - 50, 80, 100, 80, 12, '#e8f0ff', '#4478c4', 2);
+  canvasText('count =', half / 2, 114, { align: 'center', size: 12, color: '#4478c4' });
+  canvasText(String(leftCountDisplay), half / 2, 148, { align: 'center', size: 36, weight: '800', color: '#4478c4' });
+
+  canvasText('always 1', half / 2, 185, { align: 'center', size: 11, color: '#999', weight: '600' });
+
+  // Show a visual: ball that never moves
+  const leftBallX = half / 2 - 30;
+  ctx.beginPath();
+  ctx.arc(leftBallX, 230, 18, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(68,120,196,0.25)';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(leftBallX, 230, 18, 0, Math.PI * 2);
+  ctx.strokeStyle = '#4478c4';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  canvasText('never moves', half / 2 - 28, 262, { size: 10, color: '#888' });
+
+  // Code snippet left
+  fillRR(pad + 6, 280, half - pad * 2 - 6, 66, 8, '#1e1e2a', null, 0);
+  monoText('// inside draw() — resets!', pad + 12, 298, { size: 9, color: '#6a6a7a' });
+  monoText('let count = 0;', pad + 12, 314, { size: 9, color: '#c9a0f0' });
+  monoText('count++;', pad + 12, 330, { size: 9 });
+  monoText('// count is always 1', pad + 12, 346, { size: 9, color: '#6a6a7a' });
+
+  // Right panel — outside draw()
+  fillRR(half + pad / 2, pad, half - pad * 1.5, H() - pad * 2, 14, '#fffdf7', '#c8860a', 2);
+  canvasText('Outside draw()', half + (half / 2), 34, { align: 'center', weight: '800', size: 13, color: '#8a5c00' });
+  canvasText('let count declared globally', half + (half / 2), 52, { align: 'center', size: 11, color: '#6d675f' });
+
+  // Right counter — grows
+  const displayCount = outsideCount;
+  fillRR(half + pad / 2 + (half / 2) - 50 - pad / 2, 80, 100, 80, 12, '#fff8e6', '#c8860a', 2);
+  canvasText('count =', half + (half / 2), 114, { align: 'center', size: 12, color: '#8a5c00' });
+  const displayStr = displayCount > 9999 ? '9999+' : String(displayCount);
+  const numSize = displayCount > 999 ? 24 : 36;
+  canvasText(displayStr, half + (half / 2), displayCount > 999 ? 145 : 148, { align: 'center', size: numSize, weight: '800', color: '#8a5c00' });
+
+  canvasText('grows each frame', half + (half / 2), 185, { align: 'center', size: 11, color: '#999', weight: '600' });
+
+  // Ball that moves
+  const rightBallX = half + pad / 2 + (((outsideCount * state.speed * 0.3) % (half - pad * 3 - 36)) + 18);
+  ctx.beginPath();
+  ctx.arc(rightBallX, 230, 18, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(200,134,10,0.25)';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(rightBallX, 230, 18, 0, Math.PI * 2);
+  ctx.strokeStyle = '#c8860a';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  canvasText('moves!', rightBallX - 15, 262, { size: 10, color: '#888' });
+
+  // Code snippet right
+  const rx = half + pad / 2 + 6;
+  fillRR(rx, 280, half - pad * 2 - 6, 66, 8, '#1e1e2a', null, 0);
+  monoText('// outside draw() — persists!', rx + 6, 298, { size: 9, color: '#6a6a7a' });
+  monoText('let count = 0;', rx + 6, 314, { size: 9, color: '#c9a0f0' });
+  monoText('function draw() {', rx + 6, 330, { size: 9 });
+  monoText('  count++; // grows!', rx + 6, 346, { size: 9, color: '#7dafe0' });
+  monoText('}', rx + 6, 358, { size: 9 });
+
+  // Update live code span
+  const vcEl = document.getElementById('v-c');
+  if (vcEl) vcEl.textContent = outsideCount > 9999 ? '9999+' : outsideCount;
+}
+
+function tickReset() {
+  outsideCount += state.speed;
+  renderReset();
+  rafId = requestAnimationFrame(tickReset);
+}
+
+// ─── Tab 2: Global ─────────────────────────────────────────────────────────────
+function renderGlobal() {
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W(), H());
+
+  fillRR(12, 12, W() - 24, H() - 24, 14, '#fffdf7', '#c8860a', 2.5);
+
+  // Track line
+  const trackY = H() / 2 + 10;
+  ctx.strokeStyle = '#ded4c3';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(40, trackY);
+  ctx.lineTo(W() - 40, trackY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Ball
+  const bx = clamp(globalX, 40, W() - 40);
+  ctx.beginPath();
+  ctx.arc(bx, trackY, 22, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(200,134,10,0.18)';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(bx, trackY, 22, 0, Math.PI * 2);
+  ctx.strokeStyle = '#c8860a';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Dotted line from variable box to ball
+  const boxX = 50;
+  const boxY = 60;
+  const boxW = 160;
+  const boxH = 44;
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(200,134,10,0.45)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath();
+  ctx.moveTo(boxX + boxW / 2, boxY + boxH);
+  ctx.lineTo(bx, trackY - 22);
+  ctx.stroke();
+  ctx.restore();
+
+  // Variable box
+  fillRR(boxX, boxY, boxW, boxH, 8, '#fff8e6', '#c8860a', 1.5);
+  canvasText('x =', boxX + 14, boxY + 18, { size: 12, color: '#8a5c00', weight: '700' });
+  canvasText(String(Math.round(globalX)), boxX + 38, boxY + 18, { size: 13, weight: '800', color: '#c8860a' });
+  canvasText('(global variable)', boxX + 14, boxY + 36, { size: 10, color: '#9e9789' });
+
+  canvasText('Global scope', W() - 50, 34, { align: 'right', size: 12, weight: '800', color: '#8a5c00' });
+  canvasText('x persists across all frames', W() - 50, 52, { align: 'right', size: 11, color: '#9e9789' });
+
+  // Code block at bottom
+  const codeY = H() - 90;
+  fillRR(40, codeY, W() - 80, 70, 8, '#1e1e2a', null, 0);
+  monoText('let x = 0;  // global — lives outside draw()', 56, codeY + 18, { size: 10, color: '#c9a0f0' });
+  monoText('function draw() {', 56, codeY + 34, { size: 10 });
+  monoText(`  x += speed;  // x = ${Math.round(globalX)} right now`, 56, codeY + 50, { size: 10, color: '#7dafe0' });
+  monoText('  if (x > width) x = 0;', 56, codeY + 66, { size: 10 });
+
+  const vxEl = document.getElementById('v-x');
+  if (vxEl) vxEl.textContent = Math.round(globalX);
+}
+
+function tickGlobal() {
+  globalX += state.globalSpeed;
+  if (globalX > W() - 20) globalX = 20;
+  renderGlobal();
+  rafId = requestAnimationFrame(tickGlobal);
+}
+
+// ─── Tab 3: Blocks ─────────────────────────────────────────────────────────────
+const BLOCK_STEPS = [
+  { line: 'let score = 0;', desc: 'score born in global scope', scope: 'global', varName: 'score', alive: true },
+  { line: 'function draw() {', desc: 'entering draw() — new scope opens', scope: 'draw', varName: null, alive: true },
+  { line: '  let frame = 0;', desc: 'frame born in draw() scope', scope: 'draw', varName: 'frame', alive: true },
+  { line: '  for (let i = 0; i < 3; i++) {', desc: 'i born in for-loop scope', scope: 'loop', varName: 'i', alive: true },
+  { line: '    score += 1;', desc: 'score (global) still accessible here', scope: 'loop', varName: 'score', alive: true },
+  { line: '  }  // i dies here', desc: 'loop ends — i is destroyed', scope: 'draw', varName: 'i', alive: false },
+  { line: '  // frame still alive', desc: 'frame persists until draw() ends', scope: 'draw', varName: 'frame', alive: true },
+  { line: '}  // frame dies here', desc: 'draw() ends — frame is destroyed', scope: 'global', varName: 'frame', alive: false }
+];
+
+let blockScore = 0;
+let blockIValue = 0;
+
+function renderBlocks() {
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W(), H());
+
+  const step = clamp(state.blocksStep, 0, BLOCK_STEPS.length - 1);
+  const current = BLOCK_STEPS[step];
+
+  // Scope boxes — nested rectangles
+  // Global scope
+  fillRR(12, 12, W() - 24, H() - 74, 14, 'rgba(200,134,10,0.04)', '#c8860a', 2.5);
+  canvasText('Global scope', 28, 36, { size: 11, weight: '800', color: '#8a5c00' });
+
+  // draw() scope
+  fillRR(36, 48, W() - 72, H() - 130, 12, 'rgba(68,120,196,0.05)', '#4478c4', 2);
+  canvasText('draw() scope', 52, 68, { size: 11, weight: '800', color: '#4478c4' });
+
+  // loop scope
+  fillRR(60, 84, W() - 144, H() - 196, 10, 'rgba(139,92,246,0.05)', '#8b5cf6', 1.5);
+  canvasText('loop scope (for)', 76, 104, { size: 11, weight: '800', color: '#8b5cf6' });
+
+  // Current code line highlight
+  const lineY = 130;
+  fillRR(76, lineY, W() - 152, 28, 6, 'rgba(255,209,102,0.22)', '#ffd166', 1.5);
+  monoText(current.line, 86, lineY + 19, { size: 11 });
+
+  // Variable status boxes
+  const vars = [
+    { name: 'score', scope: 'global', color: '#c8860a', val: blockScore, alive: step >= 0 },
+    { name: 'frame', scope: 'draw()', color: '#4478c4', val: 0, alive: step >= 2 && step <= 6 },
+    { name: 'i', scope: 'loop', color: '#8b5cf6', val: blockIValue, alive: step >= 3 && step <= 4 }
+  ];
+
+  vars.forEach((v, idx) => {
+    const bx = 76 + idx * (W() - 152) / 3 + 4;
+    const by = 176;
+    const bw = (W() - 152) / 3 - 8;
+    const bh = 52;
+    const alive = v.alive;
+    const bg = alive ? '#fffdf7' : '#f0eae0';
+    const border = alive ? v.color : '#ccc';
+    const textC = alive ? v.color : '#bbb';
+    fillRR(bx, by, bw, bh, 8, bg, border, alive ? 2 : 1);
+    canvasText(v.name, bx + bw / 2, by + 18, { align: 'center', size: 11, weight: '800', color: textC });
+    canvasText(alive ? String(v.val) : '✗ gone', bx + bw / 2, by + 36, { align: 'center', size: alive ? 14 : 11, weight: '800', color: textC });
+    canvasText(v.scope, bx + bw / 2, by + 50, { align: 'center', size: 9, color: '#9e9789' });
+  });
+
+  // Description
+  fillRR(76, 246, W() - 152, 34, 8, '#fff8e6', '#c8860a', 1.5);
+  canvasText(current.desc, W() / 2, 268, { align: 'center', size: 12, weight: '700', color: '#8a5c00', maxW: W() - 160 });
+
+  // Step progress
+  canvasText(`Step ${step + 1} of ${BLOCK_STEPS.length}`, W() / 2, H() - 64, { align: 'center', size: 11, color: '#9e9789' });
+
+  // Code at bottom
+  fillRR(12, H() - 58, W() - 24, 46, 8, '#1e1e2a', null, 0);
+  monoText('let score = 0; // global', 24, H() - 40, { size: 10, color: '#c9a0f0' });
+  monoText(`→ score = ${blockScore} | i = ${blockIValue} (in loop)`, 24, H() - 24, { size: 10, color: '#f0a870' });
+
+  const viEl = document.getElementById('v-i');
+  if (viEl) viEl.textContent = blockIValue;
+}
+
+function advanceBlock() {
+  if (state.blocksStep < BLOCK_STEPS.length - 1) {
+    state.blocksStep++;
+    const step = state.blocksStep;
+    if (step === 4) { blockScore += 3; blockIValue = 0; }
+    if (step === 5) { blockIValue = -1; }
+    renderBlocks();
+  } else if (state.blocksAutoPlay) {
+    stopAnim();
+    state.blocksAutoPlay = false;
+  }
+}
+
+function resetBlock() {
+  state.blocksStep = 0;
+  blockScore = 0;
+  blockIValue = 0;
+  renderBlocks();
+}
+
+// ─── Tab 4: setup vs draw ─────────────────────────────────────────────────────
+function renderSetupDraw() {
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W(), H());
+
+  const fixed = state.setupFixed;
+  const half = W() / 2;
+  const boxH = H() - 40;
+
+  // setup() box
+  fillRR(12, 12, half - 18, boxH, 14, '#fffdf7', '#4478c4', 2);
+  canvasText('setup()', half / 2, 38, { align: 'center', weight: '800', size: 14, color: '#4478c4' });
+  canvasText('runs once', half / 2, 54, { align: 'center', size: 11, color: '#9e9789' });
+
+  const setupVarAlive = true;
+  fillRR(half / 2 - 60, 72, 120, 44, 8, '#e8f0ff', '#4478c4', 1.5);
+  canvasText('myColor', half / 2, 90, { align: 'center', size: 11, weight: '800', color: '#4478c4' });
+  if (fixed) {
+    canvasText('255,0,0', half / 2, 106, { align: 'center', size: 11, color: '#4478c4' });
+  } else {
+    canvasText('exists here', half / 2, 106, { align: 'center', size: 11, color: '#4478c4' });
+  }
+
+  // Broken state: show the let inside setup
+  if (!fixed) {
+    fillRR(22, 130, half - 30, 56, 8, '#1e1e2a', null, 0);
+    monoText('function setup() {', 30, 148, { size: 10, color: '#7dafe0' });
+    monoText('  let myColor = color(255,0,0);', 30, 164, { size: 10, color: '#c9a0f0' });
+    monoText('}', 30, 178, { size: 10 });
+  } else {
+    fillRR(22, 130, half - 30, 44, 8, '#1e1e2a', null, 0);
+    monoText('// myColor declared globally', 30, 148, { size: 10, color: '#6a6a7a' });
+    monoText('function setup() { ... }', 30, 162, { size: 10 });
+  }
+
+  // draw() box
+  fillRR(half + 6, 12, half - 18, boxH, 14, '#fffdf7', '#c8860a', 2);
+  canvasText('draw()', half + half / 2, 38, { align: 'center', weight: '800', size: 14, color: '#8a5c00' });
+  canvasText('runs every frame', half + half / 2, 54, { align: 'center', size: 11, color: '#9e9789' });
+
+  // Show variable box in draw - broken = ✗, fixed = ✓
+  const drawBoxColor = fixed ? '#6bbf7e' : '#e07070';
+  const drawBg = fixed ? '#eef8f2' : '#fef0f0';
+  fillRR(half + half / 2 - 60, 72, 120, 44, 8, drawBg, drawBoxColor, 1.5);
+  canvasText('myColor', half + half / 2, 90, { align: 'center', size: 11, weight: '800', color: drawBoxColor });
+  canvasText(fixed ? '✓ accessible' : '✗ not defined', half + half / 2, 106, { align: 'center', size: 11, color: drawBoxColor });
+
+  if (!fixed) {
+    fillRR(half + 16, 130, half - 30, 56, 8, '#1e1e2a', null, 0);
+    monoText('function draw() {', half + 24, 148, { size: 10, color: '#7dafe0' });
+    monoText('  fill(myColor); // ✗ ERROR', half + 24, 164, { size: 10, color: '#e07070' });
+    monoText('}  // myColor not in scope', half + 24, 178, { size: 10, color: '#6a6a7a' });
+
+    // Error badge
+    fillRR(half + 16, 202, half - 30, 30, 8, '#fef0f0', '#e07070', 1.5);
+    canvasText('ReferenceError: myColor is not defined', half + half / 2, 221, { align: 'center', size: 10, weight: '700', color: '#c04040', maxW: half - 40 });
+  } else {
+    fillRR(half + 16, 130, half - 30, 56, 8, '#1e1e2a', null, 0);
+    monoText('function draw() {', half + 24, 148, { size: 10, color: '#7dafe0' });
+    monoText('  fill(myColor); // ✓ works!', half + 24, 164, { size: 10, color: '#90d0a0' });
+    monoText('}  // myColor is global', half + 24, 178, { size: 10, color: '#6a6a7a' });
+
+    fillRR(half + 16, 202, half - 30, 30, 8, '#eef8f2', '#6bbf7e', 1.5);
+    canvasText('✓ No error — global variables are shared', half + half / 2, 221, { align: 'center', size: 10, weight: '700', color: '#2a5e3e', maxW: half - 40 });
+  }
+
+  // Fix arrow / explanation
+  const arrowY = 260;
+  canvasText(fixed ? 'Move declaration outside both functions' : 'Problem: myColor is trapped inside setup()', W() / 2, arrowY, { align: 'center', size: 11, weight: '700', color: fixed ? '#2a5e3e' : '#c04040', maxW: W() - 60 });
+
+  // Global fix code
+  const codeY = 280;
+  fillRR(12, codeY, W() - 24, 62, 8, '#1e1e2a', null, 0);
+  if (fixed) {
+    monoText('let myColor;  // GLOBAL — outside both functions', 22, codeY + 18, { size: 10, color: '#c9a0f0' });
+    monoText('function setup() { myColor = color(255,0,0); }', 22, codeY + 36, { size: 10, color: '#7dafe0' });
+    monoText('function draw() { fill(myColor); rect(100,100,80,80); }', 22, codeY + 52, { size: 10, color: '#90d0a0' });
+  } else {
+    monoText('let myColor;  // ← move here to fix', 22, codeY + 18, { size: 10, color: '#6a6a7a' });
+    monoText('function setup() { let myColor = color(255,0,0); }', 22, codeY + 36, { size: 10, color: '#e07070' });
+    monoText('function draw() { fill(myColor); // ✗ not found }', 22, codeY + 52, { size: 10, color: '#e07070' });
+  }
+
+  // Colored rect preview
+  const previewColor = fixed ? '#ff0000' : '#cccccc';
+  ctx.fillStyle = previewColor;
+  roundRect(W() / 2 - 30, H() - 52, 60, 36, 8);
+  ctx.fill();
+  canvasText(fixed ? 'fill works!' : 'no color', W() / 2, H() - 18, { align: 'center', size: 10, color: '#888' });
+}
+
+// ─── Tab 5: Lifetime ──────────────────────────────────────────────────────────
+function renderLifetime() {
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W(), H());
+
+  fillRR(12, 12, W() - 24, H() - 24, 14, '#fffdf7', '#ded4c3', 1.5);
+
+  const t = state.lifetimeT;
+  const totalFrames = 4; // number of "frames" shown
+  const trackStartX = 100;
+  const trackEndX = W() - 30;
+  const trackW = trackEndX - trackStartX;
+  const frameW = trackW / totalFrames;
+
+  // Frame dividers
+  for (let f = 0; f <= totalFrames; f++) {
+    const fx = trackStartX + f * frameW;
+    ctx.strokeStyle = '#ded4c3';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(fx, 36);
+    ctx.lineTo(fx, H() - 70);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    if (f < totalFrames) {
+      canvasText(`frame ${f + 1}`, trackStartX + f * frameW + frameW / 2, H() - 56, { align: 'center', size: 10, color: '#9e9789' });
+    }
+  }
+
+  // Track labels
+  const tracks = [
+    { label: 'score', subLabel: '(global)', color: '#c8860a', startFraction: 0, endFraction: 1 },
+    { label: 'frame', subLabel: '(draw)', color: '#4478c4', repeats: true },
+    { label: 'i', subLabel: '(loop)', color: '#8b5cf6', insideLoop: true }
+  ];
+
+  const trackYs = [80, 150, 220];
+  const trackH = 28;
+
+  tracks.forEach((track, idx) => {
+    const ty = trackYs[idx];
+    canvasText(track.label, trackStartX - 10, ty + 17, { align: 'right', size: 12, weight: '800', color: track.color });
+    canvasText(track.subLabel, trackStartX - 10, ty + 30, { align: 'right', size: 9, color: '#9e9789' });
+
+    // Draw the track background
+    fillRR(trackStartX, ty, trackW, trackH, 5, '#f0ebe0', null, 0);
+
+    if (idx === 0) {
+      // score: entire width, always alive
+      fillRR(trackStartX, ty, trackW, trackH, 5, '#fff3cc', '#c8860a', 1.5);
+      canvasText('alive for entire sketch', trackStartX + trackW / 2, ty + 17, { align: 'center', size: 10, color: '#8a5c00' });
+    } else if (idx === 1) {
+      // frame: alive within each draw() call, dead between
+      for (let f = 0; f < totalFrames; f++) {
+        const fx = trackStartX + f * frameW;
+        const aliveW = frameW * 0.78;
+        fillRR(fx + 2, ty, aliveW - 4, trackH, 5, '#e0eaff', '#4478c4', 1.5);
+      }
+      canvasText('alive once per frame', trackStartX + trackW / 2, ty + 17, { align: 'center', size: 10, color: '#4478c4' });
+    } else {
+      // i: alive only inside loop portion of each frame
+      for (let f = 0; f < totalFrames; f++) {
+        const fx = trackStartX + f * frameW;
+        const loopStart = frameW * 0.35;
+        const loopW = frameW * 0.42;
+        fillRR(fx + loopStart, ty, loopW, trackH, 5, '#f0ebff', '#8b5cf6', 1.5);
+      }
+      canvasText('alive only during loop', trackStartX + trackW / 2, ty + 17, { align: 'center', size: 10, color: '#8b5cf6' });
+    }
+  });
+
+  // Playhead
+  const ph = trackStartX + (t % 1) * trackW;
+  ctx.strokeStyle = '#e03030';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(ph, 36);
+  ctx.lineTo(ph, H() - 72);
+  ctx.stroke();
+  ctx.fillStyle = '#e03030';
+  ctx.beginPath();
+  ctx.arc(ph, 36, 5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Current values panel
+  const panelX = 12;
+  const panelY = 260;
+  const panelW = W() - 24;
+  fillRR(panelX, panelY, panelW, 60, 10, '#f7f3ea', '#ded4c3', 1.5);
+  canvasText('At playhead →', panelX + 12, panelY + 18, { size: 11, weight: '800', color: '#6d675f' });
+
+  const tFrac = t % 1;
+  const frameIdx = Math.floor(t * totalFrames) % totalFrames;
+  const scoreAlive = true;
+  const frameAlive = tFrac * totalFrames % 1 < 0.78;
+  const loopAlive = (tFrac * totalFrames % 1 > 0.35 && tFrac * totalFrames % 1 < 0.77);
+  const scoreVal = Math.floor(t * 12);
+
+  canvasText('score: ' + scoreVal, panelX + 130, panelY + 18, { size: 11, weight: '800', color: '#c8860a' });
+  canvasText('frame: ' + (frameAlive ? '0' : '✗ gone'), panelX + 260, panelY + 18, { size: 11, weight: '800', color: frameAlive ? '#4478c4' : '#bbb' });
+  canvasText('i: ' + (loopAlive ? '0–2' : '✗ gone'), panelX + 390, panelY + 18, { size: 11, weight: '800', color: loopAlive ? '#8b5cf6' : '#bbb' });
+
+  // Code
+  fillRR(panelX, panelY + 68, panelW, 50, 8, '#1e1e2a', null, 0);
+  monoText('let score = 0;  // global: alive entire sketch', panelX + 12, panelY + 84, { size: 10, color: '#c9a0f0' });
+  monoText('function draw() { let frame = 0; for (let i=0; i<3; i++) { score++; } }', panelX + 12, panelY + 100, { size: 10, color: '#7dafe0' });
+  monoText('// scope = lifetime of containing block', panelX + 12, panelY + 116, { size: 10, color: '#6a6a7a' });
+}
+
+function tickLifetime() {
+  if (state.lifetimePlaying) {
+    state.lifetimeT += 0.003 * state.lifetimeSpeed;
+    if (state.lifetimeT > 1) state.lifetimeT = 0;
+  }
+  renderLifetime();
+  rafId = requestAnimationFrame(tickLifetime);
+}
+
+// ─── Mode definitions ─────────────────────────────────────────────────────────
+const modes = {
+  reset: {
+    canvasTitle: 'Reset: variables inside draw() always start fresh',
+    canvasSub: 'A variable declared inside draw() is created new on every frame and disappears when the frame ends.',
+    predict: 'If you write let count = 0 inside draw() and then count++, what will count equal on frame 100?',
+    big: 'Variables declared with let inside draw() are created fresh every frame and destroyed when that frame ends. They have no memory.',
+    bug: 'The most common beginner mistake: declaring a counter or position variable inside draw(). It always resets — nothing moves, nothing accumulates.',
+    tryIt: 'Look at the right counter growing. Now imagine if that variable was inside draw(). Would the ball ever reach the right side of the canvas?',
+    note: 'Variables inside draw() reset each frame.',
+    focusHTML: () => `<span class="ct kw">let</span> count = <span class="ct num" id="v-c">0</span>; <span class="ct cm">// resets every frame!</span>`,
+    fullCode: () => `let count = 0; // OUTSIDE — persists\n\nfunction draw() {\n  let resetMe = 0; // INSIDE — always 0\n  resetMe++;\n  count++;\n  text('inside: ' + resetMe, 20, 60); // always 1\n  text('outside: ' + count, 20, 120); // grows\n}`,
+    controls: [
+      { key: 'speed', label: 'Speed', hint: '· controls counter rate', min: 1, max: 10, step: 1 }
+    ],
+    presets: [
+      { label: 'Slow (speed=1)', v: { speed: 1 } },
+      { label: 'Fast (speed=5)', v: { speed: 5 } },
+      { label: '⚠ What does count equal inside draw?', v: { speed: 3 }, isBreak: true }
+    ],
+    startAnim: () => { outsideCount = 0; rafId = requestAnimationFrame(tickReset); }
+  },
+  global: {
+    canvasTitle: 'Global: variables outside all functions persist forever',
+    canvasSub: 'A global variable is declared outside setup() and draw(). It remembers its value across every frame.',
+    predict: 'If x starts at 0 and you add 2 each frame — what will x equal after 100 frames?',
+    big: 'Global variables (declared outside all functions) persist for the entire life of the sketch. They are the right place for position, score, state, and anything that needs to survive across frames.',
+    bug: 'Using var instead of let can silently make variables global even when declared inside a function — this is a source of confusing bugs. Always use let or const.',
+    tryIt: 'Set speed to 0. Does the ball freeze? Set it to maximum. Is x growing even when the ball is off-screen?',
+    note: 'Global variables persist across all frames.',
+    focusHTML: () => `<span class="ct kw">let</span> x = <span class="ct num" id="v-x">0</span>; <span class="ct cm">// global — persists across frames</span>`,
+    fullCode: () => `let x = 0; // global\nlet speed = 2; // global\n\nfunction draw() {\n  background(245, 240, 230);\n  x += speed;\n  if (x > width) x = 0;\n  circle(x, height/2, 40);\n}`,
+    controls: [
+      { key: 'globalSpeed', label: 'Speed', hint: '· x += speed', min: 0, max: 8, step: 0.5 }
+    ],
+    presets: [
+      { label: 'Slow drift', v: { globalSpeed: 0.5 } },
+      { label: 'Fast zip', v: { globalSpeed: 6 } },
+      { label: '⚠ speed=0 (frozen)', v: { globalSpeed: 0 }, isBreak: true }
+    ],
+    startAnim: () => { globalX = 20; rafId = requestAnimationFrame(tickGlobal); }
+  },
+  blocks: {
+    canvasTitle: 'Blocks: every { } creates a new scope',
+    canvasSub: 'Variables declared with let inside any curly braces only exist inside those braces.',
+    predict: 'After the for loop ends, can you still use the variable i? What about score?',
+    big: 'Every set of curly braces { } creates a new scope. Variables declared with let inside { } only exist inside those braces.',
+    bug: 'Declaring let i inside a for loop and then trying to use i after the loop throws "i is not defined". Declare i before the loop if you need it afterward.',
+    tryIt: 'Step through the code. Watch score grow across the loop. Then watch i disappear after the loop ends. Where does score live vs where does i live?',
+    note: 'Each { } block creates a new scope.',
+    focusHTML: () => `<span class="ct kw">let</span> i = <span class="ct num" id="v-i">0</span>; <span class="ct cm">// dies after the loop</span>`,
+    fullCode: () => `let score = 0;          // born: global scope\nfunction draw() {\n  let frame = 0;        // born: draw scope, dies each frame\n  for (let i = 0; i < 3; i++) {  // i born/dies each iteration\n    score += 1;         // score still alive (global)\n  }\n  // i is gone here\n}                       // frame is gone here`,
+    controls: [],
+    presets: [
+      { label: 'Step by step', v: { blocksStep: 0 }, action: () => { resetBlock(); } },
+      { label: 'Auto-play', v: {}, action: () => { resetBlock(); state.blocksAutoPlay = true; blocksAutoTimer = setInterval(advanceBlock, 900); } },
+      { label: '⚠ Reset to start', v: {}, action: () => { resetBlock(); }, isBreak: true }
+    ],
+    extraButtons: [
+      { id: 'btn-step', label: 'Step forward ›', action: () => { advanceBlock(); } },
+      { id: 'btn-reset-block', label: 'Reset', action: () => { resetBlock(); } }
+    ],
+    startAnim: () => { renderBlocks(); }
+  },
+  setupdraw: {
+    canvasTitle: 'setup() vs draw(): separate scopes',
+    canvasSub: 'Variables declared inside setup() cannot be used in draw() and vice versa — unless declared globally.',
+    predict: 'If you declare a variable inside setup() and try to use it in draw() — will you get an error, or will it silently be undefined?',
+    big: 'setup() and draw() are separate function scopes. Variables declared in one cannot be seen in the other unless they are declared globally (outside both).',
+    bug: 'A classic bug: let myColor = color(255, 0, 0) inside setup(), then fill(myColor) inside draw() throws "myColor is not defined".',
+    tryIt: 'Toggle between broken and fixed. The only difference is where the variable is declared. What is the minimum change that fixes the bug?',
+    note: 'Declare shared variables globally.',
+    focusHTML: () => state.setupFixed
+      ? `<span class="ct kw">let</span> myColor; <span class="ct cm">// global — accessible everywhere</span>`
+      : `<span class="ct cm">// ✗ Can't use setupVar in draw()</span>`,
+    fullCode: () => state.setupFixed
+      ? `let myColor; // GLOBAL — declare outside both\n\nfunction setup() {\n  myColor = color(255, 0, 0); // assign here\n}\n\nfunction draw() {\n  fill(myColor); // ✓ works!\n  rect(100, 100, 80, 80);\n}`
+      : `function setup() {\n  let myColor = color(255, 0, 0); // trapped!\n}\n\nfunction draw() {\n  fill(myColor); // ✗ ReferenceError\n  rect(100, 100, 80, 80);\n}`,
+    controls: [],
+    presets: [
+      { label: 'Show broken', v: {}, action: () => { state.setupFixed = false; renderSetupDraw(); updateCode(); } },
+      { label: 'Show fixed', v: {}, action: () => { state.setupFixed = true; renderSetupDraw(); updateCode(); } },
+      { label: '⚠ Broken with no error shown', v: {}, action: () => { state.setupFixed = false; renderSetupDraw(); updateCode(); }, isBreak: true }
+    ],
+    extraButtons: [
+      { id: 'btn-toggle-fix', label: () => state.setupFixed ? 'Show broken' : 'Show fixed', action: () => { state.setupFixed = !state.setupFixed; renderSetupDraw(); updateCode(); const btn = document.getElementById('btn-toggle-fix'); if (btn) btn.textContent = state.setupFixed ? 'Show broken' : 'Show fixed'; } }
+    ],
+    startAnim: () => { renderSetupDraw(); }
+  },
+  lifetime: {
+    canvasTitle: 'Lifetime: scope is about time, not just location',
+    canvasSub: 'A variable lives exactly as long as its containing block is executing.',
+    predict: 'At frame 3, which variables are alive? Which are dead?',
+    big: 'Scope is about lifetime as much as location. A variable lives exactly as long as its containing block is executing.',
+    bug: 'Variables you intend to be persistent sometimes get accidentally redeclared inside draw() (writing let x = 0 instead of just x = 0) — this silently creates a new local variable instead of updating the global one.',
+    tryIt: 'Pause the timeline mid-frame. All three variables are alive simultaneously at that moment. Move to between frames — which ones survive?',
+    note: 'Scope = how long a variable lives.',
+    focusHTML: () => `<span class="ct cm">// scope = how long a variable lives</span>`,
+    fullCode: () => `let score = 0; // global: lives forever\n\nfunction draw() {\n  let frame = 0; // draw scope: each call\n  for (let i = 0; i < 3; i++) {\n    // loop scope: each iteration\n    score++;\n  }\n  // i is gone here\n  // frame is gone after draw() returns\n}`,
+    controls: [
+      { key: 'lifetimeSpeed', label: 'Speed', hint: '· playhead speed', min: 0.2, max: 4, step: 0.2 }
+    ],
+    presets: [
+      { label: 'Slow (see each frame)', v: { lifetimeSpeed: 0.4, lifetimePlaying: true } },
+      { label: 'Fast (see pattern)', v: { lifetimeSpeed: 2.5, lifetimePlaying: true } },
+      { label: '⚠ Pause mid-frame', v: { lifetimePlaying: false }, isBreak: true }
+    ],
+    extraButtons: [
+      { id: 'btn-play-pause', label: () => state.lifetimePlaying ? 'Pause' : 'Play', action: () => { state.lifetimePlaying = !state.lifetimePlaying; const btn = document.getElementById('btn-play-pause'); if (btn) btn.textContent = state.lifetimePlaying ? 'Pause' : 'Play'; } }
+    ],
+    startAnim: () => { rafId = requestAnimationFrame(tickLifetime); }
+  }
+};
+
+// ─── UI builders ──────────────────────────────────────────────────────────────
+function escapeHTML(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function updateCode() {
+  const mode = modes[state.mode];
+  const focusEl = document.getElementById('focus-code');
+  const fullEl = document.getElementById('full-code');
+  if (focusEl) focusEl.innerHTML = mode.focusHTML();
+  if (fullEl) fullEl.innerHTML = escapeHTML(mode.fullCode());
+  const codeNote = document.getElementById('code-note');
+  if (codeNote) codeNote.textContent = mode.note;
+}
+
+function buildControls() {
+  const controlsEl = document.getElementById('controls');
+  controlsEl.innerHTML = '';
+  const mode = modes[state.mode];
+
+  if (!mode.controls || mode.controls.length === 0) return;
+
+  mode.controls.forEach(ctrl => {
+    const row = document.createElement('div');
+    row.className = 'ctrl-row';
+    row.innerHTML = `
+      <div>
+        <label for="sl_${ctrl.key}">${ctrl.label}<small>${ctrl.hint || ''}</small></label>
+      </div>
+      <span class="val-badge mono" id="vb_${ctrl.key}">${state[ctrl.key]}</span>
+      <input id="sl_${ctrl.key}" type="range" min="${ctrl.min}" max="${ctrl.max}" step="${ctrl.step}" value="${state[ctrl.key]}" aria-label="${ctrl.label}">
+    `;
+    controlsEl.appendChild(row);
+
+    const slider = row.querySelector('input');
+    slider.addEventListener('input', e => {
+      state[ctrl.key] = Number(e.target.value);
+      const badge = document.getElementById(`vb_${ctrl.key}`);
+      if (badge) badge.textContent = state[ctrl.key];
+      updateCode();
+    });
+  });
+
+  // Extra buttons
+  if (mode.extraButtons) {
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;';
+    mode.extraButtons.forEach(btnDef => {
+      const btn = document.createElement('button');
+      btn.className = 'preset-btn';
+      btn.type = 'button';
+      btn.id = btnDef.id;
+      btn.textContent = typeof btnDef.label === 'function' ? btnDef.label() : btnDef.label;
+      btn.addEventListener('click', btnDef.action);
+      btnRow.appendChild(btn);
+    });
+    controlsEl.appendChild(btnRow);
+  }
+}
+
+function buildPresets() {
+  const area = document.getElementById('presets-area');
+  area.innerHTML = '';
+  const mode = modes[state.mode];
+  if (!mode.presets || mode.presets.length === 0) return;
+
+  const lbl = document.createElement('div');
+  lbl.className = 'presets-label';
+  lbl.textContent = 'Try these';
+  area.appendChild(lbl);
+
+  const row = document.createElement('div');
+  row.className = 'preset-row';
+  mode.presets.forEach(preset => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn' + (preset.isBreak ? ' break' : '');
+    btn.type = 'button';
+    btn.textContent = preset.label;
+    btn.addEventListener('click', () => {
+      if (preset.v) Object.entries(preset.v).forEach(([k, v]) => { state[k] = v; });
+      if (preset.action) preset.action();
+      buildControls();
+      updateCode();
+    });
+    row.appendChild(btn);
+  });
+  area.appendChild(row);
+}
+
+function setText(id, html, asHTML = false) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (asHTML) el.innerHTML = html;
+  else el.textContent = html;
+}
+
+function setMode(modeName) {
+  stopAnim();
+  state.mode = modeName;
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    const active = tab.dataset.mode === modeName;
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    tab.tabIndex = active ? 0 : -1;
+  });
+
+  const mode = modes[modeName];
+  setText('canvas-title', mode.canvasTitle);
+  setText('canvas-sub', mode.canvasSub);
+  setText('predict-text', mode.predict);
+  setText('big-idea-text', mode.big);
+  setText('bug-text', mode.bug);
+  setText('try-text', mode.tryIt);
+
+  buildControls();
+  buildPresets();
+  updateCode();
+
+  if (mode.startAnim) mode.startAnim();
+}
+
+function selectAdjacentTab(direction) {
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const currentIndex = tabs.findIndex(tab => tab.dataset.mode === state.mode);
+  const nextIndex = (currentIndex + direction + tabs.length) % tabs.length;
+  tabs[nextIndex].focus();
+  setMode(tabs[nextIndex].dataset.mode);
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => setMode(tab.dataset.mode));
+  tab.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); selectAdjacentTab(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); selectAdjacentTab(-1); }
+    if (e.key === 'Home') { e.preventDefault(); const first = document.querySelector('.tab'); first.focus(); setMode(first.dataset.mode); }
+    if (e.key === 'End') { e.preventDefault(); const tabs = document.querySelectorAll('.tab'); const last = tabs[tabs.length - 1]; last.focus(); setMode(last.dataset.mode); }
+  });
+});
+
+document.getElementById('fullCodeToggle').addEventListener('click', function() {
+  const fullEl = document.getElementById('full-code');
+  const open = fullEl.classList.toggle('open');
+  this.textContent = open ? '&#9660; Hide full sketch' : '&#9658; See full p5.js sketch';
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) updateCode();
+});
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+setMode('reset');
+</script>
+</body>
+</html>
