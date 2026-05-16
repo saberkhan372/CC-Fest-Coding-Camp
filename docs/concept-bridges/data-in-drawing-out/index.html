@@ -468,6 +468,35 @@
     .bottom-nav { flex-direction: column; }
   }
   @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
 </style>
 </head>
 <body>
@@ -525,6 +554,7 @@
           <span class="box-body" id="predict-text">Which encoding makes the value feel most dramatic at 90? At 10?</span>
         </div>
 
+        <div id="presets-area"></div>
         <div class="ctrl-group" id="controls"></div>
         <div id="switches-area"></div>
 
@@ -1093,6 +1123,65 @@ function updateCode() {
   document.getElementById('code-note').textContent = modes[state.mode].note;
 }
 
+// ─── Presets ──────────────────────────────────────────────────────────────────
+var presetsMap = {
+  encode: [
+    { label: 'Low (10)', v: { dataVal: 10 } },
+    { label: 'High (90)', v: { dataVal: 90 } },
+    { label: '⚠ Zero value', v: { dataVal: 0 }, isBreak: true }
+  ],
+  scale: [
+    { label: 'Standard', v: { inMin: 0, inMax: 100, outMin: 10, outMax: 300, scaleVal: 50 } },
+    { label: 'Narrow input', v: { inMin: 45, inMax: 55, outMin: 10, outMax: 300, scaleVal: 50 } },
+    { label: '⚠ Min = Max (÷0)', v: { inMin: 50, inMax: 50, outMin: 10, outMax: 300, scaleVal: 50 }, isBreak: true }
+  ],
+  compare: [
+    { label: 'Ascending', action: function() { state.bars = [10,25,40,60,75,90]; buildControls(); } },
+    { label: 'All equal', action: function() { state.bars = [50,50,50,50,50,50]; buildControls(); } },
+    { label: '⚠ One outlier', action: function() { state.bars = [48,52,50,95,51,49]; buildControls(); }, isBreak: true }
+  ],
+  narrate: [
+    { label: 'All layers', v: { showTitle: true, showAxisLabels: true, showGridlines: true, showHighlight: true } },
+    { label: 'Data only', v: { showTitle: false, showAxisLabels: false, showGridlines: false, showHighlight: false } },
+    { label: '⚠ No context', v: { showTitle: false, showAxisLabels: false, showGridlines: false, showHighlight: false }, isBreak: true }
+  ]
+};
+
+function buildPresets() {
+  var area = document.getElementById('presets-area');
+  if (!area) return;
+  area.innerHTML = '';
+  var presets = presetsMap[state.mode] || [];
+  if (!presets.length) return;
+  var lbl = document.createElement('span');
+  lbl.className = 'presets-label';
+  lbl.textContent = 'Quick presets';
+  area.appendChild(lbl);
+  var row = document.createElement('div');
+  row.className = 'preset-row';
+  presets.forEach(function(preset) {
+    var btn = document.createElement('button');
+    btn.className = 'preset-btn' + (preset.isBreak ? ' break' : '');
+    btn.type = 'button';
+    btn.textContent = preset.label;
+    btn.addEventListener('click', function() {
+      if (preset.v) {
+        Object.keys(preset.v).forEach(function(k) { state[k] = preset.v[k]; });
+        buildControls();
+        updateCode();
+        render();
+      }
+      if (preset.action) {
+        preset.action();
+        updateCode();
+        render();
+      }
+    });
+    row.appendChild(btn);
+  });
+  area.appendChild(row);
+}
+
 // ─── Build controls ───────────────────────────────────────────────────────────
 function addSlider(parent, key, labelText, subLabel, min, max, step, value, onChange) {
   var row = document.createElement('div');
@@ -1206,6 +1295,7 @@ function setMode(modeName) {
   buildControls();
   updateCode();
   render();
+  buildPresets();
 }
 
 function selectAdjacentTab(direction) {

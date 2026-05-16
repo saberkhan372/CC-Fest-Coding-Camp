@@ -1079,6 +1079,59 @@ var modeData = {
   }
 };
 
+// ── Presets ───────────────────────────────────────────────────────────────────
+
+var presetsMap = {
+  properties: [
+    { label: 'Center stage', action: function() { propState.bx=310; propState.by=190; propState.size=40; buildControls(); } },
+    { label: 'Small corner', action: function() { propState.bx=80; propState.by=60; propState.size=18; buildControls(); } },
+    { label: '⚠ Size = 2', action: function() { propState.size=2; buildControls(); }, isBreak: true }
+  ],
+  methods: [
+    { label: 'Pause', action: function() { paused = true; buildControls(); } },
+    { label: 'Resume', action: function() { paused = false; buildControls(); } },
+    { label: '⚠ Stop (vel=0)', action: function() { if (methodBall) { methodBall.vx=0; methodBall.vy=0; } }, isBreak: true }
+  ],
+  many: [
+    { label: '5 balls', action: function() { manyCount=5; manyBalls=[]; for(var i=0;i<manyCount;i++) manyBalls.push(new Ball()); } },
+    { label: '20 balls', action: function() { manyCount=20; manyBalls=[]; for(var i=0;i<manyCount;i++) manyBalls.push(new Ball()); } },
+    { label: '⚠ 0 balls', action: function() { manyCount=0; manyBalls=[]; }, isBreak: true }
+  ],
+  class: [
+    { label: 'Burst', action: function() { for(var i=0;i<12;i++) classParticles.push(new Particle(CW/2, CH/2)); } },
+    { label: 'Clear', action: function() { classParticles = []; } },
+    { label: '⚠ Overflow (200)', action: function() { classParticles=[]; for(var i=0;i<200;i++) classParticles.push(new Particle()); }, isBreak: true }
+  ]
+};
+
+function buildPresets() {
+  var area = document.getElementById('presets-area');
+  if (!area) return;
+  area.innerHTML = '';
+  var presets = presetsMap[currentMode] || [];
+  if (!presets.length) return;
+  var lbl = document.createElement('span');
+  lbl.className = 'presets-label';
+  lbl.textContent = 'Quick presets';
+  area.appendChild(lbl);
+  var row = document.createElement('div');
+  row.className = 'preset-row';
+  presets.forEach(function(preset) {
+    var btn = document.createElement('button');
+    btn.className = 'preset-btn' + (preset.isBreak ? ' break' : '');
+    btn.type = 'button';
+    btn.textContent = preset.label;
+    btn.addEventListener('click', function() {
+      if (preset.action) {
+        preset.action();
+        draw();
+      }
+    });
+    row.appendChild(btn);
+  });
+  area.appendChild(row);
+}
+
 function buildControls() {
   var cg = document.getElementById('controls');
   cg.innerHTML = '';
@@ -1238,6 +1291,7 @@ function setMode(mode) {
 
   updateUI();
   buildControls();
+  buildPresets();
 }
 
 // ── canvas click for class tab ────────────────────────────────────────────────

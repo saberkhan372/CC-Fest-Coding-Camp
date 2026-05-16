@@ -658,7 +658,7 @@ const modes = {
     presets: [
       { label: 'Simple coords', v: { wx: 300, wy: 200 } },
       { label: 'Corner', v: { wx: 50, wy: 50 } },
-      { label: 'Center', v: { wx: 200, wy: 150 } }
+      { label: 'Origin centered', v: { wx: 200, wy: 150 } }
     ],
     hasSwitches: false
   },
@@ -675,7 +675,7 @@ const modes = {
       { key: 'ty', label: 'ty (translate Y)', code: 'translate(..., ty)', min: -150, max: 150, step: 1 }
     ],
     presets: [
-      { label: 'Center', v: { tx: 0, ty: 0 } },
+      { label: 'Aligned start', v: { tx: 0, ty: 0 } },
       { label: 'Top-right', v: { tx: 160, ty: -80 } },
       { label: '⚠ Off canvas', v: { tx: 250, ty: 0 }, isBreak: true }
     ],

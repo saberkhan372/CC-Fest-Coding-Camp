@@ -887,6 +887,76 @@ function draw() {
   else if (state.mode === 'released') drawReleasedMode();
 }
 
+// ── Presets ──────────────────────────────────────────────────────────────────
+
+var presetsMap = {
+  pressed: [
+    { label: 'Fill with clicks', action: function() {
+      state.clicks = [
+        {x:100,y:120,r:28,color:'#4a7c8a'},{x:200,y:80,r:28,color:'#e8a838'},
+        {x:320,y:200,r:28,color:'#7c8a4a'},{x:450,y:130,r:28,color:'#a888cc'},
+        {x:170,y:260,r:28,color:'#cc5050'}
+      ];
+    }},
+    { label: 'Clear', action: function() { state.clicks = []; } },
+    { label: '⚠ Flood (50 clicks)', action: function() {
+      state.clicks = [];
+      for (var i=0;i<50;i++) state.clicks.push({x:Math.random()*600+10,y:Math.random()*360+10,r:28,color:'#4a7c8a'});
+    }, isBreak: true }
+  ],
+  moved: [
+    { label: 'Clear trail', action: function() { state.trail = []; } },
+    { label: '⚠ Max trail length', action: function() {
+      state.trail = [];
+      for (var i=0;i<state.trailMax;i++) state.trail.push({x:i*(620/state.trailMax)+10, y:190+Math.sin(i*0.2)*80});
+    }, isBreak: true }
+  ],
+  key: [
+    { label: 'Clear history', action: function() { state.keyHistory = []; state.lastKey = ''; state.lastKeyCode = null; } }
+  ],
+  released: [
+    { label: 'Demo lines', action: function() {
+      state.lines = [
+        {x1:80,y1:80,x2:250,y2:280},{x1:250,y1:280,x2:450,y2:120},
+        {x1:450,y1:120,x2:550,y2:300}
+      ];
+    }},
+    { label: 'Clear lines', action: function() { state.lines = []; } },
+    { label: '⚠ Many overlapping', action: function() {
+      state.lines = [];
+      for (var i=0;i<20;i++) state.lines.push({x1:300,y1:190,x2:100+Math.random()*400,y2:40+Math.random()*300});
+    }, isBreak: true }
+  ]
+};
+
+function buildPresets() {
+  var area = document.getElementById('presets-area');
+  if (!area) return;
+  area.innerHTML = '';
+  var presets = presetsMap[state.mode] || [];
+  if (!presets.length) return;
+  var lbl = document.createElement('span');
+  lbl.className = 'presets-label';
+  lbl.textContent = 'Quick presets';
+  area.appendChild(lbl);
+  var row = document.createElement('div');
+  row.className = 'preset-row';
+  presets.forEach(function(preset) {
+    var btn = document.createElement('button');
+    btn.className = 'preset-btn' + (preset.isBreak ? ' break' : '');
+    btn.type = 'button';
+    btn.textContent = preset.label;
+    btn.addEventListener('click', function() {
+      if (preset.action) {
+        preset.action();
+        draw();
+      }
+    });
+    row.appendChild(btn);
+  });
+  area.appendChild(row);
+}
+
 // ── UI ───────────────────────────────────────────────────────────────────────
 
 function buildControls() {
@@ -976,6 +1046,7 @@ function setMode(mode) {
   updateUI();
   buildControls();
   draw();
+  buildPresets();
 }
 
 // ── pointer ──────────────────────────────────────────────────────────────────
