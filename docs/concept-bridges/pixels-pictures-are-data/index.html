@@ -1095,7 +1095,7 @@ const modes = {
     focusHTML: () => `<span class="ct fn">pixels</span>[(<span class="ct num">y</span> * width + <span class="ct num">x</span>) * 4] = <span class="ct num" id="v-r">${PAINT_COLORS[state.paintColor].r}</span>; <span class="ct cm">// R</span>`,
     fullCode: () => `function setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  loadPixels();\n  let x = 5, y = 3;\n  let i = (y * width + x) * 4;\n  pixels[i]   = ${PAINT_COLORS[state.paintColor].r}; // R\n  pixels[i+1] = ${PAINT_COLORS[state.paintColor].g}; // G\n  pixels[i+2] = ${PAINT_COLORS[state.paintColor].b}; // B\n  pixels[i+3] = 255;    // A\n  updatePixels();\n}`,
     controls: [
-      { type: 'slider', key: 'cellSize', label: 'Cell size', hint: 'zoom level', min: 20, max: 60, step: 2 },
+      { type: 'slider', key: 'cellSize', label: 'Cell size', hint: '· cell px size', min: 20, max: 60, step: 2 },
       { type: 'colorpick', key: 'paintColor', label: 'Paint color' }
     ],
     presets: [
@@ -1124,8 +1124,8 @@ const modes = {
     focusHTML: () => `<span class="ct kw">let</span> i = (<span class="ct num" id="v-y">${state.ixY}</span> * width + <span class="ct num" id="v-x">${state.ixX}</span>) * 4; <span class="ct cm">// = ${state.ixY * state.pixW * 4 + state.ixX * 4}</span>`,
     fullCode: () => `function setup() {\n  createCanvas(${state.pixW}, ${state.pixH});\n}\n\nfunction draw() {\n  loadPixels();\n  let x = ${state.ixX};\n  let y = ${state.ixY};\n  let i = (y * width + x) * 4;\n  // i = ${state.ixY * state.pixW * 4 + state.ixX * 4}\n  let r = pixels[i];\n  let g = pixels[i + 1];\n  let b = pixels[i + 2];\n  let a = pixels[i + 3];\n}`,
     controls: [
-      { type: 'slider', key: 'ixX', label: 'X position', hint: `0 → ${state.pixW - 1}`, min: 0, max: state.pixW - 1, step: 1 },
-      { type: 'slider', key: 'ixY', label: 'Y position', hint: `0 → ${state.pixH - 1}`, min: 0, max: state.pixH - 1, step: 1 }
+      { type: 'slider', key: 'ixX', label: 'X position', hint: '· x (col index)', min: 0, max: state.pixW - 1, step: 1 },
+      { type: 'slider', key: 'ixY', label: 'Y position', hint: '· y (row index)', min: 0, max: state.pixH - 1, step: 1 }
     ],
     presets: [
       { label: 'Corner (0,0)', action: () => { state.ixX = 0; state.ixY = 0; } },
@@ -1144,8 +1144,8 @@ const modes = {
     focusHTML: () => `<span class="ct kw">let</span> avg = (r + g + b) / 3;\npixels[i]=avg; pixels[i+<span class="ct num">1</span>]=avg; pixels[i+<span class="ct num">2</span>]=avg;`,
     fullCode: () => `function setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  loadPixels();\n  for (let i = 0; i < pixels.length; i += 4) {\n    let r = pixels[i];\n    let g = pixels[i+1];\n    let b = pixels[i+2];\n    let avg = (r + g + b) / 3;\n    pixels[i]   = avg;\n    pixels[i+1] = avg;\n    pixels[i+2] = avg;\n    // alpha unchanged\n  }\n  updatePixels();\n}`,
     controls: [
-      { type: 'slider', key: 'blend', label: 'Blend', hint: '0 = color → 1 = grayscale', min: 0, max: 1, step: 0.01 },
-      { type: 'slider', key: 'brightness', label: 'Brightness', hint: '0–200%', min: 0, max: 200, step: 1 }
+      { type: 'slider', key: 'blend', label: 'Blend', hint: '· (r+g+b)/3 blend', min: 0, max: 1, step: 0.01 },
+      { type: 'slider', key: 'brightness', label: 'Brightness', hint: '· pixels[i] *= b', min: 0, max: 200, step: 1 }
     ],
     presets: [
       { label: 'Full color', action: () => { state.blend = 0; state.brightness = 100; } },
@@ -1166,7 +1166,7 @@ const modes = {
     fullCode: () => `function setup() {\n  createCanvas(620, 420);\n}\n\nfunction draw() {\n  loadPixels();\n  for (let y = 0; y < height; y++) {\n    for (let x = 0; x < width; x++) {\n      let i = (y * width + x) * 4;\n      pixels[i]   = sin(x / ${state.genScale}) * 127 + 128;\n      pixels[i+1] = sin(y / ${state.genScale}) * 127 + 128;\n      pixels[i+2] = 200;\n      pixels[i+3] = 255;\n    }\n  }\n  updatePixels();\n}`,
     controls: [
       { type: 'modebtn', options: ['gradient', 'checker', 'noise', 'stripes'], labels: ['Gradient', 'Checker', 'Noise', 'Stripes'] },
-      { type: 'slider', key: 'genScale', label: 'Scale', hint: 'frequency of pattern', min: 4, max: 60, step: 1 }
+      { type: 'slider', key: 'genScale', label: 'Scale', hint: '· sin(x/scale)', min: 4, max: 60, step: 1 }
     ],
     presets: [
       { label: 'Gradient', action: () => { state.genMode = 'gradient'; } },
@@ -1187,7 +1187,7 @@ const modes = {
     fullCode: () => `function setup() {\n  createCanvas(620, 420);\n}\n\nfunction mouseDragged() {\n  loadPixels();\n  let bs = ${state.brushSize};\n  for (let dy = -bs; dy <= bs; dy++) {\n    for (let dx = -bs; dx <= bs; dx++) {\n      if (dx*dx+dy*dy <= bs*bs) {\n        let px = mouseX + dx;\n        let py = mouseY + dy;\n        if (px >= 0 && px < width && py >= 0 && py < height) {\n          let i = (py * width + px) * 4;\n          pixels[i]   = ${PAINT_COLORS[state.brushColor].r};\n          pixels[i+1] = ${PAINT_COLORS[state.brushColor].g};\n          pixels[i+2] = ${PAINT_COLORS[state.brushColor].b};\n          pixels[i+3] = 255;\n        }\n      }\n    }\n  }\n  updatePixels();\n}`,
     controls: [
       { type: 'colorpick', key: 'brushColor', label: 'Brush color' },
-      { type: 'slider', key: 'brushSize', label: 'Brush size', hint: '1 → 20 px', min: 1, max: 20, step: 1 }
+      { type: 'slider', key: 'brushSize', label: 'Brush size', hint: '· brush radius px', min: 1, max: 20, step: 1 }
     ],
     presets: [
       { label: 'Red paint', action: () => { state.brushColor = 1; } },

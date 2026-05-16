@@ -897,8 +897,8 @@ const modes = {
     bug: 'In JavaScript, N % 0 is NaN and negative % N gives a negative result -- add N before taking modulo if your counter can go negative.',
     tryIt: 'Set divisor to 1. What does every number % 1 equal? Set divisor to 100 and move the counter slowly.',
     controls: [
-      { key: 'cycleN', label: 'Counter (n)', hint: '0 to 120', min: 0, max: 120, step: 1 },
-      { key: 'cycleDivisor', label: 'Divisor (N)', hint: '2 to 20', min: 1, max: 20, step: 1 }
+      { key: 'cycleN', label: 'Counter (n)', hint: '· n (counter)', min: 0, max: 120, step: 1 },
+      { key: 'cycleDivisor', label: 'Divisor (N)', hint: '· n % N', min: 1, max: 20, step: 1 }
     ],
     presets: [
       { label: 'Zero start', v: { cycleN: 0, cycleDivisor: 7 } },
@@ -925,8 +925,8 @@ const modes = {
     bug: 'Using a stripe width of 0 causes division by zero. Always ensure the divisor is >= 1.',
     tryIt: 'Make stripes so thin they look like a texture. Make them so wide only a few appear.',
     controls: [
-      { key: 'stripeWidth', label: 'Stripe width', hint: '1 to 80 px', min: 1, max: 80, step: 1 },
-      { key: 'stripeColorCount', label: 'Color count', hint: '2 to 8', min: 2, max: 8, step: 1 }
+      { key: 'stripeWidth', label: 'Stripe width', hint: '· x % stripeWidth', min: 1, max: 80, step: 1 },
+      { key: 'stripeColorCount', label: 'Color count', hint: '· % colorCount', min: 2, max: 8, step: 1 }
     ],
     presets: [
       { label: 'Thin (10)', v: { stripeWidth: 10, stripeColorCount: 2 } },
@@ -951,8 +951,8 @@ const modes = {
     bug: 'Using very small cell sizes with many colors makes the pattern hard to read. Stay above 10px per cell.',
     tryIt: 'Set divisor to 3 and try to predict which cells will be which color before you look.',
     controls: [
-      { key: 'gridDivisor', label: 'Divisor (N)', hint: '2 to 8', min: 1, max: 8, step: 1 },
-      { key: 'gridCellSize', label: 'Cell size', hint: '10 to 60 px', min: 6, max: 60, step: 2 }
+      { key: 'gridDivisor', label: 'Divisor (N)', hint: '· % colorCount', min: 1, max: 8, step: 1 },
+      { key: 'gridCellSize', label: 'Cell size', hint: '· cellSize px', min: 6, max: 60, step: 2 }
     ],
     presets: [
       { label: 'Checkerboard (2)', v: { gridDivisor: 2, gridCellSize: 30 } },
@@ -977,8 +977,8 @@ const modes = {
     bug: 'Resetting a variable manually instead of using modulo leads to off-by-one errors or missed resets.',
     tryIt: 'Find the period that makes the ball cross the canvas in exactly 2 seconds.',
     controls: [
-      { key: 'framePeriod', label: 'Period (N)', hint: '5 to 120 frames', min: 5, max: 120, step: 5 },
-      { key: 'frameSpeed', label: 'Speed multiplier', hint: '1x to 5x', min: 1, max: 5, step: 0.5 }
+      { key: 'framePeriod', label: 'Period (N)', hint: '· frameCount % N', min: 5, max: 120, step: 5 },
+      { key: 'frameSpeed', label: 'Speed multiplier', hint: '· speed multiplier', min: 1, max: 5, step: 0.5 }
     ],
     presets: [
       { label: 'Fast (20)', v: { framePeriod: 20 } },
@@ -1003,7 +1003,7 @@ const modes = {
     bug: 'Forgetting to divide before taking modulo means minutes and hours advance way too fast.',
     tryIt: 'What modulo gives a 24-hour clock instead of 12-hour?',
     controls: [
-      { key: 'clockSpeed', label: 'Speed', hint: '1x to 10x real time', min: 1, max: 10, step: 0.5 }
+      { key: 'clockSpeed', label: 'Speed', hint: '· speed multiplier', min: 1, max: 10, step: 0.5 }
     ],
     presets: [
       { label: 'Normal (1x)', v: { clockSpeed: 1 } },

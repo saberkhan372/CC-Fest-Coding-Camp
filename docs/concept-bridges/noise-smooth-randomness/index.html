@@ -1005,8 +1005,8 @@ const modes = {
     bug: 'Calling noise() with the same argument every frame gives the same value every frame — you must advance the input over time.',
     tryIt: 'Increase the offset slider until the jitter feels unnatural. Which version breaks the illusion first?',
     controls: [
-      { key: 'jitterOffset', label: 'Offset', hint: 'how far the dot can move', min: 1, max: 50, step: 1 },
-      { key: 'jitterSpeed', label: 'Speed', hint: 'how fast noise advances', min: 0.2, max: 4, step: 0.1 }
+      { key: 'jitterOffset', label: 'Offset', hint: '· noise(t) * offset', min: 1, max: 50, step: 1 },
+      { key: 'jitterSpeed', label: 'Speed', hint: '· t += speed', min: 0.2, max: 4, step: 0.1 }
     ],
     presets: [
       { label: 'Subtle', v: { jitterOffset: 5 } },
@@ -1030,8 +1030,8 @@ const modes = {
     bug: 'Using a scale that is too large makes the terrain spike like static. Use small values (0.005–0.03) for natural-looking terrain.',
     tryIt: 'Find a scale that looks like rolling hills, then one that looks like sharp mountains.',
     controls: [
-      { key: 'lsScale', label: 'Scale', hint: '0.002 to 0.05', min: 0.002, max: 0.05, step: 0.001 },
-      { key: 'lsAmplitude', label: 'Amplitude', hint: 'terrain height range', min: 20, max: 200, step: 5 }
+      { key: 'lsScale', label: 'Scale', hint: '· noise(x * scale)', min: 0.002, max: 0.05, step: 0.001 },
+      { key: 'lsAmplitude', label: 'Amplitude', hint: '· noise(...) * amplitude', min: 20, max: 200, step: 5 }
     ],
     presets: [
       { label: 'Rolling hills', v: { lsScale: 0.010, lsAmplitude: 80 } },
@@ -1055,7 +1055,7 @@ const modes = {
     bug: 'Multiplying coordinates by too-large a number samples widely spaced noise — the flow looks random, not smooth.',
     tryIt: 'Turn on multiple walkers. Do they seem to follow the same invisible paths?',
     controls: [
-      { key: 'flowStep', label: 'Step size', hint: 'pixels per frame', min: 1, max: 5, step: 0.5 }
+      { key: 'flowStep', label: 'Step size', hint: '· step each frame', min: 1, max: 5, step: 0.5 }
     ],
     switches: [
       { key: 'flowTrail', label: 'Trail' },
@@ -1083,7 +1083,7 @@ const modes = {
     bug: 'A scale of 0 makes all noise values identical — you get a flat gray.',
     tryIt: 'Find a scale value that looks like aerial photography. What does it suggest about natural patterns?',
     controls: [
-      { key: 'texScale', label: 'Scale', hint: '0.05 to 0.5', min: 0.01, max: 0.5, step: 0.01 }
+      { key: 'texScale', label: 'Scale', hint: '· noise(col*s, row*s)', min: 0.01, max: 0.5, step: 0.01 }
     ],
     switches: [
       { key: 'texAnimate', label: 'Animate' }
@@ -1110,7 +1110,7 @@ const modes = {
     bug: 'Advancing t by a large step each frame makes the motion jumpy — it skips through the smooth parts of the noise.',
     tryIt: 'Slow the speed to minimum. Can you predict where the dot is heading next?',
     controls: [
-      { key: 'timeSpeed', label: 'Speed', hint: '0.005 to 0.05', min: 0.005, max: 0.05, step: 0.005 }
+      { key: 'timeSpeed', label: 'Speed', hint: '· t += speed', min: 0.005, max: 0.05, step: 0.005 }
     ],
     presets: [
       { label: 'Slow breath', v: { timeSpeed: 0.005 } },

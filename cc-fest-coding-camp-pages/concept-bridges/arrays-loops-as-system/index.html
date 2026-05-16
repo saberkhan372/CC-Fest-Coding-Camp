@@ -980,22 +980,22 @@ function buildControls() {
 
   const controlDefs = {
     array: [
-      { key: 'selectedIndex', label: 'Selected index', hint: 'arr[i]', min: 0, max: Math.max(0, state.arr.length - 1), step: 1 }
+      { key: 'selectedIndex', label: 'Selected index', hint: '· arr[i]', min: 0, max: Math.max(0, state.arr.length - 1), step: 1 }
     ],
     loop: [
-      { key: 'loopSpeed', label: 'Playback speed', hint: 'steps per second', min: 0.3, max: 4, step: 0.1 }
+      { key: 'loopSpeed', label: 'Playback speed', hint: '· loop speed', min: 0.3, max: 4, step: 0.1 }
     ],
     draw: [
-      { key: 'drawCount', label: 'Count', hint: 'circles in array', min: 0, max: 30, step: 1 },
-      { key: 'drawSize', label: 'Size', hint: 'diameter each', min: 8, max: 50, step: 1 },
-      { key: 'drawSpacing', label: 'Spacing', hint: 'pixels between', min: 30, max: 90, step: 5 }
+      { key: 'drawCount', label: 'Count', hint: '· circles.length', min: 0, max: 30, step: 1 },
+      { key: 'drawSize', label: 'Size', hint: '· circles[i].r*2', min: 8, max: 50, step: 1 },
+      { key: 'drawSpacing', label: 'Spacing', hint: '· spacing px', min: 30, max: 90, step: 5 }
     ],
     update: [
-      { key: 'updateCount', label: 'Count', hint: 'particles', min: 1, max: 30, step: 1 },
-      { key: 'updateSpeed', label: 'Speed', hint: 'velocity scale', min: 0, max: 4, step: 0.1 }
+      { key: 'updateCount', label: 'Count', hint: '· particles.length', min: 1, max: 30, step: 1 },
+      { key: 'updateSpeed', label: 'Speed', hint: '· p.vx, p.vy', min: 0, max: 4, step: 0.1 }
     ],
     push: [
-      { key: 'pushSpeed', label: 'Particle speed', hint: 'on push', min: 0.5, max: 6, step: 0.1 }
+      { key: 'pushSpeed', label: 'Particle speed', hint: '· p.vx / p.vy', min: 0.5, max: 6, step: 0.1 }
     ]
   };
 
