@@ -156,6 +156,9 @@
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 36bd71d (tighten concept bridge layout)
   .main-left {
     display: grid;
     gap: 18px;
@@ -594,10 +597,14 @@
   .callout.try { background: var(--try-bg); border-color: var(--try-border); }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   .prose-section { margin-top: 0; }
 =======
   .prose-section { margin-top: 22px; }
 >>>>>>> f9d93c8 (redesign first concept bridge batch)
+=======
+  .prose-section { margin-top: 0; }
+>>>>>>> 36bd71d (tighten concept bridge layout)
   .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
   .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 760px; }
 
@@ -664,9 +671,13 @@
   @media (max-width: 860px) {
     .main-grid { grid-template-columns: 1fr; }
 <<<<<<< HEAD
+<<<<<<< HEAD
     .main-left { gap: 18px; }
 =======
 >>>>>>> f9d93c8 (redesign first concept bridge batch)
+=======
+    .main-left { gap: 18px; }
+>>>>>>> 36bd71d (tighten concept bridge layout)
     .tabs { grid-template-columns: repeat(3, 1fr); }
   }
   @media (max-width: 560px) {
@@ -794,16 +805,51 @@
 =======
 
   <section class="main-grid" aria-label="Interactive map concept bridge">
-    <article class="panel canvas-panel">
-      <div class="canvas-bar">
-        <div class="canvas-bar-title" id="canvas-title">Size: mouse position becomes circle size</div>
-        <div class="canvas-bar-sub" id="canvas-sub">The input stays the same percent through its new range.</div>
+    <div class="main-left">
+      <article class="panel canvas-panel">
+        <div class="canvas-bar">
+          <div class="canvas-bar-title" id="canvas-title">Size: mouse position becomes circle size</div>
+          <div class="canvas-bar-sub" id="canvas-sub">The input stays the same percent through its new range.</div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="map-canvas" width="620" height="420" aria-label="Interactive map() visualization"></canvas>
+          <div class="touch-hint">Tap and drag the sliders on the right to explore.</div>
+        </div>
+      </article>
+
+      <section class="prose-section">
+        <h2 id="prose-title">The same relative position moves to a new world</h2>
+        <p id="prose-body">If an input is 25% of the way through its original range, <code>map()</code> places the output 25% of the way through the new range. That is the whole idea. Once you feel that relationship, <code>map()</code> stops being a formula and starts becoming a wiring move.</p>
+      </section>
+
+      <div class="legend" aria-label="map concept legend">
+        <div class="legend-item"><span class="swatch" style="background:#7a5ea8"></span> input range</div>
+        <div class="legend-item"><span class="swatch" style="background:#315c92"></span> translator / mapping</div>
+        <div class="legend-item"><span class="swatch" style="background:#e07a5f"></span> output value</div>
+        <div class="legend-item"><span class="swatch" style="background:#81b29a"></span> same percent through</div>
       </div>
-      <div class="canvas-wrap">
-        <canvas id="map-canvas" width="620" height="420" aria-label="Interactive map() visualization"></canvas>
-        <div class="touch-hint">Tap and drag the sliders on the right to explore.</div>
-      </div>
-    </article>
+
+      <section class="pathways" aria-label="Practice and remix links">
+        <div class="pathways-title">What's next</div>
+        <div class="path-links">
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/map-explorer/" class="path-link">
+            <span class="path-link-type">Practice →</span>
+            <span class="path-link-name">Map() Explorer — use range translation in a full workshop tool with more guided controls</span>
+            <span class="path-link-arrow">›</span>
+          </a>
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/color-from-position/" class="path-link">
+            <span class="path-link-type">Remix →</span>
+            <span class="path-link-name">Color From Position — let mouse position map directly into brightness, hue, or size</span>
+            <span class="path-link-arrow">›</span>
+          </a>
+          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/" class="path-link">
+            <span class="path-link-type">Related →</span>
+            <span class="path-link-name">Distance Becomes Behavior — use one measured number to drive many visual behaviors</span>
+            <span class="path-link-arrow">›</span>
+          </a>
+        </div>
+      </section>
+    </div>
 
     <aside class="panel ctrl-panel">
       <nav class="tabs" role="tablist" aria-label="map() modes">
@@ -852,6 +898,7 @@
     </aside>
   </section>
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   <nav class="bottom-nav" aria-label="Bridge navigation">
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
@@ -1022,6 +1069,8 @@ const modes = {
     </div>
   </section>
 
+=======
+>>>>>>> 36bd71d (tighten concept bridge layout)
   <nav class="bottom-nav" aria-label="Bridge navigation">
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/">Next: Distance Becomes Behavior →</a>
