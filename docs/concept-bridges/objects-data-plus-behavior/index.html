@@ -1,1330 +1,1308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Objects: Data + Behavior</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --data: #0891b2;
-      --behavior: #e11d48;
-      --object: #f59e0b;
-      --class: #7c3aed;
-      --many: #16a34a;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../concept-bridge.css">
+<title>Objects: Data + Behavior</title>
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #49627a;
+    --accent-dark: #2e3f52;
+    --accent-bg: #eef2f6;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 940px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--accent-dark); }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
 
-    .controls,
-    .workspace,
-    .side-panel {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      user-select: none;
-    }
-
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
-
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
-
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
-
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
-
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 96px minmax(150px, 1fr) 72px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(380px, 100%);
-    }
-
-    label,
-    .value-label,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
-
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
-
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    #sketch-holder canvas { display: block; }
-
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
-
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .card h2 { font-size: 1.15rem; }
-    .card h3 { font-size: 1rem; }
-
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .card p { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
-
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      white-space: pre-wrap;
-    }
-
-    .legend {
-      display: grid;
-      gap: 8px;
-    }
-
-    .legend-item {
-      display: grid;
-      grid-template-columns: 16px 1fr;
-      gap: 8px;
-      align-items: center;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .swatch {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-    }
-
-    .swatch.data { background: var(--data); }
-    .swatch.behavior { background: var(--behavior); }
-    .swatch.object { background: var(--object); }
-    .swatch.class { background: var(--class); }
-    .swatch.many { background: var(--many); }
-
-    .code-card { display: none; }
-    .code-card.visible { display: block; }
-
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
-
-    .note {
-      font-size: 0.86rem;
-      color: var(--muted);
-    }
-
-    @media (max-width: 980px) {
-      main { grid-template-columns: 1fr; }
-      .workspace { height: 590px; }
-    }
-
-    @media (max-width: 600px) {
-      header, main { padding-left: 12px; padding-right: 12px; }
-      .slider-wrap { grid-template-columns: 1fr; gap: 4px; }
-      .workspace { height: 540px; }
-    }
-  
-  /* ── Bridge improvement additions ─────────────────────────────── */
   .unlocks {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 0 0 20px;
+    margin: 0 0 22px;
   }
+
   .unlock-pill {
     font-size: 0.75rem;
-    font-weight: 700;
-    color: #2a5e3e;
-    background: #eef8f2;
-    border: 1px solid #b8dcc8;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
     padding: 5px 10px;
     border-radius: 999px;
   }
+
   .before-after {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     overflow: hidden;
     margin-bottom: 22px;
-    background: rgba(255,255,255,0.55);
+    background: var(--paper);
   }
-  .ba-col { padding: 14px 18px; }
-  .ba-col:first-child {
-    background: rgba(0,0,0,0.025);
-    border-right: 1px solid var(--line, #ded2c1);
-  }
+
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
+
   .ba-label {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #9e9789;
+    color: var(--faint);
     margin-bottom: 5px;
   }
-  .ba-col:last-child .ba-label { color: #2a5e3e; }
-  .ba-text { font-size: 0.9rem; line-height: 1.5; }
-  .predict-box {
-    background: #fef9ee;
-    border: 1px solid #efd09e;
-    border-radius: 10px;
-    padding: 11px 14px;
-    margin-bottom: 12px;
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
   }
-  .predict-box .pbox-label {
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .canvas-panel { overflow: hidden; }
+
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
+
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
+
+  #objects-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
+
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
+
+  .ctrl-panel { padding: 16px; }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
+
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #fff2dc; border-color: #e0a050; }
+
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
+
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(73,98,122,0.4);
+    outline-offset: 2px;
+  }
+
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .box-label {
     display: block;
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    color: var(--ink);
     margin-bottom: 3px;
   }
-  .predict-box .pbox-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
+
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
+
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
   }
-  .callout-mistake {
-    background: #fff3e6;
-    border: 1px solid #edbd83;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin: 10px 0 0;
-  }
-  .callout-mistake .cm-label {
+
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
     display: block;
-    font-size: 0.72rem;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    min-width: 42px;
+    text-align: center;
   }
-  .callout-mistake .cm-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
   }
-  .pathways-section {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 32px 20px 8px;
-  }
-  .pathways-title {
-    font-size: 0.72rem;
-    font-weight: 700;
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #9e9789;
-    margin-bottom: 12px;
+    color: var(--faint);
+    margin-bottom: 6px;
   }
-  .path-links { display: grid; gap: 8px; max-width: 820px; }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: color var(--transition);
+  }
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 22px; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 720px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
   .path-link {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
     text-decoration: none;
-    color: var(--ink, #222);
-    background: rgba(255,250,242,0.92);
-    transition: border-color 0.14s ease, background 0.14s ease;
-    font-family: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
   }
-  .path-link:hover {
-    border-color: var(--accent, #2563eb);
-    background: rgba(230,240,255,0.6);
-  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
   .path-link-type {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #9e9789;
+    color: var(--faint);
     flex-shrink: 0;
-    min-width: 82px;
+    min-width: 88px;
   }
-  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
   .path-link-name { font-size: 0.9rem; font-weight: 700; }
-  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
   .bottom-nav {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 18px 20px 40px;
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    border-top: 1px solid var(--line, #ded2c1);
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
   }
-  .bottom-nav a {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #6b6258;
-    text-decoration: none;
-    font-family: inherit;
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color var(--transition); }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
   }
-  .bottom-nav a:hover { color: var(--accent, #2563eb); }
   @media (max-width: 560px) {
     .before-after { grid-template-columns: 1fr; }
-    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
     .bottom-nav { flex-direction: column; }
   }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
 </style>
-  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
-  </div>
-  <header>
-    <h1>Objects: Data + Behavior</h1>
-    <p class="subtitle">
-      A concept bridge for object literals, classes, properties, and methods. An object bundles what something <strong>knows</strong> with what it <strong>does</strong>.
-    </p>
-  <div class="unlocks" aria-label="What this bridge unlocks">
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+  <p class="eyebrow">Concept bridge · Foundations</p>
+  <h1>Objects: Data + Behavior</h1>
+  <p class="subtitle">A concept bridge for JavaScript objects and classes. An object bundles the properties of a thing (its data) with what it can do (its methods) into one tidy package.</p>
+  <div class="unlocks">
     <span class="unlock-pill">particle systems</span>
-    <span class="unlock-pill">reusable entities</span>
-    <span class="unlock-pill">object-oriented thinking</span>
-    <span class="unlock-pill">clean code</span>
+    <span class="unlock-pill">game entities</span>
+    <span class="unlock-pill">creature animation</span>
+    <span class="unlock-pill">organized code</span>
+    <span class="unlock-pill">multiple instances</span>
   </div>
-  <section class="before-after" aria-label="Before and after mental model">
+  <section class="before-after">
     <div class="ba-col">
       <div class="ba-label">Before this bridge, you might think</div>
-      <div class="ba-text">Objects are an advanced feature — I can just use separate x, y, and speed variables</div>
+      <div class="ba-text">I have separate variables: <code>ballX</code>, <code>ballY</code>, <code>ballSpeedX</code>, <code>ballSpeedY</code>. Adding a second ball means four more variables.</div>
     </div>
     <div class="ba-col">
       <div class="ba-label">After this bridge</div>
-      <div class="ba-text">An object bundles what something knows with what it can do — one entity, one name, zero duplicate code</div>
+      <div class="ba-text">One object: <code>{ x, y, vx, vy, update(), draw() }</code>. Ten balls means an array of ten objects. Each manages itself.</div>
     </div>
   </section>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-            <div class="predict-box">
-        <span class="pbox-label">Before you interact — predict first</span>
-        <span class="pbox-body">Before you create a second ball object — how many new lines of code do you expect to write?</span>
+  <section class="main-grid">
+    <article class="panel canvas-panel">
+      <div class="canvas-bar">
+        <div class="canvas-bar-title" id="canvas-title">Properties: an object groups related data</div>
+        <div class="canvas-bar-sub" id="canvas-sub">Adjust the sliders to change the object's property values.</div>
       </div>
-<div class="row">
-        <button id="mode-vars" class="active">Loose Variables</button>
-        <button id="mode-object">Object Literal</button>
-        <button id="mode-methods">Methods</button>
-        <button id="mode-class">Class Blueprint</button>
-        <button id="mode-many">Many Objects</button>
-        <button id="reset-button">Reset</button>
-        <span id="mode-pill" class="pill">loose variables describe one thing</span>
+      <div class="canvas-wrap">
+        <canvas id="objects-canvas" width="620" height="380" aria-label="Interactive objects concept bridge"></canvas>
+        <div class="touch-hint">Tap and drag the sliders to explore.</div>
       </div>
-
-      <div class="row">
-        <div class="slider-wrap">
-          <label for="size-slider">Size</label>
-          <input id="size-slider" type="range" min="30" max="130" value="72" step="1" />
-          <span id="size-value" class="value-label">72</span>
+    </article>
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="Object concept tabs">
+        <button class="tab" role="tab" data-mode="properties" aria-selected="true" tabindex="0">Properties<span class="step">1 of 4</span></button>
+        <button class="tab" role="tab" data-mode="methods" aria-selected="false" tabindex="-1">Methods<span class="step">2 of 4</span></button>
+        <button class="tab" role="tab" data-mode="many" aria-selected="false" tabindex="-1">Many<span class="step">3 of 4</span></button>
+        <button class="tab" role="tab" data-mode="class" aria-selected="false" tabindex="-1">Class<span class="step">4 of 4</span></button>
+      </nav>
+      <div id="bridge-panel" role="tabpanel" aria-live="polite">
+        <div class="predict">
+          <span class="box-label">Predict before changing</span>
+          <span class="box-body" id="predict-text">If you set x and y to the center of the canvas — what values would you use? How does that compare to tracking separate variables?</span>
         </div>
-        <div class="slider-wrap">
-          <label for="speed-slider">Speed</label>
-          <input id="speed-slider" type="range" min="0" max="5" value="1.6" step="0.1" />
-          <span id="speed-value" class="value-label">1.6×</span>
+        <div class="ctrl-group" id="controls"></div>
+        <div id="presets-area"></div>
+        <div class="code-section">
+          <div class="code-header"><span>Live code</span><span id="code-note">Properties live inside the object.</span></div>
+          <div class="code-focus-line mono" id="focus-code"></div>
+          <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false">▸ See full p5.js sketch</button>
+          <div class="full-code-body mono" id="full-code"></div>
         </div>
-        <div class="slider-wrap">
-          <label for="count-slider">Objects</label>
-          <input id="count-slider" type="range" min="1" max="12" value="5" step="1" />
-          <span id="count-value" class="value-label">5</span>
-        </div>
+        <div class="callout big-idea"><span class="box-label">Big idea</span><span class="box-body" id="big-idea-text"></span></div>
+        <div class="callout bug"><span class="box-label">⚠ Common mistake</span><span class="box-body" id="bug-text"></span></div>
+        <div class="callout try"><span class="box-label">Try this</span><span class="box-body" id="try-text"></span></div>
       </div>
-
-      <div class="row">
-        <span class="preset-label">Actions:</span>
-        <button id="randomize-button">Randomize objects</button>
-        <button id="add-button">Add object</button>
-        <button id="remove-button">Remove object</button>
-        <label class="toggle-label"><input id="animate-toggle" type="checkbox" checked />Animate</label>
-        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
-      </div>
-    </section>
-
-    <section class="workspace">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        Loose variables can describe one thing, but an object bundles the related data together.
-      </div>
-    </section>
-
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">Loose variables describe one thing</h2>
-        <p id="lesson-text">
-          At first, it is common to store a shape's x, y, size, and speed in separate variables. That works, but the relationship between those variables is only in your head.
-        </p>
-        <span id="formula-box" class="formula">let x = 200;
-let y = 200;
-let size = 72;
-let speed = 1.6;</span>
-      </section>
-
-      <section class="card">
-        <h3>Big idea</h3>
-        <p><strong>Properties</strong> are what an object knows.</p>
-        <p><strong>Methods</strong> are what an object does.</p>
-        <p><strong>Classes</strong> are blueprints for making many similar objects.</p>
-      </section>
-
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch data"></span><span>data / properties</span></div>
-          <div class="legend-item"><span class="swatch behavior"></span><span>behavior / methods</span></div>
-          <div class="legend-item"><span class="swatch object"></span><span>one object instance</span></div>
-          <div class="legend-item"><span class="swatch class"></span><span>class blueprint</span></div>
-          <div class="legend-item"><span class="swatch many"></span><span>many objects</span></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">Which variables belong together because they describe the same thing?</p>
-      </section>
-
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code id="code-box">let x = 200;
-let y = 200;
-let size = 72;
-let speed = 1.6;</code></pre>
-        <p class="note">
-          In JavaScript, object literals are a gentle first step. Classes become useful when you want a repeatable blueprint for many objects.
-        </p>
-      </section>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    const state = {
-      mode: "vars",
-      size: 72,
-      speed: 1.6,
-      count: 5,
-      animate: true,
-      showLabels: true,
-      showCode: false,
-      ball: { x: 260, y: 230, size: 72, speedX: 1.6, speedY: 1.1, hue: 35 },
-      balls: [],
-      methodBall: { x: 240, y: 200, vx: 2, vy: 1.5, size: 72 },
-      methodLoop: false,
-      lastMethodCalled: null,
-      displayFlash: 0
-    };
+  <section class="prose-section">
+    <h2 id="prose-title">One template, many instances</h2>
+    <p id="prose-body">An object bundles data (properties) and behavior (methods) into one named thing. A class gives you the template; new creates each instance. One loop calls .update() and .draw() on every instance — the loop stays the same no matter how many objects exist.</p>
+  </section>
 
-    const els = {};
+  <div class="legend">
+    <div class="legend-item"><span class="swatch" style="background:#fff;border:2px solid #49627a"></span> object box</div>
+    <div class="legend-item"><span class="swatch" style="background:#eef2f6;border:1px solid #c4d0dc"></span> property slot</div>
+    <div class="legend-item"><span class="swatch" style="background:#60a878"></span> method badge</div>
+    <div class="legend-item"><span class="swatch" style="background:#e8a838"></span> instance dot</div>
+    <div class="legend-item"><span class="swatch" style="background:#fff;border:2px dashed #a888cc"></span> class template</div>
+  </div>
 
-    function setupUI() {
-      els.modeVars = document.querySelector("#mode-vars");
-      els.modeObject = document.querySelector("#mode-object");
-      els.modeMethods = document.querySelector("#mode-methods");
-      els.modeClass = document.querySelector("#mode-class");
-      els.modeMany = document.querySelector("#mode-many");
-      els.resetButton = document.querySelector("#reset-button");
-      els.randomizeButton = document.querySelector("#randomize-button");
-      els.addButton = document.querySelector("#add-button");
-      els.removeButton = document.querySelector("#remove-button");
-      els.modePill = document.querySelector("#mode-pill");
-      els.sizeSlider = document.querySelector("#size-slider");
-      els.speedSlider = document.querySelector("#speed-slider");
-      els.countSlider = document.querySelector("#count-slider");
-      els.sizeValue = document.querySelector("#size-value");
-      els.speedValue = document.querySelector("#speed-value");
-      els.countValue = document.querySelector("#count-value");
-      els.animateToggle = document.querySelector("#animate-toggle");
-      els.showLabels = document.querySelector("#show-labels");
-      els.showCode = document.querySelector("#show-code");
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.formulaBox = document.querySelector("#formula-box");
-      els.questionText = document.querySelector("#question-text");
-      els.caption = document.querySelector("#canvas-caption");
-      els.codeCard = document.querySelector("#code-card");
-      els.codeBox = document.querySelector("#code-box");
+  <section class="pathways">
+    <div class="pathways-title">What's next</div>
+    <div class="path-links">
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
+        <span class="path-link-type">Practice →</span>
+        <span class="path-link-name">Look for object-oriented or particle system tools in the workshop library</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
+        <span class="path-link-type">Remix →</span>
+        <span class="path-link-name">Convert a single ball's variables into an object with update() and draw() methods</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/arrays-loops-a-system/" class="path-link">
+        <span class="path-link-type">Related →</span>
+        <span class="path-link-name">Arrays + Loops: A System — store many objects in an array and loop over them</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+    </div>
+  </section>
 
-      els.modeVars.addEventListener("click", () => setMode("vars"));
-      els.modeObject.addEventListener("click", () => setMode("object"));
-      els.modeMethods.addEventListener("click", () => setMode("methods"));
-      els.modeClass.addEventListener("click", () => setMode("class"));
-      els.modeMany.addEventListener("click", () => setMode("many"));
+  <nav class="bottom-nav">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
+    <a href="../pixels-pictures-are-data/">Next: Pixels: Pictures Are Data →</a>
+  </nav>
+</main>
 
-      els.sizeSlider.addEventListener("input", () => {
-        state.size = Number(els.sizeSlider.value);
-        state.ball.size = state.size;
-        updateUI();
-      });
+<script>
+'use strict';
 
-      els.speedSlider.addEventListener("input", () => {
-        state.speed = Number(els.speedSlider.value);
-        state.ball.speedX = state.speed;
-        updateUI();
-      });
+var canvas = document.getElementById('objects-canvas');
+var ctx = canvas.getContext('2d');
 
-      els.countSlider.addEventListener("input", () => {
-        state.count = Number(els.countSlider.value);
-        syncBallCount();
-        updateUI();
-      });
+var DPR = Math.min(window.devicePixelRatio || 1, 2);
+var CW = 620;
+var CH = 380;
+canvas.width = CW * DPR;
+canvas.height = CH * DPR;
+canvas.style.width = CW + 'px';
+canvas.style.height = CH + 'px';
+ctx.scale(DPR, DPR);
 
-      els.animateToggle.addEventListener("change", () => {
-        state.animate = els.animateToggle.checked;
-      });
+// ── state ────────────────────────────────────────────────────────────────────
 
-      els.showLabels.addEventListener("change", () => {
-        state.showLabels = els.showLabels.checked;
-      });
+var currentMode = 'properties';
+var animId = null;
+var paused = false;
 
-      els.showCode.addEventListener("change", () => {
-        state.showCode = els.showCode.checked;
-        updateUI();
-      });
+// Properties tab state
+var propState = { bx: 200, by: 190, size: 40, speed: 3 };
 
-      els.resetButton.addEventListener("click", () => {
-        resetSingleBall();
-        resetManyBalls();
-        updateUI();
-      });
+// Methods tab: single animated ball
+var methodBall = null;
 
-      els.randomizeButton.addEventListener("click", () => {
-        randomizeBalls();
-        updateUI();
-      });
+// Many tab: array of balls
+var manyBalls = [];
+var manyCount = 10;
 
-      els.addButton.addEventListener("click", () => {
-        state.count = Math.min(12, state.count + 1);
-        syncBallCount(true);
-        updateUI();
-      });
+// Class tab: spawned particles
+var classParticles = [];
 
-      els.removeButton.addEventListener("click", () => {
-        state.count = Math.max(1, state.count - 1);
-        syncBallCount();
-        updateUI();
-      });
+// ── color palette ────────────────────────────────────────────────────────────
 
-      resetSingleBall();
-      resetManyBalls();
-      updateUI();
+var BALL_COLORS = [
+  '#49627a', '#e8a838', '#60a878', '#a888cc', '#cc6050',
+  '#3a7a6a', '#8a6a3a', '#6a3a8a', '#507a50', '#7a5050'
+];
+
+// ── Ball "class" (constructor function) ──────────────────────────────────────
+
+function Ball(x, y, vx, vy, r, color) {
+  this.x = x !== undefined ? x : Math.random() * CW;
+  this.y = y !== undefined ? y : Math.random() * CH;
+  this.vx = vx !== undefined ? vx : (Math.random() - 0.5) * 6;
+  this.vy = vy !== undefined ? vy : (Math.random() - 0.5) * 6;
+  this.r = r !== undefined ? r : 14 + Math.random() * 14;
+  this.color = color || BALL_COLORS[Math.floor(Math.random() * BALL_COLORS.length)];
+}
+
+Ball.prototype.update = function() {
+  this.x += this.vx;
+  this.y += this.vy;
+  if (this.x - this.r < 0) { this.x = this.r; this.vx *= -1; }
+  if (this.x + this.r > CW) { this.x = CW - this.r; this.vx *= -1; }
+  if (this.y - this.r < 0) { this.y = this.r; this.vy *= -1; }
+  if (this.y + this.r > CH) { this.y = CH - this.r; this.vy *= -1; }
+};
+
+Ball.prototype.draw = function() {
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+  ctx.fillStyle = this.color + 'dd';
+  ctx.fill();
+  ctx.strokeStyle = this.color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // velocity arrow
+  ctx.beginPath();
+  ctx.moveTo(this.x, this.y);
+  ctx.lineTo(this.x + this.vx * 3, this.y + this.vy * 3);
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+};
+
+// ── Particle "class" for class tab ───────────────────────────────────────────
+
+function Particle(x, y) {
+  this.x = x !== undefined ? x : CW / 2 + (Math.random() - 0.5) * 40;
+  this.y = y !== undefined ? y : CH / 2 + (Math.random() - 0.5) * 40;
+  this.vx = (Math.random() - 0.5) * 5;
+  this.vy = (Math.random() - 0.5) * 5;
+  this.r = 8 + Math.random() * 14;
+  this.life = 1.0;
+  this.decay = 0.004 + Math.random() * 0.006;
+  this.color = BALL_COLORS[Math.floor(Math.random() * BALL_COLORS.length)];
+}
+
+Particle.prototype.update = function() {
+  this.x += this.vx;
+  this.y += this.vy;
+  this.vy += 0.08; // slight gravity
+  this.life -= this.decay;
+  if (this.x - this.r < 0) { this.x = this.r; this.vx *= -0.7; }
+  if (this.x + this.r > CW) { this.x = CW - this.r; this.vx *= -0.7; }
+  if (this.y - this.r < 0) { this.y = this.r; this.vy *= -0.7; }
+  if (this.y + this.r > CH) { this.y = CH - this.r; this.vy *= -0.7; }
+};
+
+Particle.prototype.draw = function() {
+  var a = Math.max(0, this.life);
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, this.r * a, 0, Math.PI * 2);
+  ctx.fillStyle = this.color + Math.round(a * 200).toString(16).padStart(2, '0');
+  ctx.fill();
+  ctx.strokeStyle = this.color;
+  ctx.globalAlpha = a;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+};
+
+Particle.prototype.isAlive = function() {
+  return this.life > 0;
+};
+
+// ── animation loop helpers ────────────────────────────────────────────────────
+
+function stopAnim() {
+  if (animId) { cancelAnimationFrame(animId); animId = null; }
+}
+
+function startMethodsLoop() {
+  stopAnim();
+  function loop() {
+    if (currentMode !== 'methods') return;
+    if (!paused) {
+      methodBall.update();
     }
+    drawMethodsMode();
+    animId = requestAnimationFrame(loop);
+  }
+  animId = requestAnimationFrame(loop);
+}
 
-    function resetSingleBall() {
-      state.ball = { x: 260, y: 230, size: state.size, speedX: state.speed, speedY: 1.1, hue: 35 };
-      state.methodBall = { x: 240, y: 200, vx: 2, vy: 1.5, size: state.size };
-      state.methodLoop = false;
-      state.lastMethodCalled = null;
+function startManyLoop() {
+  stopAnim();
+  function loop() {
+    if (currentMode !== 'many') return;
+    manyBalls.forEach(function(b) { b.update(); });
+    drawManyMode();
+    animId = requestAnimationFrame(loop);
+  }
+  animId = requestAnimationFrame(loop);
+}
+
+function startClassLoop() {
+  stopAnim();
+  function loop() {
+    if (currentMode !== 'class') return;
+    classParticles = classParticles.filter(function(p) { return p.isAlive(); });
+    classParticles.forEach(function(p) { p.update(); });
+    drawClassMode();
+    animId = requestAnimationFrame(loop);
+  }
+  animId = requestAnimationFrame(loop);
+}
+
+// ── drawing ───────────────────────────────────────────────────────────────────
+
+function clearBg() {
+  ctx.fillStyle = '#f5f0e8';
+  ctx.fillRect(0, 0, CW, CH);
+}
+
+function drawGrid(spacing, alpha) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,0,0,' + alpha + ')';
+  ctx.lineWidth = 1;
+  for (var x = 0; x <= CW; x += spacing) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, CH); ctx.stroke();
+  }
+  for (var y = 0; y <= CH; y += spacing) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function roundRect(x, y, w, h, r) {
+  var rad = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rad, y);
+  ctx.lineTo(x + w - rad, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rad);
+  ctx.lineTo(x + w, y + h - rad);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
+  ctx.lineTo(x + rad, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - rad);
+  ctx.lineTo(x, y + rad);
+  ctx.quadraticCurveTo(x, y, x + rad, y);
+  ctx.closePath();
+}
+
+function drawPropertiesMode() {
+  clearBg();
+  drawGrid(40, 0.04);
+
+  // Draw the ball from slider values
+  var bx = propState.bx;
+  var by = propState.by;
+  var r = propState.size;
+
+  // Ball
+  ctx.beginPath();
+  ctx.arc(bx, by, r, 0, Math.PI * 2);
+  ctx.fillStyle = '#49627add';
+  ctx.fill();
+  ctx.strokeStyle = '#49627a';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Cross-hairs
+  ctx.save();
+  ctx.strokeStyle = 'rgba(73,98,122,0.25)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(bx, 0); ctx.lineTo(bx, CH); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, by); ctx.lineTo(CW, by); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Object box visualization on the right
+  var bxR = 390;
+  var byR = 60;
+  var bwR = 200;
+  var slots = [
+    { key: 'x', val: Math.round(bx) },
+    { key: 'y', val: Math.round(by) },
+    { key: 'vx', val: propState.speed.toFixed(1) },
+    { key: 'vy', val: propState.speed.toFixed(1) },
+    { key: 'color', val: '"#49627a"' },
+    { key: 'size', val: r }
+  ];
+
+  // Box border
+  roundRect(bxR - 4, byR - 22, bwR + 8, 22 + slots.length * 34 + 10, 10);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.strokeStyle = '#49627a';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Header
+  ctx.fillStyle = '#49627a';
+  ctx.font = 'bold 12px "DM Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('ball = {', bxR, byR - 18);
+
+  // Slots
+  slots.forEach(function(s, i) {
+    var sy = byR + i * 34;
+    roundRect(bxR, sy, bwR, 28, 6);
+    ctx.fillStyle = '#eef2f6';
+    ctx.fill();
+    ctx.strokeStyle = '#c4d0dc';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = '#49627a';
+    ctx.font = 'bold 11px "DM Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s.key + ':', bxR + 8, sy + 14);
+
+    ctx.fillStyle = '#e8a838';
+    ctx.font = 'bold 11px "DM Mono", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(String(s.val), bxR + bwR - 8, sy + 14);
+  });
+
+  ctx.fillStyle = '#49627a';
+  ctx.font = 'bold 12px "DM Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('}', bxR, byR + slots.length * 34 + 2);
+
+  // Labels on ball
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.font = 'bold 11px "DM Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('x=' + Math.round(bx), bx, by - r - 4);
+  ctx.textBaseline = 'middle';
+  ctx.fillText('y=' + Math.round(by), bx + r + 24, by);
+}
+
+function drawMethodsMode() {
+  clearBg();
+  drawGrid(40, 0.03);
+  methodBall.draw();
+
+  // Pause indicator
+  if (paused) {
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(0, 0, CW, CH);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 20px "DM Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Paused', CW / 2, CH / 2);
+    ctx.font = '13px "DM Sans", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillText('x=' + Math.round(methodBall.x) + '  y=' + Math.round(methodBall.y), CW / 2, CH / 2 + 28);
+  } else {
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.font = 'bold 12px "DM Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('ball.update()  ball.draw()', 12, 10);
+    ctx.font = '11px "DM Mono", monospace';
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillText('x=' + Math.round(methodBall.x) + ' y=' + Math.round(methodBall.y) +
+      ' vx=' + methodBall.vx.toFixed(1) + ' vy=' + methodBall.vy.toFixed(1), 12, 26);
+  }
+
+  // Method labels
+  var mx = methodBall.x;
+  var my = methodBall.y;
+  var mr = methodBall.r;
+  ctx.save();
+  ctx.fillStyle = '#60a878';
+  ctx.font = 'bold 10px "DM Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  var labelX = Math.min(mx + mr + 8, CW - 80);
+  roundRect(labelX, my - 12, 62, 14, 4);
+  ctx.fillStyle = '#60a878';
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.fillText('.update()', labelX + 4, my - 5);
+  roundRect(labelX, my + 2, 56, 14, 4);
+  ctx.fillStyle = '#60a878';
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.fillText('.draw()', labelX + 4, my + 9);
+  ctx.restore();
+}
+
+function drawManyMode() {
+  clearBg();
+  drawGrid(40, 0.03);
+  manyBalls.forEach(function(b) { b.draw(); });
+
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  ctx.font = 'bold 12px "DM Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('Balls: ' + manyBalls.length, 12, 10);
+  ctx.font = '11px "DM Mono", monospace';
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillText('for (let b of balls) { b.update(); b.draw(); }', 12, 26);
+}
+
+function drawClassMode() {
+  clearBg();
+  drawGrid(40, 0.03);
+
+  // Template box (dashed purple border)
+  var tx = 16;
+  var ty = 20;
+  var tw = 200;
+  var th = 120;
+  roundRect(tx, ty, tw, th, 10);
+  ctx.save();
+  ctx.setLineDash([6, 4]);
+  ctx.strokeStyle = '#a888cc';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  ctx.fillStyle = 'rgba(168,136,204,0.07)';
+  roundRect(tx, ty, tw, th, 10);
+  ctx.fill();
+
+  ctx.fillStyle = '#a888cc';
+  ctx.font = 'bold 11px "DM Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('class Particle {', tx + 10, ty + 8);
+  ctx.fillStyle = '#6a6a7a';
+  ctx.font = '10px "DM Mono", monospace';
+  ctx.fillText('  constructor(x, y) {', tx + 10, ty + 24);
+  ctx.fillText('    this.x = x;', tx + 10, ty + 38);
+  ctx.fillText('    this.y = y;', tx + 10, ty + 52);
+  ctx.fillText('    this.vx = random(-3, 3);', tx + 10, ty + 66);
+  ctx.fillText('  }', tx + 10, ty + 80);
+  ctx.fillText('  update() { ... }', tx + 10, ty + 94);
+  ctx.fillStyle = '#a888cc';
+  ctx.fillText('}', tx + 10, ty + 108);
+
+  // Particles
+  classParticles.forEach(function(p) { p.draw(); });
+
+  // Count and hint
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  ctx.font = 'bold 12px "DM Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('Instances: ' + classParticles.length, 12, 160);
+
+  if (classParticles.length === 0) {
+    ctx.fillStyle = '#9e9789';
+    ctx.font = '14px "DM Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Click the canvas or use Spawn to create particles', CW / 2, CH / 2 + 30);
+  }
+
+  ctx.font = '11px "DM Mono", monospace';
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('let p = new Particle(mouseX, mouseY);', 12, 176);
+}
+
+// ── main draw dispatcher ──────────────────────────────────────────────────────
+
+function draw() {
+  if (currentMode === 'properties') drawPropertiesMode();
+  else if (currentMode === 'methods') drawMethodsMode();
+  else if (currentMode === 'many') drawManyMode();
+  else if (currentMode === 'class') drawClassMode();
+}
+
+// ── UI builders ───────────────────────────────────────────────────────────────
+
+var modeData = {
+  properties: {
+    title: 'Properties: an object groups related data',
+    sub: 'Adjust the sliders to change the object\'s property values.',
+    predict: 'If you set x and y to the center of the canvas — what values would you use? How is that easier than tracking separate variables?',
+    big: 'An object groups related data under one name. ball.x and ball.y travel together because they belong to the same thing.',
+    bug: 'Accessing obj.property before defining it returns undefined silently. Always initialize all properties in the constructor or object literal.',
+    tryIt: 'Set x and y to center the ball. What values did you use? How is that easier than separate variables?',
+    note: 'Properties live inside the object.',
+    focusHTML: 'ball.<span class="ct fn">x</span> = <span class="ct num" id="v-x">200</span>;<br>ball.<span class="ct fn">y</span> = <span class="ct num" id="v-y">190</span>;<br>ball.<span class="ct fn">size</span> = <span class="ct num" id="v-size">40</span>;',
+    fullCode: 'let ball = {\n  x: 200,\n  y: 190,\n  vx: 3,\n  vy: 2,\n  color: \'#49627a\',\n  size: 40\n};\n\nfunction setup() {\n  createCanvas(620, 380);\n}\n\nfunction draw() {\n  background(245, 241, 232);\n  fill(ball.color);\n  stroke(30);\n  strokeWeight(2);\n  circle(ball.x, ball.y, ball.size * 2);\n}'
+  },
+  methods: {
+    title: 'Methods: an object knows what to do',
+    sub: 'Use pause/play to freeze the ball, then move it with sliders.',
+    predict: 'If you pause and change x and y with sliders — when you resume, will the method pick up the new values?',
+    big: 'A method is a function that belongs to an object. It can read and change its own properties using this.',
+    bug: 'Arrow functions inside objects do not bind this — use regular function() syntax for methods so this refers to the object.',
+    tryIt: 'Pause. Change x and y with sliders. Resume. Did the method pick up the new values immediately?',
+    note: 'Methods called from draw().',
+    focusHTML: 'ball.<span class="ct fn">update</span>();<br>ball.<span class="ct fn">draw</span>();',
+    fullCode: 'let ball;\n\nfunction setup() {\n  createCanvas(620, 380);\n  ball = {\n    x: 310,\n    y: 190,\n    vx: 3,\n    vy: 2,\n    r: 20,\n    color: \'#49627a\',\n    update: function() {\n      this.x += this.vx;\n      this.y += this.vy;\n      // bounce off walls\n      if (this.x - this.r < 0 || this.x + this.r > width)\n        this.vx *= -1;\n      if (this.y - this.r < 0 || this.y + this.r > height)\n        this.vy *= -1;\n    },\n    draw: function() {\n      fill(this.color);\n      stroke(30);\n      strokeWeight(2);\n      circle(this.x, this.y, this.r * 2);\n    }\n  };\n}\n\nfunction draw() {\n  background(245, 241, 232);\n  ball.update();\n  ball.draw();\n}'
+  },
+  many: {
+    title: 'Many: one loop, any number of objects',
+    sub: 'Drag the count slider to add or remove balls.',
+    predict: 'When you double the number of balls — does the loop code change at all?',
+    big: 'With objects, one loop handles everything. Each object manages itself — the loop just triggers the action.',
+    bug: 'Removing items from an array while iterating over it skips items. Collect removals and splice afterwards, or filter into a new array.',
+    tryIt: 'Add 25 balls. Does the loop code change at all? Does it get slower? What determines the upper limit?',
+    note: 'One loop for all objects.',
+    focusHTML: '<span class="ct kw">for</span> (<span class="ct kw">let</span> b <span class="ct kw">of</span> balls) {<br>&nbsp;&nbsp;b.<span class="ct fn">update</span>();<br>&nbsp;&nbsp;b.<span class="ct fn">draw</span>();<br>}',
+    fullCode: 'let balls = [];\n\nfunction setup() {\n  createCanvas(620, 380);\n  for (let i = 0; i < 10; i++) {\n    balls.push(new Ball());\n  }\n}\n\nfunction draw() {\n  background(245, 241, 232);\n  // The loop doesn\'t change no matter how many balls:\n  for (let b of balls) {\n    b.update();\n    b.draw();\n  }\n}\n\nclass Ball {\n  constructor() {\n    this.x = random(width);\n    this.y = random(height);\n    this.vx = random(-3, 3);\n    this.vy = random(-3, 3);\n    this.r = random(10, 24);\n    this.color = color(random(255), random(255), random(255));\n  }\n  update() {\n    this.x += this.vx;\n    this.y += this.vy;\n    if (this.x < this.r || this.x > width - this.r)  this.vx *= -1;\n    if (this.y < this.r || this.y > height - this.r) this.vy *= -1;\n  }\n  draw() {\n    fill(this.color);\n    stroke(30);\n    circle(this.x, this.y, this.r * 2);\n  }\n}'
+  },
+  class: {
+    title: 'Class: a template for making objects',
+    sub: 'Click the canvas or press Spawn to create a new particle.',
+    predict: 'If you spawn 15 particles from the same class — will any two be exactly the same?',
+    big: 'A class is a template for creating objects. The constructor sets initial values. Methods are shared. Use new to create instances.',
+    bug: 'Forgetting new before a class name in strict mode throws a TypeError — it does not silently create an empty object.',
+    tryIt: 'Spawn 15 particles by clicking. They all use the same class. Are any two exactly identical?',
+    note: 'new creates a fresh instance.',
+    focusHTML: '<span class="ct kw">let</span> p = <span class="ct kw">new</span> <span class="ct fn">Particle</span>(mouseX, mouseY);',
+    fullCode: 'let particles = [];\n\nfunction setup() {\n  createCanvas(620, 380);\n}\n\nfunction draw() {\n  background(245, 241, 232);\n  // Remove dead particles, update and draw the rest\n  particles = particles.filter(p => p.isAlive());\n  for (let p of particles) {\n    p.update();\n    p.draw();\n  }\n}\n\nfunction mousePressed() {\n  // new creates a fresh instance each time\n  particles.push(new Particle(mouseX, mouseY));\n}\n\nclass Particle {\n  constructor(x, y) {\n    this.x = x;\n    this.y = y;\n    this.vx = random(-3, 3);\n    this.vy = random(-3, 3);\n    this.r = random(8, 22);\n    this.life = 1.0;\n    this.color = color(random(255), random(150, 255), random(255));\n  }\n  update() {\n    this.x += this.vx;\n    this.y += this.vy;\n    this.vy += 0.08; // gravity\n    this.life -= 0.005;\n  }\n  draw() {\n    push();\n    tint(255, this.life * 255);\n    fill(this.color);\n    noStroke();\n    circle(this.x, this.y, this.r * 2 * this.life);\n    pop();\n  }\n  isAlive() {\n    return this.life > 0;\n  }\n}'
+  }
+};
+
+function buildControls() {
+  var cg = document.getElementById('controls');
+  cg.innerHTML = '';
+
+  if (currentMode === 'properties') {
+    cg.innerHTML =
+      '<div class="ctrl-row">' +
+        '<label>x<small>ball.x — horizontal position</small></label>' +
+        '<span class="val-badge" id="bx-badge">' + Math.round(propState.bx) + '</span>' +
+        '<input type="range" id="bx-slider" min="20" max="600" value="' + propState.bx + '">' +
+      '</div>' +
+      '<div class="ctrl-row">' +
+        '<label>y<small>ball.y — vertical position</small></label>' +
+        '<span class="val-badge" id="by-badge">' + Math.round(propState.by) + '</span>' +
+        '<input type="range" id="by-slider" min="20" max="360" value="' + propState.by + '">' +
+      '</div>' +
+      '<div class="ctrl-row">' +
+        '<label>size<small>ball.size — radius</small></label>' +
+        '<span class="val-badge" id="sz-badge">' + propState.size + '</span>' +
+        '<input type="range" id="sz-slider" min="10" max="80" value="' + propState.size + '">' +
+      '</div>';
+
+    document.getElementById('bx-slider').addEventListener('input', function(e) {
+      propState.bx = +e.target.value;
+      document.getElementById('bx-badge').textContent = Math.round(propState.bx);
+      var vx = document.getElementById('v-x');
+      if (vx) { vx.textContent = Math.round(propState.bx); vx.classList.add('flash'); setTimeout(function() { vx.classList.remove('flash'); }, 400); }
+      draw();
+    });
+    document.getElementById('by-slider').addEventListener('input', function(e) {
+      propState.by = +e.target.value;
+      document.getElementById('by-badge').textContent = Math.round(propState.by);
+      var vy = document.getElementById('v-y');
+      if (vy) { vy.textContent = Math.round(propState.by); vy.classList.add('flash'); setTimeout(function() { vy.classList.remove('flash'); }, 400); }
+      draw();
+    });
+    document.getElementById('sz-slider').addEventListener('input', function(e) {
+      propState.size = +e.target.value;
+      document.getElementById('sz-badge').textContent = propState.size;
+      var vs = document.getElementById('v-size');
+      if (vs) { vs.textContent = propState.size; vs.classList.add('flash'); setTimeout(function() { vs.classList.remove('flash'); }, 400); }
+      draw();
+    });
+
+  } else if (currentMode === 'methods') {
+    cg.innerHTML =
+      '<div class="ctrl-row" style="grid-template-columns:1fr auto auto">' +
+        '<label>Position (while paused)<small>Drag to reposition ball</small></label>' +
+        '<button class="preset-btn" id="pause-btn" style="white-space:nowrap">' + (paused ? '▶ Resume' : '⏸ Pause') + '</button>' +
+      '</div>' +
+      '<div class="ctrl-row" id="method-sliders">' +
+        '<label>x<small>ball.x</small></label>' +
+        '<span class="val-badge" id="mx-badge">' + Math.round(methodBall.x) + '</span>' +
+        '<input type="range" id="mx-slider" min="20" max="600" value="' + Math.round(methodBall.x) + '" ' + (paused ? '' : 'disabled') + '>' +
+      '</div>' +
+      '<div class="ctrl-row">' +
+        '<label>y<small>ball.y</small></label>' +
+        '<span class="val-badge" id="my-badge">' + Math.round(methodBall.y) + '</span>' +
+        '<input type="range" id="my-slider" min="20" max="360" value="' + Math.round(methodBall.y) + '" ' + (paused ? '' : 'disabled') + '>' +
+      '</div>';
+
+    document.getElementById('pause-btn').addEventListener('click', function() {
+      paused = !paused;
+      this.textContent = paused ? '▶ Resume' : '⏸ Pause';
+      var mxs = document.getElementById('mx-slider');
+      var mys = document.getElementById('my-slider');
+      if (mxs) mxs.disabled = !paused;
+      if (mys) mys.disabled = !paused;
+    });
+
+    document.getElementById('mx-slider').addEventListener('input', function(e) {
+      if (!paused) return;
+      methodBall.x = +e.target.value;
+      document.getElementById('mx-badge').textContent = Math.round(methodBall.x);
+      draw();
+    });
+    document.getElementById('my-slider').addEventListener('input', function(e) {
+      if (!paused) return;
+      methodBall.y = +e.target.value;
+      document.getElementById('my-badge').textContent = Math.round(methodBall.y);
+      draw();
+    });
+
+  } else if (currentMode === 'many') {
+    cg.innerHTML =
+      '<div class="ctrl-row">' +
+        '<label>Ball count<small>How many objects to manage</small></label>' +
+        '<span class="val-badge" id="cn-badge">' + manyCount + '</span>' +
+        '<input type="range" id="cn-slider" min="1" max="25" value="' + manyCount + '">' +
+      '</div>';
+    document.getElementById('cn-slider').addEventListener('input', function(e) {
+      manyCount = +e.target.value;
+      document.getElementById('cn-badge').textContent = manyCount;
+      while (manyBalls.length < manyCount) {
+        manyBalls.push(new Ball());
+      }
+      manyBalls.length = manyCount;
+    });
+
+  } else if (currentMode === 'class') {
+    cg.innerHTML =
+      '<div class="ctrl-row" style="grid-template-columns:1fr auto">' +
+        '<label>Particles<small>Click canvas or Spawn</small></label>' +
+        '<button class="preset-btn" id="spawn-btn">Spawn</button>' +
+      '</div>' +
+      '<div class="ctrl-row">' +
+        '<label>Clear<small>Remove all instances</small></label>' +
+        '<button class="preset-btn" id="clear-btn" style="grid-column:1/-1;margin-top:2px">Clear all particles</button>' +
+      '</div>';
+    document.getElementById('spawn-btn').addEventListener('click', function() {
+      var px = CW / 2 + (Math.random() - 0.5) * 60;
+      var py = CH / 2 + (Math.random() - 0.5) * 60;
+      for (var i = 0; i < 5; i++) classParticles.push(new Particle(px, py));
+    });
+    document.getElementById('clear-btn').addEventListener('click', function() {
+      classParticles = [];
+    });
+  }
+}
+
+function updateUI() {
+  var m = modeData[currentMode];
+  document.getElementById('canvas-title').textContent = m.title;
+  document.getElementById('canvas-sub').textContent = m.sub;
+  document.getElementById('predict-text').textContent = m.predict;
+  document.getElementById('big-idea-text').textContent = m.big;
+  document.getElementById('bug-text').textContent = m.bug;
+  document.getElementById('try-text').textContent = m.tryIt;
+  document.getElementById('code-note').textContent = m.note;
+  document.getElementById('focus-code').innerHTML = m.focusHTML;
+  document.getElementById('full-code').textContent = m.fullCode;
+  document.querySelectorAll('.tab').forEach(function(t) {
+    var active = t.dataset.mode === currentMode;
+    t.setAttribute('aria-selected', active ? 'true' : 'false');
+    t.tabIndex = active ? 0 : -1;
+  });
+}
+
+function setMode(mode) {
+  stopAnim();
+  currentMode = mode;
+  paused = false;
+
+  if (mode === 'methods') {
+    methodBall = new Ball(310, 190, 3, 2, 22, '#49627a');
+    startMethodsLoop();
+  } else if (mode === 'many') {
+    manyBalls = [];
+    for (var i = 0; i < manyCount; i++) manyBalls.push(new Ball());
+    startManyLoop();
+  } else if (mode === 'class') {
+    classParticles = [];
+    startClassLoop();
+  } else {
+    draw();
+  }
+
+  updateUI();
+  buildControls();
+}
+
+// ── canvas click for class tab ────────────────────────────────────────────────
+
+function getPos(e) {
+  var rect = canvas.getBoundingClientRect();
+  var sx = CW / rect.width;
+  var sy = CH / rect.height;
+  if (e.touches && e.touches.length) {
+    return { x: (e.touches[0].clientX - rect.left) * sx, y: (e.touches[0].clientY - rect.top) * sy };
+  }
+  return { x: (e.clientX - rect.left) * sx, y: (e.clientY - rect.top) * sy };
+}
+
+canvas.addEventListener('click', function(e) {
+  if (currentMode === 'class') {
+    var pos = getPos(e);
+    for (var i = 0; i < 5; i++) classParticles.push(new Particle(pos.x, pos.y));
+  }
+});
+
+canvas.addEventListener('touchstart', function(e) {
+  e.preventDefault();
+  if (currentMode === 'class') {
+    var pos = getPos(e);
+    for (var i = 0; i < 5; i++) classParticles.push(new Particle(pos.x, pos.y));
+  }
+}, { passive: false });
+
+// ── tabs ──────────────────────────────────────────────────────────────────────
+
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() { setMode(tab.dataset.mode); });
+  tab.addEventListener('keydown', function(e) {
+    var tabs = Array.from(document.querySelectorAll('.tab'));
+    var idx = tabs.indexOf(tab);
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      var next = tabs[(idx + 1) % tabs.length];
+      next.focus(); setMode(next.dataset.mode);
     }
-
-    function makeBall(i) {
-      return {
-        x: 90 + i * 72,
-        y: 190 + (i % 3) * 58,
-        size: 36 + (i % 5) * 10,
-        speedX: (0.7 + (i % 4) * 0.35) * (i % 2 === 0 ? 1 : -1),
-        speedY: (0.55 + (i % 3) * 0.25) * (i % 2 === 0 ? 1 : -1),
-        hue: i,
-        name: `ball${i}`
-      };
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      var prev = tabs[(idx - 1 + tabs.length) % tabs.length];
+      prev.focus(); setMode(prev.dataset.mode);
     }
-
-    function resetManyBalls() {
-      state.balls = [];
-      for (let i = 0; i < state.count; i++) state.balls.push(makeBall(i));
+    if (e.key === 'Home') { e.preventDefault(); tabs[0].focus(); setMode(tabs[0].dataset.mode); }
+    if (e.key === 'End') {
+      e.preventDefault();
+      var last = tabs[tabs.length - 1];
+      last.focus(); setMode(last.dataset.mode);
     }
+  });
+});
 
-    function syncBallCount(addRandom = false) {
-      while (state.balls.length < state.count) {
-        const i = state.balls.length;
-        const ball = addRandom ? {
-          x: 90 + Math.random() * 560,
-          y: 120 + Math.random() * 260,
-          size: 32 + Math.random() * 62,
-          speedX: -2 + Math.random() * 4,
-          speedY: -1.6 + Math.random() * 3.2,
-          hue: i,
-          name: `ball${i}`
-        } : makeBall(i);
-        state.balls.push(ball);
-      }
-      state.balls.length = state.count;
-    }
+document.getElementById('fullCodeToggle').addEventListener('click', function() {
+  var body = document.getElementById('full-code');
+  var open = body.classList.toggle('open');
+  this.textContent = open ? '▾ Hide full sketch' : '▸ See full p5.js sketch';
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
 
-    function randomizeBalls() {
-      state.balls = [];
-      for (let i = 0; i < state.count; i++) {
-        state.balls.push({
-          x: 90 + Math.random() * 560,
-          y: 120 + Math.random() * 260,
-          size: 30 + Math.random() * 70,
-          speedX: -2.2 + Math.random() * 4.4,
-          speedY: -1.8 + Math.random() * 3.6,
-          hue: i,
-          name: `ball${i}`
-        });
-      }
-    }
+// ── init ──────────────────────────────────────────────────────────────────────
 
-    function setMode(mode) {
-      state.mode = mode;
-      updateUI();
-    }
-
-    function updateUI() {
-      const buttons = [
-        [els.modeVars, "vars"],
-        [els.modeObject, "object"],
-        [els.modeMethods, "methods"],
-        [els.modeClass, "class"],
-        [els.modeMany, "many"]
-      ];
-
-      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
-
-      els.sizeSlider.value = state.size;
-      els.speedSlider.value = state.speed;
-      els.countSlider.value = state.count;
-      els.sizeValue.textContent = String(Math.round(state.size));
-      els.speedValue.textContent = `${state.speed.toFixed(1)}×`;
-      els.countValue.textContent = String(state.count);
-      els.animateToggle.checked = state.animate;
-      els.showLabels.checked = state.showLabels;
-      els.showCode.checked = state.showCode;
-      els.codeCard.classList.toggle("visible", state.showCode);
-
-      const lessons = {
-        vars: {
-          pill: "loose variables describe one thing",
-          title: "Loose variables describe one thing",
-          text: "At first, it is common to store a shape's x, y, size, and speed in separate variables. That works, but the relationship between those variables is only in your head.",
-          formula: `let x = 200;\nlet y = 200;\nlet size = ${Math.round(state.size)};\nlet speed = ${state.speed.toFixed(1)};`,
-          question: "Which variables belong together because they describe the same thing?",
-          caption: "Loose variables can describe one thing, but an object bundles the related data together.",
-          code: `let x = 200;\nlet y = 200;\nlet size = ${Math.round(state.size)};\nlet speed = ${state.speed.toFixed(1)};\n\nfunction draw() {\n  circle(x, y, size);\n  x = x + speed;\n}`
-        },
-        object: {
-          pill: "an object bundles related data",
-          title: "An object keeps related data together",
-          text: "An object groups properties under one name. Instead of separate variables floating around, the ball carries its own x, y, size, and speed.",
-          formula: `let ball = {\n  x: 200,\n  y: 200,\n  size: ${Math.round(state.size)},\n  speedX: ${state.speed.toFixed(1)}\n};`,
-          question: "Why is ball.x clearer than a loose variable named x?",
-          caption: "The ball object knows its own position, size, and speed through properties.",
-          code: `let ball = {\n  x: 200,\n  y: 200,\n  size: ${Math.round(state.size)},\n  speedX: ${state.speed.toFixed(1)}\n};\n\nfunction draw() {\n  circle(ball.x, ball.y, ball.size);\n  ball.x += ball.speedX;\n}`
-        },
-        methods: {
-          pill: "methods are verbs you call on an object",
-          title: "Methods are verbs you call on the object",
-          text: "Click move() to step the ball forward. Click display() to draw it. Press \"Loop: call both\" to animate every frame — just like p5.js draw() does.",
-          formula: `ball.move();    // updates x, y\nball.display(); // draws the circle\n\n// current state:\n{ x: ${Math.round(state.methodBall.x)}, y: ${Math.round(state.methodBall.y)}, vx: ${state.methodBall.vx}, vy: ${state.methodBall.vy} }`,
-          question: "What changes when move() and display() belong to the object?",
-          caption: "Methods are verbs. Click move() or display() to call them on the ball object.",
-          code: `let ball = {\n  x: ${Math.round(state.methodBall.x)}, y: ${Math.round(state.methodBall.y)},\n  vx: ${state.methodBall.vx}, vy: ${state.methodBall.vy},\n  size: ${Math.round(state.size)},\n\n  move() {\n    this.x += this.vx;\n    this.y += this.vy;\n  },\n\n  display() {\n    circle(this.x, this.y, this.size);\n  }\n};\n\nball.move();\nball.display();`
-        },
-        class: {
-          pill: "a class is a reusable blueprint",
-          title: "A class is a blueprint for objects",
-          text: "A class defines the structure and behavior for a type of thing. Each new Ball gets its own properties but shares the same methods.",
-          formula: `class Ball {\n  constructor(x, y, size) { ... }\n  move() { ... }\n  display() { ... }\n}`,
-          question: "How is a class different from one single object?",
-          caption: "The class is the recipe. Each object is one thing made from that recipe.",
-          code: `class Ball {\n  constructor(x, y, size) {\n    this.x = x;\n    this.y = y;\n    this.size = size;\n  }\n\n  move() {\n    this.x += 2;\n  }\n\n  display() {\n    circle(this.x, this.y, this.size);\n  }\n}`
-        },
-        many: {
-          pill: "many objects can share one blueprint",
-          title: "Many objects can share one blueprint",
-          text: "Once you have a class, you can create many objects. Each ball has its own data but uses the same move() and display() behavior.",
-          formula: `let balls = [];\nballs.push(new Ball(...));\n\nfor (let ball of balls) {\n  ball.move();\n  ball.display();\n}`,
-          question: "What is the same for every ball? What is different for each ball?",
-          caption: "Each ball has different data, but they all know how to move and display themselves.",
-          code: `let balls = [];\n\nfunction setup() {\n  for (let i = 0; i < ${state.count}; i++) {\n    balls.push(new Ball(random(width), random(height), random(30, 80)));\n  }\n}\n\nfunction draw() {\n  for (let ball of balls) {\n    ball.move();\n    ball.display();\n  }\n}`
-        }
-      };
-
-      const lesson = lessons[state.mode];
-      els.modePill.textContent = lesson.pill;
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.formulaBox.textContent = lesson.formula;
-      els.questionText.textContent = lesson.question;
-      els.caption.textContent = lesson.caption;
-      els.codeBox.textContent = lesson.code;
-    }
-
-    setupUI();
-
-    const sketch = (p) => {
-      let canvas;
-      let holder;
-      let previousWidth = 0;
-      let previousHeight = 0;
-
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive visualization of objects as data plus behavior in p5.js.");
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
-      };
-
-      p.windowResized = () => resizeToHolder();
-
-      function hitTest(btn) {
-        return btn && p.mouseX >= btn.x && p.mouseX <= btn.x + btn.w && p.mouseY >= btn.y && p.mouseY <= btn.y + btn.h;
-      }
-
-      p.mousePressed = () => {
-        if (state.mode !== "methods") return;
-        const mb = state.methodBall;
-        const bounds = getStageBounds();
-        if (hitTest(methodMoveBounds)) {
-          // move step
-          mb.x += mb.vx * state.speed * 10;
-          mb.y += mb.vy * state.speed * 5;
-          // bounce
-          if (mb.x < bounds.x + mb.size / 2 || mb.x > bounds.x + bounds.w - mb.size / 2) mb.vx *= -1;
-          if (mb.y < bounds.y + mb.size / 2 || mb.y > bounds.y + bounds.h - mb.size / 2) mb.vy *= -1;
-          mb.x = Math.max(bounds.x + mb.size / 2, Math.min(bounds.x + bounds.w - mb.size / 2, mb.x));
-          mb.y = Math.max(bounds.y + mb.size / 2, Math.min(bounds.y + bounds.h - mb.size / 2, mb.y));
-          state.lastMethodCalled = "move";
-          state.displayFlash = p.millis();
-          updateUI();
-        } else if (hitTest(methodDisplayBounds)) {
-          state.lastMethodCalled = "display";
-          state.displayFlash = p.millis();
-          updateUI();
-        } else if (hitTest(methodLoopBounds)) {
-          state.methodLoop = !state.methodLoop;
-          updateUI();
-        }
-      };
-
-      p.draw = () => {
-        resizeToHolder();
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-        drawPanelTitle();
-        updateMotion();
-
-        if (state.mode === "vars") drawVarsMode();
-        if (state.mode === "object") drawObjectMode();
-        if (state.mode === "methods") drawMethodsMode();
-        if (state.mode === "class") drawClassMode();
-        if (state.mode === "many") drawManyMode();
-
-        drawReadoutCards();
-      };
-
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-        if (w !== previousWidth || h !== previousHeight) {
-          p.resizeCanvas(w, h);
-          previousWidth = w;
-          previousHeight = h;
-        }
-      }
-
-      function updateMotion() {
-        if (!state.animate) return;
-        const bounds = getStageBounds();
-        const b = state.ball;
-        b.x += b.speedX * state.speed;
-        b.y += b.speedY * state.speed;
-        if (b.x < bounds.x + b.size / 2 || b.x > bounds.x + bounds.w - b.size / 2) b.speedX *= -1;
-        if (b.y < bounds.y + b.size / 2 || b.y > bounds.y + bounds.h - b.size / 2) b.speedY *= -1;
-
-        for (const ball of state.balls) {
-          ball.x += ball.speedX * state.speed;
-          ball.y += ball.speedY * state.speed;
-          if (ball.x < bounds.x + ball.size / 2 || ball.x > bounds.x + bounds.w - ball.size / 2) ball.speedX *= -1;
-          if (ball.y < bounds.y + ball.size / 2 || ball.y > bounds.y + bounds.h - ball.size / 2) ball.speedY *= -1;
-        }
-      }
-
-      function getStageBounds() {
-        return { x: p.width * 0.08, y: p.height * 0.15, w: p.width * 0.84, h: p.height * 0.50 };
-      }
-
-      function drawSubtleGrid() {
-        p.push();
-        p.stroke(236, 224, 207);
-        p.strokeWeight(1);
-        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
-        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
-        p.pop();
-      }
-
-      function drawPanelTitle() {
-        const titles = {
-          vars: ["Loose Variables", "The data belongs together, but the code has not bundled it yet."],
-          object: ["Object Literal", "One object groups related properties under one name."],
-          methods: ["Methods", "Functions can belong to the object too."],
-          class: ["Class Blueprint", "A class describes how to make this kind of object."],
-          many: ["Many Objects", "Each instance has its own data and shared behavior."]
-        };
-        const [title, subtitle] = titles[state.mode];
-        p.push();
-        p.noStroke();
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(22);
-        p.text(title, 24, 38);
-        p.textStyle(p.NORMAL);
-        p.textSize(14);
-        p.fill("#6b6258");
-        p.text(subtitle, 24, 62);
-        p.pop();
-      }
-
-      function drawVarsMode() {
-        const bounds = getStageBounds();
-        drawStage(bounds);
-        drawBall(state.ball, "#0891b2");
-        drawLooseVariableCards(bounds.x + 22, bounds.y + 24);
-      }
-
-      function drawObjectMode() {
-        const bounds = getStageBounds();
-        drawStage(bounds);
-        drawBall(state.ball, "#f59e0b");
-        drawObjectCard(bounds.x + 22, bounds.y + 24, false);
-      }
-
-      // Method button bounds for click detection
-      let methodMoveBounds = null;
-      let methodDisplayBounds = null;
-      let methodLoopBounds = null;
-
-      function drawMethodsMode() {
-        const bounds = getStageBounds();
-        drawStage(bounds);
-
-        const mb = state.methodBall;
-
-        // Animate loop
-        if (state.methodLoop && state.animate) {
-          // move
-          mb.x += mb.vx * state.speed;
-          mb.y += mb.vy * state.speed;
-          // bounce within stage
-          if (mb.x < bounds.x + mb.size / 2 || mb.x > bounds.x + bounds.w - mb.size / 2) mb.vx *= -1;
-          if (mb.y < bounds.y + mb.size / 2 || mb.y > bounds.y + bounds.h - mb.size / 2) mb.vy *= -1;
-          mb.x = Math.max(bounds.x + mb.size / 2, Math.min(bounds.x + bounds.w - mb.size / 2, mb.x));
-          mb.y = Math.max(bounds.y + mb.size / 2, Math.min(bounds.y + bounds.h - mb.size / 2, mb.y));
-          updateUI();
-        }
-
-        // Draw ball with optional display flash
-        const flashActive = p.millis() - state.displayFlash < 400;
-        p.push();
-        if (flashActive) {
-          // Glow ring for display flash
-          p.noStroke();
-          p.fill(245, 158, 11, 80);
-          p.circle(mb.x, mb.y, mb.size * 1.6);
-        }
-        p.pop();
-        drawBall({ x: mb.x, y: mb.y, size: mb.size, speedX: mb.vx, speedY: mb.vy }, "#f59e0b");
-
-        // Property readout card
-        const cardX = bounds.x + 18;
-        const cardY = bounds.y + 22;
-        const cardLines = [
-          { k: "x", v: Math.round(mb.x), color: "#0891b2" },
-          { k: "y", v: Math.round(mb.y), color: "#0891b2" },
-          { k: "vx", v: mb.vx.toFixed(1), color: "#0891b2" },
-          { k: "vy", v: mb.vy.toFixed(1), color: "#0891b2" }
-        ];
-        p.push();
-        p.noStroke();
-        p.fill(255, 250, 242, 245);
-        p.rect(cardX, cardY, 160, 110, 14);
-        p.stroke("#f59e0b");
-        p.strokeWeight(2);
-        p.noFill();
-        p.rect(cardX, cardY, 160, 110, 14);
-        p.noStroke();
-        p.fill("#f59e0b");
-        p.textStyle(p.BOLD);
-        p.textSize(13);
-        p.text("ball  { ... }", cardX + 10, cardY + 18);
-        p.textSize(11);
-        for (let i = 0; i < cardLines.length; i++) {
-          const row = cardLines[i];
-          const yy = cardY + 34 + i * 18;
-          p.fill(row.color);
-          p.text(row.k + ":", cardX + 12, yy);
-          p.fill("#222222");
-          p.textAlign(p.RIGHT, p.BASELINE);
-          p.text(String(row.v), cardX + 150, yy);
-          p.textAlign(p.LEFT, p.BASELINE);
-        }
-        p.pop();
-
-        // Method buttons
-        const btnY = bounds.y + bounds.h + 18;
-        const btnH = 42;
-
-        // move() button
-        const moveBtnX = bounds.x + bounds.w * 0.22;
-        const moveBtnW = 120;
-        const moveActive = state.lastMethodCalled === "move" && p.millis() - state.displayFlash < 400;
-        p.push();
-        p.noStroke();
-        p.fill(state.methodLoop ? "#e11d48" : (moveActive ? "#b91c1c" : "#e11d48"));
-        p.rect(moveBtnX, btnY, moveBtnW, btnH, 999);
-        p.fill("#ffffff");
-        p.textStyle(p.BOLD);
-        p.textSize(15);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.text("ball.move()", moveBtnX + moveBtnW / 2, btnY + btnH / 2);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.pop();
-        methodMoveBounds = { x: moveBtnX, y: btnY, w: moveBtnW, h: btnH };
-
-        // display() button
-        const dispBtnX = moveBtnX + moveBtnW + 16;
-        const dispBtnW = 140;
-        const dispActive = state.lastMethodCalled === "display" && p.millis() - state.displayFlash < 400;
-        p.push();
-        p.noStroke();
-        p.fill(dispActive ? "#b45309" : "#f59e0b");
-        p.rect(dispBtnX, btnY, dispBtnW, btnH, 999);
-        p.fill("#ffffff");
-        p.textStyle(p.BOLD);
-        p.textSize(15);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.text("ball.display()", dispBtnX + dispBtnW / 2, btnY + btnH / 2);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.pop();
-        methodDisplayBounds = { x: dispBtnX, y: btnY, w: dispBtnW, h: btnH };
-
-        // Loop button
-        const loopBtnX = dispBtnX + dispBtnW + 16;
-        const loopBtnW = 150;
-        p.push();
-        p.noStroke();
-        p.fill(state.methodLoop ? "#16a34a" : "#334155");
-        p.rect(loopBtnX, btnY, loopBtnW, btnH, 999);
-        p.fill("#ffffff");
-        p.textStyle(p.BOLD);
-        p.textSize(13);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.text(state.methodLoop ? "Stop loop" : "Loop: call both", loopBtnX + loopBtnW / 2, btnY + btnH / 2);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.pop();
-        methodLoopBounds = { x: loopBtnX, y: btnY, w: loopBtnW, h: btnH };
-
-        // Code snippet with active method highlighted
-        const snapX = bounds.x + bounds.w * 0.58;
-        const snapY = bounds.y + 22;
-        const snapW = bounds.w * 0.40;
-        p.push();
-        p.noStroke();
-        p.fill(17, 24, 39, 235);
-        p.rect(snapX, snapY, snapW, 90, 14);
-        p.textFont("ui-monospace, SFMono-Regular, Menlo, Monaco, monospace");
-        p.textSize(13);
-        p.textAlign(p.LEFT, p.BASELINE);
-
-        const moveLine = "ball.move();    // updates x, y";
-        const dispLine = "ball.display(); // draws the circle";
-        const moveHighlight = state.lastMethodCalled === "move" && p.millis() - state.displayFlash < 600;
-        const dispHighlight = state.lastMethodCalled === "display" && p.millis() - state.displayFlash < 600;
-        const loopHighlight = state.methodLoop;
-
-        if (moveHighlight || loopHighlight) {
-          p.noStroke();
-          p.fill(225, 29, 72, 50);
-          p.rect(snapX + 6, snapY + 14, snapW - 12, 18, 4);
-        }
-        if (dispHighlight || loopHighlight) {
-          p.noStroke();
-          p.fill(245, 158, 11, 50);
-          p.rect(snapX + 6, snapY + 36, snapW - 12, 18, 4);
-        }
-
-        p.textStyle(p.NORMAL);
-        p.fill(moveHighlight || loopHighlight ? "#fca5a5" : "#e5e7eb");
-        p.text(moveLine, snapX + 10, snapY + 28);
-        p.fill(dispHighlight || loopHighlight ? "#fde68a" : "#e5e7eb");
-        p.text(dispLine, snapX + 10, snapY + 50);
-        p.fill("#6b7280");
-        p.textSize(11);
-        p.text("// both called each frame in draw()", snapX + 10, snapY + 76);
-        p.textFont("Inter, system-ui, sans-serif");
-        p.pop();
-      }
-
-      function drawClassMode() {
-        const bounds = getStageBounds();
-        drawStage(bounds);
-        drawClassBlueprint(bounds.x + 30, bounds.y + 36, bounds.w * 0.35, bounds.h - 72);
-        drawInstanceFromBlueprint(bounds.x + bounds.w * 0.60, bounds.y + bounds.h * 0.50);
-      }
-
-      function drawManyMode() {
-        const bounds = getStageBounds();
-        drawStage(bounds);
-        for (let i = 0; i < state.balls.length; i++) {
-          drawBall(state.balls[i], palette(i));
-          if (state.showLabels && i < 6) drawLabel(state.balls[i].name, state.balls[i].x - 22, state.balls[i].y + state.balls[i].size / 2 + 18, palette(i), 11);
-        }
-        if (state.showLabels) drawLabel(`${state.count} objects, same blueprint`, bounds.x + 24, bounds.y + 34, "#16a34a", 14);
-      }
-
-      function drawStage(bounds) {
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 235);
-        p.rect(bounds.x, bounds.y, bounds.w, bounds.h, 24);
-        p.stroke("#e6dac8");
-        p.strokeWeight(2);
-        p.noFill();
-        p.rect(bounds.x + 14, bounds.y + 14, bounds.w - 28, bounds.h - 28, 18);
-        p.pop();
-      }
-
-      function drawBall(ball, color) {
-        p.push();
-        p.noStroke();
-        p.fill(color);
-        p.circle(ball.x, ball.y, ball.size);
-        p.fill("#ffffff");
-        p.circle(ball.x + ball.size * 0.12, ball.y - ball.size * 0.12, Math.max(8, ball.size * 0.18));
-        p.fill("#222222");
-        p.circle(ball.x + ball.size * 0.16, ball.y - ball.size * 0.12, Math.max(4, ball.size * 0.08));
-        p.stroke("#222222");
-        p.strokeWeight(2);
-        p.noFill();
-        p.arc(ball.x, ball.y + ball.size * 0.08, ball.size * 0.30, ball.size * 0.22, 0, p.PI);
-        p.pop();
-      }
-
-      function drawLooseVariableCards(x, y) {
-        const rows = [
-          { name: "x", value: Math.round(state.ball.x), color: "#0891b2" },
-          { name: "y", value: Math.round(state.ball.y), color: "#0891b2" },
-          { name: "size", value: Math.round(state.ball.size), color: "#0891b2" },
-          { name: "speed", value: state.ball.speedX.toFixed(1), color: "#0891b2" }
-        ];
-        drawMiniTable(x, y, 150, rows, "loose variables", "#0891b2");
-        if (state.showLabels) drawLabel("These describe the same ball, but nothing groups them yet.", x + 176, y + 40, "#6b6258", 13);
-      }
-
-      function drawObjectCard(x, y, includeMethods) {
-        const rows = [
-          { name: "ball.x", value: Math.round(state.ball.x), color: "#0891b2" },
-          { name: "ball.y", value: Math.round(state.ball.y), color: "#0891b2" },
-          { name: "ball.size", value: Math.round(state.ball.size), color: "#0891b2" },
-          { name: "ball.speedX", value: state.ball.speedX.toFixed(1), color: "#0891b2" }
-        ];
-        if (includeMethods) {
-          rows.push({ name: "ball.move()", value: "does", color: "#e11d48" });
-          rows.push({ name: "ball.display()", value: "does", color: "#e11d48" });
-        }
-        drawMiniTable(x, y, includeMethods ? 190 : 170, rows, "ball object", "#f59e0b");
-        if (state.showLabels) {
-          const message = includeMethods ? "Properties + methods live together." : "Properties are bundled under one name.";
-          drawLabel(message, x + 216, y + 42, includeMethods ? "#e11d48" : "#f59e0b", 13);
-        }
-      }
-
-      function drawMiniTable(x, y, w, rows, title, color) {
-        const rowH = 26;
-        const h = 42 + rows.length * rowH;
-        p.push();
-        p.noStroke();
-        p.fill(255, 250, 242, 245);
-        p.rect(x, y, w, h, 16);
-        p.stroke(color);
-        p.strokeWeight(2);
-        p.noFill();
-        p.rect(x, y, w, h, 16);
-        p.noStroke();
-        p.fill(color);
-        p.textStyle(p.BOLD);
-        p.textSize(14);
-        p.text(title, x + 12, y + 24);
-        p.textSize(12);
-        for (let i = 0; i < rows.length; i++) {
-          const yy = y + 46 + i * rowH;
-          p.fill(rows[i].color);
-          p.text(rows[i].name, x + 12, yy);
-          p.fill("#222222");
-          p.textAlign(p.RIGHT, p.BASELINE);
-          p.text(String(rows[i].value), x + w - 12, yy);
-          p.textAlign(p.LEFT, p.BASELINE);
-        }
-        p.pop();
-      }
-
-      function drawMethodArrows(bounds) {
-        const bx = state.ball.x;
-        const by = state.ball.y;
-        p.push();
-        p.stroke("#e11d48");
-        p.strokeWeight(3);
-        p.drawingContext.setLineDash([8, 7]);
-        p.line(bounds.x + 220, bounds.y + 160, bx, by);
-        p.drawingContext.setLineDash([]);
-        if (state.showLabels) drawLabel("methods act on this object's data", bounds.x + 210, bounds.y + 150, "#e11d48", 13);
-        p.pop();
-      }
-
-      function drawClassBlueprint(x, y, w, h) {
-        p.push();
-        p.noStroke();
-        p.fill(245, 243, 255, 245);
-        p.rect(x, y, w, h, 20);
-        p.stroke("#7c3aed");
-        p.strokeWeight(3);
-        p.noFill();
-        p.rect(x, y, w, h, 20);
-        p.noStroke();
-        p.fill("#7c3aed");
-        p.textStyle(p.BOLD);
-        p.textSize(18);
-        p.text("class Ball", x + 20, y + 34);
-        p.fill("#334155");
-        p.textStyle(p.NORMAL);
-        p.textSize(13);
-        p.text("constructor(x, y, size)", x + 20, y + 72);
-        p.text("this.x = x", x + 36, y + 100);
-        p.text("this.y = y", x + 36, y + 124);
-        p.text("this.size = size", x + 36, y + 148);
-        p.fill("#e11d48");
-        p.textStyle(p.BOLD);
-        p.text("move()", x + 20, y + 192);
-        p.text("display()", x + 20, y + 222);
-        if (state.showLabels) drawLabel("blueprint / recipe", x + 20, y + h - 22, "#7c3aed", 13);
-        p.pop();
-      }
-
-      function drawInstanceFromBlueprint(x, y) {
-        p.push();
-        drawBall({ x, y, size: state.size, speedX: state.speed, speedY: 1 }, "#f59e0b");
-        drawLabel("new Ball(...)", x - 44, y + state.size / 2 + 34, "#f59e0b", 15);
-        p.stroke("#16a34a");
-        p.strokeWeight(3);
-        p.line(x - 150, y, x - 70, y);
-        p.noStroke();
-        p.fill("#16a34a");
-        p.triangle(x - 70, y, x - 82, y - 7, x - 82, y + 7);
-        if (state.showLabels) drawLabel("class creates instance", x - 152, y - 18, "#16a34a", 13);
-        p.pop();
-      }
-
-      function drawReadoutCards() {
-        const cards = [
-          { label: "properties", value: state.mode === "vars" ? "loose" : "bundled", color: "#0891b2" },
-          { label: "methods", value: ["methods", "class", "many"].includes(state.mode) ? "yes" : "not yet", color: "#e11d48" },
-          { label: "objects", value: state.mode === "many" ? state.count : 1, color: "#16a34a" }
-        ];
-        const cardW = Math.min(176, (p.width - 70) / cards.length);
-        const y = p.height - 168;
-        const x = 28;
-
-        p.push();
-        for (let i = 0; i < cards.length; i++) {
-          const cx = x + i * (cardW + 10);
-          p.noStroke();
-          p.fill(255, 255, 255, 235);
-          p.rect(cx, y, cardW, 62, 14);
-          p.fill(cards[i].color);
-          p.textStyle(p.BOLD);
-          p.textSize(13);
-          p.text(cards[i].label, cx + 12, y + 22);
-          p.fill("#222222");
-          p.textSize(18);
-          p.text(String(cards[i].value), cx + 12, y + 48);
-        }
-        p.pop();
-      }
-
-      function palette(i) {
-        const colors = ["#f59e0b", "#7c3aed", "#0891b2", "#e11d48", "#16a34a", "#2563eb", "#9333ea", "#dc2626", "#0f766e", "#ca8a04", "#be123c", "#4f46e5"];
-        return colors[i % colors.length];
-      }
-
-      function drawLabel(text, x, y, color, size = 13) {
-        p.push();
-        p.textSize(size);
-        p.textStyle(p.BOLD);
-        const padX = 7;
-        const padY = 4;
-        const tw = p.textWidth(text);
-        p.noStroke();
-        p.fill(255, 250, 242, 238);
-        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
-        p.fill(color);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.text(text, x, y);
-        p.pop();
-      }
-    };
-
-    new p5(sketch);
-  </script>
+setMode('properties');
+</script>
 </body>
 </html>

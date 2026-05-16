@@ -1,1266 +1,1375 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Functions: Make Your Own Commands</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --repeat: #e11d48;
-      --function: #7c3aed;
-      --parameter: #0891b2;
-      --argument: #f59e0b;
-      --return: #16a34a;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../concept-bridge.css">
+<title>Functions: Make Your Own Commands</title>
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #2d6a4f;
+    --accent-dark: #1a3f30;
+    --accent-bg: #eef8f2;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 940px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--accent-dark); }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
 
-    .controls,
-    .workspace,
-    .side-panel {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      user-select: none;
-    }
-
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
-
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
-
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
-
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
-
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 96px minmax(150px, 1fr) 74px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(380px, 100%);
-    }
-
-    label,
-    .value-label,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
-
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
-
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    #sketch-holder canvas { display: block; }
-
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
-
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .card h2 { font-size: 1.15rem; }
-    .card h3 { font-size: 1rem; }
-
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .card p { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
-
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      white-space: pre-wrap;
-    }
-
-    .legend {
-      display: grid;
-      gap: 8px;
-    }
-
-    .legend-item {
-      display: grid;
-      grid-template-columns: 16px 1fr;
-      gap: 8px;
-      align-items: center;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .swatch {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-    }
-
-    .swatch.repeat { background: var(--repeat); }
-    .swatch.function { background: var(--function); }
-    .swatch.parameter { background: var(--parameter); }
-    .swatch.argument { background: var(--argument); }
-    .swatch.return { background: var(--return); }
-
-    .code-card { display: none; }
-    .code-card.visible { display: block; }
-
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
-
-    .note {
-      font-size: 0.86rem;
-      color: var(--muted);
-    }
-
-    @media (max-width: 980px) {
-      main { grid-template-columns: 1fr; }
-      .workspace { height: 590px; }
-    }
-
-    @media (max-width: 600px) {
-      header, main { padding-left: 12px; padding-right: 12px; }
-      .slider-wrap { grid-template-columns: 1fr; gap: 4px; }
-      .workspace { height: 540px; }
-    }
-  
-  /* ── Bridge improvement additions ─────────────────────────────── */
   .unlocks {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 0 0 20px;
+    margin: 0 0 22px;
   }
+
   .unlock-pill {
     font-size: 0.75rem;
-    font-weight: 700;
-    color: #2a5e3e;
-    background: #eef8f2;
-    border: 1px solid #b8dcc8;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
     padding: 5px 10px;
     border-radius: 999px;
   }
+
   .before-after {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     overflow: hidden;
     margin-bottom: 22px;
-    background: rgba(255,255,255,0.55);
+    background: var(--paper);
   }
-  .ba-col { padding: 14px 18px; }
-  .ba-col:first-child {
-    background: rgba(0,0,0,0.025);
-    border-right: 1px solid var(--line, #ded2c1);
-  }
+
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
+
   .ba-label {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #9e9789;
+    color: var(--faint);
     margin-bottom: 5px;
   }
-  .ba-col:last-child .ba-label { color: #2a5e3e; }
-  .ba-text { font-size: 0.9rem; line-height: 1.5; }
-  .predict-box {
-    background: #fef9ee;
-    border: 1px solid #efd09e;
-    border-radius: 10px;
-    padding: 11px 14px;
-    margin-bottom: 12px;
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
   }
-  .predict-box .pbox-label {
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .canvas-panel { overflow: hidden; }
+
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
+
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
+
+  #fn-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
+
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
+
+  .ctrl-panel { padding: 16px; }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
+
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #e8f5ee; border-color: #5aaa7a; }
+
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
+
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(45,106,79,0.4);
+    outline-offset: 2px;
+  }
+
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .box-label {
     display: block;
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    color: var(--ink);
     margin-bottom: 3px;
   }
-  .predict-box .pbox-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
+
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
+
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
   }
-  .callout-mistake {
-    background: #fff3e6;
-    border: 1px solid #edbd83;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin: 10px 0 0;
-  }
-  .callout-mistake .cm-label {
+
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
     display: block;
-    font-size: 0.72rem;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    min-width: 42px;
+    text-align: center;
   }
-  .callout-mistake .cm-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
   }
-  .pathways-section {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 32px 20px 8px;
-  }
-  .pathways-title {
-    font-size: 0.72rem;
-    font-weight: 700;
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #9e9789;
-    margin-bottom: 12px;
+    color: var(--faint);
+    margin-bottom: 6px;
   }
-  .path-links { display: grid; gap: 8px; max-width: 820px; }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: color var(--transition);
+  }
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 22px; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 720px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
   .path-link {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
     text-decoration: none;
-    color: var(--ink, #222);
-    background: rgba(255,250,242,0.92);
-    transition: border-color 0.14s ease, background 0.14s ease;
-    font-family: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
   }
-  .path-link:hover {
-    border-color: var(--accent, #2563eb);
-    background: rgba(230,240,255,0.6);
-  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
   .path-link-type {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #9e9789;
+    color: var(--faint);
     flex-shrink: 0;
-    min-width: 82px;
+    min-width: 88px;
   }
-  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
   .path-link-name { font-size: 0.9rem; font-weight: 700; }
-  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
   .bottom-nav {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 18px 20px 40px;
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    border-top: 1px solid var(--line, #ded2c1);
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
   }
-  .bottom-nav a {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #6b6258;
-    text-decoration: none;
-    font-family: inherit;
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color var(--transition); }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
   }
-  .bottom-nav a:hover { color: var(--accent, #2563eb); }
   @media (max-width: 560px) {
     .before-after { grid-template-columns: 1fr; }
-    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
     .bottom-nav { flex-direction: column; }
   }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
 </style>
-  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
-  </div>
-  <header>
-    <h1>Functions: Make Your Own Commands</h1>
-    <p class="subtitle">
-      A concept bridge for functions, parameters, arguments, and return values. A function packages an idea so you can reuse it with different inputs.
-    </p>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · Foundations</p>
+  <h1>Functions: Make Your Own Commands</h1>
+  <p class="subtitle">
+    A concept bridge for writing your own functions. Instead of repeating the same drawing steps,
+    you name them once and call them anywhere.
+  </p>
+
   <div class="unlocks" aria-label="What this bridge unlocks">
-    <span class="unlock-pill">named actions</span>
-    <span class="unlock-pill">reusable drawing blocks</span>
-    <span class="unlock-pill">readable sketches</span>
-    <span class="unlock-pill">parameterized art</span>
+    <span class="unlock-pill">reusable shapes</span>
+    <span class="unlock-pill">DRY code</span>
+    <span class="unlock-pill">parameters</span>
+    <span class="unlock-pill">return values</span>
+    <span class="unlock-pill">modular sketches</span>
   </div>
+
   <section class="before-after" aria-label="Before and after mental model">
     <div class="ba-col">
       <div class="ba-label">Before this bridge, you might think</div>
-      <div class="ba-text">Functions just move code to a different place — I don't see why that helps</div>
+      <div class="ba-text">To draw a house I write 10 lines of code. To draw two houses I copy those 10 lines. To draw 10 houses I have 100 lines.</div>
     </div>
     <div class="ba-col">
       <div class="ba-label">After this bridge</div>
-      <div class="ba-text">A function is a named recipe — call it anywhere, pass different arguments, get different results</div>
+      <div class="ba-text">I write a drawHouse(x, y, size) function once. To draw 10 houses I call it 10 times with different arguments.</div>
     </div>
   </section>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-            <div class="predict-box">
-        <span class="pbox-label">Before you interact — predict first</span>
-        <span class="pbox-body">Before you call the function a second time — what single change will make the shape appear in a different position?</span>
+  <section class="main-grid" aria-label="Interactive functions concept bridge">
+    <article class="panel canvas-panel">
+      <div class="canvas-bar">
+        <div class="canvas-bar-title" id="canvas-title">Repeat: same drawing code copied vs. one function called</div>
+        <div class="canvas-bar-sub" id="canvas-sub">Left: repeated code. Right: the same result from one function called three times.</div>
       </div>
-<div class="row">
-        <button id="mode-repeat" class="active">Repeated Code</button>
-        <button id="mode-function">Make a Command</button>
-        <button id="mode-params">Parameters</button>
-        <button id="mode-return">Return Values</button>
-        <button id="mode-compose">Build a Scene</button>
-        <button id="reset-button">Reset</button>
-        <span id="mode-pill" class="pill">same idea copied many times</span>
+      <div class="canvas-wrap">
+        <canvas id="fn-canvas" width="620" height="420" aria-label="Interactive functions visualization"></canvas>
+        <div class="touch-hint">Tap and drag the sliders on the right to explore.</div>
       </div>
+    </article>
 
-      <div class="row">
-        <div class="slider-wrap">
-          <label for="x-slider">x</label>
-          <input id="x-slider" type="range" min="80" max="720" value="360" step="1" />
-          <span id="x-value" class="value-label">360</span>
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="Functions concept tabs">
+        <button class="tab" role="tab" id="tab-repeat" data-mode="repeat" aria-selected="true" aria-controls="bridge-panel" tabindex="0">Repeat<span class="step">1 of 5</span></button>
+        <button class="tab" role="tab" id="tab-define" data-mode="define" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Define<span class="step">2 of 5</span></button>
+        <button class="tab" role="tab" id="tab-params" data-mode="params" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Params<span class="step">3 of 5</span></button>
+        <button class="tab" role="tab" id="tab-return" data-mode="return" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Return<span class="step">4 of 5</span></button>
+        <button class="tab" role="tab" id="tab-compose" data-mode="compose" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Compose<span class="step">5 of 5</span></button>
+      </nav>
+
+      <div id="bridge-panel" role="tabpanel" aria-live="polite">
+        <div class="predict">
+          <span class="box-label">Predict before changing</span>
+          <span class="box-body" id="predict-text">Before counting — how many lines of drawing code would 5 identical shapes require without a function?</span>
         </div>
-        <div class="slider-wrap">
-          <label for="y-slider">y</label>
-          <input id="y-slider" type="range" min="100" max="430" value="270" step="1" />
-          <span id="y-value" class="value-label">270</span>
+
+        <div class="ctrl-group" id="controls"></div>
+        <div id="presets-area"></div>
+
+        <div class="switches">
+          <label class="sw"><input type="checkbox" id="labelToggle" checked> Labels</label>
         </div>
-        <div class="slider-wrap">
-          <label for="size-slider">size</label>
-          <input id="size-slider" type="range" min="30" max="140" value="84" step="1" />
-          <span id="size-value" class="value-label">84</span>
+
+        <div class="code-section">
+          <div class="code-header"><span>Live code</span><span id="code-note">Define once, call anywhere.</span></div>
+          <div class="code-focus-line mono" id="focus-code"></div>
+          <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">▸ See full p5.js sketch</button>
+          <div class="full-code-body mono" id="full-code"></div>
+        </div>
+
+        <div class="callout big-idea">
+          <span class="box-label">Big idea</span>
+          <span class="box-body" id="big-idea-text"></span>
+        </div>
+
+        <div class="callout bug">
+          <span class="box-label">⚠ Common mistake</span>
+          <span class="box-body" id="bug-text"></span>
+        </div>
+
+        <div class="callout try">
+          <span class="box-label">Try this</span>
+          <span class="box-body" id="try-text"></span>
         </div>
       </div>
-
-      <div class="row">
-        <span class="preset-label">Examples:</span>
-        <button class="example-button" data-example="flower">flower</button>
-        <button class="example-button" data-example="robot">robot</button>
-        <button class="example-button" data-example="house">house</button>
-        <button id="add-call-button">Add function call</button>
-        <button id="clear-calls-button">Clear scene</button>
-        <button id="fifty-button">What if we had 50?</button>
-        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
-      </div>
-    </section>
-
-    <section class="workspace">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        Repeated drawing code is a clue: this idea could become a function.
-      </div>
-    </section>
-
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">Repeated code is a clue</h2>
-        <p id="lesson-text">
-          When the same group of drawing commands appears again and again, you probably have an idea that wants to become a function.
-        </p>
-        <span id="formula-box" class="formula">circle(200, 200, 40);
-line(200, 220, 200, 270);
-
-circle(320, 200, 40);
-line(320, 220, 320, 270);</span>
-      </section>
-
-      <section class="card">
-        <h3>Big idea</h3>
-        <p><strong>Function:</strong> a custom command.</p>
-        <p><strong>Parameter:</strong> a placeholder inside the function.</p>
-        <p><strong>Argument:</strong> the real value passed into the function call.</p>
-        <p><strong>Return:</strong> sends a calculated value back out.</p>
-      </section>
-
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch repeat"></span><span>repeated code</span></div>
-          <div class="legend-item"><span class="swatch function"></span><span>function definition</span></div>
-          <div class="legend-item"><span class="swatch parameter"></span><span>parameter placeholder</span></div>
-          <div class="legend-item"><span class="swatch argument"></span><span>argument value</span></div>
-          <div class="legend-item"><span class="swatch return"></span><span>returned result</span></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">What part of the repeated code stays the same? What part changes?</p>
-      </section>
-
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code id="code-box">function drawFlower(x, y, size) {
-  circle(x, y, size);
-}</code></pre>
-        <p class="note">
-          Functions are most useful when they name an idea. Good function names often sound like commands: drawFlower, makeButton, checkCollision, calculateScore.
-        </p>
-      </section>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    const state = {
-      mode: "repeat",
-      example: "flower",
-      x: 360,
-      y: 270,
-      size: 84,
-      showLabels: true,
-      showCode: false,
-      calls: [
-        { x: 210, y: 280, size: 64 },
-        { x: 360, y: 230, size: 92 },
-        { x: 520, y: 300, size: 72 }
-      ],
-      lastAddedIndex: -1
-    };
+  <section class="prose-section">
+    <h2 id="prose-title">Name it once, use it everywhere</h2>
+    <p id="prose-body">A function is a named block of code that you define once and call many times. Parameters let you customize each call — the same function draws one flower here and a different one there. Return values let functions compute and hand back results for you to use. Composing your sketch from small, named functions makes it easier to read, debug, and change.</p>
+  </section>
 
-    const els = {};
+  <div class="legend" aria-label="Functions concept legend">
+    <div class="legend-item"><span class="swatch" style="background:#2d6a4f"></span> function name (green)</div>
+    <div class="legend-item"><span class="swatch" style="background:#d4a030"></span> parameters (amber)</div>
+    <div class="legend-item"><span class="swatch" style="background:#f0f0f0;border:1.5px dashed #aaa"></span> body (faint border)</div>
+    <div class="legend-item"><span class="swatch" style="background:#4a6fb5"></span> call site (blue)</div>
+    <div class="legend-item"><span class="swatch" style="background:#8b5cf6"></span> return value (purple)</div>
+  </div>
 
-    function setupUI() {
-      els.modeRepeat = document.querySelector("#mode-repeat");
-      els.modeFunction = document.querySelector("#mode-function");
-      els.modeParams = document.querySelector("#mode-params");
-      els.modeReturn = document.querySelector("#mode-return");
-      els.modeCompose = document.querySelector("#mode-compose");
-      els.resetButton = document.querySelector("#reset-button");
-      els.modePill = document.querySelector("#mode-pill");
-      els.xSlider = document.querySelector("#x-slider");
-      els.ySlider = document.querySelector("#y-slider");
-      els.sizeSlider = document.querySelector("#size-slider");
-      els.xValue = document.querySelector("#x-value");
-      els.yValue = document.querySelector("#y-value");
-      els.sizeValue = document.querySelector("#size-value");
-      els.exampleButtons = Array.from(document.querySelectorAll(".example-button"));
-      els.addCallButton = document.querySelector("#add-call-button");
-      els.clearCallsButton = document.querySelector("#clear-calls-button");
-      els.fiftyButton = document.querySelector("#fifty-button");
-      els.showLabels = document.querySelector("#show-labels");
-      els.showCode = document.querySelector("#show-code");
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.formulaBox = document.querySelector("#formula-box");
-      els.questionText = document.querySelector("#question-text");
-      els.caption = document.querySelector("#canvas-caption");
-      els.codeCard = document.querySelector("#code-card");
-      els.codeBox = document.querySelector("#code-box");
+  <section class="pathways" aria-label="Practice and remix links">
+    <div class="pathways-title">What's next</div>
+    <div class="path-links">
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
+        <span class="path-link-type">Practice →</span>
+        <span class="path-link-name">Look for modular drawing or function-based tools in the workshop library</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
+        <span class="path-link-type">Remix →</span>
+        <span class="path-link-name">Take a starter sketch and extract repeated drawing code into one reusable function</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/objects-data-plus-behavior/" class="path-link">
+        <span class="path-link-type">Related →</span>
+        <span class="path-link-name">Objects: Data + Behavior — combine data and functions into one bundled object</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+    </div>
+  </section>
 
-      els.modeRepeat.addEventListener("click", () => setMode("repeat"));
-      els.modeFunction.addEventListener("click", () => setMode("function"));
-      els.modeParams.addEventListener("click", () => setMode("params"));
-      els.modeReturn.addEventListener("click", () => setMode("return"));
-      els.modeCompose.addEventListener("click", () => setMode("compose"));
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All bridges</a>
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/objects-data-plus-behavior/">Next: Objects: Data + Behavior →</a>
+  </nav>
+</main>
 
-      els.xSlider.addEventListener("input", () => {
-        state.x = Number(els.xSlider.value);
-        updateUI();
-      });
+<script>
+'use strict';
 
-      els.ySlider.addEventListener("input", () => {
-        state.y = Number(els.ySlider.value);
-        updateUI();
-      });
+const state = {
+  mode: 'repeat',
+  repeatCount: 3,
+  defHighlight: 'name', // name | params | body | call
+  paramX: 200,
+  paramY: 150,
+  paramSize: 50,
+  paramHue: 150,
+  returnTemp: 65,
+  composeShow: { sky: true, ground: true, tree: true, sun: true },
+  labelsOn: true,
+  changedKey: 'repeatCount'
+};
 
-      els.sizeSlider.addEventListener("input", () => {
-        state.size = Number(els.sizeSlider.value);
-        updateUI();
-      });
+const modes = {
+  repeat: {
+    canvasTitle: 'Repeat: same drawing code copied vs. one function called',
+    canvasSub: 'Left: repeated code. Right: the same result from one function called three times.',
+    predict: 'Before counting — how many lines of drawing code would 5 identical shapes require without a function?',
+    big: 'Repeated code is a problem because a bug or change must be fixed in every copy. A function fixes it once everywhere.',
+    bug: 'Copy-paste code creates silent inconsistencies — you fix a bug in one copy and forget another. Functions prevent this.',
+    tryIt: 'Count the total lines with duplication vs. with a function. How does the ratio change as you add more copies?',
+    note: '3 calls instead of 30 lines.',
+    proseTitle: 'Name it once, use it everywhere',
+    proseBody: 'A function is a named block of code that you define once and call many times. Parameters let you customize each call — the same function draws one flower here and a different one there. Return values let functions compute and hand back results for you to use. Composing your sketch from small, named functions makes it easier to read, debug, and change.',
+    controls: [{ key: 'repeatCount', label: 'Copies', hint: 'how many repeated drawings', min: 1, max: 6, step: 1 }],
+    presets: [
+      { label: 'Show 3×', v: { repeatCount: 3 } },
+      { label: 'Show 6×', v: { repeatCount: 6 } },
+      { label: '⚠ Show 1 (no repetition)', v: { repeatCount: 1 }, isBreak: true }
+    ]
+  },
+  define: {
+    canvasTitle: 'Define: anatomy of a function',
+    canvasSub: 'Name, parameters, body, call site — each part plays a specific role.',
+    predict: 'Before clicking — can you guess which part of a function you use most often when you are debugging?',
+    big: 'A function has four parts: the name (what you call it), parameters (what data it needs), body (what it does), and optionally a return value (what it gives back).',
+    bug: 'Defining a function with the same name twice — the second definition silently overwrites the first. JavaScript does not warn you.',
+    tryIt: 'Click each part of the function anatomy. Can you explain each one in your own words?',
+    note: 'function name(params) { body }',
+    proseTitle: 'Name it once, use it everywhere',
+    proseBody: 'A function is a named block of code that you define once and call many times. Parameters let you customize each call — the same function draws one flower here and a different one there. Return values let functions compute and hand back results for you to use. Composing your sketch from small, named functions makes it easier to read, debug, and change.',
+    controls: [],
+    presets: [
+      { label: 'Highlight name', v: { defHighlight: 'name' } },
+      { label: 'Highlight params', v: { defHighlight: 'params' } },
+      { label: 'Highlight body', v: { defHighlight: 'body' } }
+    ]
+  },
+  params: {
+    canvasTitle: 'Parameters: customize each call',
+    canvasSub: 'Sliders change the arguments. The function signature updates to match.',
+    predict: 'Before changing size — how many properties of the drawn shape do you think will change?',
+    big: 'Parameters make a function flexible. The same drawFlower() can draw a small blue flower here and a large red one there.',
+    bug: 'Forgetting to pass a required argument gives undefined inside the function. Check that your call site has the right number of arguments.',
+    tryIt: 'Change only the size slider. How many properties of the drawn shape change? How many did not?',
+    note: 'drawFlower(x, y, size);',
+    proseTitle: 'Name it once, use it everywhere',
+    proseBody: 'A function is a named block of code that you define once and call many times. Parameters let you customize each call — the same function draws one flower here and a different one there. Return values let functions compute and hand back results for you to use. Composing your sketch from small, named functions makes it easier to read, debug, and change.',
+    controls: [
+      { key: 'paramX', label: 'x', hint: 'horizontal position', min: 60, max: 560, step: 1 },
+      { key: 'paramY', label: 'y', hint: 'vertical position', min: 40, max: 380, step: 1 },
+      { key: 'paramSize', label: 'size', hint: '10–100', min: 10, max: 100, step: 1 },
+      { key: 'paramHue', label: 'hue', hint: '0–360', min: 0, max: 360, step: 1 }
+    ],
+    presets: [
+      { label: 'Center', v: { paramX: 310, paramY: 210, paramSize: 50, paramHue: 150 } },
+      { label: 'Corner', v: { paramX: 90, paramY: 80, paramSize: 35, paramHue: 30 } },
+      { label: '⚠ Size=0', v: { paramX: 310, paramY: 210, paramSize: 10, paramHue: 150 }, isBreak: true }
+    ]
+  },
+  return: {
+    canvasTitle: 'Return: a function that computes and gives back a value',
+    canvasSub: 'colorFromTemperature(t) returns a color. The slider controls t.',
+    predict: 'Before sliding — at what temperature do you predict the color will look most neutral?',
+    big: 'A function that returns a value computes something and hands it back. You use the result like any other value — in fill(), stroke(), or a variable.',
+    bug: 'A function without a return statement returns undefined. If you try to use that as a color, you get an error.',
+    tryIt: 'Find a temperature value where the returned color looks neutral (neither warm nor cool).',
+    note: 'let c = colorFromTemp(t); // returns color',
+    proseTitle: 'Name it once, use it everywhere',
+    proseBody: 'A function is a named block of code that you define once and call many times. Parameters let you customize each call — the same function draws one flower here and a different one there. Return values let functions compute and hand back results for you to use. Composing your sketch from small, named functions makes it either to read, debug, and change.',
+    controls: [
+      { key: 'returnTemp', label: 'Temperature', hint: '0 = cold, 100 = hot', min: 0, max: 100, step: 1 }
+    ],
+    presets: [
+      { label: 'Cold (0)', v: { returnTemp: 0 } },
+      { label: 'Warm (50)', v: { returnTemp: 50 } },
+      { label: 'Hot (100)', v: { returnTemp: 100 } },
+      { label: '⚠ Out of range (120)', v: { returnTemp: 100 }, isBreak: true }
+    ]
+  },
+  compose: {
+    canvasTitle: 'Compose: a scene built from named functions',
+    canvasSub: 'Toggle each sub-function. The scene shows only the active parts.',
+    predict: 'Before hiding one function — can you predict which part of the scene it controls?',
+    big: 'Complex sketches decompose into smaller functions. Each function is responsible for one thing. The top-level draw() just calls them in order.',
+    bug: 'Putting complex logic directly in draw() makes debugging hard. When something breaks, you do not know which part is responsible.',
+    tryIt: 'Hide the drawSky function. Can you tell which part of the scene disappears?',
+    note: 'drawScene(); // calls drawSky, drawGround, drawTree',
+    proseTitle: 'Name it once, use it everywhere',
+    proseBody: 'A function is a named block of code that you define once and call many times. Parameters let you customize each call — the same function draws one flower here and a different one there. Return values let functions compute and hand back results for you to use. Composing your sketch from small, named functions makes it easier to read, debug, and change.',
+    controls: [],
+    presets: [
+      { label: 'All visible', v: { composeShow: { sky: true, ground: true, tree: true, sun: true } } },
+      { label: 'Sky only', v: { composeShow: { sky: true, ground: false, tree: false, sun: false } } },
+      { label: 'Ground only', v: { composeShow: { sky: false, ground: true, tree: false, sun: false } } },
+      { label: '⚠ Nothing visible', v: { composeShow: { sky: false, ground: false, tree: false, sun: false } }, isBreak: true }
+    ]
+  }
+};
 
-      els.exampleButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          state.example = button.dataset.example;
-          updateUI();
-        });
-      });
+const canvas = document.getElementById('fn-canvas');
+const ctx = canvas.getContext('2d');
+const controlsEl = document.getElementById('controls');
+const focusEl = document.getElementById('focus-code');
+const fullEl = document.getElementById('full-code');
 
-      els.addCallButton.addEventListener("click", () => {
-        state.calls.push({
-          x: 110 + Math.random() * 570,
-          y: 130 + Math.random() * 280,
-          size: state.size
-        });
-        state.lastAddedIndex = state.calls.length - 1;
-        if (state.mode !== "compose") { state.mode = "compose"; }
-        updateUI();
-      });
+function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+function hslStr(h, s, l) { return `hsl(${Math.round(h)},${s}%,${l}%)`; }
 
-      els.clearCallsButton.addEventListener("click", () => {
-        state.calls = [];
-        state.lastAddedIndex = -1;
-        updateUI();
-      });
+function renderBase() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  rrFill(22, 22, canvas.width - 44, canvas.height - 44, 20, '#fffdf7');
+}
 
-      els.fiftyButton.addEventListener("click", () => {
-        state.calls = [];
-        for (let i = 0; i < 50; i++) {
-          state.calls.push({
-            x: 60 + Math.random() * 640,
-            y: 100 + Math.random() * 340,
-            size: 20 + Math.random() * 60
-          });
-        }
-        state.lastAddedIndex = 49;
-        if (state.mode !== "compose") { state.mode = "compose"; }
-        updateUI();
-      });
+function rrFill(x, y, w, h, r, fill, stroke, sw) {
+  const rad = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rad, y);
+  ctx.lineTo(x + w - rad, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rad);
+  ctx.lineTo(x + w, y + h - rad);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
+  ctx.lineTo(x + rad, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - rad);
+  ctx.lineTo(x, y + rad);
+  ctx.quadraticCurveTo(x, y, x + rad, y);
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke && sw) { ctx.strokeStyle = stroke; ctx.lineWidth = sw; ctx.stroke(); }
+}
 
-      els.resetButton.addEventListener("click", () => {
-        state.x = 360;
-        state.y = 270;
-        state.size = 84;
-        state.calls = [
-          { x: 210, y: 280, size: 64 },
-          { x: 360, y: 230, size: 92 },
-          { x: 520, y: 300, size: 72 }
-        ];
-        updateUI();
-      });
+function drawText(text, x, y, opts = {}) {
+  if (!state.labelsOn && !opts.forceShow) return;
+  ctx.save();
+  ctx.font = `${opts.weight || 700} ${opts.size || 12}px "${opts.mono ? 'DM Mono' : 'DM Sans'}", system-ui, sans-serif`;
+  ctx.fillStyle = opts.color || '#23201c';
+  if (opts.align) ctx.textAlign = opts.align;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
 
-      els.showLabels.addEventListener("change", () => {
-        state.showLabels = els.showLabels.checked;
-      });
+function colorFromTemp(t) {
+  const tc = clamp(t, 0, 100);
+  // Cool (blue) → neutral (gray-green) → warm (orange-red)
+  if (tc < 50) {
+    const r = Math.round(80 + tc * 1.4);
+    const g = Math.round(130 + tc * 1.0);
+    const b = Math.round(220 - tc * 2.0);
+    return `rgb(${r},${g},${b})`;
+  } else {
+    const frac = (tc - 50) / 50;
+    const r = Math.round(150 + frac * 105);
+    const g = Math.round(175 - frac * 95);
+    const b = Math.round(120 - frac * 90);
+    return `rgb(${r},${g},${b})`;
+  }
+}
 
-      els.showCode.addEventListener("change", () => {
-        state.showCode = els.showCode.checked;
-        updateUI();
-      });
+// ---- RENDERERS ----
 
-      updateUI();
+function renderRepeat() {
+  renderBase();
+  const W = canvas.width;
+  const H = canvas.height;
+  const n = state.repeatCount;
+  const positions = [];
+  const spacing = Math.min(80, (H - 80) / n);
+  for (let i = 0; i < n; i++) positions.push(50 + i * spacing);
+
+  // Left: repeated code visualization
+  const lx = W * 0.2;
+  ctx.save();
+  ctx.fillStyle = 'rgba(229,115,22,0.12)';
+  ctx.strokeStyle = '#c96f4a';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  for (let i = 0; i < n; i++) {
+    const cy = positions[i];
+    ctx.beginPath();
+    ctx.roundRect(lx - 36, cy - 20, 72, 40, 8);
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Draw the repeated flowers
+  for (let i = 0; i < n; i++) {
+    drawFlowerAt(lx, positions[i], 18, 120 + i * 40);
+    if (state.labelsOn) {
+      drawText(`copy ${i + 1}`, lx + 28, positions[i] + 4, { size: 10, color: '#9e9789', weight: 600 });
     }
+  }
 
-    function setMode(mode) {
-      state.mode = mode;
-      updateUI();
+  // Line count annotation
+  const lineCount = n * 8;
+  if (state.labelsOn) {
+    drawText(`≈${lineCount} lines`, lx - 28, H - 30, { size: 11, color: '#9b4a2e' });
+    drawText('(copy-paste)', lx - 28, H - 16, { size: 10, color: '#9e9789', weight: 600 });
+  }
+
+  // Divider
+  ctx.save();
+  ctx.strokeStyle = '#ded4c3';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath();
+  ctx.moveTo(W * 0.46, 40);
+  ctx.lineTo(W * 0.46, H - 40);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Right: function call visualization
+  const rx = W * 0.72;
+  ctx.save();
+  ctx.fillStyle = 'rgba(45,106,79,0.10)';
+  ctx.strokeStyle = '#2d6a4f';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  for (let i = 0; i < n; i++) {
+    const cy = positions[i];
+    ctx.beginPath();
+    ctx.roundRect(rx - 36, cy - 20, 72, 40, 8);
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  for (let i = 0; i < n; i++) {
+    drawFlowerAt(rx, positions[i], 18, 120 + i * 40);
+    if (state.labelsOn) {
+      drawText(`call ${i + 1}`, rx + 28, positions[i] + 4, { size: 10, color: '#2d6a4f', weight: 700 });
     }
+  }
 
-    function currentFunctionName() {
-      if (state.example === "robot") return "drawRobot";
-      if (state.example === "house") return "drawHouse";
-      return "drawFlower";
+  if (state.labelsOn) {
+    drawText('≈3 lines', rx - 20, H - 30, { size: 11, color: '#2d6a4f' });
+    drawText('(function)', rx - 20, H - 16, { size: 10, color: '#9e9789', weight: 600 });
+    drawText('Without function', lx - 48, 32, { size: 11, color: '#9b4a2e', weight: 700 });
+    drawText('With function', rx - 38, 32, { size: 11, color: '#2d6a4f', weight: 700 });
+  }
+}
+
+function drawFlowerAt(cx, cy, r, hue) {
+  const petals = 6;
+  for (let p = 0; p < petals; p++) {
+    const angle = (p / petals) * Math.PI * 2;
+    const px = cx + Math.cos(angle) * r;
+    const py = cy + Math.sin(angle) * r;
+    ctx.save();
+    ctx.fillStyle = hslStr(hue, 70, 65);
+    ctx.beginPath();
+    ctx.arc(px, py, r * 0.55, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.save();
+  ctx.fillStyle = hslStr(hue + 30, 80, 80);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.45, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function renderDefine() {
+  renderBase();
+  const W = canvas.width;
+  const H = canvas.height;
+  const hl = state.defHighlight;
+  const boxX = 50;
+  const boxW = W - 100;
+
+  // Function box
+  const totalH = 200;
+  const topY = (H - totalH) / 2 - 10;
+
+  // Outer box (body)
+  const bodyHighlight = hl === 'body';
+  rrFill(boxX, topY + 40, boxW, totalH - 20, 14,
+    bodyHighlight ? 'rgba(45,106,79,0.08)' : 'rgba(0,0,0,0.03)',
+    bodyHighlight ? '#2d6a4f' : '#ded4c3', bodyHighlight ? 2.5 : 1.5);
+
+  // function keyword
+  drawText('function', boxX + 14, topY + 26, { size: 14, color: '#c9a0f0', weight: 700, mono: true, forceShow: true });
+
+  // Name label
+  const nameColor = hl === 'name' ? '#2d6a4f' : '#7dafe0';
+  const nameBg = hl === 'name' ? 'rgba(45,106,79,0.15)' : 'rgba(125,175,224,0.1)';
+  rrFill(boxX + 100, topY + 10, 140, 30, 8, nameBg, hl === 'name' ? '#2d6a4f' : '#7dafe0', hl === 'name' ? 2.5 : 1.5);
+  drawText('drawFlower', boxX + 110, topY + 30, { size: 14, color: nameColor, weight: 700, mono: true, forceShow: true });
+
+  // Params
+  const paramsColor = hl === 'params' ? '#d4a030' : '#f0a870';
+  const paramsBg = hl === 'params' ? 'rgba(212,160,48,0.15)' : 'rgba(240,168,112,0.08)';
+  rrFill(boxX + 250, topY + 10, 180, 30, 8, paramsBg, hl === 'params' ? '#d4a030' : '#f0a870', hl === 'params' ? 2.5 : 1.5);
+  drawText('(x, y, size)', boxX + 260, topY + 30, { size: 14, color: paramsColor, weight: 700, mono: true, forceShow: true });
+
+  // Body content
+  const bodyTextColor = bodyHighlight ? '#2d6a4f' : '#6d675f';
+  drawText('// draw petals at x, y using size', boxX + 24, topY + 80, { size: 12, color: bodyTextColor, mono: true, forceShow: true });
+  drawText('for (let p = 0; p < 6; p++) {', boxX + 24, topY + 100, { size: 12, color: bodyTextColor, mono: true, forceShow: true });
+  drawText('  circle(x + cos(p) * size, y + sin(p) * size, size * 0.5);', boxX + 24, topY + 118, { size: 11, color: bodyTextColor, mono: true, forceShow: true });
+  drawText('}', boxX + 24, topY + 136, { size: 12, color: bodyTextColor, mono: true, forceShow: true });
+
+  // Call site
+  const callHighlight = hl === 'call';
+  const callY = topY + totalH + 20;
+  rrFill(boxX + 40, callY, 220, 34, 8,
+    callHighlight ? 'rgba(74,111,181,0.15)' : 'rgba(74,111,181,0.06)',
+    callHighlight ? '#4a6fb5' : '#ded4c3', callHighlight ? 2.5 : 1.5);
+  drawText('drawFlower(200, 150, 40);', boxX + 54, callY + 22, { size: 13, color: callHighlight ? '#4a6fb5' : '#6d675f', weight: 700, mono: true, forceShow: true });
+
+  // Labels
+  if (state.labelsOn) {
+    drawText('NAME', boxX + 110, topY + 4, { size: 9, color: nameColor, weight: 800, forceShow: true });
+    drawText('PARAMETERS', boxX + 258, topY + 4, { size: 9, color: paramsColor, weight: 800, forceShow: true });
+    drawText('BODY', boxX + 14, topY + 50, { size: 9, color: '#9e9789', weight: 800, forceShow: true });
+    drawText('CALL SITE', boxX + 54, callY + 38, { size: 9, color: callHighlight ? '#4a6fb5' : '#9e9789', weight: 800, forceShow: true });
+
+    // Arrow from call to definition
+    ctx.save();
+    ctx.strokeStyle = '#2d6a4f';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(boxX + 160, callY);
+    ctx.lineTo(boxX + 160, topY + 40);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // arrowhead
+    ctx.beginPath();
+    ctx.moveTo(boxX + 156, topY + 50);
+    ctx.lineTo(boxX + 160, topY + 40);
+    ctx.lineTo(boxX + 164, topY + 50);
+    ctx.strokeStyle = '#2d6a4f';
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function renderParams() {
+  renderBase();
+  const W = canvas.width;
+  const H = canvas.height;
+  const cx = state.paramX;
+  const cy = state.paramY;
+  const sz = state.paramSize;
+  const hue = state.paramHue;
+
+  drawFlowerAt(cx, cy, sz * 0.55, hue);
+
+  // Cross-hair guides
+  ctx.save();
+  ctx.strokeStyle = 'rgba(45,106,79,0.25)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(cx, 30);
+  ctx.lineTo(cx, H - 30);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(30, cy);
+  ctx.lineTo(W - 30, cy);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // x label
+  if (state.labelsOn) {
+    drawText(`x=${Math.round(cx)}`, cx + 6, cy - 8, { size: 11, color: '#4a6fb5', weight: 700 });
+    drawText(`y=${Math.round(cy)}`, cx + 6, cy + 20, { size: 11, color: '#4a6fb5', weight: 700 });
+    drawText(`size=${sz}`, cx + 6, cy + 38, { size: 11, color: '#d4a030', weight: 700 });
+    drawText(`hue=${hue}°`, cx + 6, cy + 56, { size: 11, color: hslStr(hue, 70, 45), weight: 700 });
+  }
+}
+
+function renderReturn() {
+  renderBase();
+  const W = canvas.width;
+  const H = canvas.height;
+  const t = state.returnTemp;
+  const col = colorFromTemp(t);
+
+  // Thermometer bar
+  const barX = 60;
+  const barY = H * 0.38;
+  const barW = W - 120;
+  const barH = 28;
+
+  // Gradient strip
+  const grad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+  grad.addColorStop(0, colorFromTemp(0));
+  grad.addColorStop(0.5, colorFromTemp(50));
+  grad.addColorStop(1, colorFromTemp(100));
+  ctx.fillStyle = grad;
+  rrFill(barX, barY, barW, barH, 14, null, null, 0);
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.roundRect(barX, barY, barW, barH, 14);
+  ctx.fill();
+
+  // Marker
+  const mx = barX + (t / 100) * barW;
+  ctx.save();
+  ctx.fillStyle = '#fff';
+  ctx.strokeStyle = '#1d1b18';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(mx, barY + barH / 2, 14, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  // Color swatch
+  const swY = H * 0.5;
+  const swSize = 100;
+  rrFill(W / 2 - swSize / 2, swY, swSize, swSize, 14, col, '#1d1b18', 2);
+
+  // Return value badge
+  if (state.labelsOn) {
+    drawText(`colorFromTemp(${Math.round(t)})`, barX, barY - 18, { size: 12, color: '#8b5cf6', weight: 700, mono: true, forceShow: true });
+    drawText(`→ returns: ${col}`, barX, barY - 4, { size: 11, color: '#6d675f', weight: 600, mono: true, forceShow: true });
+    drawText('returned color', W / 2 - 36, swY + swSize + 22, { size: 11, color: '#6d675f', forceShow: true });
+    drawText('0 = cold', barX, barY + barH + 18, { size: 10, color: '#4a6fb5', weight: 600, forceShow: true });
+    drawText('100 = hot', barX + barW - 60, barY + barH + 18, { size: 10, color: '#c23030', weight: 600, forceShow: true });
+  }
+}
+
+function renderCompose() {
+  renderBase();
+  const W = canvas.width;
+  const H = canvas.height;
+  const show = state.composeShow;
+
+  // Sky
+  if (show.sky) {
+    rrFill(42, 42, W - 84, H * 0.55, 14, '#87CEEB', null, 0);
+    if (state.labelsOn) {
+      drawText('drawSky()', 56, 70, { size: 11, color: '#4a6fb5', weight: 700 });
     }
+  }
 
-    function currentThingName() {
-      if (state.example === "robot") return "robot";
-      if (state.example === "house") return "house";
-      return "flower";
+  // Sun
+  if (show.sun) {
+    ctx.save();
+    ctx.fillStyle = '#f0c040';
+    ctx.beginPath();
+    ctx.arc(W * 0.78, H * 0.2, 36, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    if (state.labelsOn) {
+      drawText('drawSun()', W * 0.78 - 28, H * 0.2 + 52, { size: 11, color: '#d4a030', weight: 700 });
     }
+  }
 
-    function repeatedCodeText() {
-      if (state.example === "robot") {
-        return `rect(180, 190, 60, 80);\ncircle(210, 165, 50);\nline(180, 220, 150, 250);\n\nrect(330, 190, 60, 80);\ncircle(360, 165, 50);\nline(330, 220, 300, 250);`;
-      }
-      if (state.example === "house") {
-        return `rect(170, 220, 90, 80);\ntriangle(160, 220, 215, 170, 270, 220);\n\nrect(340, 220, 90, 80);\ntriangle(330, 220, 385, 170, 440, 220);`;
-      }
-      return `circle(200, 200, 40);\nline(200, 220, 200, 270);\n\ncircle(320, 200, 40);\nline(320, 220, 320, 270);`;
+  // Ground
+  if (show.ground) {
+    rrFill(42, H * 0.55, W - 84, H * 0.38, 14, '#5a8a50', null, 0);
+    if (state.labelsOn) {
+      drawText('drawGround()', 56, H * 0.65, { size: 11, color: '#2d6a4f', weight: 700 });
     }
+  }
 
-    function functionBodyText() {
-      const name = currentFunctionName();
-      if (state.example === "robot") {
-        return `function ${name}(x, y, size) {\n  rect(x, y, size * 0.7, size);\n  circle(x, y - size * 0.55, size * 0.6);\n  line(x - size * 0.35, y, x - size * 0.75, y + size * 0.35);\n}`;
-      }
-      if (state.example === "house") {
-        return `function ${name}(x, y, size) {\n  rect(x, y, size, size * 0.75);\n  triangle(x - size * 0.1, y, x + size * 0.5, y - size * 0.55, x + size * 1.1, y);\n}`;
-      }
-      return `function ${name}(x, y, size) {\n  circle(x, y, size);\n  line(x, y + size / 2, x, y + size);\n  circle(x - size * 0.3, y, size * 0.45);\n  circle(x + size * 0.3, y, size * 0.45);\n}`;
+  // Tree
+  if (show.tree) {
+    const tx = W * 0.38;
+    const ty = H * 0.25;
+    ctx.save();
+    ctx.fillStyle = '#4a7a3a';
+    ctx.beginPath();
+    ctx.moveTo(tx, ty);
+    ctx.lineTo(tx + 55, ty + 120);
+    ctx.lineTo(tx - 55, ty + 120);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#6b4226';
+    ctx.fillRect(tx - 12, ty + 118, 24, 50);
+    ctx.restore();
+    if (state.labelsOn) {
+      drawText('drawTree()', tx - 28, ty - 10, { size: 11, color: '#2d6a4f', weight: 700 });
     }
+  }
 
-    function updateUI() {
-      const buttons = [
-        [els.modeRepeat, "repeat"],
-        [els.modeFunction, "function"],
-        [els.modeParams, "params"],
-        [els.modeReturn, "return"],
-        [els.modeCompose, "compose"]
-      ];
-      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
+  // Compose call stack hint
+  if (state.labelsOn) {
+    drawText('draw() calls:', W * 0.62, H * 0.3, { size: 11, color: '#6d675f', weight: 700, forceShow: true });
+    const fns = [
+      { name: 'drawSky()', active: show.sky, color: '#4a6fb5' },
+      { name: 'drawSun()', active: show.sun, color: '#d4a030' },
+      { name: 'drawTree()', active: show.tree, color: '#2d6a4f' },
+      { name: 'drawGround()', active: show.ground, color: '#5a8a50' }
+    ];
+    fns.forEach((fn, i) => {
+      const fc = fn.active ? fn.color : '#ccc';
+      drawText(`  ${fn.name}`, W * 0.62, H * 0.3 + 20 + i * 18, { size: 11, color: fc, mono: true, forceShow: true });
+    });
+  }
+}
 
-      els.exampleButtons.forEach((button) => button.classList.toggle("active", button.dataset.example === state.example));
+const renderers = {
+  repeat: renderRepeat,
+  define: renderDefine,
+  params: renderParams,
+  return: renderReturn,
+  compose: renderCompose
+};
 
-      els.xSlider.value = state.x;
-      els.ySlider.value = state.y;
-      els.sizeSlider.value = state.size;
-      els.xValue.textContent = String(Math.round(state.x));
-      els.yValue.textContent = String(Math.round(state.y));
-      els.sizeValue.textContent = String(Math.round(state.size));
-      els.showLabels.checked = state.showLabels;
-      els.showCode.checked = state.showCode;
-      els.codeCard.classList.toggle("visible", state.showCode);
+function render() { renderers[state.mode](); }
 
-      const name = currentFunctionName();
-      const thing = currentThingName();
-      const call = `${name}(${Math.round(state.x)}, ${Math.round(state.y)}, ${Math.round(state.size)});`;
+function fmtV(key) {
+  const v = state[key];
+  if (v === undefined) return '?';
+  return typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(1)) : v;
+}
 
-      const lessons = {
-        repeat: {
-          pill: "same idea copied many times",
-          title: "Repeated code is a clue",
-          text: "When the same group of drawing commands appears again and again, you probably have an idea that wants to become a function.",
-          formula: repeatedCodeText(),
-          question: "What part of the repeated code stays the same? What part changes?",
-          caption: "Repeated drawing code is a clue: this idea could become a function.",
-          code: repeatedCodeText()
-        },
-        function: {
-          pill: "a function names a reusable idea",
-          title: "A function makes a custom command",
-          text: `Instead of copying all the drawing code, name the idea once. Now ${name}() becomes a command you can use later.`,
-          formula: functionBodyText(),
-          question: `What idea is hidden inside the ${name}() function?`,
-          caption: `A function packages the drawing steps into one custom command: ${name}().`,
-          code: functionBodyText()
-        },
-        params: {
-          pill: "parameters are placeholders",
-          title: "Parameters make functions flexible",
-          text: "Parameters are placeholder names inside the function. Arguments are the real values you send when you call the function.",
-          formula: `function ${name}(x, y, size) { ... }\n\n${call}`,
-          question: "Which words are parameters? Which numbers are arguments?",
-          caption: `Change x, y, and size to call the same ${thing} command with different arguments.`,
-          code: `${functionBodyText()}\n\n${call}`
-        },
-        return: {
-          pill: "return sends a value back",
-          title: "Some functions calculate and return",
-          text: "Not every function draws. Some functions calculate an answer and send it back with return.",
-          formula: `function scaledSize(size, factor) {\n  return size * factor;\n}\n\nlet small = scaledSize(${Math.round(state.size)}, 0.5);`,
-          question: "How is a function that returns a value different from a function that draws?",
-          caption: "A drawing function creates a visual result. A return function sends a value back for the sketch to use.",
-          code: `function scaledSize(size, factor) {\n  return size * factor;\n}\n\nlet small = scaledSize(${Math.round(state.size)}, 0.5);\nlet large = scaledSize(${Math.round(state.size)}, 1.3);\n\ncircle(220, 250, small);\ncircle(420, 250, large);`
-        },
-        compose: {
-          pill: "click the canvas to place a shape",
-          title: "Click anywhere to place a shape",
-          text: `Click on the canvas to place a ${thing}. Each click adds one function call. The function definition never changes — only the arguments do.`,
-          formula: state.calls.slice(-8).map(c => `${name}(${Math.round(c.x)}, ${Math.round(c.y)}, ${Math.round(c.size)});`).join("\n") || `// Click the canvas to add calls`,
-          question: "The function definition stays the same. Why does that matter when you have 50 calls?",
-          caption: `Click anywhere on the canvas to call ${name}() at that position. Try "What if we had 50?"`,
-          code: `${functionBodyText()}\n\nfunction draw() {\n  background(240);\n${state.calls.slice(0, 6).map(c => `  ${name}(${Math.round(c.x)}, ${Math.round(c.y)}, ${Math.round(c.size)});`).join("\n")}${state.calls.length > 6 ? `\n  // ... ${state.calls.length - 6} more calls` : ""}\n}`
-        }
-      };
+function buildControls() {
+  controlsEl.innerHTML = '';
+  const mode = modes[state.mode];
 
-      const lesson = lessons[state.mode];
-      els.modePill.textContent = lesson.pill;
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.formulaBox.textContent = lesson.formula;
-      els.questionText.textContent = lesson.question;
-      els.caption.textContent = lesson.caption;
-      els.codeBox.textContent = lesson.code;
-    }
+  // Special: compose toggles
+  if (state.mode === 'compose') {
+    const fns = ['sky', 'ground', 'tree', 'sun'];
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;';
+    fns.forEach(fn => {
+      const lbl = document.createElement('label');
+      lbl.className = 'sw';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = state.composeShow[fn];
+      cb.addEventListener('change', () => {
+        state.composeShow[fn] = cb.checked;
+        render();
+        updateCode();
+      });
+      lbl.appendChild(cb);
+      lbl.appendChild(document.createTextNode(` draw${fn.charAt(0).toUpperCase() + fn.slice(1)}()`));
+      row.appendChild(lbl);
+    });
+    controlsEl.appendChild(row);
+    return;
+  }
 
-    setupUI();
+  // Special: define highlight buttons
+  if (state.mode === 'define') {
+    const parts = ['name', 'params', 'body', 'call'];
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;';
+    parts.forEach(part => {
+      const btn = document.createElement('button');
+      btn.className = 'preset-btn';
+      btn.type = 'button';
+      btn.textContent = part;
+      btn.style.cssText = state.defHighlight === part ? 'border-color:#2d6a4f;color:#1a3f30;background:#eef8f2' : '';
+      btn.addEventListener('click', () => {
+        state.defHighlight = part;
+        buildControls();
+        render();
+        updateCode();
+      });
+      row.appendChild(btn);
+    });
+    controlsEl.appendChild(row);
+    return;
+  }
 
-    const sketch = (p) => {
-      let canvas;
-      let holder;
-      let previousWidth = 0;
-      let previousHeight = 0;
+  mode.controls.forEach(control => {
+    const row = document.createElement('div');
+    row.className = 'ctrl-row';
+    const val = state[control.key] !== undefined ? state[control.key] : 0;
+    row.innerHTML = `
+      <div><label for="sl_${control.key}">${control.label}<small>${control.hint}</small></label></div>
+      <span class="val-badge mono" id="vb_${control.key}">${val}</span>
+      <input id="sl_${control.key}" type="range" min="${control.min}" max="${control.max}" step="${control.step}" value="${val}" aria-label="${control.label}">
+    `;
+    controlsEl.appendChild(row);
 
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive visualization of functions, repeated code, parameters, arguments, and return values in p5.js.");
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
-      };
+    row.querySelector('input').addEventListener('input', ev => {
+      state[control.key] = Number(ev.target.value);
+      state.changedKey = control.key;
+      document.getElementById(`vb_${control.key}`).textContent = Math.round(state[control.key]);
+      render();
+      updateCode();
+    });
+  });
+}
 
-      p.windowResized = () => resizeToHolder();
+function buildPresets() {
+  const area = document.getElementById('presets-area');
+  area.innerHTML = '';
+  const mode = modes[state.mode];
+  if (!mode.presets || mode.presets.length === 0) return;
 
-      let recentlyAddedTimer = 0;
+  const lbl = document.createElement('div');
+  lbl.className = 'presets-label';
+  lbl.textContent = 'Try these';
+  area.appendChild(lbl);
 
-      p.mousePressed = () => {
-        if (state.mode !== "compose") return;
-        const panel = { x: p.width * 0.08, y: p.height * 0.15, w: p.width * 0.84, h: p.height * 0.50 };
-        if (p.mouseX < panel.x || p.mouseX > panel.x + panel.w) return;
-        if (p.mouseY < panel.y || p.mouseY > panel.y + panel.h) return;
-        state.calls.push({ x: p.mouseX, y: p.mouseY, size: state.size });
-        state.lastAddedIndex = state.calls.length - 1;
-        recentlyAddedTimer = p.millis();
-        updateUI();
-      };
+  const row = document.createElement('div');
+  row.className = 'preset-row';
+  mode.presets.forEach(preset => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn' + (preset.isBreak ? ' break' : '');
+    btn.type = 'button';
+    btn.textContent = preset.label;
+    btn.addEventListener('click', () => {
+      Object.entries(preset.v).forEach(([k, v]) => { state[k] = v; });
+      buildControls();
+      render();
+      updateCode();
+    });
+    row.appendChild(btn);
+  });
+  area.appendChild(row);
+}
 
-      p.draw = () => {
-        resizeToHolder();
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-        drawPanelTitle();
+function focusHTML() {
+  const m = state.mode;
+  if (m === 'repeat') return `<span class="ct cm">// ${state.repeatCount} calls instead of ${state.repeatCount * 8} lines</span>`;
+  if (m === 'define') return `<span class="ct kw">function</span> <span class="ct fn" id="v-fn">drawFlower</span>(x, y, size) { ... }`;
+  if (m === 'params') {
+    return `<span class="ct fn">drawFlower</span>(<span class="ct num" id="v-paramX">${Math.round(state.paramX)}</span>, <span class="ct num" id="v-paramY">${Math.round(state.paramY)}</span>, <span class="ct num" id="v-paramSize">${state.paramSize}</span>);`;
+  }
+  if (m === 'return') {
+    return `<span class="ct kw">let</span> c = <span class="ct fn">colorFromTemp</span>(<span class="ct num" id="v-returnTemp">${Math.round(state.returnTemp)}</span>); <span class="ct cm">// returns color</span>`;
+  }
+  return `<span class="ct fn">drawScene</span>(); <span class="ct cm">// calls drawSky, drawGround, drawTree</span>`;
+}
 
-        if (state.mode === "repeat") drawRepeatMode();
-        if (state.mode === "function") drawFunctionMode();
-        if (state.mode === "params") drawParamsMode();
-        if (state.mode === "return") drawReturnMode();
-        if (state.mode === "compose") drawComposeMode();
+function fullCodeText() {
+  const m = state.mode;
+  if (m === 'repeat') {
+    const copies = Array.from({ length: state.repeatCount }, (_, i) =>
+      `  circle(${80 + i * 100}, 200, 36);  // copy ${i + 1}`).join('\n');
+    const calls = Array.from({ length: state.repeatCount }, (_, i) =>
+      `  drawFlower(${80 + i * 100}, 200, 36);`).join('\n');
+    return `// Without function (${state.repeatCount * 8} lines):\nfunction draw() {\n${copies}\n}\n\n// With function (${state.repeatCount} calls):\nfunction drawFlower(x, y, size) { ... }\nfunction draw() {\n${calls}\n}`;
+  }
+  if (m === 'define') {
+    return `function drawFlower(x, y, size) {\n  for (let p = 0; p < 6; p++) {\n    let px = x + cos(p) * size;\n    let py = y + sin(p) * size;\n    circle(px, py, size * 0.5);\n  }\n  circle(x, y, size * 0.4); // center\n}\n\n// Call it:\ndrawFlower(200, 150, 40);`;
+  }
+  if (m === 'params') {
+    return `function drawFlower(x, y, size, hue) {\n  colorMode(HSB, 360, 100, 100);\n  fill(hue, 70, 65);\n  for (let p = 0; p < 6; p++) {\n    let px = x + cos(p) * size * 0.55;\n    let py = y + sin(p) * size * 0.55;\n    circle(px, py, size * 0.55);\n  }\n}\n\ndrawFlower(${Math.round(state.paramX)}, ${Math.round(state.paramY)}, ${state.paramSize}, ${state.paramHue});`;
+  }
+  if (m === 'return') {
+    return `function colorFromTemp(t) {\n  t = constrain(t, 0, 100);\n  if (t < 50) {\n    return color(lerp(80, 150, t/50), lerp(130,175,t/50), lerp(220,120,t/50));\n  } else {\n    let f = (t-50)/50;\n    return color(lerp(150,255,f), lerp(175,80,f), lerp(120,30,f));\n  }\n}\n\nlet c = colorFromTemp(${Math.round(state.returnTemp)});\nfill(c);\nrect(100, 100, 200, 200);`;
+  }
+  const active = Object.entries(state.composeShow).filter(([, v]) => v).map(([k]) => `  draw${k.charAt(0).toUpperCase() + k.slice(1)}();`).join('\n');
+  return `function draw() {\n  background(240);\n${active || '  // (nothing visible)'}\n}\n\nfunction drawSky() { /* ... */ }\nfunction drawSun() { /* ... */ }\nfunction drawGround() { /* ... */ }\nfunction drawTree() { /* ... */ }`;
+}
 
-        drawReadoutCards();
-      };
+function escapeHTML(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-        if (w !== previousWidth || h !== previousHeight) {
-          p.resizeCanvas(w, h);
-          previousWidth = w;
-          previousHeight = h;
-        }
-      }
+function updateCode() {
+  focusEl.innerHTML = focusHTML();
+  fullEl.innerHTML = escapeHTML(fullCodeText());
+  document.getElementById('code-note').textContent = modes[state.mode].note;
+}
 
-      function drawSubtleGrid() {
-        p.push();
-        p.stroke(236, 224, 207);
-        p.strokeWeight(1);
-        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
-        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
-        p.pop();
-      }
+function setText(id, value, asHTML = false) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (asHTML) el.innerHTML = value;
+  else el.textContent = value;
+}
 
-      function drawPanelTitle() {
-        const titles = {
-          repeat: ["Repeated Code", "The same idea appears again and again."],
-          function: ["Make a Command", "A function names a reusable idea."],
-          params: ["Parameters", "Placeholders let one function work in many situations."],
-          return: ["Return Values", "Some functions calculate instead of draw."],
-          compose: ["Build a Scene", "One function can be called many times with different arguments."]
-        };
-        const [title, subtitle] = titles[state.mode];
-        p.push();
-        p.noStroke();
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(22);
-        p.text(title, 24, 38);
-        p.textStyle(p.NORMAL);
-        p.textSize(14);
-        p.fill("#6b6258");
-        p.text(subtitle, 24, 62);
-        p.pop();
-      }
+function setMode(modeName) {
+  state.mode = modeName;
 
-      function drawRepeatMode() {
-        const panel = drawStage();
-        const xs = [panel.x + panel.w * 0.30, panel.x + panel.w * 0.55, panel.x + panel.w * 0.74];
-        const sizes = [58, 82, 64];
-        for (let i = 0; i < xs.length; i++) drawThing(xs[i], panel.y + panel.h * 0.54, sizes[i], state.example, "#e11d48");
-        if (state.showLabels) {
-          drawCodeChunk(panel.x + 28, panel.y + 34, "copied drawing code", "#e11d48");
-          drawLabel("Same recipe, different positions and sizes", panel.x + 28, panel.y + panel.h - 28, "#6b6258", 14);
-        }
-      }
+  document.querySelectorAll('.tab').forEach(tab => {
+    const active = tab.dataset.mode === modeName;
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    tab.tabIndex = active ? 0 : -1;
+  });
 
-      function drawFunctionMode() {
-        const panel = drawStage();
-        drawFunctionBox(panel.x + 34, panel.y + 50, panel.w * 0.36, panel.h - 100);
-        drawArrow(panel.x + panel.w * 0.46, panel.y + panel.h * 0.50, panel.x + panel.w * 0.58, panel.y + panel.h * 0.50, "#16a34a");
-        drawThing(panel.x + panel.w * 0.70, panel.y + panel.h * 0.53, state.size, state.example, "#7c3aed");
-        if (state.showLabels) drawLabel(`${currentFunctionName()}() creates this ${currentThingName()}`, panel.x + panel.w * 0.58, panel.y + panel.h * 0.76, "#7c3aed", 14);
-      }
+  const mode = modes[modeName];
+  setText('canvas-title', mode.canvasTitle);
+  setText('canvas-sub', mode.canvasSub);
+  setText('predict-text', mode.predict);
+  setText('big-idea-text', mode.big);
+  setText('bug-text', mode.bug);
+  setText('try-text', mode.tryIt);
+  setText('prose-title', mode.proseTitle);
+  setText('prose-body', mode.proseBody, true);
 
-      function drawParamsMode() {
-        const panel = drawStage();
-        drawThing(state.x, state.y, state.size, state.example, "#f59e0b");
-        drawParameterMachine(panel.x + 34, panel.y + 42, panel.w * 0.36, panel.h - 84);
-        drawArrow(panel.x + panel.w * 0.43, panel.y + panel.h * 0.50, state.x - state.size * 0.5, state.y, "#16a34a");
-        if (state.showLabels) {
-          drawLabel(`arguments: ${Math.round(state.x)}, ${Math.round(state.y)}, ${Math.round(state.size)}`, panel.x + panel.w * 0.50, panel.y + 44, "#f59e0b", 14);
-          drawLabel("parameters become local names inside the function", panel.x + 34, panel.y + panel.h - 26, "#0891b2", 13);
-        }
-      }
+  buildControls();
+  buildPresets();
+  updateCode();
+  render();
+}
 
-      function drawReturnMode() {
-        const panel = drawStage();
-        const small = state.size * 0.5;
-        const medium = state.size;
-        const large = state.size * 1.3;
-        drawReturnMachine(panel.x + 38, panel.y + 48, panel.w * 0.34, panel.h - 96);
-        drawArrow(panel.x + panel.w * 0.43, panel.y + panel.h * 0.50, panel.x + panel.w * 0.55, panel.y + panel.h * 0.50, "#16a34a");
-        drawThing(panel.x + panel.w * 0.58, panel.y + panel.h * 0.54, small, state.example, "#16a34a");
-        drawThing(panel.x + panel.w * 0.70, panel.y + panel.h * 0.54, medium, state.example, "#f59e0b");
-        drawThing(panel.x + panel.w * 0.84, panel.y + panel.h * 0.54, large, state.example, "#7c3aed");
-        if (state.showLabels) drawLabel("returned numbers can be used later", panel.x + panel.w * 0.54, panel.y + panel.h - 26, "#16a34a", 14);
-      }
+function selectAdjacentTab(direction) {
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const idx = tabs.findIndex(t => t.dataset.mode === state.mode);
+  const next = (idx + direction + tabs.length) % tabs.length;
+  tabs[next].focus();
+  setMode(tabs[next].dataset.mode);
+}
 
-      function drawComposeMode() {
-        const name = currentFunctionName();
-        // Split canvas: left 60% = canvas, right 40% = code panel
-        const stageX = p.width * 0.08;
-        const stageY = p.height * 0.15;
-        const stageW = p.width * 0.55;
-        const stageH = p.height * 0.50;
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => setMode(tab.dataset.mode));
+  tab.addEventListener('keydown', ev => {
+    if (ev.key === 'ArrowRight') { ev.preventDefault(); selectAdjacentTab(1); }
+    if (ev.key === 'ArrowLeft') { ev.preventDefault(); selectAdjacentTab(-1); }
+    if (ev.key === 'Home') { ev.preventDefault(); const t = document.querySelector('.tab'); t.focus(); setMode(t.dataset.mode); }
+    if (ev.key === 'End') { ev.preventDefault(); const ts = document.querySelectorAll('.tab'); const t = ts[ts.length - 1]; t.focus(); setMode(t.dataset.mode); }
+  });
+});
 
-        // Draw stage
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 235);
-        p.rect(stageX, stageY, stageW, stageH, 24);
-        p.pop();
+document.getElementById('labelToggle').addEventListener('change', ev => {
+  state.labelsOn = ev.target.checked;
+  render();
+});
 
-        if (state.calls.length === 0) {
-          drawLabel("Click anywhere in this area to place a shape", stageX + stageW * 0.15, stageY + stageH * 0.50, "#6b6258", 16);
-          // Show crosshair hint
-          p.push();
-          p.stroke("#ded2c1");
-          p.strokeWeight(2);
-          p.drawingContext.setLineDash([6, 6]);
-          p.line(stageX + stageW * 0.5, stageY + 20, stageX + stageW * 0.5, stageY + stageH - 20);
-          p.line(stageX + 20, stageY + stageH * 0.5, stageX + stageW - 20, stageY + stageH * 0.5);
-          p.drawingContext.setLineDash([]);
-          p.pop();
-        }
+document.getElementById('fullCodeToggle').addEventListener('click', function () {
+  const open = fullEl.classList.toggle('open');
+  this.textContent = open ? '▾ Hide full sketch' : '▸ See full p5.js sketch';
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) updateCode();
+});
 
-        // Draw all placed things
-        const isRecent = p.millis() - recentlyAddedTimer < 600;
-        for (let i = 0; i < state.calls.length; i++) {
-          const c = state.calls[i];
-          const isLast = i === state.lastAddedIndex;
-          const col = palette(i);
-          // Clip to stage area (approximate)
-          if (c.x < stageX || c.x > stageX + stageW || c.y < stageY || c.y > stageY + stageH) continue;
-          drawThing(c.x, c.y, c.size, state.example, col);
-          if (isLast && isRecent) {
-            // Flash ring
-            p.push();
-            p.noFill();
-            p.stroke("#ffffff");
-            p.strokeWeight(4);
-            p.circle(c.x, c.y, c.size * 1.4);
-            p.stroke(col);
-            p.strokeWeight(2);
-            p.circle(c.x, c.y, c.size * 1.4);
-            p.pop();
-          }
-          if (state.showLabels && i === state.lastAddedIndex && state.calls.length <= 12) {
-            drawLabel(`${name}(${Math.round(c.x)}, ${Math.round(c.y)}, ${Math.round(c.size)})`, c.x - 70, c.y - c.size * 0.6 - 10, col, 11);
-          }
-        }
-
-        // Count label
-        if (state.calls.length > 0 && state.showLabels) {
-          drawLabel(`${state.calls.length} call${state.calls.length > 1 ? "s" : ""} — 1 definition`, stageX + 18, stageY + 30, "#7c3aed", 13);
-        }
-
-        // Code panel (right side)
-        const codeX = stageX + stageW + 16;
-        const codeY = stageY;
-        const codeW = p.width - codeX - p.width * 0.06;
-        const codeH = stageH;
-
-        p.push();
-        p.noStroke();
-        p.fill(17, 24, 39, 245);
-        p.rect(codeX, codeY, Math.max(80, codeW), codeH, 18);
-
-        p.textFont("ui-monospace, SFMono-Regular, Menlo, Monaco, monospace");
-        p.textSize(11);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.fill("#6b7280");
-        p.textStyle(p.BOLD);
-        p.text("// code panel", codeX + 10, codeY + 18);
-        p.textStyle(p.NORMAL);
-
-        const lineH = 14;
-        const maxVisible = Math.floor((codeH - 40) / lineH);
-        const totalLines = state.calls.length;
-        const startLine = Math.max(0, totalLines - maxVisible + 1);
-
-        for (let i = startLine; i < totalLines; i++) {
-          const c = state.calls[i];
-          const yy = codeY + 32 + (i - startLine) * lineH;
-          const isLast = i === state.lastAddedIndex && isRecent;
-          if (isLast) {
-            p.noStroke();
-            p.fill(251, 191, 36, 60);
-            p.rect(codeX + 4, yy - 11, Math.max(80, codeW) - 8, lineH + 2, 4);
-          }
-          p.fill(isLast ? "#fde68a" : palette(i));
-          p.text(`${name}(${Math.round(c.x)}, ${Math.round(c.y)}, ${Math.round(c.size)});`, codeX + 10, yy);
-        }
-        p.textFont("Inter, system-ui, sans-serif");
-        p.pop();
-      }
-
-      function drawStage() {
-        const panel = { x: p.width * 0.08, y: p.height * 0.15, w: p.width * 0.84, h: p.height * 0.50 };
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 235);
-        p.rect(panel.x, panel.y, panel.w, panel.h, 24);
-        p.pop();
-        return panel;
-      }
-
-      function drawThing(x, y, size, type, color) {
-        p.push();
-        p.noStroke();
-        p.fill(color);
-        if (type === "robot") {
-          p.rectMode(p.CENTER);
-          p.rect(x, y, size * 0.70, size, 10);
-          p.circle(x, y - size * 0.62, size * 0.62);
-          p.stroke(color);
-          p.strokeWeight(Math.max(3, size * 0.06));
-          p.line(x - size * 0.35, y - size * 0.05, x - size * 0.72, y + size * 0.35);
-          p.line(x + size * 0.35, y - size * 0.05, x + size * 0.72, y + size * 0.35);
-          p.noStroke();
-          p.fill("#ffffff");
-          p.circle(x - size * 0.12, y - size * 0.66, size * 0.11);
-          p.circle(x + size * 0.12, y - size * 0.66, size * 0.11);
-        } else if (type === "house") {
-          p.rectMode(p.CENTER);
-          p.rect(x, y + size * 0.15, size, size * 0.72, 8);
-          p.triangle(x - size * 0.65, y - size * 0.20, x, y - size * 0.82, x + size * 0.65, y - size * 0.20);
-          p.fill("#fff7ed");
-          p.rect(x, y + size * 0.30, size * 0.24, size * 0.42, 5);
-          p.rect(x - size * 0.24, y + size * 0.08, size * 0.20, size * 0.18, 5);
-          p.rect(x + size * 0.24, y + size * 0.08, size * 0.20, size * 0.18, 5);
-        } else {
-          p.stroke("#16a34a");
-          p.strokeWeight(Math.max(3, size * 0.06));
-          p.line(x, y + size * 0.35, x, y + size * 1.0);
-          p.noStroke();
-          p.fill("#16a34a");
-          p.ellipse(x - size * 0.18, y + size * 0.65, size * 0.30, size * 0.16);
-          p.fill(color);
-          for (let i = 0; i < 6; i++) {
-            const a = i * p.TWO_PI / 6;
-            p.ellipse(x + Math.cos(a) * size * 0.28, y + Math.sin(a) * size * 0.28, size * 0.42, size * 0.22);
-          }
-          p.fill("#fef3c7");
-          p.circle(x, y, size * 0.34);
-        }
-        p.pop();
-      }
-
-      function drawFunctionBox(x, y, w, h) {
-        p.push();
-        p.noStroke();
-        p.fill(245, 243, 255, 245);
-        p.rect(x, y, w, h, 20);
-        p.stroke("#7c3aed");
-        p.strokeWeight(3);
-        p.noFill();
-        p.rect(x, y, w, h, 20);
-        p.noStroke();
-        p.fill("#7c3aed");
-        p.textStyle(p.BOLD);
-        p.textSize(18);
-        p.text(`${currentFunctionName()}()`, x + 18, y + 32);
-        p.fill("#334155");
-        p.textStyle(p.NORMAL);
-        p.textSize(13);
-        p.text("contains the drawing recipe", x + 18, y + 66);
-        p.text("• shapes", x + 30, y + 102);
-        p.text("• colors", x + 30, y + 126);
-        p.text("• layout", x + 30, y + 150);
-        if (state.showLabels) drawLabel("custom command", x + 18, y + h - 22, "#7c3aed", 13);
-        p.pop();
-      }
-
-      function drawParameterMachine(x, y, w, h) {
-        p.push();
-        p.noStroke();
-        p.fill(239, 246, 255, 245);
-        p.rect(x, y, w, h, 20);
-        p.stroke("#0891b2");
-        p.strokeWeight(3);
-        p.noFill();
-        p.rect(x, y, w, h, 20);
-        p.noStroke();
-        p.fill("#0891b2");
-        p.textStyle(p.BOLD);
-        p.textSize(16);
-        p.text("parameters", x + 18, y + 30);
-        p.textStyle(p.NORMAL);
-        p.fill("#334155");
-        p.textSize(13);
-        p.text("x", x + 28, y + 70);
-        p.text("y", x + 28, y + 102);
-        p.text("size", x + 28, y + 134);
-        p.fill("#f59e0b");
-        p.textStyle(p.BOLD);
-        p.text(`${Math.round(state.x)}`, x + 90, y + 70);
-        p.text(`${Math.round(state.y)}`, x + 90, y + 102);
-        p.text(`${Math.round(state.size)}`, x + 90, y + 134);
-        p.pop();
-      }
-
-      function drawReturnMachine(x, y, w, h) {
-        p.push();
-        p.noStroke();
-        p.fill(240, 253, 244, 245);
-        p.rect(x, y, w, h, 20);
-        p.stroke("#16a34a");
-        p.strokeWeight(3);
-        p.noFill();
-        p.rect(x, y, w, h, 20);
-        p.noStroke();
-        p.fill("#16a34a");
-        p.textStyle(p.BOLD);
-        p.textSize(16);
-        p.text("scaledSize()", x + 18, y + 32);
-        p.fill("#334155");
-        p.textStyle(p.NORMAL);
-        p.textSize(13);
-        p.text("input: size, factor", x + 18, y + 68);
-        p.text("calculate:", x + 18, y + 102);
-        p.text("size * factor", x + 34, y + 126);
-        p.fill("#16a34a");
-        p.textStyle(p.BOLD);
-        p.text("return result", x + 18, y + h - 24);
-        p.pop();
-      }
-
-      function drawCodeChunk(x, y, title, color) {
-        p.push();
-        p.noStroke();
-        p.fill(255, 250, 242, 245);
-        p.rect(x, y, 190, 126, 16);
-        p.stroke(color);
-        p.strokeWeight(2);
-        p.noFill();
-        p.rect(x, y, 190, 126, 16);
-        p.noStroke();
-        p.fill(color);
-        p.textStyle(p.BOLD);
-        p.textSize(14);
-        p.text(title, x + 12, y + 24);
-        p.fill("#334155");
-        p.textStyle(p.NORMAL);
-        p.textSize(12);
-        p.text("circle(...)", x + 18, y + 56);
-        p.text("line(...)", x + 18, y + 80);
-        p.text("circle(...)", x + 18, y + 104);
-        p.pop();
-      }
-
-      function drawArrow(x1, y1, x2, y2, color) {
-        p.push();
-        p.stroke(color);
-        p.strokeWeight(3);
-        p.line(x1, y1, x2, y2);
-        const angle = Math.atan2(y2 - y1, x2 - x1);
-        p.noStroke();
-        p.fill(color);
-        p.push();
-        p.translate(x2, y2);
-        p.rotate(angle);
-        p.triangle(0, 0, -10, -6, -10, 6);
-        p.pop();
-        p.pop();
-      }
-
-      function drawReadoutCards() {
-        const cards = [
-          { label: "function", value: currentFunctionName(), color: "#7c3aed" },
-          { label: "arguments", value: "x, y, size", color: "#f59e0b" },
-          { label: "calls", value: state.mode === "compose" ? state.calls.length : 1, color: "#16a34a" }
-        ];
-        const cardW = Math.min(176, (p.width - 70) / cards.length);
-        const y = p.height - 168;
-        const x = 28;
-
-        p.push();
-        for (let i = 0; i < cards.length; i++) {
-          const cx = x + i * (cardW + 10);
-          p.noStroke();
-          p.fill(255, 255, 255, 235);
-          p.rect(cx, y, cardW, 62, 14);
-          p.fill(cards[i].color);
-          p.textStyle(p.BOLD);
-          p.textSize(13);
-          p.text(cards[i].label, cx + 12, y + 22);
-          p.fill("#222222");
-          p.textSize(15);
-          p.text(String(cards[i].value), cx + 12, y + 48);
-        }
-        p.pop();
-      }
-
-      function palette(i) {
-        const colors = ["#7c3aed", "#0891b2", "#e11d48", "#f59e0b", "#16a34a", "#2563eb", "#9333ea", "#dc2626", "#0f766e", "#ca8a04"];
-        return colors[i % colors.length];
-      }
-
-      function drawLabel(text, x, y, color, size = 13) {
-        p.push();
-        p.textSize(size);
-        p.textStyle(p.BOLD);
-        const padX = 7;
-        const padY = 4;
-        const tw = p.textWidth(text);
-        p.noStroke();
-        p.fill(255, 250, 242, 238);
-        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
-        p.fill(color);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.text(text, x, y);
-        p.pop();
-      }
-    };
-
-    new p5(sketch);
-  </script>
+setMode('repeat');
+</script>
 </body>
 </html>

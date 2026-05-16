@@ -1,1088 +1,1135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Events: Sketches Listen</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --mouse: #0891b2;
-      --click: #e11d48;
-      --key: #7c3aed;
-      --hold: #16a34a;
-      --state: #f59e0b;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../concept-bridge.css">
+<title>Events: Sketches Listen</title>
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #4a7c8a;
+    --accent-dark: #2e5663;
+    --accent-bg: #eef6f8;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 960px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--accent-dark); }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
 
-    .controls,
-    .workspace,
-    .side-panel {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      user-select: none;
-    }
-
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
-
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
-
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
-
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
-
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 112px minmax(150px, 1fr) 76px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(390px, 100%);
-    }
-
-    label,
-    .value-label,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
-
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
-
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    #sketch-holder canvas { display: block; }
-
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
-
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .card h2 { font-size: 1.15rem; }
-    .card h3 { font-size: 1rem; }
-
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .card p { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
-
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      white-space: pre-wrap;
-    }
-
-    .legend { display: grid; gap: 8px; }
-    .legend-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: center; font-size: 0.9rem; color: var(--muted); }
-    .swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); }
-    .swatch.mouse { background: var(--mouse); }
-    .swatch.click { background: var(--click); }
-    .swatch.key { background: var(--key); }
-    .swatch.hold { background: var(--hold); }
-    .swatch.state { background: var(--state); }
-
-    .code-card { display: none; }
-    .code-card.visible { display: block; }
-
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
-
-    .note { font-size: 0.86rem; color: var(--muted); }
-
-    @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
-    @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
-  
-  /* ── Bridge improvement additions ─────────────────────────────── */
   .unlocks {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 0 0 20px;
+    margin: 0 0 22px;
   }
+
   .unlock-pill {
     font-size: 0.75rem;
-    font-weight: 700;
-    color: #2a5e3e;
-    background: #eef8f2;
-    border: 1px solid #b8dcc8;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
     padding: 5px 10px;
     border-radius: 999px;
   }
+
   .before-after {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     overflow: hidden;
     margin-bottom: 22px;
-    background: rgba(255,255,255,0.55);
+    background: var(--paper);
   }
-  .ba-col { padding: 14px 18px; }
-  .ba-col:first-child {
-    background: rgba(0,0,0,0.025);
-    border-right: 1px solid var(--line, #ded2c1);
-  }
+
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
+
   .ba-label {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #9e9789;
+    color: var(--faint);
     margin-bottom: 5px;
   }
-  .ba-col:last-child .ba-label { color: #2a5e3e; }
-  .ba-text { font-size: 0.9rem; line-height: 1.5; }
-  .predict-box {
-    background: #fef9ee;
-    border: 1px solid #efd09e;
-    border-radius: 10px;
-    padding: 11px 14px;
-    margin-bottom: 12px;
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
   }
-  .predict-box .pbox-label {
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .canvas-panel { overflow: hidden; }
+
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
+
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
+
+  #events-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
+
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
+
+  .ctrl-panel { padding: 16px; }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
+
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #fff2dc; border-color: #e0a050; }
+
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
+
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(74,124,138,0.4);
+    outline-offset: 2px;
+  }
+
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .box-label {
     display: block;
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    color: var(--ink);
     margin-bottom: 3px;
   }
-  .predict-box .pbox-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
+
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
+
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
   }
-  .callout-mistake {
-    background: #fff3e6;
-    border: 1px solid #edbd83;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin: 10px 0 0;
-  }
-  .callout-mistake .cm-label {
+
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
     display: block;
-    font-size: 0.72rem;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    min-width: 42px;
+    text-align: center;
   }
-  .callout-mistake .cm-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
   }
-  .pathways-section {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 32px 20px 8px;
-  }
-  .pathways-title {
-    font-size: 0.72rem;
-    font-weight: 700;
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #9e9789;
-    margin-bottom: 12px;
+    color: var(--faint);
+    margin-bottom: 6px;
   }
-  .path-links { display: grid; gap: 8px; max-width: 820px; }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: color var(--transition);
+  }
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 22px; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 720px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
   .path-link {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
     text-decoration: none;
-    color: var(--ink, #222);
-    background: rgba(255,250,242,0.92);
-    transition: border-color 0.14s ease, background 0.14s ease;
-    font-family: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
   }
-  .path-link:hover {
-    border-color: var(--accent, #2563eb);
-    background: rgba(230,240,255,0.6);
-  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
   .path-link-type {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #9e9789;
+    color: var(--faint);
     flex-shrink: 0;
-    min-width: 82px;
+    min-width: 88px;
   }
-  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
   .path-link-name { font-size: 0.9rem; font-weight: 700; }
-  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
   .bottom-nav {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 18px 20px 40px;
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    border-top: 1px solid var(--line, #ded2c1);
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
   }
-  .bottom-nav a {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #6b6258;
-    text-decoration: none;
-    font-family: inherit;
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color var(--transition); }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
   }
-  .bottom-nav a:hover { color: var(--accent, #2563eb); }
   @media (max-width: 560px) {
     .before-after { grid-template-columns: 1fr; }
-    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
     .bottom-nav { flex-direction: column; }
   }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
 </style>
-  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
-  </div>
-  <header>
-    <h1>Events: Sketches Listen</h1>
-    <p class="subtitle">
-      A concept bridge for <strong>mouseX</strong>, <strong>mouseY</strong>, <strong>mousePressed()</strong>, <strong>keyPressed()</strong>, and <strong>keyIsDown()</strong>.
-      Some input is continuous. Some input happens as an event.
-    </p>
-  <div class="unlocks" aria-label="What this bridge unlocks">
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+  <p class="eyebrow">Concept bridge · Interaction</p>
+  <h1>Events: Sketches Listen</h1>
+  <p class="subtitle">A concept bridge for <code>mousePressed()</code>, <code>keyPressed()</code>, <code>mouseMoved()</code>, and <code>mouseReleased()</code>. Events let your sketch respond to moments, not just the passage of time.</p>
+  <div class="unlocks">
     <span class="unlock-pill">mouse interaction</span>
-    <span class="unlock-pill">keyboard response</span>
-    <span class="unlock-pill">click-triggered behavior</span>
-    <span class="unlock-pill">interactive sketches</span>
+    <span class="unlock-pill">keyboard control</span>
+    <span class="unlock-pill">click response</span>
+    <span class="unlock-pill">user input</span>
+    <span class="unlock-pill">drawing tools</span>
   </div>
-  <section class="before-after" aria-label="Before and after mental model">
+  <section class="before-after">
     <div class="ba-col">
       <div class="ba-label">Before this bridge, you might think</div>
-      <div class="ba-text">mousePressed() fires once and that's it — I don't know how it connects to draw()</div>
+      <div class="ba-text">I have to check <code>mouseIsPressed</code> inside <code>draw()</code> every frame to detect a click. It fires 60 times per second instead of once.</div>
     </div>
     <div class="ba-col">
       <div class="ba-label">After this bridge</div>
-      <div class="ba-text">Event functions fire at the right moment and update state — draw() reads that state every frame</div>
+      <div class="ba-text"><code>mousePressed()</code> fires exactly once per click. p5.js calls it for you automatically — you just write what should happen inside it.</div>
     </div>
   </section>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-            <div class="predict-box">
-        <span class="pbox-label">Before you interact — predict first</span>
-        <span class="pbox-body">Before you click inside the canvas — will the event fire once or every frame while the button is held?</span>
+  <section class="main-grid">
+    <article class="panel canvas-panel">
+      <div class="canvas-bar">
+        <div class="canvas-bar-title" id="canvas-title">mousePressed: fires once per click</div>
+        <div class="canvas-bar-sub" id="canvas-sub">Click anywhere in the canvas to place a shape.</div>
       </div>
-<div class="row">
-        <button id="mode-mouse" class="active">Mouse Position</button>
-        <button id="mode-click">Click Event</button>
-        <button id="mode-key">Key Event</button>
-        <button id="mode-hold">Held Keys</button>
-        <button id="mode-state">Input Changes State</button>
-        <button id="simulate-click-button">Simulate Click</button>
-        <button id="simulate-key-button">Simulate Key</button>
-        <button id="reset-button">Reset</button>
-        <span id="mode-pill" class="pill">mouseX and mouseY update continuously</span>
+      <div class="canvas-wrap">
+        <canvas id="events-canvas" width="620" height="380" aria-label="Interactive events concept bridge"></canvas>
+        <div class="touch-hint">Tap the canvas to trigger events.</div>
       </div>
-
-      <div class="row">
-        <div class="slider-wrap">
-          <label for="speed-slider">Move speed</label>
-          <input id="speed-slider" type="range" min="1" max="10" value="4" step="1" />
-          <span id="speed-value" class="value-label">4</span>
+    </article>
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="Event type tabs">
+        <button class="tab" role="tab" data-mode="pressed" aria-selected="true" tabindex="0">Pressed<span class="step">1 of 4</span></button>
+        <button class="tab" role="tab" data-mode="moved" aria-selected="false" tabindex="-1">Moved<span class="step">2 of 4</span></button>
+        <button class="tab" role="tab" data-mode="key" aria-selected="false" tabindex="-1">Key<span class="step">3 of 4</span></button>
+        <button class="tab" role="tab" data-mode="released" aria-selected="false" tabindex="-1">Released<span class="step">4 of 4</span></button>
+      </nav>
+      <div id="bridge-panel" role="tabpanel" aria-live="polite">
+        <div class="predict">
+          <span class="box-label">Predict before interacting</span>
+          <span class="box-body" id="predict-text">If you hold the mouse button and drag — how many times do you think mousePressed() fires?</span>
         </div>
-        <div class="slider-wrap">
-          <label for="size-slider">Player size</label>
-          <input id="size-slider" type="range" min="20" max="90" value="48" step="1" />
-          <span id="size-value" class="value-label">48</span>
+        <div class="ctrl-group" id="controls"></div>
+        <div id="presets-area"></div>
+        <div class="code-section">
+          <div class="code-header"><span>Live code</span><span id="code-note">Event fires once per action.</span></div>
+          <div class="code-focus-line mono" id="focus-code"></div>
+          <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false">▸ See full p5.js sketch</button>
+          <div class="full-code-body mono" id="full-code"></div>
         </div>
-        <div class="slider-wrap">
-          <label for="trail-slider">Trail length</label>
-          <input id="trail-slider" type="range" min="0" max="80" value="30" step="1" />
-          <span id="trail-value" class="value-label">30</span>
-        </div>
+        <div class="callout big-idea"><span class="box-label">Big idea</span><span class="box-body" id="big-idea-text"></span></div>
+        <div class="callout bug"><span class="box-label">⚠ Common mistake</span><span class="box-body" id="bug-text"></span></div>
+        <div class="callout try"><span class="box-label">Try this</span><span class="box-body" id="try-text"></span></div>
       </div>
-
-      <div class="row">
-        <span class="preset-label">Try on canvas:</span>
-        <span class="pill">move mouse</span>
-        <span class="pill">click</span>
-        <span class="pill">press any key</span>
-        <span class="pill">hold arrow keys or WASD</span>
-        <button id="simulate-space-button" style="display:none">Simulate Space</button>
-        <button id="simulate-esc-button" style="display:none">Simulate Esc</button>
-        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
-      </div>
-    </section>
-
-    <section class="workspace">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        mouseX and mouseY are always available in draw(). They update continuously as the mouse moves.
-      </div>
-    </section>
-
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">Continuous input updates every frame</h2>
-        <p id="lesson-text">
-          mouseX and mouseY are variables that p5.js updates automatically. draw() can use them every frame to make the sketch follow the pointer.
-        </p>
-        <span id="formula-box" class="formula">circle(mouseX, mouseY, 40);</span>
-      </section>
-
-      <section class="card">
-        <h3>Big idea</h3>
-        <p><strong>Continuous input:</strong> values available every frame, like mouseX.</p>
-        <p><strong>Event function:</strong> runs once when something happens, like mousePressed().</p>
-        <p><strong>Held input:</strong> checked every frame with keyIsDown().</p>
-      </section>
-
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch mouse"></span><span>continuous mouse input</span></div>
-          <div class="legend-item"><span class="swatch click"></span><span>click event</span></div>
-          <div class="legend-item"><span class="swatch key"></span><span>key event</span></div>
-          <div class="legend-item"><span class="swatch hold"></span><span>held key movement</span></div>
-          <div class="legend-item"><span class="swatch state"></span><span>input changes state</span></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">Move the mouse across the canvas. Which numbers change every frame?</p>
-      </section>
-
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code id="code-box">function draw() {
-  circle(mouseX, mouseY, 40);
-}</code></pre>
-        <p class="note">
-          A common game pattern: use keyPressed() for one-time actions like jump or start, and keyIsDown() for continuous movement.
-        </p>
-      </section>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    const state = {
-      mode: "mouse",
-      speed: 4,
-      size: 48,
-      trailLength: 30,
-      showLabels: true,
-      showCode: false,
-      pointerX: 360,
-      pointerY: 250,
-      playerX: 360,
-      playerY: 260,
-      clickCount: 0,
-      lastClickX: 360,
-      lastClickY: 260,
-      lastKey: "none",
-      keyCount: 0,
-      gameState: "title",
-      gameCircles: [],
-      cursorBlink: true,
-      trail: [],
-      clickBursts: []
+  <section class="prose-section">
+    <h2 id="prose-title">Events fire once; draw() runs forever</h2>
+    <p id="prose-body">In p5.js, draw() runs 60 times per second no matter what. Event functions run only when something happens. mousePressed() fires once when the mouse button goes down — not 60 times per second, just once. Use events to record moments. Use draw() to display them.</p>
+  </section>
+
+  <div class="legend">
+    <div class="legend-item"><span class="swatch" style="background:#4a7c8a"></span> click point</div>
+    <div class="legend-item"><span class="swatch" style="background:#e8a838"></span> event flash</div>
+    <div class="legend-item"><span class="swatch" style="background:#90c4cc"></span> mouse trail</div>
+    <div class="legend-item"><span class="swatch" style="background:#7c8a4a"></span> key press</div>
+    <div class="legend-item"><span class="swatch" style="background:#a888cc"></span> drag line</div>
+  </div>
+
+  <section class="pathways">
+    <div class="pathways-title">What's next</div>
+    <div class="path-links">
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
+        <span class="path-link-type">Practice →</span>
+        <span class="path-link-name">Open the tools library and look for interactive or event-driven tools</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
+        <span class="path-link-type">Remix →</span>
+        <span class="path-link-name">Take a starter sketch and add mousePressed() to change color or shape on click</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/state-machines-sketches-have-modes/" class="path-link">
+        <span class="path-link-type">Related →</span>
+        <span class="path-link-name">State Machines: Sketches Have Modes — use events to trigger mode changes</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+    </div>
+  </section>
+
+  <nav class="bottom-nav">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/vectors-arrows-that-store-motion/">Next: Vectors: Arrows That Store Motion →</a>
+  </nav>
+</main>
+
+<script>
+'use strict';
+
+const canvas = document.getElementById('events-canvas');
+const ctx = canvas.getContext('2d');
+
+// HiDPI setup
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
+const CW = 620;
+const CH = 380;
+canvas.width = CW * DPR;
+canvas.height = CH * DPR;
+canvas.style.width = CW + 'px';
+canvas.style.height = CH + 'px';
+ctx.scale(DPR, DPR);
+
+const state = {
+  mode: 'pressed',
+  clicks: [],
+  trail: [],
+  dragStart: null,
+  lines: [],
+  lastKey: '',
+  lastKeyCode: null,
+  keyHistory: [],
+  shapeSize: 28,
+  trailMax: 60,
+  strokeWeight: 3
+};
+
+const COLORS = ['#4a7c8a', '#e8a838', '#7c8a4a', '#a888cc', '#cc5050', '#3a8a6a', '#8a4a4a', '#4a608a'];
+let colorIdx = 0;
+let isDown = false;
+let currentMouse = { x: 0, y: 0 };
+
+const modeData = {
+  pressed: {
+    title: 'mousePressed: fires once per click',
+    sub: 'Click anywhere in the canvas to place a shape.',
+    predict: 'If you hold the mouse button and drag — how many times do you think mousePressed() fires?',
+    big: 'mousePressed() fires exactly once when the button goes down — not every frame. Store what happened; draw() will display it.',
+    bug: 'Using if(mouseIsPressed) inside draw() fires 60 times per second while held. That is 60 shapes per second, not one per click.',
+    tryIt: 'Click 5 times in different spots. Now hold the button and drag. How many shapes appear compared to tapping quickly?',
+    note: 'One call per click, stored in an array.',
+    focusHTML: '<span class="ct kw">function</span> <span class="ct fn">mousePressed</span>() {<br>&nbsp;&nbsp;circles.<span class="ct fn">push</span>({x: mouseX, y: mouseY});<br>}',
+    fullCode: 'let circles = [];\n\nfunction setup() {\n  createCanvas(620, 380);\n}\n\nfunction draw() {\n  background(245, 241, 232);\n  for (let c of circles) {\n    fill(c.color);\n    stroke(30);\n    strokeWeight(2);\n    circle(c.x, c.y, c.r * 2);\n  }\n}\n\nfunction mousePressed() {\n  circles.push({\n    x: mouseX,\n    y: mouseY,\n    r: 28,\n    color: color(74, 124, 138)\n  });\n}'
+  },
+  moved: {
+    title: 'mouseMoved: fires while mouse moves',
+    sub: 'Move the mouse over the canvas to leave a trail.',
+    predict: 'Does mouseMoved() fire when a mouse button is held down and you drag?',
+    big: 'mouseMoved() gives you the current mouse position on every frame a position change is detected. Use it for trails and hover effects.',
+    bug: 'mouseMoved() does NOT fire while a button is held — use mouseDragged() for drag behavior. They are separate events.',
+    tryIt: 'Move the mouse very slowly, then very fast. Does the trail gap change? What does that tell you about when the event fires?',
+    note: 'Fires on position change, not button state.',
+    focusHTML: '<span class="ct kw">function</span> <span class="ct fn">mouseMoved</span>() {<br>&nbsp;&nbsp;trail.<span class="ct fn">push</span>({ x: mouseX, y: mouseY });<br>&nbsp;&nbsp;<span class="ct kw">if</span> (trail.length &gt; 60) trail.<span class="ct fn">shift</span>();<br>}',
+    fullCode: 'let trail = [];\n\nfunction setup() {\n  createCanvas(620, 380);\n}\n\nfunction draw() {\n  background(245, 241, 232);\n  for (let i = 1; i < trail.length; i++) {\n    let t = i / trail.length;\n    stroke(74, 124, 138, t * 230);\n    strokeWeight(1 + t * 3);\n    line(\n      trail[i-1].x, trail[i-1].y,\n      trail[i].x,   trail[i].y\n    );\n  }\n}\n\n// mouseMoved fires only when button is NOT held\nfunction mouseMoved() {\n  trail.push({ x: mouseX, y: mouseY });\n  if (trail.length > 60) trail.shift();\n}'
+  },
+  key: {
+    title: 'keyPressed: fires once per key down',
+    sub: 'Click the canvas to focus it, then press any key.',
+    predict: 'If you hold a key down — does keyPressed() fire once or repeatedly?',
+    big: 'keyPressed() fires once when a key is pressed down. The key variable holds the character; keyCode holds the numeric code for special keys.',
+    bug: 'keyPressed() only fires when the canvas (or page) has focus. Clicking outside the canvas may cause key events to stop registering.',
+    tryIt: 'Press the arrow keys. What keyCode values appear? Try Space (32), Enter (13), Escape (27).',
+    note: 'key = character, keyCode = number.',
+    focusHTML: '<span class="ct kw">function</span> <span class="ct fn">keyPressed</span>() {<br>&nbsp;&nbsp;<span class="ct kw">if</span> (key === <span class="ct str" id="v-key">\'?\'</span>) { ... }<br>}',
+    fullCode: 'function setup() {\n  createCanvas(620, 380);\n}\n\nfunction draw() {\n  // display is handled reactively in keyPressed\n}\n\nfunction keyPressed() {\n  // key holds a string: "a", "A", "Enter", " "...\n  // keyCode holds a number: 65, 13, 32...\n\n  if (key === \'c\') {\n    background(245); // clear canvas on c\n  }\n  if (keyCode === LEFT_ARROW) {\n    x -= 10;\n  }\n  if (keyCode === RIGHT_ARROW) {\n    x += 10;\n  }\n  // Return false to prevent default browser behavior\n  // (e.g. arrow keys scrolling the page)\n  return false;\n}'
+  },
+  released: {
+    title: 'mouseReleased: fires when button lifts',
+    sub: 'Click and drag to draw a line. It commits on release.',
+    predict: 'If you press, drag far, then release — when does the line appear?',
+    big: 'mouseReleased() fires once when the button lifts. Pair it with mousePressed() to measure drag distance or commit a gesture.',
+    bug: 'Without drawing a preview during the drag, interactions feel unresponsive. Show a "ghost" line in draw() while the button is held.',
+    tryIt: 'Draw several lines from the same start point. Now draw a closed shape by releasing back near the start.',
+    note: 'Commit a gesture on button release.',
+    focusHTML: '<span class="ct kw">function</span> <span class="ct fn">mouseReleased</span>() {<br>&nbsp;&nbsp;lines.<span class="ct fn">push</span>({x1, y1, x2: mouseX, y2: mouseY});<br>}',
+    fullCode: 'let lines = [];\nlet start = null;\n\nfunction setup() {\n  createCanvas(620, 380);\n}\n\nfunction draw() {\n  background(245, 241, 232);\n  for (let l of lines) {\n    stroke(168, 136, 204);\n    strokeWeight(3);\n    line(l.x1, l.y1, l.x2, l.y2);\n  }\n  // Ghost preview while dragging\n  if (mouseIsPressed && start) {\n    stroke(168, 136, 204, 100);\n    setLineDash([6, 4]);\n    line(start.x, start.y, mouseX, mouseY);\n    setLineDash([]);\n  }\n}\n\nfunction mousePressed() {\n  start = { x: mouseX, y: mouseY };\n}\n\nfunction mouseReleased() {\n  if (start) {\n    lines.push({\n      x1: start.x, y1: start.y,\n      x2: mouseX,  y2: mouseY\n    });\n    start = null;\n  }\n}'
+  }
+};
+
+// ── drawing ──────────────────────────────────────────────────────────────────
+
+function drawGrid(spacing, alpha) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,0,0,' + alpha + ')';
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= CW; x += spacing) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, CH); ctx.stroke();
+  }
+  for (let y = 0; y <= CH; y += spacing) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function clearCanvas() {
+  ctx.fillStyle = '#f5f0e8';
+  ctx.fillRect(0, 0, CW, CH);
+}
+
+function drawPressedMode() {
+  clearCanvas();
+  drawGrid(32, 0.04);
+
+  state.clicks.forEach(function(c, i) {
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+    ctx.fillStyle = c.color + 'cc';
+    ctx.fill();
+    ctx.strokeStyle = c.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 11px "DM Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(i + 1, c.x, c.y);
+  });
+
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.font = 'bold 13px "DM Sans", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('Clicks: ' + state.clicks.length, 12, 10);
+
+  if (state.clicks.length === 0) {
+    ctx.fillStyle = '#9e9789';
+    ctx.font = '14px "DM Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Click anywhere to place a shape', CW / 2, CH / 2);
+  }
+}
+
+function drawMovedMode() {
+  clearCanvas();
+
+  if (state.trail.length < 2) {
+    ctx.fillStyle = '#9e9789';
+    ctx.font = '14px "DM Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Move your mouse over this area', CW / 2, CH / 2);
+    return;
+  }
+
+  for (var i = 1; i < state.trail.length; i++) {
+    var t = i / state.trail.length;
+    ctx.beginPath();
+    ctx.moveTo(state.trail[i - 1].x, state.trail[i - 1].y);
+    ctx.lineTo(state.trail[i].x, state.trail[i].y);
+    ctx.strokeStyle = 'rgba(74,124,138,' + (t * 0.9) + ')';
+    ctx.lineWidth = 1 + t * 3;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+
+  var last = state.trail[state.trail.length - 1];
+  ctx.beginPath();
+  ctx.arc(last.x, last.y, 5, 0, Math.PI * 2);
+  ctx.fillStyle = '#4a7c8a';
+  ctx.fill();
+
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.font = 'bold 12px "DM Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('mouseX: ' + Math.round(last.x) + '  mouseY: ' + Math.round(last.y), 10, 10);
+  ctx.font = '11px "DM Mono", monospace';
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillText('Trail: ' + state.trail.length + ' / ' + state.trailMax + ' points', 10, 26);
+}
+
+function drawKeyMode() {
+  ctx.fillStyle = '#e8f3f5';
+  ctx.fillRect(0, 0, CW, CH);
+
+  if (state.lastKey) {
+    ctx.fillStyle = 'rgba(74,124,138,0.08)';
+    ctx.fillRect(0, 0, CW, CH);
+
+    ctx.font = 'bold 80px "DM Sans", sans-serif';
+    ctx.fillStyle = '#4a7c8a';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(state.lastKey, CW / 2, 150);
+
+    ctx.font = '12px "DM Mono", monospace';
+    ctx.fillStyle = '#6d675f';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('key="' + state.lastKey + '"  keyCode=' + (state.lastKeyCode !== null ? state.lastKeyCode : '?'), CW / 2, 230);
+  } else {
+    ctx.font = '16px "DM Sans", sans-serif';
+    ctx.fillStyle = '#9e9789';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Click here, then press a key', CW / 2, CH / 2 - 24);
+    ctx.font = '12px "DM Sans", sans-serif';
+    ctx.fillStyle = '#b0aa9e';
+    ctx.fillText('(arrow keys, letters, numbers, space...)', CW / 2, CH / 2 + 4);
+  }
+
+  if (state.keyHistory.length > 0) {
+    ctx.font = 'bold 11px "DM Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#2e5663';
+    ctx.fillText('Key history:', 14, 290);
+    var recent = state.keyHistory.slice(-8);
+    recent.forEach(function(k, i) {
+      var alpha = (i + 1) / recent.length;
+      ctx.fillStyle = 'rgba(46,86,99,' + alpha + ')';
+      ctx.fillText(k, 14 + i * 70, 308);
+    });
+  }
+}
+
+function drawReleasedMode() {
+  clearCanvas();
+  drawGrid(40, 0.04);
+
+  var sw = state.strokeWeight;
+
+  state.lines.forEach(function(l) {
+    ctx.beginPath();
+    ctx.moveTo(l.x1, l.y1);
+    ctx.lineTo(l.x2, l.y2);
+    ctx.strokeStyle = '#a888cc';
+    ctx.lineWidth = sw;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    ctx.beginPath(); ctx.arc(l.x1, l.y1, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#4a7c8a'; ctx.fill();
+    ctx.beginPath(); ctx.arc(l.x2, l.y2, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#e8a838'; ctx.fill();
+  });
+
+  if (state.dragStart && isDown) {
+    ctx.beginPath();
+    ctx.moveTo(state.dragStart.x, state.dragStart.y);
+    ctx.lineTo(currentMouse.x, currentMouse.y);
+    ctx.strokeStyle = 'rgba(168,136,204,0.45)';
+    ctx.lineWidth = sw;
+    ctx.lineCap = 'round';
+    ctx.setLineDash([6, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    var dx = currentMouse.x - state.dragStart.x;
+    var dy = currentMouse.y - state.dragStart.y;
+    var dist = Math.round(Math.sqrt(dx * dx + dy * dy));
+    var mx = (state.dragStart.x + currentMouse.x) / 2;
+    var my = (state.dragStart.y + currentMouse.y) / 2;
+    ctx.fillStyle = 'rgba(46,86,99,0.85)';
+    ctx.font = 'bold 11px "DM Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(dist + 'px', mx, my - 4);
+  }
+
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.font = 'bold 12px "DM Sans", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('Lines: ' + state.lines.length, 12, 10);
+
+  if (state.lines.length === 0 && !isDown) {
+    ctx.fillStyle = '#9e9789';
+    ctx.font = '14px "DM Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Click and drag to draw a line', CW / 2, CH / 2);
+  }
+}
+
+function draw() {
+  if (state.mode === 'pressed') drawPressedMode();
+  else if (state.mode === 'moved') drawMovedMode();
+  else if (state.mode === 'key') drawKeyMode();
+  else if (state.mode === 'released') drawReleasedMode();
+}
+
+// ── UI ───────────────────────────────────────────────────────────────────────
+
+function buildControls() {
+  var cg = document.getElementById('controls');
+  cg.innerHTML = '';
+
+  if (state.mode === 'pressed') {
+    cg.innerHTML =
+      '<div class="ctrl-row">' +
+        '<label>Shape size<small>Radius of placed circles</small></label>' +
+        '<span class="val-badge" id="sz-badge">' + state.shapeSize + '</span>' +
+        '<input type="range" id="sz-slider" min="8" max="60" value="' + state.shapeSize + '" aria-label="Shape size">' +
+        '<button class="preset-btn" id="clear-btn" style="grid-column:1/-1;margin-top:4px">Clear canvas</button>' +
+      '</div>';
+    document.getElementById('sz-slider').addEventListener('input', function(e) {
+      state.shapeSize = +e.target.value;
+      document.getElementById('sz-badge').textContent = state.shapeSize;
+    });
+    document.getElementById('clear-btn').addEventListener('click', function() {
+      state.clicks = []; colorIdx = 0; draw();
+    });
+
+  } else if (state.mode === 'moved') {
+    cg.innerHTML =
+      '<div class="ctrl-row">' +
+        '<label>Trail length<small>How many positions to remember</small></label>' +
+        '<span class="val-badge" id="tl-badge">' + state.trailMax + '</span>' +
+        '<input type="range" id="tl-slider" min="10" max="200" value="' + state.trailMax + '" aria-label="Trail length">' +
+        '<button class="preset-btn" id="clear-trail" style="grid-column:1/-1;margin-top:4px">Clear trail</button>' +
+      '</div>';
+    document.getElementById('tl-slider').addEventListener('input', function(e) {
+      state.trailMax = +e.target.value;
+      document.getElementById('tl-badge').textContent = state.trailMax;
+    });
+    document.getElementById('clear-trail').addEventListener('click', function() {
+      state.trail = []; draw();
+    });
+
+  } else if (state.mode === 'key') {
+    cg.innerHTML =
+      '<p style="font-size:0.82rem;color:var(--muted);padding:8px 0">Click the canvas then press any key to register it. Arrow keys, letters, numbers, and special keys all work.</p>';
+
+  } else if (state.mode === 'released') {
+    cg.innerHTML =
+      '<div class="ctrl-row">' +
+        '<label>Stroke weight<small>Line thickness in pixels</small></label>' +
+        '<span class="val-badge" id="sw-badge">' + state.strokeWeight + '</span>' +
+        '<input type="range" id="sw-slider" min="1" max="12" value="' + state.strokeWeight + '" aria-label="Stroke weight">' +
+        '<button class="preset-btn" id="clear-lines" style="grid-column:1/-1;margin-top:4px">Clear lines</button>' +
+      '</div>';
+    document.getElementById('sw-slider').addEventListener('input', function(e) {
+      state.strokeWeight = +e.target.value;
+      document.getElementById('sw-badge').textContent = state.strokeWeight;
+      draw();
+    });
+    document.getElementById('clear-lines').addEventListener('click', function() {
+      state.lines = []; state.dragStart = null; draw();
+    });
+  }
+}
+
+function updateUI() {
+  var m = modeData[state.mode];
+  document.getElementById('canvas-title').textContent = m.title;
+  document.getElementById('canvas-sub').textContent = m.sub;
+  document.getElementById('predict-text').textContent = m.predict;
+  document.getElementById('big-idea-text').textContent = m.big;
+  document.getElementById('bug-text').textContent = m.bug;
+  document.getElementById('try-text').textContent = m.tryIt;
+  document.getElementById('code-note').textContent = m.note;
+  document.getElementById('focus-code').innerHTML = m.focusHTML;
+  document.getElementById('full-code').textContent = m.fullCode;
+  document.querySelectorAll('.tab').forEach(function(t) {
+    var active = t.dataset.mode === state.mode;
+    t.setAttribute('aria-selected', active ? 'true' : 'false');
+    t.tabIndex = active ? 0 : -1;
+  });
+}
+
+function setMode(mode) {
+  state.mode = mode;
+  if (mode === 'pressed') { state.clicks = []; colorIdx = 0; }
+  if (mode === 'moved') { state.trail = []; }
+  if (mode === 'key') { state.lastKey = ''; state.lastKeyCode = null; state.keyHistory = []; }
+  if (mode === 'released') { state.lines = []; state.dragStart = null; }
+  isDown = false;
+  updateUI();
+  buildControls();
+  draw();
+}
+
+// ── pointer ──────────────────────────────────────────────────────────────────
+
+function getPos(e) {
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = CW / rect.width;
+  var scaleY = CH / rect.height;
+  if (e.touches && e.touches.length) {
+    return {
+      x: (e.touches[0].clientX - rect.left) * scaleX,
+      y: (e.touches[0].clientY - rect.top) * scaleY
     };
+  }
+  return {
+    x: (e.clientX - rect.left) * scaleX,
+    y: (e.clientY - rect.top) * scaleY
+  };
+}
 
-    const els = {};
+canvas.addEventListener('mousedown', function(e) {
+  isDown = true;
+  var pos = getPos(e);
+  currentMouse = pos;
+  if (state.mode === 'pressed') {
+    state.clicks.push({ x: pos.x, y: pos.y, r: state.shapeSize, color: COLORS[colorIdx % COLORS.length] });
+    colorIdx++;
+    draw();
+  } else if (state.mode === 'released') {
+    state.dragStart = { x: pos.x, y: pos.y };
+    draw();
+  }
+});
 
-    function setupUI() {
-      els.modeMouse = document.querySelector("#mode-mouse");
-      els.modeClick = document.querySelector("#mode-click");
-      els.modeKey = document.querySelector("#mode-key");
-      els.modeHold = document.querySelector("#mode-hold");
-      els.modeState = document.querySelector("#mode-state");
-      els.simulateClickButton = document.querySelector("#simulate-click-button");
-      els.simulateKeyButton = document.querySelector("#simulate-key-button");
-      els.resetButton = document.querySelector("#reset-button");
-      els.modePill = document.querySelector("#mode-pill");
-      els.speedSlider = document.querySelector("#speed-slider");
-      els.sizeSlider = document.querySelector("#size-slider");
-      els.trailSlider = document.querySelector("#trail-slider");
-      els.speedValue = document.querySelector("#speed-value");
-      els.sizeValue = document.querySelector("#size-value");
-      els.trailValue = document.querySelector("#trail-value");
-      els.showLabels = document.querySelector("#show-labels");
-      els.showCode = document.querySelector("#show-code");
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.formulaBox = document.querySelector("#formula-box");
-      els.questionText = document.querySelector("#question-text");
-      els.caption = document.querySelector("#canvas-caption");
-      els.codeCard = document.querySelector("#code-card");
-      els.codeBox = document.querySelector("#code-box");
+canvas.addEventListener('mousemove', function(e) {
+  var pos = getPos(e);
+  currentMouse = pos;
+  if (state.mode === 'moved' && !isDown) {
+    state.trail.push(pos);
+    if (state.trail.length > state.trailMax) state.trail.shift();
+    draw();
+  } else if (state.mode === 'released' && isDown) {
+    draw();
+  }
+});
 
-      els.simulateSpaceButton = document.querySelector("#simulate-space-button");
-      els.simulateEscButton = document.querySelector("#simulate-esc-button");
-
-      els.modeMouse.addEventListener("click", () => setMode("mouse"));
-      els.modeClick.addEventListener("click", () => setMode("click"));
-      els.modeKey.addEventListener("click", () => setMode("key"));
-      els.modeHold.addEventListener("click", () => setMode("hold"));
-      els.modeState.addEventListener("click", () => setMode("state"));
-
-      els.simulateClickButton.addEventListener("click", () => registerClick(state.pointerX, state.pointerY));
-      els.simulateKeyButton.addEventListener("click", () => registerKey("A"));
-
-      els.simulateSpaceButton.addEventListener("click", () => {
-        if (state.mode === "state" && state.gameState === "title") {
-          state.gameState = "play";
-          state.gameCircles = [];
-          updateUI();
-        }
-      });
-      els.simulateEscButton.addEventListener("click", () => {
-        if (state.mode === "state" && state.gameState === "play") {
-          state.gameState = "title";
-          updateUI();
-        }
-      });
-
-      els.resetButton.addEventListener("click", () => {
-        state.playerX = 360;
-        state.playerY = 260;
-        state.clickCount = 0;
-        state.keyCount = 0;
-        state.lastKey = "none";
-        state.gameState = "title";
-        state.gameCircles = [];
-        state.trail = [];
-        state.clickBursts = [];
-        updateUI();
-      });
-
-      els.speedSlider.addEventListener("input", () => { state.speed = Number(els.speedSlider.value); updateUI(); });
-      els.sizeSlider.addEventListener("input", () => { state.size = Number(els.sizeSlider.value); updateUI(); });
-      els.trailSlider.addEventListener("input", () => { state.trailLength = Number(els.trailSlider.value); updateUI(); });
-      els.showLabels.addEventListener("change", () => { state.showLabels = els.showLabels.checked; });
-      els.showCode.addEventListener("change", () => { state.showCode = els.showCode.checked; updateUI(); });
-
-      updateUI();
+canvas.addEventListener('mouseup', function(e) {
+  var pos = getPos(e);
+  if (state.mode === 'released' && state.dragStart && isDown) {
+    var dx = pos.x - state.dragStart.x;
+    var dy = pos.y - state.dragStart.y;
+    if (Math.sqrt(dx * dx + dy * dy) > 3) {
+      state.lines.push({ x1: state.dragStart.x, y1: state.dragStart.y, x2: pos.x, y2: pos.y });
     }
+    state.dragStart = null;
+  }
+  isDown = false;
+  draw();
+});
 
-    function setMode(mode) { state.mode = mode; updateUI(); }
+canvas.addEventListener('mouseleave', function() {
+  if (state.mode === 'released' && isDown) {
+    isDown = false;
+    state.dragStart = null;
+    draw();
+  } else {
+    isDown = false;
+  }
+});
 
-    function registerClick(x, y) {
-      state.clickCount += 1;
-      state.lastClickX = x;
-      state.lastClickY = y;
-      state.clickBursts.push({ x, y, age: 0 });
-      if (state.mode === "state") {
-        if (state.gameState === "play") {
-          // add colored circle in play mode
-          state.gameCircles.push({ x, y, r: Math.random()*30+18, hue: Math.floor(Math.random()*360) });
-        }
-      }
-      updateUI();
+canvas.addEventListener('touchstart', function(e) {
+  e.preventDefault();
+  var t = e.touches[0];
+  canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: t.clientX, clientY: t.clientY }));
+}, { passive: false });
+
+canvas.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+  var t = e.touches[0];
+  canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: t.clientX, clientY: t.clientY }));
+}, { passive: false });
+
+canvas.addEventListener('touchend', function(e) {
+  e.preventDefault();
+  var t = e.changedTouches[0];
+  if (t) canvas.dispatchEvent(new MouseEvent('mouseup', { clientX: t.clientX, clientY: t.clientY }));
+}, { passive: false });
+
+// ── keyboard ─────────────────────────────────────────────────────────────────
+
+document.addEventListener('keydown', function(e) {
+  if (state.mode !== 'key') return;
+  var display = e.key;
+  if (display === ' ') display = 'Space';
+  if (display === 'Enter') display = '↵';
+  if (display === 'ArrowLeft') display = '←';
+  if (display === 'ArrowRight') display = '→';
+  if (display === 'ArrowUp') display = '↑';
+  if (display === 'ArrowDown') display = '↓';
+  if (display === 'Escape') display = 'Esc';
+  if (display === 'Backspace') display = '⌫';
+  if (display === 'Tab') { display = 'Tab'; e.preventDefault(); }
+
+  state.lastKey = display;
+  state.lastKeyCode = e.keyCode;
+  state.keyHistory.push(display);
+  if (state.keyHistory.length > 8) state.keyHistory.shift();
+
+  var vk = document.getElementById('v-key');
+  if (vk) {
+    vk.textContent = "'" + display + "'";
+    vk.classList.add('flash');
+    setTimeout(function() { vk.classList.remove('flash'); }, 500);
+  }
+
+  draw();
+});
+
+// ── tab nav ──────────────────────────────────────────────────────────────────
+
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() { setMode(tab.dataset.mode); });
+  tab.addEventListener('keydown', function(e) {
+    var tabs = Array.from(document.querySelectorAll('.tab'));
+    var idx = tabs.indexOf(tab);
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      var next = tabs[(idx + 1) % tabs.length];
+      next.focus(); setMode(next.dataset.mode);
     }
-
-    function registerKey(k) {
-      state.keyCount += 1;
-      state.lastKey = k || "unknown";
-      if (state.mode === "state") {
-        // handled in p5 keyPressed
-      }
-      updateUI();
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      var prev = tabs[(idx - 1 + tabs.length) % tabs.length];
+      prev.focus(); setMode(prev.dataset.mode);
     }
-
-    function updateUI() {
-      const buttons = [[els.modeMouse,"mouse"],[els.modeClick,"click"],[els.modeKey,"key"],[els.modeHold,"hold"],[els.modeState,"state"]];
-      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
-
-      // Show/hide state-mode specific buttons
-      els.simulateSpaceButton.style.display = (state.mode === "state" && state.gameState === "title") ? "" : "none";
-      els.simulateEscButton.style.display = (state.mode === "state" && state.gameState === "play") ? "" : "none";
-
-      els.speedSlider.value = state.speed;
-      els.sizeSlider.value = state.size;
-      els.trailSlider.value = state.trailLength;
-      els.speedValue.textContent = String(state.speed);
-      els.sizeValue.textContent = String(state.size);
-      els.trailValue.textContent = String(state.trailLength);
-      els.showLabels.checked = state.showLabels;
-      els.showCode.checked = state.showCode;
-      els.codeCard.classList.toggle("visible", state.showCode);
-
-      const lessons = {
-        mouse: {
-          pill: "mouseX and mouseY update continuously",
-          title: "Continuous input updates every frame",
-          text: "mouseX and mouseY are variables that p5.js updates automatically. draw() can use them every frame to make the sketch follow the pointer.",
-          formula: "circle(mouseX, mouseY, 40);",
-          question: "Move the mouse across the canvas. Which numbers change every frame?",
-          caption: "mouseX and mouseY are always available in draw(). They update continuously as the mouse moves.",
-          code: `function draw() {\n  background(240);\n  circle(mouseX, mouseY, ${state.size});\n}`
-        },
-        click: {
-          pill: "mousePressed() runs once per click",
-          title: "A click is an event",
-          text: "mousePressed() does not run every frame. It runs once when the mouse is pressed, which makes it useful for adding objects, changing states, or counting clicks.",
-          formula: "function mousePressed() {\n  clickCount++;\n}",
-          question: "Why does the click count change once instead of every frame?",
-          caption: "mousePressed() is an event function. It waits, then runs once when the click happens.",
-          code: `let clickCount = 0;\n\nfunction mousePressed() {\n  clickCount++;\n  lastClickX = mouseX;\n  lastClickY = mouseY;\n}`
-        },
-        key: {
-          pill: "keyPressed() runs once per key press",
-          title: "A key press is an event",
-          text: "keyPressed() runs once when a key is pressed. It is good for toggles, menus, jumping, resetting, or choosing modes.",
-          formula: "function keyPressed() {\n  lastKey = key;\n}",
-          question: "What kind of actions should happen once per key press?",
-          caption: "Press any key while the canvas is focused. keyPressed() remembers the latest key.",
-          code: `function keyPressed() {\n  if (key === "r") {\n    resetSketch();\n  }\n\n  if (key === " ") {\n    jump();\n  }\n}`
-        },
-        hold: {
-          pill: "keyIsDown() checks held keys every frame",
-          title: "Held keys are continuous input",
-          text: "keyIsDown() is checked inside draw(), so it can move something smoothly while a key is being held down.",
-          formula: "if (keyIsDown(LEFT_ARROW)) {\n  x -= speed;\n}",
-          question: "Why is keyIsDown() better than keyPressed() for smooth movement?",
-          caption: "Hold arrow keys or WASD. keyIsDown() keeps moving the player while the key is held.",
-          code: `function draw() {\n  if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {\n    x -= ${state.speed};\n  }\n  if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {\n    x += ${state.speed};\n  }\n}`
-        },
-        state: {
-          pill: `gameState = "${state.gameState}"`,
-          title: "Input changes the game state",
-          text: "A game uses a state variable like gameState to know what to draw. Space starts the game; Escape returns to the title. The draw() function checks gameState every frame.",
-          formula: `gameState = "${state.gameState}"`,
-          question: state.gameState === "title" ? "Press Space (or Simulate Space) to start the game. What changes?" : "Press Escape (or Simulate Esc) to return to title. What changes?",
-          caption: state.gameState === "title" ? 'gameState = "title" — press Space or click Simulate Space to transition to play.' : 'gameState = "play" — click to draw circles. Press Escape to return to title.',
-          code: `let gameState = "title";\n\nfunction keyPressed() {\n  if (key === ' ' && gameState === "title") gameState = "play";\n  if (keyCode === ESCAPE && gameState === "play") gameState = "title";\n}\n\nfunction draw() {\n  if (gameState === "title") drawTitleScreen();\n  if (gameState === "play") drawPlayScreen();\n}`
-        }
-      };
-
-      const lesson = lessons[state.mode];
-      els.modePill.textContent = lesson.pill;
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.formulaBox.textContent = lesson.formula;
-      els.questionText.textContent = lesson.question;
-      els.caption.textContent = lesson.caption;
-      els.codeBox.textContent = lesson.code;
+    if (e.key === 'Home') { e.preventDefault(); tabs[0].focus(); setMode(tabs[0].dataset.mode); }
+    if (e.key === 'End') {
+      e.preventDefault();
+      var last = tabs[tabs.length - 1];
+      last.focus(); setMode(last.dataset.mode);
     }
+  });
+});
 
-    setupUI();
+document.getElementById('fullCodeToggle').addEventListener('click', function() {
+  var body = document.getElementById('full-code');
+  var open = body.classList.toggle('open');
+  this.textContent = open ? '▾ Hide full sketch' : '▸ See full p5.js sketch';
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
 
-    const sketch = (p) => {
-      let canvas, holder, previousWidth = 0, previousHeight = 0;
+// ── init ─────────────────────────────────────────────────────────────────────
 
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive visualization of mouse and keyboard events in p5.js.");
-        canvas.elt.tabIndex = 0;
-        canvas.elt.addEventListener("click", () => canvas.elt.focus());
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
-      };
-
-      p.windowResized = () => resizeToHolder();
-
-      p.mousePressed = () => {
-        if (!insideCanvas()) return;
-        canvas.elt.focus();
-        if (state.mode === "state") {
-          if (state.gameState === "play") {
-            const s = getStage();
-            if (p.mouseX > s.x && p.mouseX < s.x + s.w && p.mouseY > s.y && p.mouseY < s.y + s.h) {
-              state.gameCircles.push({ x: p.mouseX, y: p.mouseY, r: Math.random()*28+14, hue: Math.floor(Math.random()*360) });
-              updateUI();
-            }
-          }
-        } else {
-          registerClick(p.mouseX, p.mouseY);
-        }
-        return false;
-      };
-
-      p.keyPressed = () => {
-        if (state.mode === "state") {
-          if (p.key === " " && state.gameState === "title") {
-            state.gameState = "play";
-            state.gameCircles = [];
-            updateUI();
-          } else if (p.keyCode === 27 && state.gameState === "play") {
-            // ESCAPE
-            state.gameState = "title";
-            updateUI();
-          }
-        } else {
-          registerKey(p.key === " " ? "space" : p.key);
-        }
-        return false;
-      };
-
-      p.draw = () => {
-        resizeToHolder();
-        updatePointer();
-        updateHeldKeys();
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-        drawPanelTitle();
-
-        if (state.mode === "mouse") drawMouseMode();
-        if (state.mode === "click") drawClickMode();
-        if (state.mode === "key") drawKeyMode();
-        if (state.mode === "hold") drawHoldMode();
-        if (state.mode === "state") drawStateMode();
-
-        drawReadoutCards();
-      };
-
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-        if (w !== previousWidth || h !== previousHeight) { p.resizeCanvas(w, h); previousWidth = w; previousHeight = h; }
-      }
-
-      function insideCanvas() {
-        return p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height;
-      }
-
-      function updatePointer() {
-        if (insideCanvas()) {
-          state.pointerX = p.mouseX;
-          state.pointerY = p.mouseY;
-          state.trail.push({ x: state.pointerX, y: state.pointerY });
-          while (state.trail.length > state.trailLength) state.trail.shift();
-        }
-      }
-
-      function updateHeldKeys() {
-        if (state.mode !== "hold") return;
-        let dx = 0;
-        let dy = 0;
-        if (p.keyIsDown(p.LEFT_ARROW) || p.keyIsDown(65)) dx -= state.speed;
-        if (p.keyIsDown(p.RIGHT_ARROW) || p.keyIsDown(68)) dx += state.speed;
-        if (p.keyIsDown(p.UP_ARROW) || p.keyIsDown(87)) dy -= state.speed;
-        if (p.keyIsDown(p.DOWN_ARROW) || p.keyIsDown(83)) dy += state.speed;
-        const s = getStage();
-        state.playerX = p.constrain(state.playerX + dx, s.x + state.size / 2 + 12, s.x + s.w - state.size / 2 - 12);
-        state.playerY = p.constrain(state.playerY + dy, s.y + state.size / 2 + 12, s.y + s.h - state.size / 2 - 12);
-      }
-
-      function drawSubtleGrid() {
-        p.push(); p.stroke(236,224,207); p.strokeWeight(1);
-        for (let x=0; x<p.width; x+=32) p.line(x,0,x,p.height);
-        for (let y=0; y<p.height; y+=32) p.line(0,y,p.width,y);
-        p.pop();
-      }
-
-      function drawPanelTitle() {
-        const titles = {
-          mouse:["Mouse Position","Continuous input values update every frame."],
-          click:["Click Event","mousePressed() runs once when a click happens."],
-          key:["Key Event","keyPressed() runs once when a key is pressed."],
-          hold:["Held Keys","keyIsDown() supports continuous movement."],
-          state:["Input Changes State", state.gameState === "title" ? 'gameState = "title" — press Space to play.' : 'gameState = "play" — click to draw. Esc to go back.']
-        };
-        const [title, subtitle] = titles[state.mode];
-        p.push(); p.noStroke(); p.fill("#222"); p.textStyle(p.BOLD); p.textSize(22); p.text(title,24,38); p.textStyle(p.NORMAL); p.textSize(14); p.fill("#6b6258"); p.text(subtitle,24,62); p.pop();
-      }
-
-      function getStage() { return { x:p.width*0.08, y:p.height*0.15, w:p.width*0.84, h:p.height*0.50 }; }
-      function drawStage() { const s=getStage(); p.push(); p.noStroke(); p.fill(255,255,255,235); p.rect(s.x,s.y,s.w,s.h,24); p.pop(); return s; }
-
-      function drawMouseMode() {
-        const s = drawStage();
-        drawTrail("#0891b2");
-        p.push();
-        p.noStroke();
-        p.fill("#0891b2");
-        p.circle(state.pointerX, state.pointerY, state.size);
-        p.fill("#ffffff");
-        p.circle(state.pointerX, state.pointerY, 10);
-        if (state.showLabels) {
-          drawLabel(`mouseX = ${Math.round(state.pointerX)}`, s.x + 28, s.y + 42, "#0891b2", 14);
-          drawLabel(`mouseY = ${Math.round(state.pointerY)}`, s.x + 28, s.y + 70, "#0891b2", 14);
-          drawLabel("draw() uses these values every frame", state.pointerX + 24, state.pointerY - 12, "#6b6258", 13);
-        }
-        p.pop();
-      }
-
-      function drawClickMode() {
-        const s = drawStage();
-        drawClickBursts();
-        p.push();
-        p.noStroke();
-        p.fill("#e11d48");
-        p.circle(state.lastClickX, state.lastClickY, state.size);
-        p.fill("#ffffff");
-        p.textAlign(p.CENTER, p.CENTER);
-        p.textStyle(p.BOLD);
-        p.textSize(18);
-        p.text(state.clickCount, state.lastClickX, state.lastClickY);
-        if (state.showLabels) {
-          drawLabel("click on the canvas", s.x + 28, s.y + 42, "#e11d48", 14);
-          drawLabel(`clickCount = ${state.clickCount}`, s.x + 28, s.y + 70, "#e11d48", 14);
-          drawLabel("event ran here", state.lastClickX + 28, state.lastClickY - 12, "#e11d48", 13);
-        }
-        p.pop();
-      }
-
-      function drawKeyMode() {
-        const s = drawStage();
-        drawKeyboard(s.x + s.w * 0.23, s.y + s.h * 0.35, s.w * 0.54, s.h * 0.34);
-        p.push();
-        if (state.showLabels) {
-          drawLabel("press any key while canvas is focused", s.x + 28, s.y + 42, "#7c3aed", 14);
-          drawLabel(`lastKey = ${state.lastKey}`, s.x + 28, s.y + 70, "#7c3aed", 14);
-          drawLabel(`key presses = ${state.keyCount}`, s.x + 28, s.y + 98, "#7c3aed", 14);
-        }
-        p.pop();
-      }
-
-      function drawHoldMode() {
-        const s = drawStage();
-        drawHeldKeyPanel(s.x + 28, s.y + 34, 210, 150);
-        drawPlayer(state.playerX, state.playerY, "#16a34a");
-        if (state.showLabels) drawLabel("hold arrow keys or WASD", state.playerX + 28, state.playerY - 10, "#16a34a", 13);
-      }
-
-      function drawStateMode() {
-        const s = drawStage();
-        const gs = state.gameState;
-        p.push();
-
-        if (gs === "title") {
-          // TITLE SCREEN: black bg
-          p.noStroke();
-          p.fill(10, 10, 20);
-          p.rect(s.x, s.y, s.w, s.h, 20);
-          p.fill(255);
-          p.textAlign(p.CENTER, p.CENTER);
-          p.textStyle(p.BOLD);
-          p.textSize(28);
-          p.text("TITLE SCREEN", s.x + s.w/2, s.y + s.h * 0.38);
-          p.textStyle(p.NORMAL);
-          p.textSize(16);
-          p.text("Press SPACE to Start", s.x + s.w/2, s.y + s.h * 0.56);
-          // blinking cursor
-          const blinkOn = Math.floor(p.millis() / 520) % 2 === 0;
-          if (blinkOn) {
-            p.fill(255, 255, 0);
-            p.textSize(20);
-            p.text("_", s.x + s.w/2 + 100, s.y + s.h * 0.56);
-          }
-          if (state.showLabels) {
-            drawLabel('gameState = "title"', s.x + 20, s.y + 26, "#7c3aed", 14);
-            drawLabel("press Space or Simulate Space", s.x + 20, s.y + 52, "#6b6258", 12);
-          }
-        } else {
-          // PLAY SCREEN: colored bg
-          p.noStroke();
-          p.fill(224, 242, 254);
-          p.rect(s.x, s.y, s.w, s.h, 20);
-          // draw all placed circles
-          for (const c of state.gameCircles) {
-            p.colorMode(p.HSB, 360, 100, 100);
-            p.fill(c.hue, 80, 90, 0.88);
-            p.colorMode(p.RGB, 255);
-            p.noStroke();
-            p.circle(c.x, c.y, c.r * 2);
-          }
-          if (state.showLabels) {
-            drawLabel('gameState = "play"', s.x + 20, s.y + 26, "#0891b2", 14);
-            drawLabel("click inside to draw shapes", s.x + 20, s.y + 52, "#6b6258", 12);
-            drawLabel("press Esc or Simulate Esc to return to title", s.x + 20, s.y + 76, "#6b6258", 12);
-          }
-        }
-        p.pop();
-      }
-
-      function drawTrail(color) {
-        p.push();
-        p.noStroke();
-        for (let i = 0; i < state.trail.length; i++) {
-          const pt = state.trail[i];
-          const alpha = p.map(i, 0, Math.max(1, state.trail.length - 1), 25, 150);
-          p.fill(color + Math.round(alpha).toString(16).padStart(2, "0"));
-          p.circle(pt.x, pt.y, p.map(i, 0, Math.max(1, state.trail.length - 1), 8, state.size * 0.65));
-        }
-        p.pop();
-      }
-
-      function drawClickBursts() {
-        p.push();
-        for (const burst of state.clickBursts) {
-          const r = 24 + burst.age * 2.8;
-          const alpha = Math.max(0, 180 - burst.age * 5);
-          p.noFill();
-          p.stroke(225, 29, 72, alpha);
-          p.strokeWeight(3);
-          p.circle(burst.x, burst.y, r);
-          burst.age += 1;
-        }
-        state.clickBursts = state.clickBursts.filter(b => b.age < 36);
-        p.pop();
-      }
-
-      function drawKeyboard(x, y, w, h) {
-        p.push();
-        p.noStroke();
-        p.fill("#f5f3ff");
-        p.rect(x, y, w, h, 20);
-        p.stroke("#7c3aed");
-        p.strokeWeight(3);
-        p.noFill();
-        p.rect(x, y, w, h, 20);
-        const keyW = w / 8;
-        const labels = ["Q", "W", "E", "R", "A", "S", "D", "space"];
-        for (let i = 0; i < labels.length; i++) {
-          const kx = x + 18 + (i % 4) * (keyW * 1.55);
-          const ky = y + 32 + Math.floor(i / 4) * 58;
-          const active = labels[i].toLowerCase() === String(state.lastKey).toLowerCase();
-          p.noStroke();
-          p.fill(active ? "#7c3aed" : "#ffffff");
-          p.rect(kx, ky, keyW, 38, 10);
-          p.fill(active ? "#ffffff" : "#7c3aed");
-          p.textAlign(p.CENTER, p.CENTER);
-          p.textStyle(p.BOLD);
-          p.textSize(labels[i] === "space" ? 11 : 16);
-          p.text(labels[i], kx + keyW / 2, ky + 19);
-        }
-        p.pop();
-      }
-
-      function drawHeldKeyPanel(x, y, w, h) {
-        const keys = [
-          { label:"↑ / W", down:p.keyIsDown(p.UP_ARROW)||p.keyIsDown(87) },
-          { label:"← / A", down:p.keyIsDown(p.LEFT_ARROW)||p.keyIsDown(65) },
-          { label:"↓ / S", down:p.keyIsDown(p.DOWN_ARROW)||p.keyIsDown(83) },
-          { label:"→ / D", down:p.keyIsDown(p.RIGHT_ARROW)||p.keyIsDown(68) }
-        ];
-        p.push();
-        p.noStroke();
-        p.fill(240,253,244,245);
-        p.rect(x,y,w,h,18);
-        p.stroke("#16a34a");
-        p.strokeWeight(2.5);
-        p.noFill();
-        p.rect(x,y,w,h,18);
-        p.noStroke();
-        p.fill("#16a34a");
-        p.textStyle(p.BOLD);
-        p.textSize(14);
-        p.text("keyIsDown()", x+16, y+26);
-        for (let i=0; i<keys.length; i++) {
-          const k = keys[i];
-          const ky = y+54+i*24;
-          p.fill(k.down ? "#16a34a" : "#d8cbbb");
-          p.circle(x+22, ky-4, 10);
-          p.fill("#334155");
-          p.textStyle(p.NORMAL);
-          p.textSize(12);
-          p.text(k.label, x+40, ky);
-        }
-        p.pop();
-      }
-
-      function drawPlayer(x, y, color) {
-        p.push();
-        p.noStroke();
-        p.fill(color);
-        p.circle(x, y, state.size);
-        p.fill("#ffffff");
-        p.circle(x + state.size * 0.10, y - state.size * 0.10, Math.max(8, state.size * 0.18));
-        p.fill("#222222");
-        p.circle(x + state.size * 0.14, y - state.size * 0.10, Math.max(4, state.size * 0.08));
-        p.pop();
-      }
-
-      function drawReadoutCards() {
-        const cards = [
-          { label:"mouse", value:`${Math.round(state.pointerX)}, ${Math.round(state.pointerY)}`, color:"#0891b2" },
-          { label:"clicks", value:state.clickCount, color:"#e11d48" },
-          { label:"last key", value:state.lastKey, color:"#7c3aed" }
-        ];
-        const cardW=Math.min(176,(p.width-70)/cards.length); const y=p.height-168; const x=28;
-        p.push();
-        for(let i=0;i<cards.length;i++){
-          const cx=x+i*(cardW+10);
-          p.noStroke(); p.fill(255,255,255,235); p.rect(cx,y,cardW,62,14);
-          p.fill(cards[i].color); p.textStyle(p.BOLD); p.textSize(13); p.text(cards[i].label,cx+12,y+22);
-          p.fill("#222"); p.textSize(16); p.text(String(cards[i].value),cx+12,y+48);
-        }
-        p.pop();
-      }
-
-      function drawLabel(text,x,y,color,size=13){
-        p.push(); p.textSize(size); p.textStyle(p.BOLD); const padX=7,padY=4,tw=p.textWidth(text);
-        p.noStroke(); p.fill(255,250,242,238); p.rect(x-padX,y-size-padY+3,tw+padX*2,size+padY*2,9);
-        p.fill(color); p.textAlign(p.LEFT,p.BASELINE); p.text(text,x,y); p.pop();
-      }
-    };
-
-    new p5(sketch);
-  </script>
+setMode('pressed');
+</script>
 </body>
 </html>
