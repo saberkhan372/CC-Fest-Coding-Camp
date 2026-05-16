@@ -774,6 +774,11 @@ body.search-active #concept-bridges .station-list{
   display:flex !important;
 }
 
+body.search-active #interactive-tools .gallery-peek,
+body.search-active #concept-bridges .gallery-peek{
+  display:none !important;
+}
+
 body.search-active #interactive-tools,
 body.search-active #concept-bridges,
 body.search-active #starter-sketches{
@@ -857,6 +862,16 @@ body.search-active #starter-sketches{
   display:flex;
   flex-direction:column;
   gap:0;
+}
+
+#interactive-tools.is-collapsible:not(.is-open) .station-list,
+#concept-bridges.is-collapsible:not(.is-open) .station-list{
+  display:none;
+}
+
+#interactive-tools.is-collapsible.is-open .gallery-peek,
+#concept-bridges.is-collapsible.is-open .gallery-peek{
+  display:none;
 }
 
 .station{
@@ -1082,6 +1097,10 @@ body.search-active #starter-sketches{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:18px;
+}
+
+.gallery-peek{
+  margin-bottom:8px;
 }
 
 .tool-card{

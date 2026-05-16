@@ -169,6 +169,62 @@
     });
   };
 
+  const addSectionPeek = ({ section, label, itemLabel, emptyLabel }) => {
+    const header = section?.querySelector(".gallery-header");
+    const stationList = section?.querySelector(".station-list");
+    if (!section || !header || !stationList) return;
+
+    const peekCards = Array.from(section.querySelectorAll(".station .tool-card")).slice(0, 3);
+    if (peekCards.length === 0) return;
+
+    const peekGrid = document.createElement("div");
+    peekGrid.className = "gallery-peek tool-grid";
+    peekGrid.id = `${section.id}-peek-grid`;
+
+    peekCards.forEach((card) => {
+      peekGrid.appendChild(card.cloneNode(true));
+    });
+
+    const totalItems = section.querySelectorAll(".station .tool-card").length;
+    const remaining = Math.max(0, totalItems - peekCards.length);
+    const trigger = document.createElement("div");
+    trigger.className = "station-peek-trigger";
+    trigger.setAttribute("aria-hidden", "true");
+    const btn = document.createElement("span");
+    btn.className = "station-peek-btn";
+    btn.textContent = remaining > 0
+      ? `Show ${remaining} more ${itemLabel} →`
+      : emptyLabel;
+    trigger.appendChild(btn);
+    peekGrid.appendChild(trigger);
+
+    stationList.before(peekGrid);
+
+    makeCollapsible({
+      container: section,
+      header,
+      grid: peekGrid,
+      label,
+      openByDefault: false
+    });
+
+    trigger.addEventListener("click", () => header.click());
+  };
+
+  addSectionPeek({
+    section: document.querySelector("#concept-bridges"),
+    label: "concept bridges",
+    itemLabel: "concept bridges by section",
+    emptyLabel: "Show concept bridges by section →"
+  });
+
+  addSectionPeek({
+    section: document.querySelector("#interactive-tools"),
+    label: "workshop tools",
+    itemLabel: "workshop tools by section",
+    emptyLabel: "Show workshop tools by section →"
+  });
+
   document.querySelectorAll("#interactive-tools .station, #concept-bridges .station").forEach((station, index) => {
     const header = station.querySelector(".station-header");
     const grid = station.querySelector(".tool-grid");
@@ -288,6 +344,7 @@
 
   const stations = document.querySelectorAll("#interactive-tools .station");
   const sketchCards = document.querySelectorAll("#starter-sketches .tool-card");
+  const toolSection = document.querySelector("#interactive-tools");
 
   filterBar.addEventListener("click", function(e) {
     const btn = e.target.closest(".suit-btn");
@@ -303,9 +360,11 @@
     const s = document.querySelector(".tool-search"); if (s) s.value = "";
 
     if (filter === "all") {
+      toolSection?.classList.remove("is-open");
       stations.forEach(s => s.hidden = false);
       sketchCards.forEach(c => c.hidden = false);
     } else {
+      toolSection?.classList.add("is-open");
       stations.forEach(s => { s.hidden = s.dataset.suit !== filter; });
       sketchCards.forEach(c => { c.hidden = !c.classList.contains("suit-" + filter); });
     }
@@ -377,6 +436,7 @@
   const allCards = document.querySelectorAll(".tool-card");
   const stations = document.querySelectorAll("#interactive-tools .station");
   const sketchSection = document.querySelector("#starter-sketches");
+  const toolSection = document.querySelector("#interactive-tools");
 
   pathwayBar.addEventListener("click", function(e) {
     const btn = e.target.closest(".pathway-btn");
@@ -392,10 +452,12 @@
     const s = document.querySelector(".tool-search"); if (s) s.value = "";
 
     if (filter === "all") {
+      toolSection?.classList.remove("is-open");
       allCards.forEach(c => c.hidden = false);
       stations.forEach(s => s.hidden = false);
       if (sketchSection) sketchSection.hidden = false;
     } else {
+      toolSection?.classList.add("is-open");
       allCards.forEach(c => {
         const pathways = (c.dataset.pathway || "").split(" ");
         c.hidden = !pathways.includes(filter);
