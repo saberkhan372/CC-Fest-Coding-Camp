@@ -1,1284 +1,1357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pixels: Pictures Are Data</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --grid: #64748b;
-      --pixel: #7c3aed;
-      --red: #e11d48;
-      --green: #16a34a;
-      --blue: #0891b2;
-      --sample: #f59e0b;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../concept-bridge.css">
+<title>Pixels: Pictures Are Data</title>
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #7a5ea8;
+    --accent-dark: #5b3f8a;
+    --accent-bg: #f3f0ff;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 960px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--accent-dark); }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
 
-    .controls,
-    .workspace,
-    .side-panel {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      user-select: none;
-    }
-
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
-
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
-
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
-
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
-
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 104px minmax(150px, 1fr) 76px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(390px, 100%);
-    }
-
-    label,
-    .value-label,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
-
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
-
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    #sketch-holder canvas { display: block; }
-
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
-
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .card h2 { font-size: 1.15rem; }
-    .card h3 { font-size: 1rem; }
-
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .card p { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
-
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      white-space: pre-wrap;
-    }
-
-    .legend {
-      display: grid;
-      gap: 8px;
-    }
-
-    .legend-item {
-      display: grid;
-      grid-template-columns: 16px 1fr;
-      gap: 8px;
-      align-items: center;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .swatch {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-    }
-
-    .swatch.grid { background: var(--grid); }
-    .swatch.pixel { background: var(--pixel); }
-    .swatch.red { background: var(--red); }
-    .swatch.green { background: var(--green); }
-    .swatch.blue { background: var(--blue); }
-    .swatch.sample { background: var(--sample); }
-
-    .code-card { display: none; }
-    .code-card.visible { display: block; }
-
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
-
-    .note {
-      font-size: 0.86rem;
-      color: var(--muted);
-    }
-
-    @media (max-width: 980px) {
-      main { grid-template-columns: 1fr; }
-      .workspace { height: 590px; }
-    }
-
-    @media (max-width: 600px) {
-      header, main { padding-left: 12px; padding-right: 12px; }
-      .slider-wrap { grid-template-columns: 1fr; gap: 4px; }
-      .workspace { height: 540px; }
-    }
-  
-  /* ── Bridge improvement additions ─────────────────────────────── */
   .unlocks {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 0 0 20px;
+    margin: 0 0 22px;
   }
+
   .unlock-pill {
     font-size: 0.75rem;
-    font-weight: 700;
-    color: #2a5e3e;
-    background: #eef8f2;
-    border: 1px solid #b8dcc8;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
     padding: 5px 10px;
     border-radius: 999px;
   }
+
   .before-after {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     overflow: hidden;
     margin-bottom: 22px;
-    background: rgba(255,255,255,0.55);
+    background: var(--paper);
   }
-  .ba-col { padding: 14px 18px; }
-  .ba-col:first-child {
-    background: rgba(0,0,0,0.025);
-    border-right: 1px solid var(--line, #ded2c1);
-  }
+
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
+
   .ba-label {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #9e9789;
+    color: var(--faint);
     margin-bottom: 5px;
   }
-  .ba-col:last-child .ba-label { color: #2a5e3e; }
-  .ba-text { font-size: 0.9rem; line-height: 1.5; }
-  .predict-box {
-    background: #fef9ee;
-    border: 1px solid #efd09e;
-    border-radius: 10px;
-    padding: 11px 14px;
-    margin-bottom: 12px;
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
   }
-  .predict-box .pbox-label {
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .canvas-panel { overflow: hidden; }
+
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
+
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
+
+  #main-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
+
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
+
+  .ctrl-panel { padding: 16px; }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
+
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #ede8ff; border-color: #a08cd0; }
+
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
+
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(122,94,168,0.4);
+    outline-offset: 2px;
+  }
+
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .box-label {
     display: block;
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    color: var(--ink);
     margin-bottom: 3px;
   }
-  .predict-box .pbox-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
+
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
+
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
   }
-  .callout-mistake {
-    background: #fff3e6;
-    border: 1px solid #edbd83;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin: 10px 0 0;
-  }
-  .callout-mistake .cm-label {
+
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
     display: block;
-    font-size: 0.72rem;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    min-width: 42px;
+    text-align: center;
   }
-  .callout-mistake .cm-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
   }
-  .pathways-section {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 32px 20px 8px;
-  }
-  .pathways-title {
-    font-size: 0.72rem;
-    font-weight: 700;
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #9e9789;
-    margin-bottom: 12px;
+    color: var(--faint);
+    margin-bottom: 6px;
   }
-  .path-links { display: grid; gap: 8px; max-width: 820px; }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: color var(--transition);
+  }
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 22px; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 720px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
   .path-link {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
     text-decoration: none;
-    color: var(--ink, #222);
-    background: rgba(255,250,242,0.92);
-    transition: border-color 0.14s ease, background 0.14s ease;
-    font-family: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
   }
-  .path-link:hover {
-    border-color: var(--accent, #2563eb);
-    background: rgba(230,240,255,0.6);
-  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
   .path-link-type {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #9e9789;
+    color: var(--faint);
     flex-shrink: 0;
-    min-width: 82px;
+    min-width: 88px;
   }
-  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
   .path-link-name { font-size: 0.9rem; font-weight: 700; }
-  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
   .bottom-nav {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 18px 20px 40px;
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    border-top: 1px solid var(--line, #ded2c1);
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
   }
-  .bottom-nav a {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #6b6258;
-    text-decoration: none;
-    font-family: inherit;
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color var(--transition); }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
   }
-  .bottom-nav a:hover { color: var(--accent, #2563eb); }
   @media (max-width: 560px) {
     .before-after { grid-template-columns: 1fr; }
-    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
     .bottom-nav { flex-direction: column; }
   }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
 </style>
-  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
-  </div>
-  <header>
-    <h1>Pixels: Pictures Are Data</h1>
-    <p class="subtitle">
-      A concept bridge for images, pixels, RGB values, <strong>get()</strong>, <strong>pixels[]</strong>, <strong>loadPixels()</strong>, and webcam/video frames.
-      A picture is a grid, and every square in the grid stores color data.
-    </p>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · Data &amp; Systems</p>
+  <h1>Pixels: Pictures Are Data</h1>
+  <p class="subtitle">
+    A concept bridge for <code>pixels[]</code>, <code>loadPixels()</code>, <code>updatePixels()</code>, and pixel-level drawing.
+    An image is a giant array of color values — one per pixel.
+  </p>
+
   <div class="unlocks" aria-label="What this bridge unlocks">
     <span class="unlock-pill">image processing</span>
-    <span class="unlock-pill">pixel manipulation</span>
-    <span class="unlock-pill">color analysis</span>
-    <span class="unlock-pill">filter effects</span>
+    <span class="unlock-pill">pixel art</span>
+    <span class="unlock-pill">filters</span>
+    <span class="unlock-pill">noise texture</span>
+    <span class="unlock-pill">glitch effects</span>
+    <span class="unlock-pill">custom brushes</span>
   </div>
+
   <section class="before-after" aria-label="Before and after mental model">
     <div class="ba-col">
       <div class="ba-label">Before this bridge, you might think</div>
-      <div class="ba-text">Images are visual — they're not something I can calculate with</div>
+      <div class="ba-text">A picture is a thing I load. I can't change individual pixels — that's too low-level.</div>
     </div>
     <div class="ba-col">
       <div class="ba-label">After this bridge</div>
-      <div class="ba-text">Every pixel is four numbers: R, G, B, A — a photo is a huge array of numbers you can change</div>
+      <div class="ba-text">A picture is a flat array. Every pixel is 4 values: R, G, B, A. Reading and writing these values lets you filter, process, and generate images from scratch.</div>
     </div>
   </section>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-            <div class="predict-box">
-        <span class="pbox-label">Before you interact — predict first</span>
-        <span class="pbox-body">Before you invert the colors — what math operation turns 255 into 0 and 0 into 255?</span>
+  <section class="main-grid" aria-label="Interactive pixels concept bridge">
+    <article class="panel canvas-panel">
+      <div class="canvas-bar">
+        <div class="canvas-bar-title" id="canvas-title">Grid: zoom in on pixels</div>
+        <div class="canvas-bar-sub" id="canvas-sub">Each cell is one pixel. Click to change its color.</div>
       </div>
-<div class="row">
-        <button id="mode-grid" class="active">Paint &amp; Grid</button>
-        <button id="mode-rgb">RGB Values</button>
-        <button id="mode-sample">get() / Sample</button>
-        <button id="mode-pixels">pixels[] Array</button>
-        <button id="mode-remix">Remix</button>
-        <button id="reset-button">Clear canvas</button>
-        <span id="mode-pill" class="pill">paint your own pixel art</span>
+      <div class="canvas-wrap">
+        <canvas id="main-canvas" width="620" height="420" aria-label="Interactive pixel visualization"></canvas>
+        <div class="touch-hint">Tap and drag to interact.</div>
       </div>
+    </article>
 
-      <div class="row">
-        <span class="preset-label">Load preset:</span>
-        <button class="preset-button" data-preset="smiley">smiley</button>
-        <button class="preset-button" data-preset="heart">heart</button>
-        <button class="preset-button" data-preset="arrow">arrow</button>
-        <span class="preset-label" style="margin-left:12px">Remix:</span>
-        <button class="effect-button" data-effect="normal">normal</button>
-        <button class="effect-button" data-effect="grayscale">grayscale</button>
-        <button class="effect-button" data-effect="threshold">threshold</button>
-        <button class="effect-button" data-effect="invert">invert</button>
-        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
-      </div>
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="Pixel concept tabs">
+        <button class="tab" role="tab" data-mode="grid" aria-selected="true" aria-controls="bridge-panel" tabindex="0">Grid<span class="step">1 of 5</span></button>
+        <button class="tab" role="tab" data-mode="index" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Index<span class="step">2 of 5</span></button>
+        <button class="tab" role="tab" data-mode="filter" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Filter<span class="step">3 of 5</span></button>
+        <button class="tab" role="tab" data-mode="generate" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Generate<span class="step">4 of 5</span></button>
+        <button class="tab" role="tab" data-mode="brush" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Brush<span class="step">5 of 5</span></button>
+      </nav>
 
-      <div class="row" id="palette-row" style="gap:6px;align-items:center;">
-        <span class="preset-label">Color:</span>
-        <!-- swatches injected by JS -->
-      </div>
-    </section>
-
-    <section class="workspace">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        An image is a grid. Each pixel has a location and a color.
-      </div>
-    </section>
-
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">A picture is a grid</h2>
-        <p id="lesson-text">
-          Digital images are made of pixels. Each pixel is a tiny square with a position, like (x, y), and color values.
-        </p>
-        <span id="formula-box" class="formula">pixel at (x, y)
-color = [red, green, blue, alpha]</span>
-      </section>
-
-      <section class="card">
-        <h3>Big idea</h3>
-        <p><strong>Pixel:</strong> one tiny colored square.</p>
-        <p><strong>Image:</strong> a grid of pixels.</p>
-        <p><strong>RGB:</strong> red, green, and blue number values.</p>
-        <p><strong>Remix:</strong> read pixels, change values, draw something new.</p>
-      </section>
-
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch grid"></span><span>image grid</span></div>
-          <div class="legend-item"><span class="swatch pixel"></span><span>selected pixel</span></div>
-          <div class="legend-item"><span class="swatch red"></span><span>red channel</span></div>
-          <div class="legend-item"><span class="swatch green"></span><span>green channel</span></div>
-          <div class="legend-item"><span class="swatch blue"></span><span>blue channel</span></div>
-          <div class="legend-item"><span class="swatch sample"></span><span>sampled color</span></div>
+      <div id="bridge-panel" role="tabpanel" aria-live="polite">
+        <div class="predict">
+          <span class="box-label">Predict before changing</span>
+          <span class="box-body" id="predict-text">Click a cell — what do you expect to happen to the RGBA values shown below the grid?</span>
         </div>
-      </section>
 
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">Move the selected pixel. How do its red, green, and blue values change?</p>
-      </section>
+        <div class="ctrl-group" id="controls"></div>
+        <div id="presets-area"></div>
 
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code id="code-box">let c = img.get(x, y);
-let r = red(c);
-let g = green(c);
-let b = blue(c);</code></pre>
-        <p class="note">
-          A webcam frame works like an image too: it is a new grid of pixels every frame. That is why image remix ideas also apply to video.
-        </p>
-      </section>
+        <div class="code-section">
+          <div class="code-header"><span>Live code</span><span id="code-note">Pixel index formula.</span></div>
+          <div class="code-focus-line mono" id="focus-code"></div>
+          <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">▸ See full p5.js sketch</button>
+          <div class="full-code-body mono" id="full-code"></div>
+        </div>
+
+        <div class="callout big-idea">
+          <span class="box-label">Big idea</span>
+          <span class="box-body" id="big-idea-text"></span>
+        </div>
+
+        <div class="callout bug">
+          <span class="box-label">⚠ Common mistake</span>
+          <span class="box-body" id="bug-text"></span>
+        </div>
+
+        <div class="callout try">
+          <span class="box-label">Try this</span>
+          <span class="box-body" id="try-text"></span>
+        </div>
+      </div>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    // Palette: 8 colors + eraser (white)
-    const PALETTE = [
-      { r: 231, g: 29, b: 72, label: "red" },
-      { r: 245, g: 158, b: 11, label: "orange" },
-      { r: 234, g: 200, b: 50, label: "yellow" },
-      { r: 22, g: 163, b: 74, label: "green" },
-      { r: 8, g: 145, b: 178, label: "cyan" },
-      { r: 37, g: 99, b: 235, label: "blue" },
-      { r: 124, g: 58, b: 237, label: "purple" },
-      { r: 34, g: 34, b: 34, label: "black" },
-      { r: 255, g: 255, b: 255, label: "eraser" }
-    ];
+  <section class="prose-section">
+    <h2>Every image is a giant array</h2>
+    <p>When you call <code>loadPixels()</code>, p5.js exposes the raw pixel data as a flat JavaScript array. Each pixel occupies four consecutive slots — red, green, blue, alpha. The formula to find a pixel at (x, y) is <code>(y × width + x) × 4</code>. Once you know this, images transform from opaque blobs into readable, writable data you can filter, generate, and paint at the lowest possible level.</p>
+  </section>
 
-    // Presets: 10x10 encoded as palette index (-1 = white/eraser, 0-7 = color)
-    const PRESETS = {
-      smiley: [
-        [-1,-1, 1, 1, 1, 1, 1, 1,-1,-1],
-        [-1, 1, 1, 1, 1, 1, 1, 1, 1,-1],
-        [ 1, 1, 7, 7, 1, 1, 7, 7, 1, 1],
-        [ 1, 1, 7, 7, 1, 1, 7, 7, 1, 1],
-        [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [ 1, 7, 1, 1, 1, 1, 1, 1, 7, 1],
-        [ 1, 1, 7, 1, 1, 1, 1, 7, 1, 1],
-        [-1, 1, 1, 7, 7, 7, 7, 1, 1,-1],
-        [-1,-1, 1, 1, 1, 1, 1, 1,-1,-1]
-      ],
-      heart: [
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-        [-1, 0, 0,-1,-1,-1, 0, 0,-1,-1],
-        [ 0, 0, 0, 0,-1, 0, 0, 0, 0,-1],
-        [ 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
-        [ 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
-        [-1, 0, 0, 0, 0, 0, 0, 0,-1,-1],
-        [-1,-1, 0, 0, 0, 0, 0,-1,-1,-1],
-        [-1,-1,-1, 0, 0, 0,-1,-1,-1,-1],
-        [-1,-1,-1,-1, 0,-1,-1,-1,-1,-1],
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
-      ],
-      arrow: [
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-        [-1,-1,-1,-1,-1, 4,-1,-1,-1,-1],
-        [-1,-1,-1,-1, 4, 4,-1,-1,-1,-1],
-        [ 4, 4, 4, 4, 4, 4, 4, 4, 4,-1],
-        [ 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-        [ 4, 4, 4, 4, 4, 4, 4, 4, 4,-1],
-        [-1,-1,-1,-1, 4, 4,-1,-1,-1,-1],
-        [-1,-1,-1,-1,-1, 4,-1,-1,-1,-1],
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
-      ]
-    };
+  <div class="legend" aria-label="Pixel concept legend">
+    <div class="legend-item"><span class="swatch" style="background:#fff;border:2px solid #7a5ea8"></span> pixel cell (purple border)</div>
+    <div class="legend-item"><span class="swatch" style="background:#e44"></span> R channel</div>
+    <div class="legend-item"><span class="swatch" style="background:#2b6"></span> G channel</div>
+    <div class="legend-item"><span class="swatch" style="background:#36f"></span> B channel</div>
+    <div class="legend-item"><span class="swatch" style="background:rgba(150,150,150,0.4)"></span> A channel (faint)</div>
+    <div class="legend-item"><span class="swatch" style="background:#fbbf24;border:2px solid #d97706"></span> selected pixel (amber glow)</div>
+  </div>
 
-    const state = {
-      mode: "grid",
-      sampleX: 4,
-      sampleY: 3,
-      pixelSize: 28,
-      effect: "normal",
-      showLabels: true,
-      showCode: false,
-      cols: 10,
-      rows: 10,
-      data: [],
-      selectedColor: 0,      // index into PALETTE
-      fillMode: true,
-      hoveredX: -1,
-      hoveredY: -1
-    };
+  <section class="pathways" aria-label="Practice and remix links">
+    <div class="pathways-title">What's next</div>
+    <div class="path-links">
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
+        <span class="path-link-type">Practice →</span>
+        <span class="path-link-name">Look for pixel art, image filter, or texture generation tools in the workshop library</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
+        <span class="path-link-type">Remix →</span>
+        <span class="path-link-name">Take a starter sketch and apply a brightness or inversion filter to a generated gradient</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/color-numbers-become-feeling/" class="path-link">
+        <span class="path-link-type">Related →</span>
+        <span class="path-link-name">Color: Numbers Become Feeling — each pixel's RGBA values are the same color numbers you already know</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+    </div>
+  </section>
 
-    const els = {};
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All bridges</a>
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/data-in-drawing-out/">Next: Data In, Drawing Out →</a>
+  </nav>
+</main>
 
-    function setupUI() {
-      els.modeGrid = document.querySelector("#mode-grid");
-      els.modeRgb = document.querySelector("#mode-rgb");
-      els.modeSample = document.querySelector("#mode-sample");
-      els.modePixels = document.querySelector("#mode-pixels");
-      els.modeRemix = document.querySelector("#mode-remix");
-      els.resetButton = document.querySelector("#reset-button");
-      els.modePill = document.querySelector("#mode-pill");
-      els.effectButtons = Array.from(document.querySelectorAll(".effect-button"));
-      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
-      els.showLabels = document.querySelector("#show-labels");
-      els.showCode = document.querySelector("#show-code");
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.formulaBox = document.querySelector("#formula-box");
-      els.questionText = document.querySelector("#question-text");
-      els.caption = document.querySelector("#canvas-caption");
-      els.codeCard = document.querySelector("#code-card");
-      els.codeBox = document.querySelector("#code-box");
-      els.paletteRow = document.querySelector("#palette-row");
+<script>
+'use strict';
 
-      // Build palette swatches
-      PALETTE.forEach((col, i) => {
-        const btn = document.createElement("button");
-        btn.className = "swatch-btn";
-        btn.title = col.label;
-        btn.style.cssText = `width:28px;height:28px;border-radius:6px;border:3px solid ${i === state.selectedColor ? "#222" : "#ded2c1"};background:rgb(${col.r},${col.g},${col.b});cursor:pointer;padding:0;flex-shrink:0;`;
-        btn.addEventListener("click", () => {
-          state.selectedColor = i;
-          updateSwatchSelection();
+// ─── State ───────────────────────────────────────────────────────────────────
+const state = {
+  mode: 'grid',
+  // grid
+  cellSize: 36,
+  paintColor: 0, // 0=purple, 1=red, 2=teal
+  gridCells: null, // will be initialized
+  selectedCell: { x: 2, y: 2 },
+  // index
+  pixW: 10,
+  pixH: 7,
+  ixX: 2,
+  ixY: 1,
+  // filter
+  blend: 0.5,
+  brightness: 100,
+  // generate
+  genMode: 'gradient',
+  genScale: 10,
+  // brush
+  brushColor: 0,
+  brushSize: 8,
+  brushPixels: null,
+  isDrawing: false
+};
+
+const PAINT_COLORS = [
+  { r: 122, g: 94, b: 168, label: 'Purple' },
+  { r: 220, g: 50, b: 70, label: 'Red' },
+  { r: 46, g: 140, b: 126, label: 'Teal' }
+];
+
+const GRID_COLS = 15;
+const GRID_ROWS = 10;
+
+function initGridCells() {
+  state.gridCells = [];
+  for (let y = 0; y < GRID_ROWS; y++) {
+    state.gridCells[y] = [];
+    for (let x = 0; x < GRID_COLS; x++) {
+      state.gridCells[y][x] = { r: 240, g: 238, b: 232, a: 255 };
+    }
+  }
+}
+
+const CANVAS_W = 620;
+const CANVAS_H = 420;
+
+function initBrushPixels() {
+  state.brushPixels = new Uint8ClampedArray(CANVAS_W * CANVAS_H * 4);
+  for (let i = 0; i < state.brushPixels.length; i += 4) {
+    state.brushPixels[i] = 248;
+    state.brushPixels[i+1] = 245;
+    state.brushPixels[i+2] = 240;
+    state.brushPixels[i+3] = 255;
+  }
+}
+
+// ─── Canvas & context ─────────────────────────────────────────────────────────
+const canvas = document.getElementById('main-canvas');
+const ctx = canvas.getContext('2d');
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+function mapV(v, a, b, c, d) { return c + ((v - a) / (b - a)) * (d - c); }
+
+function rgba(r, g, b, a = 1) {
+  return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${a})`;
+}
+
+function drawRoundRect(x, y, w, h, r, fill, stroke, sw) {
+  const rad = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rad, y);
+  ctx.lineTo(x + w - rad, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rad);
+  ctx.lineTo(x + w, y + h - rad);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
+  ctx.lineTo(x + rad, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - rad);
+  ctx.lineTo(x, y + rad);
+  ctx.quadraticCurveTo(x, y, x + rad, y);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  if (stroke && sw) { ctx.lineWidth = sw; ctx.strokeStyle = stroke; ctx.stroke(); }
+}
+
+function drawText(text, x, y, opts = {}) {
+  ctx.save();
+  ctx.fillStyle = opts.color || '#1d1b18';
+  ctx.font = `${opts.weight || 700} ${opts.size || 13}px "DM Sans", system-ui, sans-serif`;
+  ctx.textAlign = opts.align || 'left';
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+// ─── Renderers ────────────────────────────────────────────────────────────────
+
+function renderGrid() {
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+  const cs = state.cellSize;
+  const marginX = Math.floor((CANVAS_W - GRID_COLS * cs) / 2);
+  const marginY = 14;
+
+  for (let gy = 0; gy < GRID_ROWS; gy++) {
+    for (let gx = 0; gx < GRID_COLS; gx++) {
+      const px = marginX + gx * cs;
+      const py = marginY + gy * cs;
+      const cell = state.gridCells[gy][gx];
+      const isSel = (gx === state.selectedCell.x && gy === state.selectedCell.y);
+
+      ctx.fillStyle = rgba(cell.r, cell.g, cell.b);
+      ctx.fillRect(px, py, cs, cs);
+
+      if (isSel) {
+        ctx.strokeStyle = '#d97706';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(px + 1, py + 1, cs - 2, cs - 2);
+      } else {
+        ctx.strokeStyle = '#7a5ea8';
+        ctx.lineWidth = 0.8;
+        ctx.strokeRect(px, py, cs, cs);
+      }
+    }
+  }
+
+  // RGBA readout
+  const sel = state.gridCells[state.selectedCell.y][state.selectedCell.x];
+  const ry = marginY + GRID_ROWS * cs + 14;
+  drawText(`Selected pixel (${state.selectedCell.x}, ${state.selectedCell.y})  →  R:${sel.r}  G:${sel.g}  B:${sel.b}  A:${sel.a}`, marginX, ry, { size: 12, color: '#6d675f' });
+
+  const channels = [
+    { l: 'R', v: sel.r, c: '#e44' },
+    { l: 'G', v: sel.g, c: '#2b6' },
+    { l: 'B', v: sel.b, c: '#36f' }
+  ];
+  const bx = marginX;
+  const maxW = CANVAS_W - marginX * 2;
+  channels.forEach((ch, i) => {
+    const bary = ry + 22 + i * 18;
+    ctx.fillStyle = '#ddd';
+    ctx.fillRect(bx + 16, bary, maxW - 16, 10);
+    ctx.fillStyle = ch.c;
+    ctx.fillRect(bx + 16, bary, (ch.v / 255) * (maxW - 16), 10);
+    drawText(ch.l, bx, bary + 9, { size: 11, color: '#6d675f' });
+  });
+}
+
+function renderIndex() {
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+  drawRoundRect(16, 16, CANVAS_W - 32, CANVAS_H - 32, 16, '#fffdf7', null, 0);
+
+  const W = state.pixW;
+  const H = state.pixH;
+  const ix = clamp(state.ixX, 0, W - 1);
+  const iy = clamp(state.ixY, 0, H - 1);
+  const pixelIdx = iy * W + ix;
+  const arrayIdx = pixelIdx * 4;
+
+  // Title
+  drawText(`pixels[] layout for a ${W}×${H} canvas`, 36, 48, { size: 14 });
+
+  // Array visualization — draw boxes for each slot
+  const boxW = Math.floor((CANVAS_W - 72) / (W * H * 4 > 80 ? 80 : W * H * 4));
+  const boxWUse = clamp(boxW, 4, 22);
+  const totalSlots = W * H * 4;
+  const slotStart = 36;
+  const slotY = 70;
+
+  const visible = Math.min(totalSlots, Math.floor((CANVAS_W - 72) / (boxWUse + 1)));
+  for (let i = 0; i < visible; i++) {
+    const slot = i;
+    const bx = slotStart + i * (boxWUse + 1);
+    const channel = slot % 4;
+    const pixI = Math.floor(slot / 4);
+    const isSelected = (slot >= arrayIdx && slot < arrayIdx + 4);
+    const colors = ['#e44', '#2b6', '#36f', '#bbb'];
+    ctx.fillStyle = isSelected ? colors[channel] : (channel === 0 ? '#f8d0d0' : channel === 1 ? '#d0f0da' : channel === 2 ? '#d0ddf8' : '#eee');
+    ctx.fillRect(bx, slotY, boxWUse, 22);
+    ctx.strokeStyle = isSelected ? '#333' : '#ccc';
+    ctx.lineWidth = isSelected ? 1.5 : 0.5;
+    ctx.strokeRect(bx, slotY, boxWUse, 22);
+  }
+
+  if (totalSlots > visible) {
+    drawText(`…${totalSlots - visible} more`, slotStart + visible * (boxWUse + 1) + 4, slotY + 15, { size: 10, color: '#9e9789' });
+  }
+
+  // Channel labels
+  const labelY = slotY + 32;
+  drawText('R  G  B  A  (repeats once per pixel)', slotStart, labelY, { size: 11, color: '#6d675f' });
+
+  // Formula box
+  const formulaY = labelY + 30;
+  drawRoundRect(36, formulaY, CANVAS_W - 72, 58, 10, '#ede8ff', null, 0);
+  drawText('Formula:', 52, formulaY + 20, { size: 12, color: '#5b3f8a' });
+  drawText(`index = (y * width + x) * 4`, 52, formulaY + 40, { size: 13, weight: 800 });
+
+  // Worked example
+  const exY = formulaY + 78;
+  const resultIdx = arrayIdx;
+  drawText(`For pixel (${ix}, ${iy}):`, 36, exY, { size: 13 });
+  drawText(`index = (${iy} × ${W} + ${ix}) × 4 = ${resultIdx}`, 36, exY + 22, { size: 13, color: '#5b3f8a', weight: 800 });
+  drawText(`R at [${resultIdx}], G at [${resultIdx+1}], B at [${resultIdx+2}], A at [${resultIdx+3}]`, 36, exY + 46, { size: 12, color: '#6d675f' });
+
+  // Mini grid to visualize the pixel
+  const gridX = 36;
+  const gridY = exY + 70;
+  const cellSz = Math.floor((CANVAS_W - 72) / W);
+  for (let gy = 0; gy < H; gy++) {
+    for (let gx = 0; gx < W; gx++) {
+      const bx2 = gridX + gx * cellSz;
+      const by2 = gridY + gy * cellSz;
+      const isSel = (gx === ix && gy === iy);
+      ctx.fillStyle = isSel ? '#fbbf24' : (gx % 2 === gy % 2 ? '#e8e4da' : '#d8d4ca');
+      ctx.fillRect(bx2, by2, cellSz, cellSz);
+      ctx.strokeStyle = isSel ? '#d97706' : '#bbb';
+      ctx.lineWidth = isSel ? 2 : 0.5;
+      ctx.strokeRect(bx2, by2, cellSz, cellSz);
+      if (isSel) {
+        drawText('★', bx2 + cellSz / 2, by2 + cellSz / 2 + 5, { size: clamp(cellSz - 4, 8, 14), align: 'center' });
+      }
+    }
+  }
+}
+
+function renderFilter() {
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+  const imgW = 280;
+  const imgH = 300;
+  const pad = 20;
+  const leftX = pad;
+  const rightX = CANVAS_W / 2 + pad / 2;
+  const imgY = 30;
+  const blend = clamp(state.blend, 0, 1);
+  const bright = clamp(state.brightness, 0, 200) / 100;
+
+  // Generate colorful source image
+  const colorData = new ImageData(imgW, imgH);
+  const grayData = new ImageData(imgW, imgH);
+  for (let py = 0; py < imgH; py++) {
+    for (let px = 0; px < imgW; px++) {
+      const i = (py * imgW + px) * 4;
+      const r = clamp(Math.sin(px / 28 + py / 38) * 110 + 180, 0, 255);
+      const g = clamp(Math.sin(px / 18 - py / 22 + 1.5) * 110 + 160, 0, 255);
+      const b = clamp(Math.cos(px / 32 + py / 18) * 110 + 200, 0, 255);
+      colorData.data[i] = r;
+      colorData.data[i+1] = g;
+      colorData.data[i+2] = b;
+      colorData.data[i+3] = 255;
+
+      const avg = clamp(Math.round((r + g + b) / 3 * bright), 0, 255);
+      const br = clamp(Math.round(r * bright), 0, 255);
+      const bg = clamp(Math.round(g * bright), 0, 255);
+      const bb = clamp(Math.round(b * bright), 0, 255);
+      grayData.data[i] = Math.round(br + (avg - br) * blend);
+      grayData.data[i+1] = Math.round(bg + (avg - bg) * blend);
+      grayData.data[i+2] = Math.round(bb + (avg - bb) * blend);
+      grayData.data[i+3] = 255;
+    }
+  }
+
+  const offColor = new OffscreenCanvas(imgW, imgH);
+  offColor.getContext('2d').putImageData(colorData, 0, 0);
+  ctx.drawImage(offColor, leftX, imgY, imgW, imgH);
+
+  const offGray = new OffscreenCanvas(imgW, imgH);
+  offGray.getContext('2d').putImageData(grayData, 0, 0);
+  ctx.drawImage(offGray, rightX, imgY, imgW, imgH);
+
+  // Border and labels
+  ctx.strokeStyle = '#7a5ea8';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(leftX, imgY, imgW, imgH);
+  ctx.strokeRect(rightX, imgY, imgW, imgH);
+
+  drawText('Original', leftX + imgW / 2, imgY - 8, { align: 'center', size: 12, color: '#6d675f' });
+  drawText(blend < 0.05 ? 'Original' : blend > 0.95 ? 'Grayscale' : 'Blended', rightX + imgW / 2, imgY - 8, { align: 'center', size: 12, color: '#6d675f' });
+
+  // Formula
+  const fY = imgY + imgH + 22;
+  drawText('let avg = (r + g + b) / 3;', pad, fY, { size: 12, color: '#5b3f8a', weight: 800 });
+  drawText(`blend = ${blend.toFixed(2)}   brightness = ${state.brightness}%`, pad, fY + 20, { size: 11, color: '#6d675f' });
+}
+
+function renderGenerate() {
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  const genMode = state.genMode;
+  const sc = state.genScale;
+  const imgData = new ImageData(CANVAS_W, CANVAS_H);
+
+  for (let py = 0; py < CANVAS_H; py++) {
+    for (let px = 0; px < CANVAS_W; px++) {
+      const i = (py * CANVAS_W + px) * 4;
+      let r, g, b;
+      if (genMode === 'gradient') {
+        r = Math.round((px / CANVAS_W) * 255);
+        g = Math.round((py / CANVAS_H) * 255);
+        b = 180;
+      } else if (genMode === 'checker') {
+        const v = (Math.floor(px / sc) + Math.floor(py / sc)) % 2 === 0 ? 220 : 50;
+        r = g = b = v;
+      } else if (genMode === 'noise') {
+        const v = clamp(Math.round(Math.sin(px / sc) * Math.sin(py / sc) * 127 + 128), 0, 255);
+        r = v;
+        g = clamp(Math.round(Math.sin(px / (sc * 1.3) + 1) * 127 + 128), 0, 255);
+        b = clamp(Math.round(Math.cos(py / sc) * 127 + 128), 0, 255);
+      } else { // stripes
+        r = clamp(Math.round(Math.sin(px / sc) * 127 + 128), 0, 255);
+        g = clamp(Math.round(Math.sin(py / sc) * 127 + 128), 0, 255);
+        b = 200;
+      }
+      imgData.data[i] = r;
+      imgData.data[i+1] = g;
+      imgData.data[i+2] = b;
+      imgData.data[i+3] = 255;
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  // Label overlay
+  const labels = { gradient: 'Gradient: pixels[i] = (x/width)*255', checker: `Checker: (x%${sc}<${Math.floor(sc/2)}) ? 220 : 50`, noise: `Noise: sin(x/${sc})*sin(y/${sc})*127+128`, stripes: `Stripes: sin(x/${sc})*127+128` };
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(0, CANVAS_H - 32, CANVAS_W, 32);
+  drawText(labels[genMode], 14, CANVAS_H - 11, { size: 12, color: '#fff' });
+}
+
+function renderBrush() {
+  if (!state.brushPixels) initBrushPixels();
+  const imgData = new ImageData(state.brushPixels, CANVAS_W, CANVAS_H);
+  ctx.putImageData(imgData, 0, 0);
+
+  // Instructions overlay if blank
+  const blank = state.brushPixels[0] === 248 && state.brushPixels[4] === 248;
+  if (blank) {
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    drawText('Click and drag to paint with pixels[]', CANVAS_W / 2, CANVAS_H / 2 - 10, { size: 16, align: 'center', color: '#fff' });
+    drawText(`Color: ${PAINT_COLORS[state.brushColor].label}  |  Brush size: ${state.brushSize}`, CANVAS_W / 2, CANVAS_H / 2 + 18, { size: 13, align: 'center', color: 'rgba(255,255,255,0.8)' });
+  }
+}
+
+// ─── Canvas interaction ───────────────────────────────────────────────────────
+
+function gridCellAt(ex, ey) {
+  const cs = state.cellSize;
+  const marginX = Math.floor((CANVAS_W - GRID_COLS * cs) / 2);
+  const marginY = 14;
+  const gx = Math.floor((ex - marginX) / cs);
+  const gy = Math.floor((ey - marginY) / cs);
+  if (gx >= 0 && gx < GRID_COLS && gy >= 0 && gy < GRID_ROWS) return { x: gx, y: gy };
+  return null;
+}
+
+function paintBrush(ex, ey) {
+  if (!state.brushPixels) initBrushPixels();
+  const col = PAINT_COLORS[state.brushColor];
+  const bs = state.brushSize;
+  for (let dy = -bs; dy <= bs; dy++) {
+    for (let dx = -bs; dx <= bs; dx++) {
+      if (dx * dx + dy * dy <= bs * bs) {
+        const px = Math.round(ex + dx);
+        const py = Math.round(ey + dy);
+        if (px >= 0 && px < CANVAS_W && py >= 0 && py < CANVAS_H) {
+          const i = (py * CANVAS_W + px) * 4;
+          state.brushPixels[i] = col.r;
+          state.brushPixels[i+1] = col.g;
+          state.brushPixels[i+2] = col.b;
+          state.brushPixels[i+3] = 255;
+        }
+      }
+    }
+  }
+}
+
+function canvasXY(event) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = CANVAS_W / rect.width;
+  const scaleY = CANVAS_H / rect.height;
+  const src = event.touches ? event.touches[0] : event;
+  return {
+    x: (src.clientX - rect.left) * scaleX,
+    y: (src.clientY - rect.top) * scaleY
+  };
+}
+
+canvas.addEventListener('mousedown', e => {
+  const { x, y } = canvasXY(e);
+  if (state.mode === 'grid') {
+    const cell = gridCellAt(x, y);
+    if (cell) {
+      state.selectedCell = cell;
+      const col = PAINT_COLORS[state.paintColor];
+      state.gridCells[cell.y][cell.x] = { r: col.r, g: col.g, b: col.b, a: 255 };
+      render();
+    }
+  } else if (state.mode === 'brush') {
+    state.isDrawing = true;
+    paintBrush(x, y);
+    render();
+  }
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (state.mode === 'brush' && state.isDrawing) {
+    const { x, y } = canvasXY(e);
+    paintBrush(x, y);
+    render();
+  }
+});
+
+canvas.addEventListener('mouseup', () => { state.isDrawing = false; });
+canvas.addEventListener('mouseleave', () => { state.isDrawing = false; });
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const { x, y } = canvasXY(e);
+  if (state.mode === 'grid') {
+    const cell = gridCellAt(x, y);
+    if (cell) {
+      state.selectedCell = cell;
+      const col = PAINT_COLORS[state.paintColor];
+      state.gridCells[cell.y][cell.x] = { r: col.r, g: col.g, b: col.b, a: 255 };
+      render();
+    }
+  } else if (state.mode === 'brush') {
+    state.isDrawing = true;
+    paintBrush(x, y);
+    render();
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (state.mode === 'brush' && state.isDrawing) {
+    const { x, y } = canvasXY(e);
+    paintBrush(x, y);
+    render();
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', () => { state.isDrawing = false; });
+
+// ─── Mode data ────────────────────────────────────────────────────────────────
+
+const modes = {
+  grid: {
+    canvasTitle: 'Grid: zoom in on pixels',
+    canvasSub: 'Each cell is one pixel. Click any cell to paint it with the selected color.',
+    predict: 'Click a cell — what do you expect to happen to the RGBA values shown below the grid?',
+    big: 'A canvas is a rectangle of pixels. Each pixel is a small square of color. At normal size they are invisible; zoomed in they become the grid.',
+    bug: 'After changing pixels[], you must call updatePixels() — otherwise the canvas display does not refresh.',
+    tryIt: 'Paint a diagonal line by clicking each cell one step right and down. What does it look like zoomed out?',
+    note: 'Each pixel is 4 array slots.',
+    focusHTML: () => `<span class="ct fn">pixels</span>[(<span class="ct num">y</span> * width + <span class="ct num">x</span>) * 4] = <span class="ct num" id="v-r">${PAINT_COLORS[state.paintColor].r}</span>; <span class="ct cm">// R</span>`,
+    fullCode: () => `function setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  loadPixels();\n  let x = 5, y = 3;\n  let i = (y * width + x) * 4;\n  pixels[i]   = ${PAINT_COLORS[state.paintColor].r}; // R\n  pixels[i+1] = ${PAINT_COLORS[state.paintColor].g}; // G\n  pixels[i+2] = ${PAINT_COLORS[state.paintColor].b}; // B\n  pixels[i+3] = 255;    // A\n  updatePixels();\n}`,
+    controls: [
+      { type: 'slider', key: 'cellSize', label: 'Cell size', hint: 'zoom level', min: 20, max: 60, step: 2 },
+      { type: 'colorpick', key: 'paintColor', label: 'Paint color' }
+    ],
+    presets: [
+      { label: '5×5 blank', action: () => { initGridCells(); } },
+      { label: 'Checkerboard', action: () => {
+        initGridCells();
+        for (let gy = 0; gy < GRID_ROWS; gy++) for (let gx = 0; gx < GRID_COLS; gx++) {
+          state.gridCells[gy][gx] = (gx + gy) % 2 === 0 ? { r: 122, g: 94, b: 168, a: 255 } : { r: 240, g: 238, b: 232, a: 255 };
+        }
+      }},
+      { label: '⚠ All pixels black', action: () => {
+        for (let gy = 0; gy < GRID_ROWS; gy++) for (let gx = 0; gx < GRID_COLS; gx++) {
+          state.gridCells[gy][gx] = { r: 0, g: 0, b: 0, a: 255 };
+        }
+      }, isBreak: true }
+    ]
+  },
+  index: {
+    canvasTitle: 'Index: how pixels[] is laid out',
+    canvasSub: 'Each pixel takes 4 slots: R, G, B, A. Use (y × width + x) × 4 to find any pixel.',
+    predict: 'Before moving the sliders — what index do you think pixel (0, 0) is at? And (1, 0)?',
+    big: 'The pixels array stores all pixels in one flat list: row 0 left to right, then row 1, and so on. Each pixel takes 4 values.',
+    bug: 'The formula is (y * width + x) * 4 — not (x * height + y) * 4. Using height and width swapped gives completely wrong coordinates.',
+    tryIt: 'Use the sliders to move to (0,0). What index is that? Move to (1,0). What index? Move to (0,1). What index?',
+    note: 'Index = (y*width+x)*4.',
+    focusHTML: () => `<span class="ct kw">let</span> i = (<span class="ct num" id="v-y">${state.ixY}</span> * width + <span class="ct num" id="v-x">${state.ixX}</span>) * 4; <span class="ct cm">// = ${state.ixY * state.pixW * 4 + state.ixX * 4}</span>`,
+    fullCode: () => `function setup() {\n  createCanvas(${state.pixW}, ${state.pixH});\n}\n\nfunction draw() {\n  loadPixels();\n  let x = ${state.ixX};\n  let y = ${state.ixY};\n  let i = (y * width + x) * 4;\n  // i = ${state.ixY * state.pixW * 4 + state.ixX * 4}\n  let r = pixels[i];\n  let g = pixels[i + 1];\n  let b = pixels[i + 2];\n  let a = pixels[i + 3];\n}`,
+    controls: [
+      { type: 'slider', key: 'ixX', label: 'X position', hint: `0 → ${state.pixW - 1}`, min: 0, max: state.pixW - 1, step: 1 },
+      { type: 'slider', key: 'ixY', label: 'Y position', hint: `0 → ${state.pixH - 1}`, min: 0, max: state.pixH - 1, step: 1 }
+    ],
+    presets: [
+      { label: 'Corner (0,0)', action: () => { state.ixX = 0; state.ixY = 0; } },
+      { label: 'Center', action: () => { state.ixX = Math.floor(state.pixW / 2); state.ixY = Math.floor(state.pixH / 2); } },
+      { label: '⚠ Last row', action: () => { state.ixX = 0; state.ixY = state.pixH - 1; }, isBreak: true }
+    ]
+  },
+  filter: {
+    canvasTitle: 'Filter: grayscale by averaging R, G, B',
+    canvasSub: 'Left: colorful image. Right: filtered version. Slide to blend.',
+    predict: 'Before sliding — what do you think averaging R, G, B will do to bright red? To a pastel?',
+    big: 'Grayscale is averaging R, G, B into one number and setting all three channels to it. Alpha stays unchanged.',
+    bug: 'Forgetting to call loadPixels() before reading pixels[] gives an empty or stale array.',
+    tryIt: 'Find a blend value where the image looks "film-like" — slightly desaturated but not fully gray.',
+    note: 'avg = (r+g+b)/3.',
+    focusHTML: () => `<span class="ct kw">let</span> avg = (r + g + b) / 3;\npixels[i]=avg; pixels[i+<span class="ct num">1</span>]=avg; pixels[i+<span class="ct num">2</span>]=avg;`,
+    fullCode: () => `function setup() {\n  createCanvas(400, 300);\n}\n\nfunction draw() {\n  loadPixels();\n  for (let i = 0; i < pixels.length; i += 4) {\n    let r = pixels[i];\n    let g = pixels[i+1];\n    let b = pixels[i+2];\n    let avg = (r + g + b) / 3;\n    pixels[i]   = avg;\n    pixels[i+1] = avg;\n    pixels[i+2] = avg;\n    // alpha unchanged\n  }\n  updatePixels();\n}`,
+    controls: [
+      { type: 'slider', key: 'blend', label: 'Blend', hint: '0 = color → 1 = grayscale', min: 0, max: 1, step: 0.01 },
+      { type: 'slider', key: 'brightness', label: 'Brightness', hint: '0–200%', min: 0, max: 200, step: 1 }
+    ],
+    presets: [
+      { label: 'Full color', action: () => { state.blend = 0; state.brightness = 100; } },
+      { label: 'Half gray', action: () => { state.blend = 0.5; state.brightness = 100; } },
+      { label: 'Full gray', action: () => { state.blend = 1; state.brightness = 100; } },
+      { label: '⚠ Inverted', action: () => { state.blend = 1; state.brightness = 0; }, isBreak: true }
+    ]
+  },
+  generate: {
+    canvasTitle: 'Generate: images from math',
+    canvasSub: 'Each pixel\'s color = f(x, y). No source file needed.',
+    predict: 'Before switching modes — what pattern do you think sin(x) × sin(y) will make?',
+    big: 'You can create any image with no source file — just set pixels based on x and y coordinates. The whole image is your output function.',
+    bug: 'Drawing to pixels[] outside the canvas bounds (negative index, or index ≥ pixels.length) causes silent errors or memory corruption.',
+    tryIt: 'What pattern does sin(x/10) * sin(y/10) * 127 + 128 produce? Try it in the Stripes mode.',
+    note: 'pixels[i] = f(x, y).',
+    focusHTML: () => `pixels[i] = <span class="ct fn">sin</span>(x / <span class="ct num" id="v-sc">${state.genScale}</span>) * 127 + 128;`,
+    fullCode: () => `function setup() {\n  createCanvas(620, 420);\n}\n\nfunction draw() {\n  loadPixels();\n  for (let y = 0; y < height; y++) {\n    for (let x = 0; x < width; x++) {\n      let i = (y * width + x) * 4;\n      pixels[i]   = sin(x / ${state.genScale}) * 127 + 128;\n      pixels[i+1] = sin(y / ${state.genScale}) * 127 + 128;\n      pixels[i+2] = 200;\n      pixels[i+3] = 255;\n    }\n  }\n  updatePixels();\n}`,
+    controls: [
+      { type: 'modebtn', options: ['gradient', 'checker', 'noise', 'stripes'], labels: ['Gradient', 'Checker', 'Noise', 'Stripes'] },
+      { type: 'slider', key: 'genScale', label: 'Scale', hint: 'frequency of pattern', min: 4, max: 60, step: 1 }
+    ],
+    presets: [
+      { label: 'Gradient', action: () => { state.genMode = 'gradient'; } },
+      { label: 'Checkerboard', action: () => { state.genMode = 'checker'; } },
+      { label: 'Noise', action: () => { state.genMode = 'noise'; } },
+      { label: 'Stripes', action: () => { state.genMode = 'stripes'; } }
+    ]
+  },
+  brush: {
+    canvasTitle: 'Brush: painting with pixels[]',
+    canvasSub: 'Click and drag to paint. Each stroke writes directly to pixels[].',
+    predict: 'Before painting — what do you think happens if two brush strokes overlap with different colors?',
+    big: 'Writing to pixels[] while the mouse moves creates a soft pixel paint tool. You control exactly which pixels change and by how much.',
+    bug: 'Reading from loadPixels() and writing back is slow for large canvases — limit brush size or reduce canvas resolution for performance.',
+    tryIt: 'Draw with a large brush then a tiny one. Can you write your initial using only pixel edits?',
+    note: 'pixels[(y*width+x)*4] = r.',
+    focusHTML: () => `pixels[(y*width+x)*4] = <span class="ct num" id="v-br">${PAINT_COLORS[state.brushColor].r}</span>; <span class="ct cm">// paint red</span>`,
+    fullCode: () => `function setup() {\n  createCanvas(620, 420);\n}\n\nfunction mouseDragged() {\n  loadPixels();\n  let bs = ${state.brushSize};\n  for (let dy = -bs; dy <= bs; dy++) {\n    for (let dx = -bs; dx <= bs; dx++) {\n      if (dx*dx+dy*dy <= bs*bs) {\n        let px = mouseX + dx;\n        let py = mouseY + dy;\n        if (px >= 0 && px < width && py >= 0 && py < height) {\n          let i = (py * width + px) * 4;\n          pixels[i]   = ${PAINT_COLORS[state.brushColor].r};\n          pixels[i+1] = ${PAINT_COLORS[state.brushColor].g};\n          pixels[i+2] = ${PAINT_COLORS[state.brushColor].b};\n          pixels[i+3] = 255;\n        }\n      }\n    }\n  }\n  updatePixels();\n}`,
+    controls: [
+      { type: 'colorpick', key: 'brushColor', label: 'Brush color' },
+      { type: 'slider', key: 'brushSize', label: 'Brush size', hint: '1 → 20 px', min: 1, max: 20, step: 1 }
+    ],
+    presets: [
+      { label: 'Red paint', action: () => { state.brushColor = 1; } },
+      { label: 'Blue paint', action: () => { state.brushColor = 2; } },
+      { label: '⚠ Brush size=0', action: () => { state.brushSize = 0; }, isBreak: true },
+      { label: 'Clear', action: () => { initBrushPixels(); } }
+    ]
+  }
+};
+
+// ─── UI builders ──────────────────────────────────────────────────────────────
+
+function buildControls() {
+  const controlsEl = document.getElementById('controls');
+  controlsEl.innerHTML = '';
+  const mode = modes[state.mode];
+
+  mode.controls.forEach(ctrl => {
+    if (ctrl.type === 'slider') {
+      const row = document.createElement('div');
+      row.className = 'ctrl-row';
+      const vDisplay = ctrl.key === 'blend' ? Number(state[ctrl.key]).toFixed(2) : Math.round(state[ctrl.key]);
+      row.innerHTML = `
+        <div><label for="sl_${ctrl.key}">${ctrl.label}<small>${ctrl.hint || ''}</small></label></div>
+        <span class="val-badge mono" id="vb_${ctrl.key}">${vDisplay}</span>
+        <input id="sl_${ctrl.key}" type="range" min="${ctrl.min}" max="${ctrl.max}" step="${ctrl.step}" value="${state[ctrl.key]}" aria-label="${ctrl.label}">
+      `;
+      controlsEl.appendChild(row);
+      row.querySelector('input').addEventListener('input', e => {
+        state[ctrl.key] = Number(e.target.value);
+        const disp = ctrl.key === 'blend' ? Number(state[ctrl.key]).toFixed(2) : Math.round(state[ctrl.key]);
+        document.getElementById(`vb_${ctrl.key}`).textContent = disp;
+        updateCode();
+        render();
+      });
+    } else if (ctrl.type === 'colorpick') {
+      const stateKey = ctrl.key;
+      const row = document.createElement('div');
+      row.className = 'ctrl-row';
+      row.innerHTML = `<div><label>${ctrl.label}</label></div><div></div>`;
+      const btnRow = document.createElement('div');
+      btnRow.style.cssText = 'display:flex;gap:8px;grid-column:1/-1;padding-top:4px;';
+      PAINT_COLORS.forEach((col, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = col.label;
+        btn.style.cssText = `padding:6px 12px;border-radius:8px;border:2px solid ${state[stateKey]===idx?'#7a5ea8':'#ddd'};background:${idx===0?'#ede8ff':idx===1?'#ffe8ea':'#e8f5f2'};font-weight:800;font-size:0.82rem;cursor:pointer;`;
+        btn.addEventListener('click', () => {
+          state[stateKey] = idx;
+          buildControls();
+          updateCode();
+          render();
         });
-        els.paletteRow.appendChild(btn);
+        btnRow.appendChild(btn);
       });
-      els.swatchBtns = Array.from(els.paletteRow.querySelectorAll(".swatch-btn"));
-
-      els.modeGrid.addEventListener("click", () => setMode("grid"));
-      els.modeRgb.addEventListener("click", () => setMode("rgb"));
-      els.modeSample.addEventListener("click", () => setMode("sample"));
-      els.modePixels.addEventListener("click", () => setMode("pixels"));
-      els.modeRemix.addEventListener("click", () => setMode("remix"));
-
-      els.effectButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          state.effect = button.dataset.effect;
-          state.mode = "remix";
-          updateUI();
+      row.appendChild(btnRow);
+      controlsEl.appendChild(row);
+    } else if (ctrl.type === 'modebtn') {
+      const row = document.createElement('div');
+      row.className = 'ctrl-row';
+      row.innerHTML = '<div><label>Mode</label></div><div></div>';
+      const btnRow = document.createElement('div');
+      btnRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;grid-column:1/-1;padding-top:4px;';
+      ctrl.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = ctrl.labels[idx];
+        btn.style.cssText = `padding:6px 10px;border-radius:8px;border:2px solid ${state.genMode===opt?'#7a5ea8':'#ddd'};background:${state.genMode===opt?'#ede8ff':'#fff'};font-weight:800;font-size:0.8rem;cursor:pointer;`;
+        btn.addEventListener('click', () => {
+          state.genMode = opt;
+          buildControls();
+          updateCode();
+          render();
         });
+        btnRow.appendChild(btn);
       });
-
-      els.presetButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          loadPreset(button.dataset.preset);
-          updateUI();
-        });
-      });
-
-      els.resetButton.addEventListener("click", () => {
-        buildImageData();
-        updateUI();
-      });
-
-      els.showLabels.addEventListener("change", () => {
-        state.showLabels = els.showLabels.checked;
-      });
-
-      els.showCode.addEventListener("change", () => {
-        state.showCode = els.showCode.checked;
-        updateUI();
-      });
-
-      buildImageData();
-      updateUI();
+      row.appendChild(btnRow);
+      controlsEl.appendChild(row);
     }
+  });
+}
 
-    function updateSwatchSelection() {
-      if (!els.swatchBtns) return;
-      els.swatchBtns.forEach((btn, i) => {
-        btn.style.borderColor = i === state.selectedColor ? "#222" : "#ded2c1";
-        btn.style.transform = i === state.selectedColor ? "scale(1.25)" : "scale(1)";
-      });
-    }
+function buildPresets() {
+  const area = document.getElementById('presets-area');
+  area.innerHTML = '';
+  const lbl = document.createElement('div');
+  lbl.className = 'presets-label';
+  lbl.textContent = 'Try these';
+  area.appendChild(lbl);
+  const row = document.createElement('div');
+  row.className = 'preset-row';
+  modes[state.mode].presets.forEach(preset => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'preset-btn' + (preset.isBreak ? ' break' : '');
+    btn.textContent = preset.label;
+    btn.addEventListener('click', () => {
+      preset.action();
+      buildControls();
+      updateCode();
+      render();
+    });
+    row.appendChild(btn);
+  });
+  area.appendChild(row);
+}
 
-    function buildImageData() {
-      state.data = [];
-      for (let y = 0; y < state.rows; y++) {
-        const row = [];
-        for (let x = 0; x < state.cols; x++) {
-          row.push({ r: 255, g: 255, b: 255, a: 255 });
-        }
-        state.data.push(row);
-      }
-    }
+function updateCode() {
+  const mode = modes[state.mode];
+  document.getElementById('focus-code').innerHTML = mode.focusHTML();
+  const fullEl = document.getElementById('full-code');
+  fullEl.textContent = mode.fullCode();
+  document.getElementById('code-note').textContent = mode.note;
+}
 
-    function loadPreset(name) {
-      const preset = PRESETS[name];
-      if (!preset) return;
-      buildImageData();
-      for (let y = 0; y < state.rows; y++) {
-        for (let x = 0; x < state.cols; x++) {
-          const idx = preset[y][x];
-          if (idx === -1) {
-            state.data[y][x] = { r: 255, g: 255, b: 255, a: 255 };
-          } else {
-            const col = PALETTE[idx];
-            state.data[y][x] = { r: col.r, g: col.g, b: col.b, a: 255 };
-          }
-        }
-      }
-    }
+function render() {
+  const renderers = { grid: renderGrid, index: renderIndex, filter: renderFilter, generate: renderGenerate, brush: renderBrush };
+  renderers[state.mode]();
+}
 
-    function paintCell(gx, gy) {
-      if (gx < 0 || gx >= state.cols || gy < 0 || gy >= state.rows) return;
-      const col = PALETTE[state.selectedColor];
-      state.data[gy][gx] = { r: col.r, g: col.g, b: col.b, a: 255 };
-      state.sampleX = gx;
-      state.sampleY = gy;
-      updateUI();
-    }
+// ─── Tab switching ────────────────────────────────────────────────────────────
 
-    function clamp(v, min, max) {
-      return Math.max(min, Math.min(max, v));
-    }
+function setMode(modeName) {
+  state.mode = modeName;
+  document.querySelectorAll('.tab').forEach(tab => {
+    const active = tab.dataset.mode === modeName;
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    tab.tabIndex = active ? 0 : -1;
+  });
+  const mode = modes[modeName];
+  document.getElementById('canvas-title').textContent = mode.canvasTitle;
+  document.getElementById('canvas-sub').textContent = mode.canvasSub;
+  document.getElementById('predict-text').textContent = mode.predict;
+  document.getElementById('big-idea-text').textContent = mode.big;
+  document.getElementById('bug-text').textContent = mode.bug;
+  document.getElementById('try-text').textContent = mode.tryIt;
+  buildControls();
+  buildPresets();
+  updateCode();
+  render();
+}
 
-    function selectedPixel() {
-      return state.data[state.sampleY][state.sampleX];
-    }
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => setMode(tab.dataset.mode));
+  tab.addEventListener('keydown', e => {
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const idx = tabs.findIndex(t => t.dataset.mode === state.mode);
+    if (e.key === 'ArrowRight') { e.preventDefault(); const next = tabs[(idx + 1) % tabs.length]; next.focus(); setMode(next.dataset.mode); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); const prev = tabs[(idx - 1 + tabs.length) % tabs.length]; prev.focus(); setMode(prev.dataset.mode); }
+  });
+});
 
-    function brightnessOf(c) {
-      return Math.round((c.r + c.g + c.b) / 3);
-    }
+document.getElementById('fullCodeToggle').addEventListener('click', function() {
+  const fullEl = document.getElementById('full-code');
+  const open = fullEl.classList.toggle('open');
+  this.textContent = open ? '▾ Hide full sketch' : '▸ See full p5.js sketch';
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) updateCode();
+});
 
-    function remixedColor(c) {
-      const avg = brightnessOf(c);
-      if (state.effect === "grayscale") return { r: avg, g: avg, b: avg, a: 255 };
-      if (state.effect === "threshold") return avg > 132 ? { r: 255, g: 255, b: 255, a: 255 } : { r: 20, g: 20, b: 24, a: 255 };
-      if (state.effect === "invert") return { r: 255 - c.r, g: 255 - c.g, b: 255 - c.b, a: 255 };
-      if (state.effect === "mosaic") return c;
-      return c;
-    }
-
-    function setMode(mode) {
-      state.mode = mode;
-      updateUI();
-    }
-
-    function updateUI() {
-      const buttons = [
-        [els.modeGrid, "grid"],
-        [els.modeRgb, "rgb"],
-        [els.modeSample, "sample"],
-        [els.modePixels, "pixels"],
-        [els.modeRemix, "remix"]
-      ];
-      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
-      els.effectButtons.forEach((button) => button.classList.toggle("active", button.dataset.effect === state.effect));
-
-      els.showLabels.checked = state.showLabels;
-      els.showCode.checked = state.showCode;
-      els.codeCard.classList.toggle("visible", state.showCode);
-      updateSwatchSelection();
-
-      const c = selectedPixel();
-      const idx = 4 * (state.sampleY * state.cols + state.sampleX);
-      const lessons = {
-        grid: {
-          pill: "paint your own pixel art",
-          title: "Paint pixels — they are just data",
-          text: "Click the grid to paint. Each cell is one pixel. Hover to see its RGB values. Your painting is a 10×10 array of colors.",
-          formula: `pixel at (${state.sampleX}, ${state.sampleY})\ncolor = [${c.r}, ${c.g}, ${c.b}, ${c.a}]`,
-          question: "What happens to image detail when the pixel squares are bigger? Smaller?",
-          caption: "Click to paint. Hover to inspect. Each cell stores color as numbers.",
-          code: `// Each painted cell:\nfill(${c.r}, ${c.g}, ${c.b});\nrect(${state.sampleX * 28}, ${state.sampleY * 28}, 28, 28);`
-        },
-        rgb: {
-          pill: "each pixel stores RGB values",
-          title: "Each pixel stores color numbers",
-          text: "The color you painted is stored as three numbers: red, green, and blue. Hover or click a cell to see its values.",
-          formula: `pixel(${state.sampleX}, ${state.sampleY})\nred   = ${c.r}\ngreen = ${c.g}\nblue  = ${c.b}\nalpha = ${c.a}`,
-          question: "Which channel is strongest in the selected pixel? How does that relate to the color you see?",
-          caption: "RGB values are numbers. Change the numbers, change the color.",
-          code: `let c = img.get(${state.sampleX}, ${state.sampleY});\nlet r = red(c);   // ${c.r}\nlet g = green(c); // ${c.g}\nlet b = blue(c);  // ${c.b}`
-        },
-        sample: {
-          pill: "get(x, y) samples one pixel",
-          title: "get() reads one pixel's color",
-          text: "get(x, y) asks the image for the color stored at one position. That data can be used to draw something new anywhere.",
-          formula: `let c = img.get(${state.sampleX}, ${state.sampleY});\n// c = [${c.r}, ${c.g}, ${c.b}]\nfill(c);\ncircle(mouseX, mouseY, 30);`,
-          question: "How could you use get() to make a mosaic of circles from your pixel art?",
-          caption: "Hover a cell to see its color data. get() reads that color from the painted image.",
-          code: `let c = img.get(mouseX, mouseY);\nfill(c);\ncircle(mouseX, mouseY, 30);`
-        },
-        pixels: {
-          pill: "pixels[] stores raw image data",
-          title: "pixels[] is one long list",
-          text: "Behind the grid, p5.js stores pixel data in a single long array. Each pixel takes four slots: red, green, blue, and alpha.",
-          formula: `index = 4 * (y * width + x)\n     = 4 * (${state.sampleY} * ${state.cols} + ${state.sampleX})\n     = ${idx}\n\npixels[${idx}] = ${c.r}  (red)\npixels[${idx + 1}] = ${c.g}  (green)\npixels[${idx + 2}] = ${c.b}  (blue)\npixels[${idx + 3}] = ${c.a}  (alpha)`,
-          question: "Why does each pixel need four positions in the pixels[] array?",
-          caption: "pixels[] is not a 2D grid. It is one long list with four numbers per pixel.",
-          code: `loadPixels();\nlet index = 4 * (${state.sampleY} * width + ${state.sampleX});\nlet r = pixels[index + 0]; // ${c.r}\nlet g = pixels[index + 1]; // ${c.g}\nlet b = pixels[index + 2]; // ${c.b}\nlet a = pixels[index + 3]; // ${c.a}`
-        },
-        remix: {
-          pill: "transform your painting's pixel data",
-          title: "Remix transforms your pixel data",
-          text: "The same painting — your colors — run through a math formula. Grayscale averages R, G, B. Invert subtracts each from 255. Threshold turns brightness into black or white.",
-          formula: `effect = ${state.effect}\noriginal = rgb(${c.r}, ${c.g}, ${c.b})\nbrightness = (${c.r} + ${c.g} + ${c.b}) / 3 = ${Math.round((c.r + c.g + c.b) / 3)}`,
-          question: "Which remix keeps the most color information? Which throws the most away?",
-          caption: "Same pixel data, different formula. Remixing means math on your numbers.",
-          code: `loadPixels();\nfor (let i = 0; i < pixels.length; i += 4) {\n  let r = pixels[i + 0];\n  let g = pixels[i + 1];\n  let b = pixels[i + 2];\n  let avg = (r + g + b) / 3;\n  // grayscale:\n  pixels[i + 0] = avg;\n  pixels[i + 1] = avg;\n  pixels[i + 2] = avg;\n}\nupdatePixels();`
-        }
-      };
-
-      const lesson = lessons[state.mode];
-      els.modePill.textContent = lesson.pill;
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.formulaBox.textContent = lesson.formula;
-      els.questionText.textContent = lesson.question;
-      els.caption.textContent = lesson.caption;
-      els.codeBox.textContent = lesson.code;
-    }
-
-    setupUI();
-
-    const sketch = (p) => {
-      let canvas;
-      let holder;
-      let previousWidth = 0;
-      let previousHeight = 0;
-
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive visualization of images as grids of RGB pixel data in p5.js.");
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
-      };
-
-      p.windowResized = () => resizeToHolder();
-
-      p.draw = () => {
-        resizeToHolder();
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-        drawPanelTitle();
-
-        if (state.mode === "grid") drawGridMode();
-        if (state.mode === "rgb") drawRgbMode();
-        if (state.mode === "sample") drawSampleMode();
-        if (state.mode === "pixels") drawPixelsArrayMode();
-        if (state.mode === "remix") drawRemixMode();
-
-        drawReadoutCards();
-      };
-
-      p.mousePressed = () => handleMouseInteraction(true);
-      p.mouseDragged = () => handleMouseInteraction(false);
-      p.mouseMoved = () => {
-        const grid = getPaintGrid();
-        if (p.mouseX >= grid.x && p.mouseX <= grid.x + grid.w && p.mouseY >= grid.y && p.mouseY <= grid.y + grid.h) {
-          const col = Math.floor((p.mouseX - grid.x) / grid.cell);
-          const row = Math.floor((p.mouseY - grid.y) / grid.cell);
-          const nx = clamp(col, 0, state.cols - 1);
-          const ny = clamp(row, 0, state.rows - 1);
-          if (nx !== state.hoveredX || ny !== state.hoveredY) {
-            state.hoveredX = nx;
-            state.hoveredY = ny;
-            if (state.mode !== "grid") {
-              state.sampleX = nx;
-              state.sampleY = ny;
-              updateUI();
-            }
-          }
-        } else {
-          state.hoveredX = -1;
-          state.hoveredY = -1;
-        }
-      };
-
-      function handleMouseInteraction(isClick) {
-        const grid = getPaintGrid();
-        if (p.mouseX < grid.x || p.mouseX > grid.x + grid.w || p.mouseY < grid.y || p.mouseY > grid.y + grid.h) {
-          // Not on paint grid — just update selection
-          const ig = getImageGrid();
-          if (p.mouseX >= ig.x && p.mouseX <= ig.x + ig.w && p.mouseY >= ig.y && p.mouseY <= ig.y + ig.h) {
-            const col = Math.floor((p.mouseX - ig.x) / ig.cell);
-            const row = Math.floor((p.mouseY - ig.y) / ig.cell);
-            state.sampleX = clamp(col, 0, state.cols - 1);
-            state.sampleY = clamp(row, 0, state.rows - 1);
-            updateUI();
-          }
-          return;
-        }
-        const col = Math.floor((p.mouseX - grid.x) / grid.cell);
-        const row = Math.floor((p.mouseY - grid.y) / grid.cell);
-        paintCell(clamp(col, 0, state.cols - 1), clamp(row, 0, state.rows - 1));
-      }
-
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-        if (w !== previousWidth || h !== previousHeight) {
-          p.resizeCanvas(w, h);
-          previousWidth = w;
-          previousHeight = h;
-        }
-      }
-
-      function getPaintGrid() {
-        const cell = state.pixelSize;
-        const w = cell * state.cols;
-        const h = cell * state.rows;
-        return { x: p.width * 0.06, y: p.height * 0.16, w, h, cell };
-      }
-
-      function drawSubtleGrid() {
-        p.push();
-        p.stroke(236, 224, 207);
-        p.strokeWeight(1);
-        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
-        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
-        p.pop();
-      }
-
-      function drawPanelTitle() {
-        const titles = {
-          grid: ["Paint & Grid", "Click to paint. Hover to inspect. Each cell is one pixel."],
-          rgb: ["RGB Values", "Each painted pixel stores color as three numbers."],
-          sample: ["get() / Sample", "Read one pixel and use its color somewhere else."],
-          pixels: ["pixels[] Array", "Your painting is stored as one long list of RGBA values."],
-          remix: ["Remix", "Transform your painting's pixel values with a formula."]
-        };
-        const [title, subtitle] = titles[state.mode];
-        p.push();
-        p.noStroke();
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(22);
-        p.text(title, 24, 38);
-        p.textStyle(p.NORMAL);
-        p.textSize(14);
-        p.fill("#6b6258");
-        p.text(subtitle, 24, 62);
-        p.pop();
-      }
-
-      function getImageGrid() {
-        // For non-grid modes, show a smaller version on left for reference
-        const cell = state.pixelSize;
-        const w = cell * state.cols;
-        const h = cell * state.rows;
-        return { x: p.width * 0.06, y: p.height * 0.16, w, h, cell };
-      }
-
-      function drawGridMode() {
-        const grid = getPaintGrid();
-        drawPaintGrid(grid);
-        drawZoomedPixelPanel(grid.x + grid.w + 42, grid.y, p.width - (grid.x + grid.w + 74), grid.h);
-      }
-
-      function drawRgbMode() {
-        const grid = getImageGrid();
-        drawImageGrid(grid, false, true);
-        drawRgbBars(grid.x + grid.w + 42, grid.y, p.width - (grid.x + grid.w + 74), grid.h);
-      }
-
-      function drawSampleMode() {
-        const grid = getImageGrid();
-        drawImageGrid(grid, false, true);
-        drawSamplingPanel(grid.x + grid.w + 42, grid.y, p.width - (grid.x + grid.w + 74), grid.h);
-      }
-
-      function drawPixelsArrayMode() {
-        const grid = getImageGrid();
-        drawImageGrid(grid, false, true);
-        drawPixelsArrayPanel(grid.x + grid.w + 42, grid.y, p.width - (grid.x + grid.w + 74), grid.h);
-      }
-
-      function drawRemixMode() {
-        const leftGrid = getImageGrid();
-        const rightGrid = { ...leftGrid, x: p.width * 0.50 };
-        drawImageGrid(leftGrid, false, true, "your painting");
-        drawImageGrid(rightGrid, true, true, `${state.effect} remix`);
-        if (state.showLabels) drawLabel("same data → transformed values", p.width * 0.32, p.height * 0.64, "#7c3aed", 14);
-      }
-
-      function drawPaintGrid(grid) {
-        // Background panel
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 235);
-        p.rect(grid.x - 14, grid.y - 44, grid.w + 28, grid.h + 60, 22);
-        if (state.showLabels) drawLabel("paint here — click to color", grid.x, grid.y - 18, "#7c3aed", 14);
-        p.pop();
-
-        for (let row = 0; row < state.rows; row++) {
-          for (let col = 0; col < state.cols; col++) {
-            const c = state.data[row][col];
-            const cx = grid.x + col * grid.cell;
-            const cy = grid.y + row * grid.cell;
-            const isHovered = col === state.hoveredX && row === state.hoveredY;
-            const isSelected = col === state.sampleX && row === state.sampleY;
-
-            p.push();
-            p.noStroke();
-            p.fill(c.r, c.g, c.b, c.a);
-            p.rect(cx, cy, grid.cell, grid.cell);
-            p.pop();
-
-            // Grid lines
-            p.push();
-            p.noFill();
-            p.stroke(isHovered ? "#7c3aed" : "#c4b8a8");
-            p.strokeWeight(isHovered ? 2 : 0.8);
-            p.rect(cx, cy, grid.cell, grid.cell);
-            p.pop();
-
-            // Hover highlight
-            if (isHovered) {
-              p.push();
-              p.noStroke();
-              p.fill(124, 58, 237, 40);
-              p.rect(cx, cy, grid.cell, grid.cell);
-              p.pop();
-            }
-
-            // Hovered cell code snippet inside cell
-            if (isHovered && grid.cell >= 24) {
-              const hc = state.data[row][col];
-              drawLabel(`(${col},${row})`, cx + 2, cy + grid.cell - 4, "#7c3aed", 9);
-            }
-          }
-        }
-
-        // Selection border
-        const sx = grid.x + state.sampleX * grid.cell;
-        const sy = grid.y + state.sampleY * grid.cell;
-        p.push();
-        p.noFill();
-        p.stroke("#7c3aed");
-        p.strokeWeight(3);
-        p.rect(sx, sy, grid.cell, grid.cell, 2);
-        p.pop();
-
-        // Show code for hovered cell
-        if (state.hoveredX >= 0 && state.showLabels) {
-          const hc = state.data[state.hoveredY][state.hoveredX];
-          const codeStr = `fill(${hc.r}, ${hc.g}, ${hc.b});\nrect(${state.hoveredX * grid.cell}, ${state.hoveredY * grid.cell}, ${grid.cell}, ${grid.cell});`;
-          drawLabel(codeStr, grid.x, grid.y + grid.h + 16, "#334155", 12);
-        }
-      }
-
-      function drawImageGrid(grid, remix = false, showSelection = true, title = "image grid") {
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 235);
-        p.rect(grid.x - 18, grid.y - 46, grid.w + 36, grid.h + 64, 22);
-        if (state.showLabels) drawLabel(title, grid.x, grid.y - 20, remix ? "#7c3aed" : "#64748b", 14);
-
-        for (let row = 0; row < state.rows; row++) {
-          for (let col = 0; col < state.cols; col++) {
-            let c = state.data[row][col];
-            if (remix) c = remixedColor(c);
-            const x = grid.x + col * grid.cell;
-            const y = grid.y + row * grid.cell;
-            if (state.effect === "mosaic" && remix) {
-              const b = brightnessOf(c);
-              p.fill(c.r, c.g, c.b, 230);
-              p.circle(x + grid.cell / 2, y + grid.cell / 2, p.map(b, 0, 255, 4, grid.cell * 1.05));
-            } else {
-              p.fill(c.r, c.g, c.b, c.a);
-              p.rect(x, y, grid.cell + 0.6, grid.cell + 0.6);
-            }
-          }
-        }
-
-        p.noFill();
-        p.stroke("#64748b");
-        p.strokeWeight(1);
-        for (let col = 0; col <= state.cols; col++) {
-          const x = grid.x + col * grid.cell;
-          p.line(x, grid.y, x, grid.y + grid.h);
-        }
-        for (let row = 0; row <= state.rows; row++) {
-          const y = grid.y + row * grid.cell;
-          p.line(grid.x, y, grid.x + grid.w, y);
-        }
-
-        if (showSelection) {
-          const sx = grid.x + state.sampleX * grid.cell;
-          const sy = grid.y + state.sampleY * grid.cell;
-          p.noFill();
-          p.stroke("#7c3aed");
-          p.strokeWeight(4);
-          p.rect(sx, sy, grid.cell, grid.cell, 3);
-          if (state.showLabels) drawLabel(`(${state.sampleX}, ${state.sampleY})`, sx + grid.cell + 8, sy + grid.cell * 0.75, "#7c3aed", 12);
-        }
-        p.pop();
-      }
-
-      function drawZoomedPixelPanel(x, y, w, h) {
-        const c = selectedPixel();
-        drawPanel(x, y, w, h);
-        p.push();
-        p.noStroke();
-        p.fill(c.r, c.g, c.b, c.a);
-        const size = Math.min(w * 0.55, h * 0.55);
-        p.rect(x + w * 0.5 - size / 2, y + h * 0.38 - size / 2, size, size, 18);
-        p.stroke("#7c3aed");
-        p.strokeWeight(4);
-        p.noFill();
-        p.rect(x + w * 0.5 - size / 2, y + h * 0.38 - size / 2, size, size, 18);
-        p.noStroke();
-        if (state.showLabels) {
-          drawLabel("selected pixel", x + 24, y + 34, "#7c3aed", 14);
-          drawLabel(`location: (${state.sampleX}, ${state.sampleY})`, x + 24, y + h - 48, "#64748b", 13);
-          drawLabel(`color: rgb(${c.r}, ${c.g}, ${c.b})`, x + 24, y + h - 22, "#f59e0b", 13);
-        }
-        p.pop();
-      }
-
-      function drawRgbBars(x, y, w, h) {
-        const c = selectedPixel();
-        drawPanel(x, y, w, h);
-        const bars = [
-          { label: "red", value: c.r, color: "#e11d48" },
-          { label: "green", value: c.g, color: "#16a34a" },
-          { label: "blue", value: c.b, color: "#0891b2" },
-          { label: "alpha", value: c.a, color: "#64748b" }
-        ];
-        p.push();
-        if (state.showLabels) drawLabel("RGB channels", x + 24, y + 34, "#f59e0b", 14);
-        for (let i = 0; i < bars.length; i++) {
-          const bar = bars[i];
-          const by = y + 70 + i * 48;
-          p.noStroke();
-          p.fill("#e6dac8");
-          p.rect(x + 24, by, w - 72, 22, 999);
-          p.fill(bar.color);
-          p.rect(x + 24, by, (w - 72) * (bar.value / 255), 22, 999);
-          p.fill("#222222");
-          p.textStyle(p.BOLD);
-          p.textSize(13);
-          p.text(`${bar.label}: ${bar.value}`, x + 24, by - 8);
-        }
-        p.fill(c.r, c.g, c.b, c.a);
-        p.rect(x + w - 38, y + 70, 18, 166, 9);
-        p.pop();
-      }
-
-      function drawSamplingPanel(x, y, w, h) {
-        const c = selectedPixel();
-        drawPanel(x, y, w, h);
-        p.push();
-        if (state.showLabels) drawLabel("get(x, y)", x + 24, y + 34, "#f59e0b", 14);
-        p.noStroke();
-        p.fill(c.r, c.g, c.b, c.a);
-        p.circle(x + w * 0.50, y + h * 0.38, Math.min(w, h) * 0.42);
-        p.fill("#222222");
-        p.textAlign(p.CENTER, p.CENTER);
-        p.textStyle(p.BOLD);
-        p.textSize(16);
-        p.text("sampled\ncolor", x + w * 0.50, y + h * 0.38);
-        p.textAlign(p.LEFT, p.BASELINE);
-        if (state.showLabels) {
-          drawLabel(`let c = img.get(${state.sampleX}, ${state.sampleY});`, x + 24, y + h - 64, "#334155", 12);
-          drawLabel("use the color to draw something new", x + 24, y + h - 32, "#f59e0b", 13);
-        }
-        p.pop();
-      }
-
-      function drawPixelsArrayPanel(x, y, w, h) {
-        const c = selectedPixel();
-        const index = 4 * (state.sampleY * state.cols + state.sampleX);
-        drawPanel(x, y, w, h);
-        p.push();
-        if (state.showLabels) drawLabel("pixels[] array", x + 24, y + 34, "#7c3aed", 14);
-        const rows = [
-          { label: `pixels[${index}]`, value: c.r, color: "#e11d48" },
-          { label: `pixels[${index + 1}]`, value: c.g, color: "#16a34a" },
-          { label: `pixels[${index + 2}]`, value: c.b, color: "#0891b2" },
-          { label: `pixels[${index + 3}]`, value: c.a, color: "#64748b" }
-        ];
-        for (let i = 0; i < rows.length; i++) {
-          const yy = y + 72 + i * 45;
-          p.noStroke();
-          p.fill(rows[i].color);
-          p.rect(x + 24, yy - 20, 18, 18, 5);
-          p.fill("#334155");
-          p.textStyle(p.BOLD);
-          p.textSize(13);
-          p.text(rows[i].label, x + 52, yy - 5);
-          p.fill("#222222");
-          p.textAlign(p.RIGHT, p.BASELINE);
-          p.text(rows[i].value, x + w - 28, yy - 5);
-          p.textAlign(p.LEFT, p.BASELINE);
-        }
-        if (state.showLabels) drawLabel("4 values per pixel: R, G, B, A", x + 24, y + h - 30, "#6b6258", 13);
-        p.pop();
-      }
-
-      function drawPanel(x, y, w, h) {
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 235);
-        p.rect(x, y, Math.max(120, w), h, 22);
-        p.pop();
-      }
-
-      function drawReadoutCards() {
-        const hx = state.hoveredX >= 0 ? state.hoveredX : state.sampleX;
-        const hy = state.hoveredY >= 0 ? state.hoveredY : state.sampleY;
-        const c = state.data[hy] ? state.data[hy][hx] || selectedPixel() : selectedPixel();
-        const cards = [
-          { label: "selected", value: `(${hx}, ${hy})`, color: "#7c3aed" },
-          { label: "RGB", value: `${c.r}, ${c.g}, ${c.b}`, color: "#f59e0b" },
-          { label: "brightness", value: brightnessOf(c), color: "#16a34a" }
-        ];
-        const cardW = Math.min(176, (p.width - 70) / cards.length);
-        const y = p.height - 168;
-        const x = 28;
-        p.push();
-        for (let i = 0; i < cards.length; i++) {
-          const cx = x + i * (cardW + 10);
-          p.noStroke();
-          p.fill(255, 255, 255, 235);
-          p.rect(cx, y, cardW, 62, 14);
-          p.fill(cards[i].color);
-          p.textStyle(p.BOLD);
-          p.textSize(13);
-          p.text(cards[i].label, cx + 12, y + 22);
-          p.fill("#222222");
-          p.textSize(16);
-          p.text(String(cards[i].value), cx + 12, y + 48);
-        }
-        p.pop();
-      }
-
-      function drawLabel(text, x, y, color, size = 13) {
-        p.push();
-        p.textSize(size);
-        p.textStyle(p.BOLD);
-        const padX = 7;
-        const padY = 4;
-        const tw = p.textWidth(text);
-        p.noStroke();
-        p.fill(255, 250, 242, 238);
-        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
-        p.fill(color);
-        p.textAlign(p.LEFT, p.BASELINE);
-        p.text(text, x, y);
-        p.pop();
-      }
-    };
-
-    new p5(sketch);
-  </script>
+// ─── Init ─────────────────────────────────────────────────────────────────────
+initGridCells();
+initBrushPixels();
+setMode('grid');
+</script>
 </body>
 </html>

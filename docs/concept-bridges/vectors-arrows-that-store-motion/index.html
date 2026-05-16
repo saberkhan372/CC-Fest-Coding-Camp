@@ -1,1137 +1,1232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vectors: Arrows That Store Motion</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --position: #0891b2;
-      --velocity: #7c3aed;
-      --acceleration: #e11d48;
-      --target: #f59e0b;
-      --result: #16a34a;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../concept-bridge.css">
+<title>Vectors: Arrows That Store Motion</title>
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #315c92;
+    --accent-dark: #1f3d61;
+    --accent-bg: #eef4fc;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 960px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--accent-dark); }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
 
-    .controls,
-    .workspace,
-    .side-panel {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      user-select: none;
-    }
-
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
-
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
-
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
-
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
-
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 110px minmax(150px, 1fr) 76px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(390px, 100%);
-    }
-
-    label,
-    .value-label,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
-
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
-
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    #sketch-holder canvas { display: block; }
-
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
-
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .card h2 { font-size: 1.15rem; }
-    .card h3 { font-size: 1rem; }
-
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .card p { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
-
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      white-space: pre-wrap;
-    }
-
-    .legend { display: grid; gap: 8px; }
-    .legend-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: center; font-size: 0.9rem; color: var(--muted); }
-    .swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); }
-    .swatch.position { background: var(--position); }
-    .swatch.velocity { background: var(--velocity); }
-    .swatch.acceleration { background: var(--acceleration); }
-    .swatch.target { background: var(--target); }
-    .swatch.result { background: var(--result); }
-
-    .code-card { display: none; }
-    .code-card.visible { display: block; }
-
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
-
-    .note { font-size: 0.86rem; color: var(--muted); }
-
-    @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
-    @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
-  
-  /* ── Bridge improvement additions ─────────────────────────────── */
   .unlocks {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 0 0 20px;
+    margin: 0 0 22px;
   }
+
   .unlock-pill {
     font-size: 0.75rem;
-    font-weight: 700;
-    color: #2a5e3e;
-    background: #eef8f2;
-    border: 1px solid #b8dcc8;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
     padding: 5px 10px;
     border-radius: 999px;
   }
+
   .before-after {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     overflow: hidden;
     margin-bottom: 22px;
-    background: rgba(255,255,255,0.55);
+    background: var(--paper);
   }
-  .ba-col { padding: 14px 18px; }
-  .ba-col:first-child {
-    background: rgba(0,0,0,0.025);
-    border-right: 1px solid var(--line, #ded2c1);
-  }
+
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
+
   .ba-label {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #9e9789;
+    color: var(--faint);
     margin-bottom: 5px;
   }
-  .ba-col:last-child .ba-label { color: #2a5e3e; }
-  .ba-text { font-size: 0.9rem; line-height: 1.5; }
-  .predict-box {
-    background: #fef9ee;
-    border: 1px solid #efd09e;
-    border-radius: 10px;
-    padding: 11px 14px;
-    margin-bottom: 12px;
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
   }
-  .predict-box .pbox-label {
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .canvas-panel { overflow: hidden; }
+
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
+
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
+
+  #vec-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
+
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
+
+  .ctrl-panel { padding: 16px; }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
+
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #deeaf8; border-color: #315c92; }
+
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
+
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(49,92,146,0.4);
+    outline-offset: 2px;
+  }
+
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .box-label {
     display: block;
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    color: var(--ink);
     margin-bottom: 3px;
   }
-  .predict-box .pbox-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
+
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
+
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
   }
-  .callout-mistake {
-    background: #fff3e6;
-    border: 1px solid #edbd83;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin: 10px 0 0;
-  }
-  .callout-mistake .cm-label {
+
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
     display: block;
-    font-size: 0.72rem;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    min-width: 42px;
+    text-align: center;
   }
-  .callout-mistake .cm-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
   }
-  .pathways-section {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 32px 20px 8px;
-  }
-  .pathways-title {
-    font-size: 0.72rem;
-    font-weight: 700;
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #9e9789;
-    margin-bottom: 12px;
+    color: var(--faint);
+    margin-bottom: 6px;
   }
-  .path-links { display: grid; gap: 8px; max-width: 820px; }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: color var(--transition);
+  }
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 22px; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 720px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
   .path-link {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
     text-decoration: none;
-    color: var(--ink, #222);
-    background: rgba(255,250,242,0.92);
-    transition: border-color 0.14s ease, background 0.14s ease;
-    font-family: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
   }
-  .path-link:hover {
-    border-color: var(--accent, #2563eb);
-    background: rgba(230,240,255,0.6);
-  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
   .path-link-type {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #9e9789;
+    color: var(--faint);
     flex-shrink: 0;
-    min-width: 82px;
+    min-width: 88px;
   }
-  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
   .path-link-name { font-size: 0.9rem; font-weight: 700; }
-  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
   .bottom-nav {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 18px 20px 40px;
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    border-top: 1px solid var(--line, #ded2c1);
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
   }
-  .bottom-nav a {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #6b6258;
-    text-decoration: none;
-    font-family: inherit;
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color var(--transition); }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
   }
-  .bottom-nav a:hover { color: var(--accent, #2563eb); }
   @media (max-width: 560px) {
     .before-after { grid-template-columns: 1fr; }
-    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
     .bottom-nav { flex-direction: column; }
   }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
 </style>
-  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
-  </div>
-  <header>
-    <h1>Vectors: Arrows That Store Motion</h1>
-    <p class="subtitle">
-      A concept bridge for <strong>createVector()</strong>, position, velocity, acceleration, vector addition, and steering.
-      A vector is a value with direction and size — perfect for describing motion.
-    </p>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · Math &amp; Motion</p>
+  <h1>Vectors: Arrows That Store Motion</h1>
+  <p class="subtitle">
+    A concept bridge for <code>createVector()</code>, <code>add()</code>, <code>mag()</code>, <code>normalize()</code>, and <code>limit()</code>.
+    A vector is just two numbers — but together they carry direction and speed as one unit.
+  </p>
+
   <div class="unlocks" aria-label="What this bridge unlocks">
-    <span class="unlock-pill">physics simulation</span>
-    <span class="unlock-pill">direction-aware movement</span>
-    <span class="unlock-pill">force systems</span>
-    <span class="unlock-pill">velocity + acceleration</span>
+    <span class="unlock-pill">physics</span>
+    <span class="unlock-pill">chasing</span>
+    <span class="unlock-pill">flocking</span>
+    <span class="unlock-pill">steering</span>
+    <span class="unlock-pill">particle systems</span>
+    <span class="unlock-pill">gravity</span>
   </div>
+
   <section class="before-after" aria-label="Before and after mental model">
     <div class="ba-col">
       <div class="ba-label">Before this bridge, you might think</div>
-      <div class="ba-text">Vectors are just x and y bundled together — I can use two separate variables instead</div>
+      <div class="ba-text">I track x and y position separately, and x-speed and y-speed separately. It gets messy with many objects.</div>
     </div>
     <div class="ba-col">
       <div class="ba-label">After this bridge</div>
-      <div class="ba-text">A vector has direction and magnitude — vector math handles position, velocity, and forces all at once</div>
+      <div class="ba-text">A vector bundles x and y into one object. Adding vectors adds their motion together. Scaling a vector scales both components at once.</div>
     </div>
   </section>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-            <div class="predict-box">
-        <span class="pbox-label">Before you interact — predict first</span>
-        <span class="pbox-body">Before you add the force vector — which direction do you think the ball will accelerate?</span>
+  <section class="main-grid" aria-label="Interactive vector concept bridge">
+    <article class="panel canvas-panel">
+      <div class="canvas-bar">
+        <div class="canvas-bar-title" id="canvas-title">Arrow: a vector as a visual arrow</div>
+        <div class="canvas-bar-sub" id="canvas-sub">Change x and y components. See magnitude and angle.</div>
       </div>
-<div class="row">
-        <button id="mode-why">Why Vectors?</button>
-        <button id="mode-position" class="active">Position Vector</button>
-        <button id="mode-velocity">Velocity</button>
-        <button id="mode-acceleration">Acceleration</button>
-        <button id="mode-addition">Vector Addition</button>
-        <button id="mode-seek">Seek Target</button>
-        <button id="play-button">⏸ Pause</button>
-        <button id="reset-button">Reset</button>
-        <span id="mode-pill" class="pill">a vector can store x and y together</span>
+      <div class="canvas-wrap">
+        <canvas id="vec-canvas" width="620" height="420" aria-label="Interactive vector visualization"></canvas>
+        <div class="touch-hint">Tap and drag the sliders on the right to explore.</div>
       </div>
+    </article>
 
-      <div class="row">
-        <div class="slider-wrap">
-          <label for="vx-slider">Velocity x</label>
-          <input id="vx-slider" type="range" min="-6" max="6" value="3" step="0.1" />
-          <span id="vx-value" class="value-label">3.0</span>
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="Vector concept tabs">
+        <button class="tab" role="tab" data-mode="arrow" aria-selected="true" aria-controls="bridge-panel" tabindex="0">Arrow<span class="step">1 of 5</span></button>
+        <button class="tab" role="tab" data-mode="add" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Add<span class="step">2 of 5</span></button>
+        <button class="tab" role="tab" data-mode="scale" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Scale<span class="step">3 of 5</span></button>
+        <button class="tab" role="tab" data-mode="normalize" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Normalize<span class="step">4 of 5</span></button>
+        <button class="tab" role="tab" data-mode="chase" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Chase<span class="step">5 of 5</span></button>
+      </nav>
+
+      <div id="bridge-panel" role="tabpanel" aria-live="polite">
+        <div class="predict">
+          <span class="box-label">Predict before changing</span>
+          <span class="box-body" id="predict-text">Before you move a slider — what do you think changes when x increases? What stays the same?</span>
         </div>
-        <div class="slider-wrap">
-          <label for="vy-slider">Velocity y</label>
-          <input id="vy-slider" type="range" min="-6" max="6" value="-1.5" step="0.1" />
-          <span id="vy-value" class="value-label">-1.5</span>
+
+        <div class="ctrl-group" id="controls"></div>
+        <div id="presets-area"></div>
+
+        <div class="switches" id="switches-area"></div>
+
+        <div class="code-section">
+          <div class="code-header"><span>Live code</span><span id="code-note">createVector bundles x and y.</span></div>
+          <div class="code-focus-line mono" id="focus-code"></div>
+          <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">▸ See full p5.js sketch</button>
+          <div class="full-code-body mono" id="full-code"></div>
         </div>
-        <div class="slider-wrap">
-          <label for="accel-slider">Acceleration</label>
-          <input id="accel-slider" type="range" min="0" max="0.35" value="0.08" step="0.01" />
-          <span id="accel-value" class="value-label">0.08</span>
+
+        <div class="callout big-idea">
+          <span class="box-label">Big idea</span>
+          <span class="box-body" id="big-idea-text"></span>
+        </div>
+
+        <div class="callout bug">
+          <span class="box-label">⚠ Common mistake</span>
+          <span class="box-body" id="bug-text"></span>
+        </div>
+
+        <div class="callout try">
+          <span class="box-label">Try this</span>
+          <span class="box-body" id="try-text"></span>
         </div>
       </div>
-
-      <div class="row">
-        <span class="preset-label">Presets:</span>
-        <button class="preset-button" data-preset="right">right</button>
-        <button class="preset-button" data-preset="up">up</button>
-        <button class="preset-button" data-preset="diagonal">diagonal</button>
-        <button class="preset-button" data-preset="gravity">gravity</button>
-        <button class="preset-button" data-preset="seek">seek</button>
-        <label class="toggle-label"><input id="show-trail" type="checkbox" checked />Trail</label>
-        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
-      </div>
-    </section>
-
-    <section class="workspace">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        A vector stores related numbers together. A position vector stores where something is: x and y in one value.
-      </div>
-    </section>
-
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">A vector stores x and y together</h2>
-        <p id="lesson-text">
-          Instead of storing x and y as separate variables, a vector bundles them together. In p5.js, createVector(x, y) creates a vector.
-        </p>
-        <span id="formula-box" class="formula">let position = createVector(300, 200);</span>
-      </section>
-
-      <section class="card">
-        <h3>Big idea</h3>
-        <p><strong>Position:</strong> where something is.</p>
-        <p><strong>Velocity:</strong> how position changes.</p>
-        <p><strong>Acceleration:</strong> how velocity changes.</p>
-        <p><strong>Vector addition:</strong> combine arrows to produce motion.</p>
-      </section>
-
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch position"></span><span>position vector</span></div>
-          <div class="legend-item"><span class="swatch velocity"></span><span>velocity vector</span></div>
-          <div class="legend-item"><span class="swatch acceleration"></span><span>acceleration vector</span></div>
-          <div class="legend-item"><span class="swatch target"></span><span>target / desired direction</span></div>
-          <div class="legend-item"><span class="swatch result"></span><span>resulting motion</span></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">Change velocity x and velocity y. How does the direction of the arrow change?</p>
-      </section>
-
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code id="code-box">let position = createVector(300, 200);</code></pre>
-        <p class="note">
-          Vectors are the bridge from simple animation to physics-like motion, steering behaviors, particles, and simulations.
-        </p>
-      </section>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    const state = {
-      mode: "position",
-      running: true,
-      vx: 3,
-      vy: -1.5,
-      accel: 0.08,
-      showTrail: true,
-      showLabels: true,
-      showCode: false,
-      position: { x: 310, y: 260 },
-      velocity: { x: 3, y: -1.5 },
-      acceleration: { x: 0, y: 0.08 },
-      target: { x: 560, y: 220 },
-      trail: [],
-      whyLeftWindClicked: false,
-      whyRightWindClicked: false,
-      whyLeftNewLines: 0,
-      whyRightNewLines: 0
-    };
+  <section class="prose-section">
+    <h2>Two numbers working as one</h2>
+    <p>A vector is an x and y value bundled together as a single object. It represents direction and magnitude at once. You can add vectors to combine forces, subtract them to find the direction from one point to another, normalize them to strip away magnitude while keeping direction, and scale them to set a precise speed. Every particle system, physics simulation, and steering behavior in p5.js is built on these four operations.</p>
+  </section>
 
-    const els = {};
+  <div class="legend" aria-label="Vector concept legend">
+    <div class="legend-item"><span class="swatch" style="background:#3b82f6"></span> vector A (blue arrow)</div>
+    <div class="legend-item"><span class="swatch" style="background:#f97316"></span> vector B (orange arrow)</div>
+    <div class="legend-item"><span class="swatch" style="background:#22c55e"></span> result (green arrow)</div>
+    <div class="legend-item"><span class="swatch" style="background:#a78bfa;border-style:dashed"></span> unit vector (dashed)</div>
+    <div class="legend-item"><span class="swatch" style="background:#e5e7eb"></span> component lines (faint)</div>
+    <div class="legend-item"><span class="swatch" style="background:#f59e0b"></span> magnitude badge (amber)</div>
+  </div>
 
-    function setupUI() {
-      els.modeWhy = document.querySelector("#mode-why");
-      els.modePosition = document.querySelector("#mode-position");
-      els.modeVelocity = document.querySelector("#mode-velocity");
-      els.modeAcceleration = document.querySelector("#mode-acceleration");
-      els.modeAddition = document.querySelector("#mode-addition");
-      els.modeSeek = document.querySelector("#mode-seek");
-      els.playButton = document.querySelector("#play-button");
-      els.resetButton = document.querySelector("#reset-button");
-      els.modePill = document.querySelector("#mode-pill");
-      els.vxSlider = document.querySelector("#vx-slider");
-      els.vySlider = document.querySelector("#vy-slider");
-      els.accelSlider = document.querySelector("#accel-slider");
-      els.vxValue = document.querySelector("#vx-value");
-      els.vyValue = document.querySelector("#vy-value");
-      els.accelValue = document.querySelector("#accel-value");
-      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
-      els.showTrail = document.querySelector("#show-trail");
-      els.showLabels = document.querySelector("#show-labels");
-      els.showCode = document.querySelector("#show-code");
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.formulaBox = document.querySelector("#formula-box");
-      els.questionText = document.querySelector("#question-text");
-      els.caption = document.querySelector("#canvas-caption");
-      els.codeCard = document.querySelector("#code-card");
-      els.codeBox = document.querySelector("#code-box");
+  <section class="pathways" aria-label="Practice and remix links">
+    <div class="pathways-title">What's next</div>
+    <div class="path-links">
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
+        <span class="path-link-type">Practice →</span>
+        <span class="path-link-name">Look for physics, particle, or steering tools in the workshop library</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
+        <span class="path-link-type">Remix →</span>
+        <span class="path-link-name">Take a starter sketch and make one object chase another using vector subtraction</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/" class="path-link">
+        <span class="path-link-type">Related →</span>
+        <span class="path-link-name">Distance Becomes Behavior — measure the magnitude of the difference vector to trigger behavior</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+    </div>
+  </section>
 
-      els.modeWhy.addEventListener("click", () => setMode("why"));
-      els.modePosition.addEventListener("click", () => setMode("position"));
-      els.modeVelocity.addEventListener("click", () => setMode("velocity"));
-      els.modeAcceleration.addEventListener("click", () => setMode("acceleration"));
-      els.modeAddition.addEventListener("click", () => setMode("addition"));
-      els.modeSeek.addEventListener("click", () => setMode("seek"));
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All bridges</a>
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/state-machines-sketches-have-modes/">Next: State Machines: Sketches Have Modes →</a>
+  </nav>
+</main>
 
-      els.playButton.addEventListener("click", () => { state.running = !state.running; updateUI(); });
-      els.resetButton.addEventListener("click", () => { resetMotion(); updateUI(); });
+<script>
+'use strict';
 
-      els.vxSlider.addEventListener("input", () => { state.vx = Number(els.vxSlider.value); state.velocity.x = state.vx; updateUI(); });
-      els.vySlider.addEventListener("input", () => { state.vy = Number(els.vySlider.value); state.velocity.y = state.vy; updateUI(); });
-      els.accelSlider.addEventListener("input", () => { state.accel = Number(els.accelSlider.value); state.acceleration.y = state.accel; updateUI(); });
+// ── State ──────────────────────────────────────────────────────────────────
+const state = {
+  mode: 'arrow',
+  // arrow
+  vx: 120, vy: -80,
+  // add
+  ax: 100, ay: 0, bx: 0, by: 80,
+  // scale
+  svx: 100, svy: -60, scale: 1.5,
+  // normalize
+  nvx: 140, nvy: 80, targetSpeed: 2,
+  // chase
+  speed: 3, trailOn: true,
+  // shared
+  labelsOn: true,
+  changedKey: 'vx',
+  // chase animation
+  ballX: 310, ballY: 210,
+  mouseX: 400, mouseY: 150,
+  trail: [],
+  animFrame: null
+};
 
-      els.presetButtons.forEach(button => button.addEventListener("click", () => {
-        const preset = button.dataset.preset;
-        if (preset === "right") { state.vx = 4; state.vy = 0; state.accel = 0; }
-        if (preset === "up") { state.vx = 0; state.vy = -4; state.accel = 0; }
-        if (preset === "diagonal") { state.vx = 3; state.vy = -2.5; state.accel = 0.04; }
-        if (preset === "gravity") { state.vx = 3; state.vy = -5; state.accel = 0.16; state.mode = "acceleration"; }
-        if (preset === "seek") { state.mode = "seek"; state.accel = 0.10; }
-        state.velocity.x = state.vx;
-        state.velocity.y = state.vy;
-        state.acceleration.y = state.accel;
-        resetMotion(false);
-        updateUI();
-      }));
+// ── Mode definitions ────────────────────────────────────────────────────────
+const modes = {
+  arrow: {
+    canvasTitle: 'Arrow: a vector as a visual arrow',
+    canvasSub: 'Change x and y components. See magnitude and angle.',
+    predict: 'Before you move a slider — what do you think changes when x increases? What stays the same?',
+    big: 'A vector stores direction and magnitude together. The same object gives you both x/y for drawing and mag() for speed checking.',
+    bug: 'Beginners sometimes treat p5.Vectors as unchangeable. They are mutable — calling .add() changes the original unless you use p5.Vector.add().',
+    tryIt: 'Set x=100, y=0. Now set x=0, y=100. The magnitude stays the same. What does this tell you?',
+    note: 'createVector bundles x and y.',
+    controls: [
+      { key: 'vx', label: 'x component', hint: 'horizontal', min: -200, max: 200, step: 1 },
+      { key: 'vy', label: 'y component', hint: 'vertical', min: -200, max: 200, step: 1 }
+    ],
+    presets: [
+      { label: 'Rightward', v: { vx: 160, vy: 0 } },
+      { label: 'Diagonal', v: { vx: 120, vy: -80 } },
+      { label: '⚠ Zero vector', v: { vx: 0, vy: 0 }, isBreak: true }
+    ]
+  },
+  add: {
+    canvasTitle: 'Add: head-to-tail vector addition',
+    canvasSub: 'A + B = result. Place B at tip of A. Result goes from start to end.',
+    predict: 'Before changing vectors — where will the green result arrow point if A and B both point right?',
+    big: 'Adding vectors adds their x-components and y-components separately. Visually: place the second arrow at the tip of the first. The result goes from start to final tip.',
+    bug: 'v.add(other) changes v in place. If you need the result as a new vector, use p5.Vector.add(v, other).',
+    tryIt: 'Make vectors A and B point in opposite directions with equal length. What does the sum equal?',
+    note: 'p5.Vector.add(a, b) returns a new vector.',
+    controls: [
+      { key: 'ax', label: 'A  x', hint: 'vector A horizontal', min: -180, max: 180, step: 1 },
+      { key: 'ay', label: 'A  y', hint: 'vector A vertical', min: -180, max: 180, step: 1 },
+      { key: 'bx', label: 'B  x', hint: 'vector B horizontal', min: -180, max: 180, step: 1 },
+      { key: 'by', label: 'B  y', hint: 'vector B vertical', min: -180, max: 180, step: 1 }
+    ],
+    presets: [
+      { label: 'Right + Up', v: { ax: 110, ay: 0, bx: 0, by: -90 } },
+      { label: 'Opposite vectors', v: { ax: 110, ay: 0, bx: -110, by: 0 } },
+      { label: '⚠ Both zero', v: { ax: 0, ay: 0, bx: 0, by: 0 }, isBreak: true }
+    ]
+  },
+  scale: {
+    canvasTitle: 'Scale: multiply a vector by a scalar',
+    canvasSub: 'Arrow grows or shrinks. Direction stays the same.',
+    predict: 'Before moving the scale slider — will the direction of the arrow change when you scale it?',
+    big: 'Multiplying a vector by a number scales both x and y by that factor. Direction stays the same. Magnitude changes by the same factor.',
+    bug: 'Multiplying by 0 gives a zero vector — magnitude 0, direction undefined. This can cause NaN errors in normalize() afterwards.',
+    tryIt: 'Find a scale that makes the arrow exactly twice as long as the original. How do you know you found it?',
+    note: 'v.mult(scalar) scales both x and y.',
+    controls: [
+      { key: 'svx', label: 'base x', hint: 'before scaling', min: -160, max: 160, step: 1 },
+      { key: 'svy', label: 'base y', hint: 'before scaling', min: -160, max: 160, step: 1 },
+      { key: 'scale', label: 'scalar', hint: 'multiplier', min: 0.1, max: 3, step: 0.05 }
+    ],
+    presets: [
+      { label: 'Shrink (0.3)', v: { svx: 120, svy: -60, scale: 0.3 } },
+      { label: 'Double (2)', v: { svx: 80, svy: -40, scale: 2 } },
+      { label: '⚠ Scale = 0', v: { svx: 120, svy: -60, scale: 0 }, isBreak: true }
+    ]
+  },
+  normalize: {
+    canvasTitle: 'Normalize: force magnitude to 1',
+    canvasSub: 'Then scale to any desired speed. Direction is preserved.',
+    predict: 'Before normalizing — what will be the length of the result arrow, regardless of the original length?',
+    big: 'normalize() divides a vector by its magnitude, leaving a unit vector with length 1. Multiply by any number to set speed without changing direction.',
+    bug: 'Never normalize a zero vector — it has no direction, so division by zero produces NaN in both components.',
+    tryIt: 'Try several different base vector lengths then normalize. Is the result always the same unit length?',
+    note: 'normalize() then mult(speed) sets exact speed.',
+    controls: [
+      { key: 'nvx', label: 'x component', hint: 'any magnitude', min: -180, max: 180, step: 1 },
+      { key: 'nvy', label: 'y component', hint: 'any magnitude', min: -180, max: 180, step: 1 },
+      { key: 'targetSpeed', label: 'target speed', hint: 'multiply after normalize', min: 1, max: 5, step: 0.1 }
+    ],
+    presets: [
+      { label: 'Short vector', v: { nvx: 40, nvy: -30, targetSpeed: 2 } },
+      { label: 'Long vector', v: { nvx: 170, nvy: -120, targetSpeed: 2 } },
+      { label: '⚠ Zero vector', v: { nvx: 0, nvy: 0, targetSpeed: 2 }, isBreak: true }
+    ]
+  },
+  chase: {
+    canvasTitle: 'Chase: ball chases the mouse using vectors',
+    canvasSub: 'direction = mouse − ball, normalized, × speed. Move your mouse over the canvas.',
+    predict: 'Before enabling — what direction should the ball move if the mouse is to the upper-right?',
+    big: 'Each frame: direction = target − position. Normalize. Scale by speed. Add to position. This is the core of any chasing or steering behavior.',
+    bug: 'Without limit(), chasing gets faster as the distance increases. The object accelerates past the target and oscillates.',
+    tryIt: 'Set speed very high. Does the ball overshoot? What would you add to prevent that?',
+    note: 'sub → normalize → mult is the chase pattern.',
+    controls: [
+      { key: 'speed', label: 'chase speed', hint: 'pixels per frame', min: 1, max: 8, step: 0.1 }
+    ],
+    presets: [
+      { label: 'Slow drift (1)', v: { speed: 1 } },
+      { label: 'Fast chase (7)', v: { speed: 7 } },
+      { label: '⚠ Speed = 0', v: { speed: 0 }, isBreak: true }
+    ]
+  }
+};
 
-      els.showTrail.addEventListener("change", () => { state.showTrail = els.showTrail.checked; });
-      els.showLabels.addEventListener("change", () => { state.showLabels = els.showLabels.checked; });
-      els.showCode.addEventListener("change", () => { state.showCode = els.showCode.checked; updateUI(); });
+// ── Canvas ──────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('vec-canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
 
-      updateUI();
+function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+function mag(x, y) { return Math.sqrt(x * x + y * y); }
+function angleDeg(x, y) { return Math.round(Math.atan2(-y, x) * 180 / Math.PI); }
+
+// ── Arrow helper ────────────────────────────────────────────────────────────
+function drawArrow(x0, y0, vx, vy, color, dashed) {
+  const m = mag(vx, vy);
+  if (m < 0.5) return;
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 3;
+  if (dashed) ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + vx, y0 + vy);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // arrowhead
+  const angle = Math.atan2(vy, vx);
+  const hs = 12;
+  ctx.beginPath();
+  ctx.moveTo(x0 + vx, y0 + vy);
+  ctx.lineTo(x0 + vx - hs * Math.cos(angle - 0.4), y0 + vy - hs * Math.sin(angle - 0.4));
+  ctx.lineTo(x0 + vx - hs * Math.cos(angle + 0.4), y0 + vy - hs * Math.sin(angle + 0.4));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawLabel(text, x, y, color) {
+  if (!state.labelsOn) return;
+  ctx.save();
+  ctx.font = '700 12px "DM Sans", system-ui, sans-serif';
+  const tw = ctx.measureText(text).width;
+  ctx.fillStyle = 'rgba(255,253,247,0.88)';
+  ctx.beginPath();
+  ctx.roundRect(x - 4, y - 13, tw + 8, 18, 4);
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+function drawMagBadge(x, y, value) {
+  const text = 'mag: ' + value.toFixed(1);
+  ctx.save();
+  ctx.font = '700 12px "DM Sans", system-ui, sans-serif';
+  const tw = ctx.measureText(text).width;
+  ctx.fillStyle = '#f59e0b';
+  ctx.beginPath();
+  ctx.roundRect(x, y, tw + 14, 22, 99);
+  ctx.fill();
+  ctx.fillStyle = '#1d1b18';
+  ctx.fillText(text, x + 7, y + 15);
+  ctx.restore();
+}
+
+function bg() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W, H);
+  ctx.save();
+  ctx.fillStyle = '#fffdf7';
+  ctx.beginPath();
+  ctx.roundRect(18, 18, W - 36, H - 36, 16);
+  ctx.fill();
+  ctx.restore();
+}
+
+// ── Renderers ────────────────────────────────────────────────────────────────
+function renderArrow() {
+  bg();
+  const cx = W / 2, cy = H / 2;
+  const vx = state.vx, vy = state.vy;
+  const m = mag(vx, vy);
+
+  // component lines (dashed, faint)
+  ctx.save();
+  ctx.strokeStyle = '#d1c5b5';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + vx, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx + vx, cy); ctx.lineTo(cx + vx, cy + vy); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // origin dot
+  ctx.fillStyle = '#6d675f';
+  ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
+
+  if (m > 0.5) {
+    // angle arc
+    const arcR = 36;
+    ctx.save();
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, arcR, 0, Math.atan2(vy, vx));
+    ctx.stroke();
+    ctx.restore();
+
+    drawArrow(cx, cy, vx, vy, '#3b82f6', false);
+    drawMagBadge(cx + vx / 2 - 40, cy + vy / 2 - 30, m);
+    if (state.labelsOn) {
+      drawLabel(`x: ${Math.round(vx)}`, cx + vx + 10, cy + vy / 2, '#3b82f6');
+      drawLabel(`y: ${Math.round(vy)}`, cx + vx / 2, cy + vy + 16, '#3b82f6');
+      drawLabel(`angle: ${angleDeg(vx, vy)}°`, cx + 40, cy - 10, '#94a3b8');
     }
+  } else {
+    drawLabel('Zero vector — no direction', cx - 60, cy - 20, '#e11d48');
+  }
+  drawLabel('origin', cx + 8, cy + 18, '#6d675f');
+}
 
-    function setMode(mode) {
-      state.mode = mode;
-      if (mode === "why") {
-        state.whyLeftWindClicked = false;
-        state.whyRightWindClicked = false;
-        state.whyLeftNewLines = 0;
-        state.whyRightNewLines = 0;
-        // whyInitialized reset is done in sketch via a flag check
-      }
-      resetMotion(false);
-      updateUI();
+function renderAdd() {
+  bg();
+  const ox = W * 0.22, oy = H * 0.55;
+  const ax = state.ax, ay = state.ay, bx = state.bx, by = state.by;
+  const rx = ax + bx, ry = ay + by;
+
+  drawArrow(ox, oy, ax, ay, '#3b82f6', false);
+  drawArrow(ox + ax, oy + ay, bx, by, '#f97316', false);
+  drawArrow(ox, oy, rx, ry, '#22c55e', false);
+
+  if (state.labelsOn) {
+    drawLabel('A', ox + ax / 2 + 8, oy + ay / 2 - 8, '#3b82f6');
+    drawLabel('B', ox + ax + bx / 2 + 8, oy + ay + by / 2 - 8, '#f97316');
+    drawLabel('A + B', ox + rx / 2 - 20, oy + ry / 2 - 16, '#22c55e');
+    drawLabel(`mag(A+B): ${mag(rx, ry).toFixed(1)}`, 30, H - 50, '#22c55e');
+  }
+
+  // tip dot
+  ctx.fillStyle = '#22c55e';
+  ctx.beginPath(); ctx.arc(ox + rx, oy + ry, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#3b82f6';
+  ctx.beginPath(); ctx.arc(ox, oy, 4, 0, Math.PI * 2); ctx.fill();
+}
+
+function renderScale() {
+  bg();
+  const cx = W / 2, cy = H / 2;
+  const bvx = state.svx, bvy = state.svy, sc = state.scale;
+  const svx = bvx * sc, svy = bvy * sc;
+
+  // original (faint)
+  drawArrow(cx, cy, bvx, bvy, '#94a3b8', true);
+  // scaled
+  drawArrow(cx, cy, svx, svy, '#3b82f6', false);
+
+  if (state.labelsOn) {
+    const bm = mag(bvx, bvy), sm = mag(svx, svy);
+    drawLabel(`original mag: ${bm.toFixed(1)}`, 30, H - 70, '#94a3b8');
+    drawLabel(`scaled mag: ${sm.toFixed(1)}`, 30, H - 50, '#3b82f6');
+    drawLabel(`× ${sc.toFixed(2)}`, cx + svx / 2 + 8, cy + svy / 2 - 10, '#f59e0b');
+  }
+
+  ctx.fillStyle = '#6d675f';
+  ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
+
+  if (sc === 0) {
+    drawLabel('⚠ scale=0 → zero vector', cx - 70, cy - 20, '#e11d48');
+  }
+}
+
+function renderNormalize() {
+  bg();
+  const cx = W / 2, cy = H * 0.52;
+  const nvx = state.nvx, nvy = state.nvy;
+  const m = mag(nvx, nvy);
+  const spd = state.targetSpeed;
+
+  if (m < 0.5) {
+    drawLabel('⚠ Zero vector — cannot normalize', cx - 90, cy - 20, '#e11d48');
+    return;
+  }
+
+  // original
+  drawArrow(cx, cy, nvx, nvy, '#94a3b8', true);
+
+  // unit vector (scaled to 60px for visibility)
+  const ux = nvx / m * 60, uy = nvy / m * 60;
+  drawArrow(cx, cy, ux, uy, '#a78bfa', false);
+
+  // speed-scaled
+  const sux = nvx / m * spd * 40, suy = nvy / m * spd * 40;
+  drawArrow(cx, cy, sux, suy, '#22c55e', false);
+
+  if (state.labelsOn) {
+    drawLabel(`original mag: ${m.toFixed(1)}`, 30, H - 90, '#94a3b8');
+    drawLabel('unit mag: 1.0 (normalized)', 30, H - 70, '#a78bfa');
+    drawLabel(`speed ${spd.toFixed(1)} applied`, 30, H - 50, '#22c55e');
+  }
+
+  drawMagBadge(cx + ux + 8, cy + uy - 12, 1.0);
+  ctx.fillStyle = '#6d675f';
+  ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
+}
+
+// Chase uses requestAnimationFrame — managed by tab switch
+let chaseRAF = null;
+
+function startChase() {
+  if (chaseRAF) cancelAnimationFrame(chaseRAF);
+  function loop() {
+    if (state.mode !== 'chase') return;
+    renderChase();
+    chaseRAF = requestAnimationFrame(loop);
+  }
+  chaseRAF = requestAnimationFrame(loop);
+}
+
+function stopChase() {
+  if (chaseRAF) { cancelAnimationFrame(chaseRAF); chaseRAF = null; }
+}
+
+function renderChase() {
+  bg();
+  const mx = state.mouseX, my = state.mouseY;
+  const bx = state.ballX, by = state.ballY;
+  const spd = state.speed;
+
+  const dx = mx - bx, dy = my - by;
+  const d = mag(dx, dy);
+  if (d > 2) {
+    const nx = dx / d, ny = dy / d;
+    state.ballX += nx * spd;
+    state.ballY += ny * spd;
+    if (state.trailOn) {
+      state.trail.push({ x: state.ballX, y: state.ballY });
+      if (state.trail.length > 60) state.trail.shift();
     }
+  }
 
-    function resetMotion(full = true) {
-      state.position = { x: 310, y: 260 };
-      state.velocity = { x: state.vx, y: state.vy };
-      state.acceleration = { x: 0, y: state.accel };
-      state.trail = [];
-      if (full) {
-        state.target = { x: 560, y: 220 };
-      }
+  // trail
+  if (state.trailOn) {
+    for (let i = 0; i < state.trail.length; i++) {
+      const t = state.trail[i];
+      const alpha = i / state.trail.length;
+      ctx.fillStyle = `rgba(49,92,146,${alpha * 0.5})`;
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, 4 + alpha * 8, 0, Math.PI * 2);
+      ctx.fill();
     }
+  }
 
-    function updateUI() {
-      const buttons = [[els.modeWhy,"why"],[els.modePosition,"position"],[els.modeVelocity,"velocity"],[els.modeAcceleration,"acceleration"],[els.modeAddition,"addition"],[els.modeSeek,"seek"]];
-      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
+  // direction arrow from ball to mouse
+  if (d > 10) {
+    drawArrow(state.ballX, state.ballY, dx * 0.5, dy * 0.5, '#22c55e', true);
+  }
 
-      els.playButton.textContent = state.running ? "⏸ Pause" : "▶ Play";
-      els.vxSlider.value = state.vx;
-      els.vySlider.value = state.vy;
-      els.accelSlider.value = state.accel;
-      els.vxValue.textContent = state.vx.toFixed(1);
-      els.vyValue.textContent = state.vy.toFixed(1);
-      els.accelValue.textContent = state.accel.toFixed(2);
-      els.showTrail.checked = state.showTrail;
-      els.showLabels.checked = state.showLabels;
-      els.showCode.checked = state.showCode;
-      els.codeCard.classList.toggle("visible", state.showCode);
+  // mouse target
+  ctx.fillStyle = '#f59e0b';
+  ctx.beginPath(); ctx.arc(mx, my, 12, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(mx, my, 5, 0, Math.PI * 2); ctx.fill();
+  if (state.labelsOn) drawLabel('mouse target', mx + 16, my - 4, '#f59e0b');
 
-      const lessons = {
-        why: {
-          pill: "vectors keep related values together",
-          title: "Why use vectors?",
-          text: "Both sides show the same bouncing ball. Left uses 4 separate variables; right uses 2 vectors. Click 'Add Wind' to see the difference.",
-          formula: `// Left: 4 variables\nlet x, y, vx, vy;\n\n// Right: 2 vectors\nlet pos, vel;`,
-          question: "Click 'Add Wind' on each side. Which approach adds wind in fewer lines?",
-          caption: "Both balls behave identically. The difference shows up when you need to add more forces.",
-          code: `// 4 variables approach:\nwindX = 0.5; windY = -0.1;\nvx += windX; vy += windY;\n\n// 2 vectors approach:\nvel.add(createVector(0.5, -0.1));`
-        },
-        position: {
-          pill: "a vector can store x and y together",
-          title: "A vector stores x and y together",
-          text: "Instead of storing x and y as separate variables, a vector bundles them together. In p5.js, createVector(x, y) creates a vector.",
-          formula: `let position = createVector(${Math.round(state.position.x)}, ${Math.round(state.position.y)});`,
-          question: "Why is position.x and position.y cleaner than two unrelated variables?",
-          caption: "A vector stores related numbers together. A position vector stores where something is: x and y in one value.",
-          code: `let position;\n\nfunction setup() {\n  createCanvas(600, 400);\n  position = createVector(300, 200);\n}\n\nfunction draw() {\n  circle(position.x, position.y, 40);\n}`
-        },
-        velocity: {
-          pill: "velocity changes position",
-          title: "Velocity is a vector for motion",
-          text: "Velocity stores how position changes each frame. Adding velocity to position moves the object.",
-          formula: `position.add(velocity);\nvelocity = (${state.vx.toFixed(1)}, ${state.vy.toFixed(1)})`,
-          question: "Change velocity x and velocity y. How does the direction of motion change?",
-          caption: "The object moves because position.add(velocity) changes its position every frame.",
-          code: `let position = createVector(300, 200);\nlet velocity = createVector(${state.vx.toFixed(1)}, ${state.vy.toFixed(1)});\n\nfunction draw() {\n  position.add(velocity);\n  circle(position.x, position.y, 40);\n}`
-        },
-        acceleration: {
-          pill: "acceleration changes velocity",
-          title: "Acceleration changes velocity",
-          text: "Acceleration is a vector that changes velocity over time. Gravity is often modeled as downward acceleration.",
-          formula: `velocity.add(acceleration);\nposition.add(velocity);\nacceleration = (0, ${state.accel.toFixed(2)})`,
-          question: "Why does the path curve when acceleration is added?",
-          caption: "Acceleration changes velocity; velocity changes position. That chain creates curved motion.",
-          code: `let position = createVector(300, 200);\nlet velocity = createVector(${state.vx.toFixed(1)}, ${state.vy.toFixed(1)});\nlet acceleration = createVector(0, ${state.accel.toFixed(2)});\n\nfunction draw() {\n  velocity.add(acceleration);\n  position.add(velocity);\n  circle(position.x, position.y, 40);\n}`
-        },
-        addition: {
-          pill: "vector addition combines arrows",
-          title: "Vector addition combines motion ideas",
-          text: "You can add vectors together. For example, a velocity vector plus a wind vector creates a new resulting movement.",
-          formula: `result = velocity + wind\n(${state.vx.toFixed(1)}, ${state.vy.toFixed(1)}) + (2.0, 1.0)`,
-          question: "How does the green result arrow relate to the purple and orange arrows?",
-          caption: "Vector addition is arrow addition: one motion idea plus another motion idea creates a result.",
-          code: `let velocity = createVector(${state.vx.toFixed(1)}, ${state.vy.toFixed(1)});\nlet wind = createVector(2, 1);\nlet result = p5.Vector.add(velocity, wind);`
-        },
-        seek: {
-          pill: "steering uses a vector toward a target",
-          title: "Vectors can point toward a target",
-          text: "To seek a target, subtract position from target. That creates a direction vector pointing from the object to the target.",
-          formula: `desired = target - position\ndesired.setMag(maxSpeed)\nsteering = desired - velocity`,
-          question: "Why does subtracting position from target create a direction arrow?",
-          caption: "Click inside the canvas to move the target. The object uses vectors to steer toward it.",
-          code: `let desired = p5.Vector.sub(target, position);\ndesired.setMag(maxSpeed);\n\nlet steering = p5.Vector.sub(desired, velocity);\nsteering.limit(maxForce);\n\nvelocity.add(steering);\nposition.add(velocity);`
-        }
-      };
+  // ball
+  ctx.fillStyle = '#315c92';
+  ctx.beginPath(); ctx.arc(state.ballX, state.ballY, 16, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(state.ballX + 4, state.ballY - 4, 5, 0, Math.PI * 2); ctx.fill();
 
-      const lesson = lessons[state.mode];
-      els.modePill.textContent = lesson.pill;
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.formulaBox.textContent = lesson.formula;
-      els.questionText.textContent = lesson.question;
-      els.caption.textContent = lesson.caption;
-      els.codeBox.textContent = lesson.code;
-    }
+  if (state.labelsOn) {
+    drawLabel(`speed: ${spd.toFixed(1)}`, 30, H - 50, '#315c92');
+    drawLabel(`dist: ${d.toFixed(1)}`, 30, H - 70, '#6d675f');
+  }
+}
 
-    setupUI();
+const renderers = { arrow: renderArrow, add: renderAdd, scale: renderScale, normalize: renderNormalize };
+function render() {
+  if (state.mode === 'chase') return; // handled by RAF loop
+  renderers[state.mode]();
+}
 
-    const sketch = (p) => {
-      let canvas, holder, previousWidth = 0, previousHeight = 0;
+// ── Canvas mouse tracking for chase ─────────────────────────────────────────
+canvas.addEventListener('mousemove', e => {
+  if (state.mode !== 'chase') return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width, scaleY = H / rect.height;
+  state.mouseX = (e.clientX - rect.left) * scaleX;
+  state.mouseY = (e.clientY - rect.top) * scaleY;
+});
 
-      // Why Vectors? mode — two bouncing balls
-      let whyLeft = { x: 0, y: 0, vx: 2.2, vy: 1.5, windX: 0, windY: 0 };
-      let whyRight = { x: 0, y: 0, vx: 2.2, vy: 1.5, windX: 0, windY: 0 };
-      let whyInitialized = false;
-      let prevMode = "";
+canvas.addEventListener('touchmove', e => {
+  if (state.mode !== 'chase') return;
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width, scaleY = H / rect.height;
+  state.mouseX = (e.touches[0].clientX - rect.left) * scaleX;
+  state.mouseY = (e.touches[0].clientY - rect.top) * scaleY;
+}, { passive: false });
 
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive visualization of vectors, position, velocity, acceleration, and steering in p5.js.");
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
-      };
+// ── Controls ────────────────────────────────────────────────────────────────
+const controlsEl = document.getElementById('controls');
+const focusEl = document.getElementById('focus-code');
+const fullEl = document.getElementById('full-code');
 
-      p.windowResized = () => resizeToHolder();
+function fmtV(key) {
+  const v = state[key];
+  if (key === 'scale' || key === 'targetSpeed' || key === 'speed') return Number(v).toFixed(key === 'scale' ? 2 : 1);
+  return Math.round(v);
+}
 
-      p.mousePressed = () => {
-        const s = stage();
-        if (state.mode === "why") {
-          // Left "Add Wind" button
-          const lbx = s.x + s.w * 0.25 - 48; const lby = s.y + s.h - 142;
-          if (p.mouseX > lbx && p.mouseX < lbx + 96 && p.mouseY > lby && p.mouseY < lby + 30) {
-            state.whyLeftWindClicked = true;
-            whyLeft.windX = 0.5; whyLeft.windY = -0.1;
-            updateUI();
-          }
-          // Right "Add Wind" button
-          const midX = s.x + s.w / 2;
-          const rbx = s.x + s.w * 0.75 - 48; const rby = s.y + s.h - 142;
-          if (p.mouseX > rbx && p.mouseX < rbx + 96 && p.mouseY > rby && p.mouseY < rby + 30) {
-            state.whyRightWindClicked = true;
-            whyRight.windX = 0.5; whyRight.windY = -0.1;
-            updateUI();
-          }
-        }
-        if (state.mode === "seek" && p.mouseX > s.x && p.mouseX < s.x + s.w && p.mouseY > s.y && p.mouseY < s.y + s.h) {
-          state.target = { x: p.mouseX, y: p.mouseY };
-        }
-      };
+function buildControls() {
+  controlsEl.innerHTML = '';
+  modes[state.mode].controls.forEach(ctrl => {
+    const row = document.createElement('div');
+    row.className = 'ctrl-row';
+    row.innerHTML = `
+      <div><label for="sl_${ctrl.key}">${ctrl.label}<small>${ctrl.hint}</small></label></div>
+      <span class="val-badge mono" id="vb_${ctrl.key}">${fmtV(ctrl.key)}</span>
+      <input id="sl_${ctrl.key}" type="range" min="${ctrl.min}" max="${ctrl.max}" step="${ctrl.step}" value="${state[ctrl.key]}" aria-label="${ctrl.label}">
+    `;
+    controlsEl.appendChild(row);
+    row.querySelector('input').addEventListener('input', ev => {
+      state[ctrl.key] = Number(ev.target.value);
+      state.changedKey = ctrl.key;
+      document.getElementById(`vb_${ctrl.key}`).textContent = fmtV(ctrl.key);
+      updateCode();
+      render();
+    });
+  });
 
-      p.draw = () => {
-        resizeToHolder();
-        // Reset why balls when entering why mode
-        if (state.mode !== prevMode) {
-          if (state.mode === "why") whyInitialized = false;
-          prevMode = state.mode;
-        }
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-        drawPanelTitle();
-        if (state.running) updateMotion();
+  // Chase trail toggle
+  const sw = document.getElementById('switches-area');
+  sw.innerHTML = '';
+  if (state.mode === 'chase') {
+    const lbl = document.createElement('label');
+    lbl.className = 'sw';
+    lbl.innerHTML = `<input type="checkbox" id="trailToggle" ${state.trailOn ? 'checked' : ''}> Trail`;
+    sw.appendChild(lbl);
+    lbl.querySelector('input').addEventListener('change', e => { state.trailOn = e.target.checked; state.trail = []; });
+  }
+}
 
-        if (state.mode === "why") drawWhyMode();
-        if (state.mode === "position") drawPositionMode();
-        if (state.mode === "velocity") drawVelocityMode();
-        if (state.mode === "acceleration") drawAccelerationMode();
-        if (state.mode === "addition") drawAdditionMode();
-        if (state.mode === "seek") drawSeekMode();
+function buildPresets() {
+  const area = document.getElementById('presets-area');
+  area.innerHTML = '';
+  const lbl = document.createElement('div');
+  lbl.className = 'presets-label';
+  lbl.textContent = 'Try these';
+  area.appendChild(lbl);
+  const row = document.createElement('div');
+  row.className = 'preset-row';
+  modes[state.mode].presets.forEach(preset => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn' + (preset.isBreak ? ' break' : '');
+    btn.type = 'button';
+    btn.textContent = preset.label;
+    btn.addEventListener('click', () => {
+      Object.entries(preset.v).forEach(([k, v]) => { state[k] = v; });
+      if (state.mode === 'chase') { state.trail = []; state.ballX = W / 2; state.ballY = H / 2; }
+      buildControls();
+      updateCode();
+      render();
+    });
+    row.appendChild(btn);
+  });
+  area.appendChild(row);
+}
 
-        drawReadoutCards();
-      };
+// ── Code display ─────────────────────────────────────────────────────────────
+function flash(key) { return state.changedKey === key ? ' flash' : ''; }
 
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-        if (w !== previousWidth || h !== previousHeight) { p.resizeCanvas(w, h); previousWidth = w; previousHeight = h; }
-      }
+function focusHTML() {
+  const m = state.mode;
+  if (m === 'arrow') {
+    return `<span class="ct kw">let</span> v = <span class="ct fn">createVector</span>(<span class="ct num${flash('vx')}" id="v-vx">${fmtV('vx')}</span>, <span class="ct num${flash('vy')}" id="v-vy">${fmtV('vy')}</span>);`;
+  }
+  if (m === 'add') {
+    return `<span class="ct kw">let</span> result = p5.Vector.<span class="ct fn">add</span>(a, b);`;
+  }
+  if (m === 'scale') {
+    return `v.<span class="ct fn">mult</span>(<span class="ct num${flash('scale')}" id="v-sc">${fmtV('scale')}</span>);`;
+  }
+  if (m === 'normalize') {
+    return `v.<span class="ct fn">normalize</span>(); v.<span class="ct fn">mult</span>(<span class="ct num${flash('targetSpeed')}">${fmtV('targetSpeed')}</span>);`;
+  }
+  // chase
+  return `<span class="ct kw">let</span> dir = p5.Vector.<span class="ct fn">sub</span>(target, pos);\ndir.<span class="ct fn">normalize</span>(); dir.<span class="ct fn">mult</span>(<span class="ct num${flash('speed')}" id="v-sp">${fmtV('speed')}</span>);`;
+}
 
-      function updateMotion() {
-        if (state.mode === "velocity") {
-          state.position.x += state.velocity.x;
-          state.position.y += state.velocity.y;
-          wrapPosition();
-          addTrail();
-        }
-        if (state.mode === "acceleration") {
-          state.velocity.x += state.acceleration.x;
-          state.velocity.y += state.acceleration.y;
-          state.position.x += state.velocity.x;
-          state.position.y += state.velocity.y;
-          bouncePosition();
-          addTrail();
-        }
-        if (state.mode === "seek") {
-          const desired = subVec(state.target, state.position);
-          setMag(desired, 3.8);
-          const steer = subVec(desired, state.velocity);
-          limit(steer, state.accel * 2.8);
-          state.velocity.x += steer.x;
-          state.velocity.y += steer.y;
-          limit(state.velocity, 4.2);
-          state.position.x += state.velocity.x;
-          state.position.y += state.velocity.y;
-          addTrail();
-        }
-      }
+function fullCodeText() {
+  const m = state.mode;
+  if (m === 'arrow') {
+    return `function setup() {\n  createCanvas(400, 400);\n}\n\nfunction draw() {\n  background(245);\n  let v = createVector(${fmtV('vx')}, ${fmtV('vy')});\n  // Draw arrow from center\n  translate(200, 200);\n  stroke(60, 100, 180);\n  strokeWeight(3);\n  line(0, 0, v.x, v.y);\n  // magnitude\n  fill(0); noStroke();\n  text('mag: ' + nf(v.mag(), 1, 1), 10, 10);\n}`;
+  }
+  if (m === 'add') {
+    return `let a = createVector(${fmtV('ax')}, ${fmtV('ay')});\nlet b = createVector(${fmtV('bx')}, ${fmtV('by')});\nlet result = p5.Vector.add(a, b);\n\n// Draw head-to-tail:\n// A starts at origin\n// B starts at tip of A\n// result goes from origin to tip of B`;
+  }
+  if (m === 'scale') {
+    return `let v = createVector(${fmtV('svx')}, ${fmtV('svy')});\nconsole.log(v.mag()); // ${mag(state.svx, state.svy).toFixed(1)}\n\nv.mult(${fmtV('scale')}); // scale in place\nconsole.log(v.mag()); // ${mag(state.svx * state.scale, state.svy * state.scale).toFixed(1)}`;
+  }
+  if (m === 'normalize') {
+    return `let v = createVector(${fmtV('nvx')}, ${fmtV('nvy')});\n// mag is currently ${mag(state.nvx, state.nvy).toFixed(1)}\n\nv.normalize(); // mag becomes 1\nv.mult(${fmtV('targetSpeed')}); // now set exact speed\n// mag is now ${fmtV('targetSpeed')}`;
+  }
+  return `let pos = createVector(200, 200);\nlet vel = createVector(0, 0);\nlet speed = ${fmtV('speed')};\n\nfunction draw() {\n  let target = createVector(mouseX, mouseY);\n  let dir = p5.Vector.sub(target, pos);\n  dir.normalize();\n  dir.mult(speed);\n  vel = dir;\n  pos.add(vel);\n  circle(pos.x, pos.y, 30);\n}`;
+}
 
-      function wrapPosition() {
-        const s = stage();
-        if (state.position.x < s.x) state.position.x = s.x + s.w;
-        if (state.position.x > s.x + s.w) state.position.x = s.x;
-        if (state.position.y < s.y) state.position.y = s.y + s.h;
-        if (state.position.y > s.y + s.h) state.position.y = s.y;
-      }
+function escapeHTML(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
-      function bouncePosition() {
-        const s = stage();
-        if (state.position.x < s.x + 20 || state.position.x > s.x + s.w - 20) state.velocity.x *= -0.88;
-        if (state.position.y < s.y + 20 || state.position.y > s.y + s.h - 20) state.velocity.y *= -0.88;
-        state.position.x = p.constrain(state.position.x, s.x + 20, s.x + s.w - 20);
-        state.position.y = p.constrain(state.position.y, s.y + 20, s.y + s.h - 20);
-      }
+function updateCode() {
+  focusEl.innerHTML = focusHTML();
+  fullEl.innerHTML = escapeHTML(fullCodeText());
+  document.getElementById('code-note').textContent = modes[state.mode].note;
+  setTimeout(() => document.querySelectorAll('.ct.flash').forEach(el => el.classList.remove('flash')), 500);
+}
 
-      function addTrail() {
-        state.trail.push({ x: state.position.x, y: state.position.y });
-        while (state.trail.length > 90) state.trail.shift();
-      }
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
 
-      function subVec(a, b) { return { x: a.x - b.x, y: a.y - b.y }; }
-      function mag(v) { return Math.sqrt(v.x * v.x + v.y * v.y); }
-      function setMag(v, m) { const current = mag(v) || 1; v.x = v.x / current * m; v.y = v.y / current * m; }
-      function limit(v, max) { if (mag(v) > max) setMag(v, max); }
+// ── Tab switching ────────────────────────────────────────────────────────────
+function setMode(name) {
+  stopChase();
+  state.mode = name;
+  state.changedKey = modes[name].controls[0].key;
+  if (name === 'chase') {
+    state.ballX = W / 2; state.ballY = H / 2;
+    state.mouseX = W * 0.7; state.mouseY = H * 0.3;
+    state.trail = [];
+  }
 
-      function drawSubtleGrid() {
-        p.push(); p.stroke(236,224,207); p.strokeWeight(1);
-        for (let x=0; x<p.width; x+=32) p.line(x,0,x,p.height);
-        for (let y=0; y<p.height; y+=32) p.line(0,y,p.width,y);
-        p.pop();
-      }
+  document.querySelectorAll('.tab').forEach(t => {
+    const active = t.dataset.mode === name;
+    t.setAttribute('aria-selected', active ? 'true' : 'false');
+    t.tabIndex = active ? 0 : -1;
+  });
 
-      function drawPanelTitle() {
-        const titles = {
-          why:["Why Vectors?","Compare 4 variables vs 2 vectors — same result, one scales better."],
-          position:["Position Vector","A vector can store a location as x and y."],
-          velocity:["Velocity","Add velocity to position to create movement."],
-          acceleration:["Acceleration","Add acceleration to velocity to change motion over time."],
-          addition:["Vector Addition","Combine arrows to create a resulting arrow."],
-          seek:["Seek Target","Use vectors to point and steer toward a target."]
-        };
-        const [title, subtitle] = titles[state.mode];
-        p.push(); p.noStroke(); p.fill("#222"); p.textStyle(p.BOLD); p.textSize(22); p.text(title,24,38); p.textStyle(p.NORMAL); p.textSize(14); p.fill("#6b6258"); p.text(subtitle,24,62); p.pop();
-      }
+  const m = modes[name];
+  setText('canvas-title', m.canvasTitle);
+  setText('canvas-sub', m.canvasSub);
+  setText('predict-text', m.predict);
+  setText('big-idea-text', m.big);
+  setText('bug-text', m.bug);
+  setText('try-text', m.tryIt);
 
-      function stage() { return { x:p.width*0.08, y:p.height*0.15, w:p.width*0.84, h:p.height*0.50 }; }
-      function drawStage() { const s=stage(); p.push(); p.noStroke(); p.fill(255,255,255,235); p.rect(s.x,s.y,s.w,s.h,24); p.pop(); return s; }
+  buildControls();
+  buildPresets();
+  updateCode();
 
-      function drawWhyMode() {
-        const s = stage();
-        // divider line
-        const midX = s.x + s.w / 2;
-        p.push();
-        p.stroke("#ded2c1"); p.strokeWeight(2);
-        p.line(midX, s.y + 8, midX, s.y + s.h - 8);
-        p.pop();
+  if (name === 'chase') startChase();
+  else render();
+}
 
-        // Initialize ball positions once per mode enter
-        if (!whyInitialized) {
-          whyLeft.x = s.x + s.w * 0.22; whyLeft.y = s.y + s.h * 0.45;
-          whyRight.x = s.x + s.w * 0.72; whyRight.y = s.y + s.h * 0.45;
-          whyLeft.vx = 2.2; whyLeft.vy = 1.5;
-          whyRight.vx = 2.2; whyRight.vy = 1.5;
-          whyLeft.windX = 0; whyLeft.windY = 0;
-          whyRight.windX = 0; whyRight.windY = 0;
-          whyInitialized = true;
-        }
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => setMode(tab.dataset.mode));
+  tab.addEventListener('keydown', ev => {
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const idx = tabs.indexOf(tab);
+    if (ev.key === 'ArrowRight') { ev.preventDefault(); const n = tabs[(idx + 1) % tabs.length]; n.focus(); setMode(n.dataset.mode); }
+    if (ev.key === 'ArrowLeft') { ev.preventDefault(); const n = tabs[(idx - 1 + tabs.length) % tabs.length]; n.focus(); setMode(n.dataset.mode); }
+    if (ev.key === 'Home') { ev.preventDefault(); tabs[0].focus(); setMode(tabs[0].dataset.mode); }
+    if (ev.key === 'End') { ev.preventDefault(); tabs[tabs.length - 1].focus(); setMode(tabs[tabs.length - 1].dataset.mode); }
+  });
+});
 
-        // Bounds for each half
-        const leftBounds = { x1: s.x + 10, x2: midX - 10, y1: s.y + 10, y2: s.y + s.h - 50 };
-        const rightBounds = { x1: midX + 10, x2: s.x + s.w - 10, y1: s.y + 10, y2: s.y + s.h - 50 };
+document.getElementById('fullCodeToggle').addEventListener('click', function() {
+  const open = fullEl.classList.toggle('open');
+  this.textContent = open ? '▾ Hide full sketch' : '▸ See full p5.js sketch';
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) updateCode();
+});
 
-        // Update left ball
-        if (state.running) {
-          whyLeft.vx += whyLeft.windX; whyLeft.vy += whyLeft.windY;
-          whyLeft.x += whyLeft.vx; whyLeft.y += whyLeft.vy;
-          if (whyLeft.x < leftBounds.x1 + 18 || whyLeft.x > leftBounds.x2 - 18) whyLeft.vx *= -1;
-          if (whyLeft.y < leftBounds.y1 + 18 || whyLeft.y > leftBounds.y2 - 18) whyLeft.vy *= -1;
-          whyLeft.x = p.constrain(whyLeft.x, leftBounds.x1 + 18, leftBounds.x2 - 18);
-          whyLeft.y = p.constrain(whyLeft.y, leftBounds.y1 + 18, leftBounds.y2 - 18);
-          whyLeft.windX = 0; whyLeft.windY = 0;
-
-          // Update right ball identically
-          whyRight.vx += whyRight.windX; whyRight.vy += whyRight.windY;
-          whyRight.x += whyRight.vx; whyRight.y += whyRight.vy;
-          if (whyRight.x < rightBounds.x1 + 18 || whyRight.x > rightBounds.x2 - 18) whyRight.vx *= -1;
-          if (whyRight.y < rightBounds.y1 + 18 || whyRight.y > rightBounds.y2 - 18) whyRight.vy *= -1;
-          whyRight.x = p.constrain(whyRight.x, rightBounds.x1 + 18, rightBounds.x2 - 18);
-          whyRight.y = p.constrain(whyRight.y, rightBounds.y1 + 18, rightBounds.y2 - 18);
-          whyRight.windX = 0; whyRight.windY = 0;
-        }
-
-        // --- LEFT PANEL ---
-        p.push();
-        p.noStroke(); p.fill(240, 248, 255, 200);
-        p.rect(s.x + 4, s.y + 4, s.w/2 - 8, s.h - 8, 18);
-
-        // Header
-        p.fill("#334155"); p.textStyle(p.BOLD); p.textSize(14);
-        p.textAlign(p.CENTER, p.TOP);
-        p.text("4 Variables", s.x + s.w * 0.25, s.y + 18);
-
-        // Code panel (left)
-        const leftCode = state.whyLeftWindClicked
-          ? "let x, y, vx, vy;\n// wind:\nwindX = 0.5;\nwindY = -0.1;\nvx += windX;\nvy += windY;"
-          : "let x, y, vx, vy;";
-        drawWhyCodePanel(s.x + 14, s.y + s.h - 130, s.w/2 - 28, 116, leftCode, state.whyLeftWindClicked, "#7c3aed");
-
-        // Ball
-        drawMover(whyLeft.x, whyLeft.y, "#7c3aed");
-
-        // Add Wind button
-        const lbx = s.x + s.w * 0.25 - 48; const lby = s.y + s.h - 142;
-        p.noStroke(); p.fill(state.whyLeftWindClicked ? "#7c3aed" : "#f3f0ff");
-        p.rect(lbx, lby, 96, 30, 14);
-        p.fill(state.whyLeftWindClicked ? "#fff" : "#7c3aed"); p.textSize(12); p.textStyle(p.BOLD);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.text("+ Add Wind", lbx + 48, lby + 15);
-        p.pop();
-
-        // --- RIGHT PANEL ---
-        p.push();
-        p.noStroke(); p.fill(240, 255, 248, 200);
-        p.rect(midX + 4, s.y + 4, s.w/2 - 8, s.h - 8, 18);
-
-        // Header
-        p.fill("#334155"); p.textStyle(p.BOLD); p.textSize(14);
-        p.textAlign(p.CENTER, p.TOP);
-        p.text("2 Vectors", s.x + s.w * 0.75, s.y + 18);
-
-        // Code panel (right)
-        const rightCode = state.whyRightWindClicked
-          ? "let pos, vel;\n// wind:\nvel.add(\n  createVector(0.5, -0.1)\n);"
-          : "let pos, vel;";
-        drawWhyCodePanel(midX + 14, s.y + s.h - 130, s.w/2 - 28, 116, rightCode, state.whyRightWindClicked, "#16a34a");
-
-        // Ball
-        drawMover(whyRight.x, whyRight.y, "#16a34a");
-
-        // Add Wind button
-        const rbx = s.x + s.w * 0.75 - 48; const rby = s.y + s.h - 142;
-        p.noStroke(); p.fill(state.whyRightWindClicked ? "#16a34a" : "#f0fdf4");
-        p.rect(rbx, rby, 96, 30, 14);
-        p.fill(state.whyRightWindClicked ? "#fff" : "#16a34a"); p.textSize(12); p.textStyle(p.BOLD);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.text("+ Add Wind", rbx + 48, rby + 15);
-        p.pop();
-
-        // Bottom label
-        p.push();
-        p.noStroke(); p.fill(255, 250, 242, 230);
-        p.textStyle(p.BOLD); p.textSize(13); p.fill("#334155");
-        p.textAlign(p.CENTER, p.BOTTOM);
-        p.text("Same result. One approach scales.", s.x + s.w/2, s.y + s.h + 18);
-        p.pop();
-      }
-
-      function drawWhyCodePanel(x, y, w, h, code, hasNew, color) {
-        p.push();
-        p.noStroke(); p.fill(17, 24, 39); p.rect(x, y, w, h, 10);
-        const lines = code.split("\n");
-        p.textAlign(p.LEFT, p.TOP); p.textSize(11);
-        p.textStyle(p.NORMAL);
-        const lineH = 15;
-        for (let i = 0; i < lines.length; i++) {
-          const isNew = hasNew && i > 0;
-          if (isNew) {
-            p.noStroke(); p.fill(255, 230, 0, 60);
-            p.rect(x + 6, y + 8 + i * lineH, w - 12, lineH, 3);
-          }
-          p.fill(isNew ? "#fbbf24" : "#e5e7eb");
-          p.text(lines[i], x + 10, y + 8 + i * lineH);
-        }
-        p.pop();
-      }
-
-      function drawPositionMode() {
-        const s = drawStage();
-        const origin = { x: s.x + 55, y: s.y + s.h - 45 };
-        const pos = { x: state.position.x, y: state.position.y };
-        drawVector(origin, { x: pos.x - origin.x, y: pos.y - origin.y }, "#0891b2", "position");
-        drawMover(pos.x, pos.y, "#0891b2");
-        if (state.showLabels) {
-          drawLabel(`position.x = ${Math.round(pos.x)}`, s.x + 28, s.y + 42, "#0891b2", 14);
-          drawLabel(`position.y = ${Math.round(pos.y)}`, s.x + 28, s.y + 70, "#0891b2", 14);
-          drawLabel("origin", origin.x - 18, origin.y + 24, "#64748b", 12);
-        }
-      }
-
-      function drawVelocityMode() {
-        const s = drawStage();
-        drawTrail();
-        drawMover(state.position.x, state.position.y, "#7c3aed");
-        drawVector({ x: state.position.x, y: state.position.y }, scaleVec(state.velocity, 18), "#7c3aed", "velocity");
-        if (state.showLabels) drawLabel("position.add(velocity)", s.x + 28, s.y + 42, "#7c3aed", 14);
-      }
-
-      function drawAccelerationMode() {
-        const s = drawStage();
-        drawTrail();
-        drawMover(state.position.x, state.position.y, "#e11d48");
-        drawVector({ x: state.position.x, y: state.position.y }, scaleVec(state.velocity, 14), "#7c3aed", "velocity");
-        drawVector({ x: state.position.x, y: state.position.y }, scaleVec(state.acceleration, 520), "#e11d48", "acceleration");
-        if (state.showLabels) drawLabel("acceleration changes velocity", s.x + 28, s.y + 42, "#e11d48", 14);
-      }
-
-      function drawAdditionMode() {
-        const s = drawStage();
-        const origin = { x: s.x + s.w * 0.36, y: s.y + s.h * 0.55 };
-        const v = scaleVec({ x: state.vx, y: state.vy }, 24);
-        const wind = { x: 90, y: 45 };
-        const result = { x: v.x + wind.x, y: v.y + wind.y };
-        drawVector(origin, v, "#7c3aed", "velocity");
-        drawVector({ x: origin.x + v.x, y: origin.y + v.y }, wind, "#f59e0b", "wind");
-        drawVector(origin, result, "#16a34a", "result");
-        drawMover(origin.x + result.x, origin.y + result.y, "#16a34a");
-        if (state.showLabels) drawLabel("result = velocity + wind", s.x + 28, s.y + 42, "#16a34a", 14);
-      }
-
-      function drawSeekMode() {
-        const s = drawStage();
-        drawTrail();
-        p.push();
-        p.noStroke();
-        p.fill("#f59e0b");
-        p.circle(state.target.x, state.target.y, 34);
-        p.fill("#ffffff");
-        p.circle(state.target.x, state.target.y, 10);
-        p.pop();
-        const desired = subVec(state.target, state.position);
-        drawVector({ x: state.position.x, y: state.position.y }, desired, "#f59e0b", "desired");
-        drawVector({ x: state.position.x, y: state.position.y }, scaleVec(state.velocity, 18), "#7c3aed", "velocity");
-        drawMover(state.position.x, state.position.y, "#16a34a");
-        if (state.showLabels) {
-          drawLabel("click to move target", state.target.x + 24, state.target.y - 10, "#f59e0b", 13);
-          drawLabel("target - position = direction", s.x + 28, s.y + 42, "#f59e0b", 14);
-        }
-      }
-
-      function scaleVec(v, amount) { return { x: v.x * amount, y: v.y * amount }; }
-
-      function drawVector(start, vec, color, label) {
-        const end = { x: start.x + vec.x, y: start.y + vec.y };
-        p.push();
-        p.stroke(color);
-        p.strokeWeight(4);
-        p.line(start.x, start.y, end.x, end.y);
-        const angle = Math.atan2(vec.y, vec.x);
-        p.noStroke();
-        p.fill(color);
-        p.push();
-        p.translate(end.x, end.y);
-        p.rotate(angle);
-        p.triangle(0, 0, -13, -8, -13, 8);
-        p.pop();
-        if (state.showLabels) drawLabel(label, end.x + 8, end.y - 8, color, 12);
-        p.pop();
-      }
-
-      function drawMover(x, y, color) {
-        p.push();
-        p.noStroke();
-        p.fill(color);
-        p.circle(x, y, 42);
-        p.fill("#ffffff");
-        p.circle(x + 6, y - 6, 10);
-        p.fill("#222222");
-        p.circle(x + 8, y - 6, 4);
-        p.pop();
-      }
-
-      function drawTrail() {
-        if (!state.showTrail) return;
-        p.push();
-        p.noStroke();
-        for (let i = 0; i < state.trail.length; i++) {
-          const pt = state.trail[i];
-          const alpha = p.map(i, 0, Math.max(1, state.trail.length - 1), 20, 125);
-          p.fill(124, 58, 237, alpha);
-          p.circle(pt.x, pt.y, p.map(i, 0, Math.max(1, state.trail.length - 1), 5, 18));
-        }
-        p.pop();
-      }
-
-      function drawReadoutCards() {
-        const cards = [
-          { label:"position", value:`${Math.round(state.position.x)}, ${Math.round(state.position.y)}`, color:"#0891b2" },
-          { label:"velocity", value:`${state.velocity.x.toFixed(1)}, ${state.velocity.y.toFixed(1)}`, color:"#7c3aed" },
-          { label:"speed", value:mag(state.velocity).toFixed(2), color:"#16a34a" }
-        ];
-        const cardW=Math.min(176,(p.width-70)/cards.length); const y=p.height-168; const x=28;
-        p.push();
-        for(let i=0;i<cards.length;i++){
-          const cx=x+i*(cardW+10);
-          p.noStroke(); p.fill(255,255,255,235); p.rect(cx,y,cardW,62,14);
-          p.fill(cards[i].color); p.textStyle(p.BOLD); p.textSize(13); p.text(cards[i].label,cx+12,y+22);
-          p.fill("#222"); p.textSize(15); p.text(String(cards[i].value),cx+12,y+48);
-        }
-        p.pop();
-      }
-
-      function drawLabel(text,x,y,color,size=13){
-        p.push(); p.textSize(size); p.textStyle(p.BOLD); const padX=7,padY=4,tw=p.textWidth(text);
-        p.noStroke(); p.fill(255,250,242,238); p.rect(x-padX,y-size-padY+3,tw+padX*2,size+padY*2,9);
-        p.fill(color); p.textAlign(p.LEFT,p.BASELINE); p.text(text,x,y); p.pop();
-      }
-    };
-
-    new p5(sketch);
-  </script>
+// ── Init ─────────────────────────────────────────────────────────────────────
+setMode('arrow');
+</script>
 </body>
 </html>

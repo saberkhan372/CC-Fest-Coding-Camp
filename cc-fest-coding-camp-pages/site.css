@@ -690,6 +690,48 @@ a{color:inherit}
   padding:6px 14px;
 }
 
+/* ─── LIBRARY SUMMARY STAT CARDS ─── */
+.library-summary{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-top:18px;
+}
+@media(max-width:700px){.library-summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.library-summary{grid-template-columns:1fr}}
+.summary-card{
+  padding:14px 14px 12px;
+  border-radius:16px;
+  border:1px solid rgba(44,42,38,.08);
+  background:rgba(255,255,255,.72);
+  box-shadow:0 6px 18px rgba(53,43,32,.06);
+}
+.summary-card strong{
+  display:block;
+  margin-bottom:3px;
+  font-family:"Fraunces","DM Sans",system-ui,sans-serif;
+  font-size:28px;
+  line-height:1;
+  letter-spacing:-.04em;
+  color:var(--ink);
+}
+.summary-card span{
+  font-size:12px;
+  font-weight:600;
+  color:var(--ink-light);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.summary-card .summary-sub{
+  display:block;
+  font-size:11px;
+  color:var(--ink-light);
+  margin-top:4px;
+  font-weight:400;
+  text-transform:none;
+  letter-spacing:0;
+}
+
 /* ─── CAMP WORDS STRIP ─── */
 
 .camp-words{
@@ -1009,9 +1051,21 @@ body.search-active .station-peek-trigger{display:none !important}
   display:none;
 }
 
-/* Solo station (1 card): fill both columns so no empty gap appears */
-.station[data-solo]:not(#station-support) .tool-grid{
-  grid-template-columns:repeat(2,1fr);
+/* Hide full gallery-peek container when section is expanded */
+#interactive-tools.is-collapsible.is-open .gallery-peek,
+#concept-bridges.is-collapsible.is-open .gallery-peek{
+  display:none;
+}
+
+.gallery-peek{margin-bottom:8px}
+
+/* Solo station (1 card): constrain width so no empty gap appears */
+.station[data-card-count="1"]:not(#station-support) .tool-grid{
+  grid-template-columns:minmax(0,380px);
+}
+/* Two-card station: even columns */
+.station[data-card-count="2"] .tool-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
 }
 
 .station-peek-btn{

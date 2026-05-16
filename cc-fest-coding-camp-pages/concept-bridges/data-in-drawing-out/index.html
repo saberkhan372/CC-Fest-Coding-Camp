@@ -1,1157 +1,1241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data In, Drawing Out</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --file: #7c3aed;
-      --row: #0891b2;
-      --column: #e11d48;
-      --value: #f59e0b;
-      --visual: #16a34a;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../concept-bridge.css">
+<title>Data In, Drawing Out</title>
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #4a8a7c;
+    --accent-dark: #2e5f55;
+    --accent-bg: #eef8f5;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 960px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--accent-dark); }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
 
-    .controls,
-    .workspace,
-    .side-panel {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      user-select: none;
-    }
-
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
-
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
-
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
-
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
-
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 110px minmax(150px, 1fr) 78px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(390px, 100%);
-    }
-
-    label,
-    .value-label,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
-
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
-
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    #sketch-holder canvas { display: block; }
-
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
-
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .card h2 { font-size: 1.15rem; }
-    .card h3 { font-size: 1rem; }
-
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .card p { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
-
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      white-space: pre-wrap;
-    }
-
-    .legend { display: grid; gap: 8px; }
-    .legend-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: center; font-size: 0.9rem; color: var(--muted); }
-    .swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); }
-    .swatch.file { background: var(--file); }
-    .swatch.row { background: var(--row); }
-    .swatch.column { background: var(--column); }
-    .swatch.value { background: var(--value); }
-    .swatch.visual { background: var(--visual); }
-
-    .code-card { display: none; }
-    .code-card.visible { display: block; }
-
-    /* Edit the Table mode */
-    .table-editor-wrap {
-      display: none;
-      grid-column: 1 / -1;
-      gap: 18px;
-      grid-template-columns: 1fr 1fr;
-      align-items: start;
-    }
-    .table-editor-wrap.visible {
-      display: grid;
-    }
-    .editable-table-card {
-      background: rgba(255,250,242,0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      padding: 20px;
-    }
-    .editable-table-card h2 {
-      margin: 0 0 14px;
-      font-size: 1.1rem;
-      letter-spacing: -0.02em;
-    }
-    .editable-table-card table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.93rem;
-    }
-    .editable-table-card th {
-      text-align: left;
-      padding: 8px 10px;
-      background: #f1f5f9;
-      border: 1px solid var(--line);
-      font-size: 0.83rem;
-      color: var(--muted);
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-    .editable-table-card td {
-      padding: 0;
-      border: 1px solid var(--line);
-    }
-    .editable-table-card td input {
-      width: 100%;
-      border: none;
-      outline: none;
-      padding: 9px 10px;
-      font-size: 0.93rem;
-      font-family: inherit;
-      background: white;
-      color: var(--ink);
-    }
-    .editable-table-card td input:focus {
-      background: #eff6ff;
-    }
-    .editable-table-card td.color-cell input[type="color"] {
-      padding: 2px 4px;
-      width: 48px;
-      height: 36px;
-      cursor: pointer;
-      border: none;
-      background: none;
-    }
-    .editable-table-card td.color-cell {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .editable-table-card td.color-cell input[type="text"] {
-      flex: 1;
-    }
-    .table-caption {
-      margin-top: 14px;
-      font-size: 0.88rem;
-      color: var(--muted);
-      font-style: italic;
-      line-height: 1.5;
-    }
-    .table-code-card {
-      background: rgba(255,250,242,0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      padding: 20px;
-    }
-    .table-code-card h2 {
-      margin: 0 0 12px;
-      font-size: 1.1rem;
-      letter-spacing: -0.02em;
-    }
-    .table-code-card pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.83rem;
-      line-height: 1.5;
-      padding: 14px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
-    .table-preview-canvas {
-      margin-top: 16px;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      background: white;
-    }
-    .table-preview-canvas canvas { display: block; }
-
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
-
-    .note { font-size: 0.86rem; color: var(--muted); }
-
-    @media (max-width: 980px) { main { grid-template-columns: 1fr; } .workspace { height: 590px; } }
-    @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .slider-wrap { grid-template-columns: 1fr; gap: 4px; } .workspace { height: 540px; } }
-  
-  /* ── Bridge improvement additions ─────────────────────────────── */
   .unlocks {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 0 0 20px;
+    margin: 0 0 22px;
   }
+
   .unlock-pill {
     font-size: 0.75rem;
-    font-weight: 700;
-    color: #2a5e3e;
-    background: #eef8f2;
-    border: 1px solid #b8dcc8;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
     padding: 5px 10px;
     border-radius: 999px;
   }
+
   .before-after {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     overflow: hidden;
     margin-bottom: 22px;
-    background: rgba(255,255,255,0.55);
+    background: var(--paper);
   }
-  .ba-col { padding: 14px 18px; }
-  .ba-col:first-child {
-    background: rgba(0,0,0,0.025);
-    border-right: 1px solid var(--line, #ded2c1);
-  }
+
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
+
   .ba-label {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #9e9789;
+    color: var(--faint);
     margin-bottom: 5px;
   }
-  .ba-col:last-child .ba-label { color: #2a5e3e; }
-  .ba-text { font-size: 0.9rem; line-height: 1.5; }
-  .predict-box {
-    background: #fef9ee;
-    border: 1px solid #efd09e;
-    border-radius: 10px;
-    padding: 11px 14px;
-    margin-bottom: 12px;
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
   }
-  .predict-box .pbox-label {
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .canvas-panel { overflow: hidden; }
+
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
+
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
+
+  #data-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
+
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
+
+  .ctrl-panel { padding: 16px; }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
+
+  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #e6f5f2; border-color: #4a8a7c; }
+
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
+
+  .tab:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(74,138,124,0.4);
+    outline-offset: 2px;
+  }
+
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .box-label {
     display: block;
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    color: var(--ink);
     margin-bottom: 3px;
   }
-  .predict-box .pbox-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
+
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
+
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
   }
-  .callout-mistake {
-    background: #fff3e6;
-    border: 1px solid #edbd83;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin: 10px 0 0;
-  }
-  .callout-mistake .cm-label {
+
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
     display: block;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
   }
-  .callout-mistake .cm-body {
+
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 42px;
+    text-align: center;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
+  }
+
+  .switches { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .sw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
     font-size: 0.88rem;
-    line-height: 1.5;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
   }
-  .pathways-section {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 32px 20px 8px;
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: color var(--transition);
   }
-  .pathways-title {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #9e9789;
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
     margin-bottom: 12px;
+    border: 1px solid;
   }
-  .path-links { display: grid; gap: 8px; max-width: 820px; }
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 22px; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 720px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
   .path-link {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
     text-decoration: none;
-    color: var(--ink, #222);
-    background: rgba(255,250,242,0.92);
-    transition: border-color 0.14s ease, background 0.14s ease;
-    font-family: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
   }
-  .path-link:hover {
-    border-color: var(--accent, #2563eb);
-    background: rgba(230,240,255,0.6);
-  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
   .path-link-type {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #9e9789;
+    color: var(--faint);
     flex-shrink: 0;
-    min-width: 82px;
+    min-width: 88px;
   }
-  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
   .path-link-name { font-size: 0.9rem; font-weight: 700; }
-  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
   .bottom-nav {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 18px 20px 40px;
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    border-top: 1px solid var(--line, #ded2c1);
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
   }
-  .bottom-nav a {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #6b6258;
-    text-decoration: none;
-    font-family: inherit;
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color var(--transition); }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
   }
-  .bottom-nav a:hover { color: var(--accent, #2563eb); }
   @media (max-width: 560px) {
     .before-after { grid-template-columns: 1fr; }
-    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
     .bottom-nav { flex-direction: column; }
   }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
 </style>
-  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
-  </div>
-  <header>
-    <h1>Data In, Drawing Out</h1>
-    <p class="subtitle">
-      A concept bridge for <strong>preload()</strong>, <strong>loadTable()</strong>, <strong>loadJSON()</strong>, rows, columns, and data visualization.
-      A sketch can read data from outside the code and turn it into shapes.
-    </p>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · Data &amp; Systems</p>
+  <h1>Data In, Drawing Out</h1>
+  <p class="subtitle">
+    A concept bridge for data-driven drawing. Real numbers — temperatures, counts, scores — become visual shapes when you map their values to visual properties.
+  </p>
+
   <div class="unlocks" aria-label="What this bridge unlocks">
     <span class="unlock-pill">data visualization</span>
-    <span class="unlock-pill">map() for scaling</span>
+    <span class="unlock-pill">infographics</span>
     <span class="unlock-pill">bar charts</span>
-    <span class="unlock-pill">real-world data in p5</span>
+    <span class="unlock-pill">visual encoding</span>
+    <span class="unlock-pill">dashboard design</span>
   </div>
+
   <section class="before-after" aria-label="Before and after mental model">
     <div class="ba-col">
       <div class="ba-label">Before this bridge, you might think</div>
-      <div class="ba-text">Data visualization requires special libraries — p5.js is just for drawing shapes</div>
+      <div class="ba-text">Data is for spreadsheets. I'm not sure how numbers connect to visual sketches.</div>
     </div>
     <div class="ba-col">
       <div class="ba-label">After this bridge</div>
-      <div class="ba-text">Any number can drive any visual property — <code>map()</code> connects raw data to pixel space</div>
+      <div class="ba-text">A number can control size, color, height, or opacity. Mapping data values to visual properties turns any dataset into a picture.</div>
     </div>
   </section>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-            <div class="predict-box">
-        <span class="pbox-label">Before you interact — predict first</span>
-        <span class="pbox-body">Before you see the data drawn — will the bars use the raw data values or scaled ones?</span>
+  <section class="main-grid" aria-label="Interactive data drawing concept bridge">
+    <article class="panel canvas-panel">
+      <div class="canvas-bar">
+        <div class="canvas-bar-title" id="canvas-title">Encode: one value, four visual channels</div>
+        <div class="canvas-bar-sub" id="canvas-sub">Each shape encodes the same data value using a different visual property.</div>
       </div>
-<div class="row">
-        <button id="mode-edittable" class="active">Edit the Table</button>
-        <button id="mode-file">External File</button>
-        <button id="mode-table">Table Rows</button>
-        <button id="mode-column">Columns</button>
-        <button id="mode-map">Map to Visuals</button>
-        <button id="mode-json">JSON Shape</button>
-        <button id="reset-button">Reset Data</button>
-        <span id="mode-pill" class="pill">edit data → see drawing change</span>
+      <div class="canvas-wrap">
+        <canvas id="data-canvas" width="620" height="380" aria-label="Interactive data visualization canvas"></canvas>
+        <div class="touch-hint">Tap and drag the sliders on the right to explore.</div>
       </div>
+    </article>
 
-      <div class="row">
-        <div class="slider-wrap">
-          <label for="row-slider">Selected row</label>
-          <input id="row-slider" type="range" min="0" max="5" value="2" step="1" />
-          <span id="row-value" class="value-label">2</span>
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="Data drawing tabs">
+        <button class="tab" role="tab" data-mode="encode" aria-selected="true" aria-controls="bridge-panel" tabindex="0">Encode<span class="step">1 of 4</span></button>
+        <button class="tab" role="tab" data-mode="scale" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Scale<span class="step">2 of 4</span></button>
+        <button class="tab" role="tab" data-mode="compare" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Compare<span class="step">3 of 4</span></button>
+        <button class="tab" role="tab" data-mode="narrate" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Narrate<span class="step">4 of 4</span></button>
+      </nav>
+
+      <div id="bridge-panel" role="tabpanel" aria-live="polite">
+        <div class="predict">
+          <span class="box-label">Predict before changing</span>
+          <span class="box-body" id="predict-text">Which encoding makes the value feel most dramatic at 90? At 10?</span>
         </div>
-        <div class="slider-wrap">
-          <label for="scale-slider">Visual scale</label>
-          <input id="scale-slider" type="range" min="0.5" max="2.0" value="1.0" step="0.1" />
-          <span id="scale-value" class="value-label">1.0×</span>
+
+        <div class="ctrl-group" id="controls"></div>
+        <div id="switches-area"></div>
+
+        <div class="code-section">
+          <div class="code-header"><span>Live code</span><span id="code-note">map() scales the value into each channel.</span></div>
+          <div class="code-focus-line mono" id="focus-code"></div>
+          <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">&#9658; See full p5.js sketch</button>
+          <div class="full-code-body mono" id="full-code"></div>
         </div>
-        <div class="slider-wrap">
-          <label for="sort-slider">Sort by</label>
-          <input id="sort-slider" type="range" min="0" max="2" value="0" step="1" />
-          <span id="sort-value" class="value-label">original</span>
+
+        <div class="callout big-idea">
+          <span class="box-label">Big idea</span>
+          <span class="box-body" id="big-idea-text">Data visualization is choosing which visual property carries meaning. Size communicates magnitude. Color communicates intensity. There is no single correct encoding.</span>
+        </div>
+
+        <div class="callout bug">
+          <span class="box-label">&#9888; Common mistake</span>
+          <span class="box-body" id="bug-text">Using color alone to encode numbers excludes colorblind viewers. Always pair color with another channel — size, position, or a label.</span>
+        </div>
+
+        <div class="callout try">
+          <span class="box-label">Try this</span>
+          <span class="box-body" id="try-text">Set data to 0. Which encoding completely disappears? Which stays visible even at zero?</span>
         </div>
       </div>
-
-      <div class="row">
-        <span class="preset-label">Dataset:</span>
-        <button class="dataset-button" data-dataset="weather">weather</button>
-        <button class="dataset-button" data-dataset="colors">colors</button>
-        <button class="dataset-button" data-dataset="projects">projects</button>
-        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
-      </div>
-    </section>
-
-    <!-- Edit the Table mode: full-width row -->
-    <div class="table-editor-wrap visible" id="table-editor-section" style="grid-column:1/-1;">
-      <div class="editable-table-card">
-        <h2>Edit the spreadsheet — watch the chart update live</h2>
-        <table id="live-data-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Value (0–100)</th>
-              <th>Color</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><input type="text" class="tbl-name" value="Week 1" /></td>
-              <td><input type="number" class="tbl-value" value="42" min="0" max="100" /></td>
-              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
-                <input type="color" class="tbl-color-picker" value="#c8391d" />
-                <input type="text" class="tbl-color-text" value="#c8391d" style="flex:1;padding:9px 6px;" />
-              </td>
-            </tr>
-            <tr>
-              <td><input type="text" class="tbl-name" value="Week 2" /></td>
-              <td><input type="number" class="tbl-value" value="67" min="0" max="100" /></td>
-              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
-                <input type="color" class="tbl-color-picker" value="#f5a800" />
-                <input type="text" class="tbl-color-text" value="#f5a800" style="flex:1;padding:9px 6px;" />
-              </td>
-            </tr>
-            <tr>
-              <td><input type="text" class="tbl-name" value="Week 3" /></td>
-              <td><input type="number" class="tbl-value" value="55" min="0" max="100" /></td>
-              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
-                <input type="color" class="tbl-color-picker" value="#2d6a4f" />
-                <input type="text" class="tbl-color-text" value="#2d6a4f" style="flex:1;padding:9px 6px;" />
-              </td>
-            </tr>
-            <tr>
-              <td><input type="text" class="tbl-name" value="Week 4" /></td>
-              <td><input type="number" class="tbl-value" value="81" min="0" max="100" /></td>
-              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
-                <input type="color" class="tbl-color-picker" value="#315c92" />
-                <input type="text" class="tbl-color-text" value="#315c92" style="flex:1;padding:9px 6px;" />
-              </td>
-            </tr>
-            <tr>
-              <td><input type="text" class="tbl-name" value="Week 5" /></td>
-              <td><input type="number" class="tbl-value" value="73" min="0" max="100" /></td>
-              <td style="display:flex;align-items:center;gap:6px;padding:2px 6px;">
-                <input type="color" class="tbl-color-picker" value="#7149a3" />
-                <input type="text" class="tbl-color-text" value="#7149a3" style="flex:1;padding:9px 6px;" />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="table-caption">
-          This is exactly what happens when your code reads from a real CSV: change the file → change the drawing.
-        </p>
-      </div>
-
-      <div class="table-code-card">
-        <h2>The chart updates from your table</h2>
-        <div class="table-preview-canvas">
-          <canvas id="table-preview-canvas" width="480" height="260"></canvas>
-        </div>
-        <p style="margin:14px 0 8px;font-size:0.88rem;color:var(--muted);">The p5.js code that would read this from a CSV file:</p>
-        <pre id="live-code-snippet">function preload() {
-  table = loadTable("data.csv", "csv", "header");
-}
-function draw() {
-  for (let i = 0; i &lt; table.getRowCount(); i++) {
-    let val = table.getNum(i, "Value");
-    let h = map(val, 0, 100, 0, 300);
-    fill(table.getString(i, "Color"));
-    rect(x, height - h, barW, h);
-  }
-}</pre>
-      </div>
-    </div>
-
-    <section class="workspace" id="main-workspace" style="display:none;">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        preload() gets external data ready before setup() and draw() try to use it.
-      </div>
-    </section>
-
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">Data can come from outside the sketch</h2>
-        <p id="lesson-text">
-          Instead of typing every value directly into your code, p5.js can load a CSV table or JSON file. The sketch then uses that data to decide what to draw.
-        </p>
-        <span id="formula-box" class="formula">function preload() {
-  table = loadTable("data.csv", "csv", "header");
-}</span>
-      </section>
-
-      <section class="card">
-        <h3>Big idea</h3>
-        <p><strong>preload():</strong> load files before the sketch starts.</p>
-        <p><strong>Table:</strong> rows and columns, like a spreadsheet.</p>
-        <p><strong>JSON:</strong> named data inside objects and arrays.</p>
-        <p><strong>Visualization:</strong> map data values to visual properties.</p>
-      </section>
-
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch file"></span><span>external file</span></div>
-          <div class="legend-item"><span class="swatch row"></span><span>selected row / record</span></div>
-          <div class="legend-item"><span class="swatch column"></span><span>column / field name</span></div>
-          <div class="legend-item"><span class="swatch value"></span><span>data value</span></div>
-          <div class="legend-item"><span class="swatch visual"></span><span>visual result</span></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">Change the selected row. Which values change, and which visual properties respond?</p>
-      </section>
-
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code id="code-box">function preload() {
-  table = loadTable("data.csv", "csv", "header");
-}</code></pre>
-        <p class="note">
-          This tool uses built-in sample data so it works as one file. In a real sketch, the same idea applies to CSV or JSON files in your project folder.
-        </p>
-      </section>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    const datasets = {
-      weather: {
-        name: "weather.csv",
-        columns: ["day", "temp", "rain", "wind"],
-        rows: [
-          { day: "Mon", temp: 68, rain: 10, wind: 4 },
-          { day: "Tue", temp: 72, rain: 0, wind: 7 },
-          { day: "Wed", temp: 61, rain: 45, wind: 11 },
-          { day: "Thu", temp: 66, rain: 20, wind: 5 },
-          { day: "Fri", temp: 78, rain: 0, wind: 9 },
-          { day: "Sat", temp: 83, rain: 0, wind: 3 }
-        ]
-      },
-      colors: {
-        name: "palette.csv",
-        columns: ["name", "red", "green", "blue"],
-        rows: [
-          { name: "sunset", red: 240, green: 94, blue: 72 },
-          { name: "ocean", red: 25, green: 130, blue: 196 },
-          { name: "moss", red: 65, green: 150, blue: 88 },
-          { name: "lavender", red: 142, green: 110, blue: 214 },
-          { name: "gold", red: 232, green: 175, blue: 64 },
-          { name: "night", red: 45, green: 58, blue: 92 }
-        ]
-      },
-      projects: {
-        name: "projects.json",
-        columns: ["title", "complexity", "joy", "polish"],
-        rows: [
-          { title: "Garden", complexity: 4, joy: 8, polish: 7 },
-          { title: "Robot", complexity: 7, joy: 6, polish: 5 },
-          { title: "City", complexity: 8, joy: 7, polish: 6 },
-          { title: "Game", complexity: 9, joy: 9, polish: 4 },
-          { title: "Poster", complexity: 5, joy: 8, polish: 9 },
-          { title: "Music", complexity: 6, joy: 10, polish: 6 }
-        ]
-      }
-    };
+  <section class="prose-section">
+    <h2>Numbers become shapes when you decide what they mean</h2>
+    <p>Data-driven drawing is the choice to let a number control a visual property. The data doesn't change; the drawing code doesn't know where the numbers come from. You provide the mapping. A temperature becomes a bar height. A score becomes a circle size. A percentage becomes opacity. Once you see this translation clearly, any dataset becomes drawable.</p>
+  </section>
 
-    const state = {
-      mode: "edittable",
-      datasetKey: "weather",
-      selectedRow: 2,
-      visualScale: 1,
-      sortMode: 0,
-      showLabels: true,
-      showCode: false
-    };
+  <div class="legend" aria-label="Data drawing legend">
+    <div class="legend-item"><span class="swatch" style="background:#f0a832"></span> data value (amber)</div>
+    <div class="legend-item"><span class="swatch" style="background:#4a8a7c"></span> bar (teal)</div>
+    <div class="legend-item"><span class="swatch" style="background:#5a8fd0"></span> map() arrow (blue)</div>
+    <div class="legend-item"><span class="swatch" style="background:#9e9789"></span> axis label (muted)</div>
+    <div class="legend-item"><span class="swatch" style="background:#fff;border:2.5px solid #4a8a7c"></span> highlight bar (accent border)</div>
+  </div>
 
-    const els = {};
+  <section class="pathways" aria-label="Practice and remix links">
+    <div class="pathways-title">What's next</div>
+    <div class="path-links">
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
+        <span class="path-link-type">Practice →</span>
+        <span class="path-link-name">Open the workshop tools and look for chart, data visualization, or mapping tools</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
+        <span class="path-link-type">Remix →</span>
+        <span class="path-link-name">Replace hardcoded sizes in a starter sketch with values from a data array</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="../map-range-translator/" class="path-link">
+        <span class="path-link-type">Related →</span>
+        <span class="path-link-name">map() Range Translator — the core function that makes data-driven drawing possible</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+    </div>
+  </section>
 
-    function data() { return datasets[state.datasetKey]; }
-    function rows() {
-      const r = [...data().rows];
-      if (state.sortMode === 1) {
-        const numeric = data().columns.find(c => typeof r[0][c] === "number");
-        if (numeric) r.sort((a, b) => a[numeric] - b[numeric]);
-      }
-      if (state.sortMode === 2) {
-        const numeric = data().columns.find(c => typeof r[0][c] === "number");
-        if (numeric) r.sort((a, b) => b[numeric] - a[numeric]);
-      }
-      return r;
-    }
-    function selected() { return rows()[state.selectedRow]; }
-    function firstNumericColumn() { return data().columns.find(c => typeof data().rows[0][c] === "number"); }
-    function labelColumn() { return data().columns.find(c => typeof data().rows[0][c] === "string"); }
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All bridges</a>
+    <a href="../data-as-argument/">Next: Data as Argument →</a>
+  </nav>
+</main>
 
-    // ---- Live editable table preview canvas ----
-    function getTableData() {
-      const names = Array.from(document.querySelectorAll(".tbl-name")).map(i => i.value);
-      const values = Array.from(document.querySelectorAll(".tbl-value")).map(i => Number(i.value) || 0);
-      const colors = Array.from(document.querySelectorAll(".tbl-color-text")).map(i => i.value || "#888");
-      return names.map((n, i) => ({ name: n, value: values[i], color: colors[i] }));
-    }
+<script>
+'use strict';
 
-    function drawTablePreview() {
-      const canvas = document.getElementById("table-preview-canvas");
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      const rows = getTableData();
-      const W = canvas.width, H = canvas.height;
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#fffaf2";
-      ctx.fillRect(0, 0, W, H);
+// ─── Utility ─────────────────────────────────────────────────────────────────
+function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+function mapV(v, a, b, c, d) {
+  if (b === a) return c;
+  return c + ((v - a) / (b - a)) * (d - c);
+}
 
-      const maxVal = Math.max(...rows.map(r => r.value), 1);
-      const baseline = H - 44;
-      const barCount = rows.length;
-      const totalBarW = W - 60;
-      const barW = totalBarW / barCount;
-      const maxH = baseline - 28;
+// ─── Canvas ──────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('data-canvas');
+const ctx = canvas.getContext('2d');
 
-      for (let i = 0; i < rows.length; i++) {
-        const { name, value, color } = rows[i];
-        const bh = (value / 100) * maxH;
-        const bx = 30 + i * barW;
-        ctx.fillStyle = color;
-        const rx = bx + barW * 0.1;
-        const rw = barW * 0.8;
-        const ry = baseline - bh;
-        ctx.beginPath();
-        if (ctx.roundRect) {
-          ctx.roundRect(rx, ry, rw, bh, [6, 6, 0, 0]);
-        } else {
-          ctx.rect(rx, ry, rw, bh);
-        }
-        ctx.fill();
-        // value label
-        ctx.fillStyle = "#333";
-        ctx.font = "bold 12px Inter, system-ui, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(value, rx + rw / 2, ry - 6);
-        // name label
-        ctx.fillStyle = "#6b6258";
-        ctx.font = "11px Inter, system-ui, sans-serif";
-        ctx.fillText(name, rx + rw / 2, baseline + 16);
-      }
-      // baseline
-      ctx.strokeStyle = "#ded2c1";
-      ctx.lineWidth = 1.5;
+// ─── State ───────────────────────────────────────────────────────────────────
+const state = {
+  mode: 'encode',
+  dataVal: 55,
+  inMin: 0,
+  inMax: 100,
+  outMin: 10,
+  outMax: 400,
+  scaleVal: 50,
+  bars: [72, 45, 88, 31, 60, 53],
+  sortBars: false,
+  highlightMax: true,
+  showTitle: true,
+  showAxisLabels: true,
+  showGridlines: true,
+  showHighlight: true
+};
+
+// ─── Mode content ─────────────────────────────────────────────────────────────
+const modes = {
+  encode: {
+    canvasTitle: 'Encode: one value, four visual channels',
+    canvasSub: 'Each shape encodes the same data value using a different visual property.',
+    predict: 'Which encoding makes the value feel most dramatic at 90? At 10?',
+    big: 'Data visualization is choosing which visual property carries meaning. Size communicates magnitude. Color communicates intensity. There is no single correct encoding.',
+    bug: 'Using color alone to encode numbers excludes colorblind viewers. Always pair color with another channel — size, position, or a label.',
+    tryIt: 'Set data to 0. Which encoding completely disappears? Which stays visible even at zero?',
+    note: 'map() scales the value into each channel.'
+  },
+  scale: {
+    canvasTitle: 'Scale: map() connects two number ranges',
+    canvasSub: 'A dot moves through the input range; another moves through the output range.',
+    predict: 'If value is exactly halfway through the input range, where will it land in the output range?',
+    big: 'map() translates a number from one range to another while preserving its relative position. That is the entire mechanism of data visualization.',
+    bug: 'Using a hardcoded scale factor instead of map() means your chart breaks when data changes. Always map dynamically.',
+    tryIt: 'Make inMin and inMax identical. What happens? Why is this a divide-by-zero situation?',
+    note: 'map(value, inMin, inMax, outMin, outMax)'
+  },
+  compare: {
+    canvasTitle: 'Compare: same code, different data',
+    canvasSub: 'Six bars driven by data values. Same drawing loop — different numbers produce different heights.',
+    predict: 'Sort the bars ascending. Does the pattern become easier or harder to read?',
+    big: 'Alignment and consistent scale let viewers compare values. Same drawing code, different data, meaningful comparison.',
+    bug: 'Scaling each bar relative to itself (so every bar reaches the top) makes all bars look equal regardless of value — destroying the comparison.',
+    tryIt: 'Make all values identical. What does the chart look like? Now set one to 5 and the others to 95. Is the outlier obvious?',
+    note: 'for loop maps each value to bar height.'
+  },
+  narrate: {
+    canvasTitle: 'Narrate: annotation turns data into story',
+    canvasSub: 'Toggle annotation layers and see how much context each one provides.',
+    predict: 'Remove all annotation. Can you still read the chart accurately? What is the minimum you need?',
+    big: 'Labels, titles, and highlights are not decoration — they tell the viewer what to look for. Without them, data is ambiguous.',
+    bug: 'Too many labels creates clutter. Prioritize: title, axis labels, one highlighted value, minimal gridlines.',
+    tryIt: 'Keep only the highlight annotation and remove everything else. Is the chart still interpretable?',
+    note: 'text() labels and highlight layer.'
+  }
+};
+
+// ─── Drawing helpers ──────────────────────────────────────────────────────────
+function roundRectPath(x, y, w, h, r) {
+  const rad = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rad, y);
+  ctx.lineTo(x + w - rad, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rad);
+  ctx.lineTo(x + w, y + h - rad);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
+  ctx.lineTo(x + rad, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - rad);
+  ctx.lineTo(x, y + rad);
+  ctx.quadraticCurveTo(x, y, x + rad, y);
+  ctx.closePath();
+}
+
+function canvasBg() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  roundRectPath(18, 18, canvas.width - 36, canvas.height - 36, 18);
+  ctx.fillStyle = '#fffdf7';
+  ctx.fill();
+}
+
+function cLabel(text, x, y, opts) {
+  opts = opts || {};
+  ctx.save();
+  ctx.font = (opts.bold ? '700' : '600') + ' ' + (opts.size || 12) + 'px "DM Sans", system-ui, sans-serif';
+  ctx.fillStyle = opts.color || '#23201c';
+  ctx.textAlign = opts.align || 'left';
+  ctx.textBaseline = opts.baseline || 'alphabetic';
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+// ─── Render Encode ────────────────────────────────────────────────────────────
+function renderEncode() {
+  canvasBg();
+  var v = state.dataVal;
+  var W = canvas.width;
+  var H = canvas.height;
+  var cellW = Math.floor((W - 48) / 2);
+  var cellH = Math.floor((H - 56) / 2);
+  var origs = [
+    { x: 24, y: 30 },
+    { x: 24 + cellW + 8, y: 30 },
+    { x: 24, y: 30 + cellH + 6 },
+    { x: 24 + cellW + 8, y: 30 + cellH + 6 }
+  ];
+  var cellLabels = ['radius', 'brightness', 'bar height', 'opacity'];
+  var accent = '#4a8a7c';
+
+  // data label center top
+  cLabel('data = ' + v, W / 2, 22, { align: 'center', size: 13, bold: true, color: '#1d1b18' });
+
+  origs.forEach(function(orig, i) {
+    var cx = orig.x + cellW / 2;
+    var cy = orig.y + cellH / 2;
+
+    // cell bg
+    ctx.save();
+    roundRectPath(orig.x, orig.y, cellW, cellH, 10);
+    ctx.fillStyle = 'rgba(255,255,255,0.72)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.07)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+
+    cLabel(cellLabels[i], orig.x + 8, orig.y + 15, { size: 11, bold: true, color: '#2e5f55' });
+
+    if (i === 0) {
+      // radius
+      var r = mapV(v, 0, 100, 6, Math.min(cellW, cellH) * 0.40);
       ctx.beginPath();
-      ctx.moveTo(20, baseline);
-      ctx.lineTo(W - 20, baseline);
+      ctx.arc(cx, cy + 4, r, 0, Math.PI * 2);
+      ctx.fillStyle = accent;
+      ctx.fill();
+      cLabel('r = ' + Math.round(r), cx, cy + Math.min(cellW, cellH) * 0.42 + 14, { align: 'center', size: 11, color: '#555' });
+    } else if (i === 1) {
+      // brightness
+      var bright = Math.round(mapV(v, 0, 100, 28, 228));
+      var r2 = Math.min(cellW, cellH) * 0.34;
+      ctx.beginPath();
+      ctx.arc(cx, cy + 4, r2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgb(' + bright + ',' + bright + ',' + bright + ')';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      cLabel('fill(' + bright + ')', cx, cy + r2 + 18, { align: 'center', size: 11, color: '#555' });
+    } else if (i === 2) {
+      // bar height
+      var maxBH = cellH * 0.66;
+      var barH = mapV(v, 0, 100, 3, maxBH);
+      var barW = cellW * 0.28;
+      var bx = cx - barW / 2;
+      var baseY = orig.y + cellH * 0.84;
+      ctx.save();
+      roundRectPath(bx, baseY - barH, barW, barH, 4);
+      ctx.fillStyle = accent;
+      ctx.fill();
+      ctx.restore();
+      ctx.fillStyle = 'rgba(0,0,0,0.15)';
+      ctx.fillRect(orig.x + 8, baseY, cellW - 16, 2);
+      cLabel('h = ' + Math.round(barH), cx, baseY + 16, { align: 'center', size: 11, color: '#555' });
+    } else if (i === 3) {
+      // opacity
+      var alpha = mapV(v, 0, 100, 0.04, 1.0);
+      var r3 = Math.min(cellW, cellH) * 0.34;
+      // checkerboard clip
+      ctx.save();
+      roundRectPath(cx - r3, cy + 4 - r3, r3 * 2, r3 * 2, r3);
+      ctx.clip();
+      var sz = 8;
+      for (var ry = 0; ry < r3 * 2; ry += sz) {
+        for (var rx = 0; rx < r3 * 2; rx += sz) {
+          ctx.fillStyle = ((Math.floor(rx / sz) + Math.floor(ry / sz)) % 2 === 0) ? '#ddd' : '#c4c4c4';
+          ctx.fillRect(cx - r3 + rx, cy + 4 - r3 + ry, sz, sz);
+        }
+      }
+      ctx.restore();
+      ctx.beginPath();
+      ctx.arc(cx, cy + 4, r3, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(74,138,124,' + alpha.toFixed(2) + ')';
+      ctx.fill();
+      cLabel('alpha = ' + alpha.toFixed(2), cx, cy + 4 + r3 + 16, { align: 'center', size: 11, color: '#555' });
+    }
+  });
+}
+
+// ─── Render Scale ─────────────────────────────────────────────────────────────
+function renderScale() {
+  canvasBg();
+  var W = canvas.width;
+  var H = canvas.height;
+  var inMin = state.inMin;
+  var inMax = state.inMax;
+  var outMin = state.outMin;
+  var outMax = state.outMax;
+  var v = clamp(state.scaleVal, Math.min(inMin, inMax), Math.max(inMin, inMax));
+  var lineY1 = 115;
+  var lineY2 = 262;
+  var lineX0 = 62;
+  var lineX1 = W - 62;
+  var lineW = lineX1 - lineX0;
+
+  // input label
+  cLabel('Input range', lineX0, lineY1 - 32, { size: 12, bold: true, color: '#2e5f55' });
+  cLabel(String(inMin), lineX0, lineY1 - 14, { align: 'center', size: 11 });
+  cLabel(String(inMax), lineX1, lineY1 - 14, { align: 'center', size: 11 });
+
+  // input axis
+  ctx.save();
+  ctx.strokeStyle = '#c0b8ae';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(lineX0, lineY1);
+  ctx.lineTo(lineX1, lineY1);
+  ctx.stroke();
+  ctx.restore();
+
+  // input dot
+  var tNorm = (inMax === inMin) ? 0 : (v - inMin) / (inMax - inMin);
+  var tClamped = clamp(tNorm, 0, 1);
+  var dotX1 = lineX0 + tClamped * lineW;
+  ctx.beginPath();
+  ctx.arc(dotX1, lineY1, 10, 0, Math.PI * 2);
+  ctx.fillStyle = '#f0a832';
+  ctx.fill();
+  ctx.strokeStyle = '#c07818';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  cLabel(String(state.scaleVal), dotX1, lineY1 + 24, { align: 'center', size: 11, bold: true, color: '#c07818' });
+
+  // dashed arrow
+  var arrowMidY = (lineY1 + lineY2) / 2;
+  ctx.save();
+  ctx.strokeStyle = '#5a8fd0';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath();
+  ctx.moveTo(dotX1, lineY1 + 16);
+  ctx.lineTo(dotX1, lineY2 - 16);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+  // arrowhead
+  ctx.save();
+  ctx.fillStyle = '#5a8fd0';
+  ctx.beginPath();
+  ctx.moveTo(dotX1, lineY2 - 10);
+  ctx.lineTo(dotX1 - 7, lineY2 - 24);
+  ctx.lineTo(dotX1 + 7, lineY2 - 24);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+  cLabel('map()', dotX1 + 12, arrowMidY + 5, { size: 12, bold: true, color: '#5a8fd0' });
+
+  // output label
+  cLabel('Output range', lineX0, lineY2 - 32, { size: 12, bold: true, color: '#2e5f55' });
+  cLabel(String(outMin), lineX0, lineY2 - 14, { align: 'center', size: 11 });
+  cLabel(String(outMax), lineX1, lineY2 - 14, { align: 'center', size: 11 });
+
+  // output axis
+  ctx.save();
+  ctx.strokeStyle = '#c0b8ae';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(lineX0, lineY2);
+  ctx.lineTo(lineX1, lineY2);
+  ctx.stroke();
+  ctx.restore();
+
+  // output dot
+  var mappedV = mapV(state.scaleVal, inMin, inMax, outMin, outMax);
+  var outNorm = (outMax === outMin) ? 0 : clamp((mappedV - outMin) / (outMax - outMin), 0, 1);
+  var dotX2 = lineX0 + outNorm * lineW;
+  ctx.beginPath();
+  ctx.arc(dotX2, lineY2, 10, 0, Math.PI * 2);
+  ctx.fillStyle = '#4a8a7c';
+  ctx.fill();
+  ctx.strokeStyle = '#2e5f55';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  cLabel(Math.round(mappedV).toString(), dotX2, lineY2 + 24, { align: 'center', size: 11, bold: true, color: '#2e5f55' });
+
+  // formula
+  var formula = 'map(' + state.scaleVal + ', ' + inMin + ', ' + inMax + ', ' + outMin + ', ' + outMax + ') = ' + Math.round(mappedV);
+  cLabel(formula, W / 2, lineY2 + 56, { align: 'center', size: 12, color: '#444' });
+}
+
+// ─── Render Compare ───────────────────────────────────────────────────────────
+function renderCompare() {
+  canvasBg();
+  var W = canvas.width;
+  var H = canvas.height;
+  var data = state.bars.slice();
+  var maxVal = Math.max.apply(null, data);
+  var indices = data.map(function(_, i) { return i; });
+  if (state.sortBars) {
+    indices.sort(function(a, b) { return data[a] - data[b]; });
+  }
+  var n = 6;
+  var padL = 36, padR = 18, padT = 24, padB = 40;
+  var chartW = W - padL - padR - 32;
+  var chartH = H - padT - padB - 32;
+  var originX = padL + 16;
+  var originY = padT + 16 + chartH;
+  var barGap = chartW / n;
+  var barW = barGap * 0.60;
+
+  // gridlines
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,0,0,0.07)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  for (var g = 0; g <= 4; g++) {
+    var gy = originY - (g / 4) * chartH;
+    ctx.beginPath();
+    ctx.moveTo(originX, gy);
+    ctx.lineTo(originX + chartW, gy);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // baseline
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.fillRect(originX, originY, chartW, 2);
+
+  indices.forEach(function(dataIdx, pos) {
+    var val = data[dataIdx];
+    var barH = mapV(val, 0, 100, 0, chartH);
+    var bx = originX + pos * barGap + (barGap - barW) / 2;
+    var by = originY - barH;
+    var isMax = state.highlightMax && (val === maxVal);
+
+    ctx.save();
+    roundRectPath(bx, by, barW, Math.max(barH, 2), 5);
+    ctx.fillStyle = isMax ? '#4a8a7c' : '#8dc4ba';
+    ctx.fill();
+    if (isMax) {
+      ctx.strokeStyle = '#2e5f55';
+      ctx.lineWidth = 2.5;
       ctx.stroke();
     }
+    ctx.restore();
 
-    function setupTableEditor() {
-      // Wire up color pickers ↔ text inputs
-      document.querySelectorAll(".tbl-color-picker").forEach((picker, i) => {
-        const textInput = document.querySelectorAll(".tbl-color-text")[i];
-        picker.addEventListener("input", () => {
-          textInput.value = picker.value;
-          drawTablePreview();
-        });
-        textInput.addEventListener("input", () => {
-          if (/^#[0-9a-fA-F]{6}$/.test(textInput.value)) {
-            picker.value = textInput.value;
-          }
-          drawTablePreview();
-        });
-      });
-      document.querySelectorAll(".tbl-name, .tbl-value").forEach(input => {
-        input.addEventListener("input", drawTablePreview);
-      });
-      drawTablePreview();
+    // value label
+    cLabel(String(val), bx + barW / 2, by - 6, { align: 'center', size: 11, bold: isMax, color: isMax ? '#2e5f55' : '#555' });
+    // x label
+    cLabel(String.fromCharCode(65 + dataIdx), bx + barW / 2, originY + 18, { align: 'center', size: 11, color: '#666' });
+  });
+}
+
+// ─── Render Narrate ───────────────────────────────────────────────────────────
+function renderNarrate() {
+  canvasBg();
+  var W = canvas.width;
+  var H = canvas.height;
+  var data = state.bars.slice();
+  var maxVal = Math.max.apply(null, data);
+  var barLabels = ['A', 'B', 'C', 'D', 'E', 'F'];
+  var n = 6;
+  var padL = 44, padR = 18, padT = 38, padB = 42;
+  var chartW = W - padL - padR - 32;
+  var chartH = H - padT - padB - 32;
+  var originX = padL + 16;
+  var originY = padT + 16 + chartH;
+  var barGap = chartW / n;
+  var barW = barGap * 0.58;
+
+  // title
+  if (state.showTitle) {
+    cLabel('Sample Data Chart', W / 2, padT + 4, { align: 'center', size: 14, bold: true, color: '#1d1b18' });
+  }
+
+  // gridlines + y-axis labels
+  if (state.showGridlines) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,0,0,0.07)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    for (var g = 0; g <= 4; g++) {
+      var gy = originY - (g / 4) * chartH;
+      ctx.beginPath();
+      ctx.moveTo(originX, gy);
+      ctx.lineTo(originX + chartW, gy);
+      ctx.stroke();
+      if (state.showAxisLabels) {
+        cLabel(String(g * 25), originX - 6, gy + 4, { align: 'right', size: 10, color: '#888' });
+      }
+    }
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // baseline
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.fillRect(originX, originY, chartW, 2);
+
+  data.forEach(function(val, i) {
+    var barH = mapV(val, 0, 100, 0, chartH);
+    var bx = originX + i * barGap + (barGap - barW) / 2;
+    var by = originY - barH;
+    var isMax = (val === maxVal);
+
+    ctx.save();
+    roundRectPath(bx, by, barW, Math.max(barH, 2), 5);
+    if (state.showHighlight && isMax) {
+      ctx.fillStyle = '#4a8a7c';
+      ctx.fill();
+      ctx.strokeStyle = '#2e5f55';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = '#8dc4ba';
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // highlight annotation
+    if (state.showHighlight && isMax) {
+      cLabel('Highest', bx + barW / 2, by - 20, { align: 'center', size: 11, bold: true, color: '#2e5f55' });
+      ctx.save();
+      ctx.strokeStyle = '#2e5f55';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(bx + barW / 2, by - 14);
+      ctx.lineTo(bx + barW / 2, by - 4);
+      ctx.stroke();
+      ctx.restore();
     }
 
-    function setupUI() {
-      els.modeEditTable = document.querySelector("#mode-edittable");
-      els.modeFile = document.querySelector("#mode-file");
-      els.modeTable = document.querySelector("#mode-table");
-      els.modeColumn = document.querySelector("#mode-column");
-      els.modeMap = document.querySelector("#mode-map");
-      els.modeJson = document.querySelector("#mode-json");
-      els.resetButton = document.querySelector("#reset-button");
-      els.modePill = document.querySelector("#mode-pill");
-      els.rowSlider = document.querySelector("#row-slider");
-      els.scaleSlider = document.querySelector("#scale-slider");
-      els.sortSlider = document.querySelector("#sort-slider");
-      els.rowValue = document.querySelector("#row-value");
-      els.scaleValue = document.querySelector("#scale-value");
-      els.sortValue = document.querySelector("#sort-value");
-      els.datasetButtons = Array.from(document.querySelectorAll(".dataset-button"));
-      els.showLabels = document.querySelector("#show-labels");
-      els.showCode = document.querySelector("#show-code");
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.formulaBox = document.querySelector("#formula-box");
-      els.questionText = document.querySelector("#question-text");
-      els.caption = document.querySelector("#canvas-caption");
-      els.codeCard = document.querySelector("#code-card");
-      els.codeBox = document.querySelector("#code-box");
-      els.tableEditorSection = document.querySelector("#table-editor-section");
-      els.mainWorkspace = document.querySelector("#main-workspace");
+    // x-axis label
+    if (state.showAxisLabels) {
+      cLabel(barLabels[i], bx + barW / 2, originY + 18, { align: 'center', size: 11, color: '#666' });
+    }
+  });
+}
 
-      els.modeEditTable.addEventListener("click", () => setMode("edittable"));
-      els.modeFile.addEventListener("click", () => setMode("file"));
-      els.modeTable.addEventListener("click", () => setMode("table"));
-      els.modeColumn.addEventListener("click", () => setMode("column"));
-      els.modeMap.addEventListener("click", () => setMode("map"));
-      els.modeJson.addEventListener("click", () => setMode("json"));
+// ─── Render dispatcher ────────────────────────────────────────────────────────
+function render() {
+  if (state.mode === 'encode') renderEncode();
+  else if (state.mode === 'scale') renderScale();
+  else if (state.mode === 'compare') renderCompare();
+  else renderNarrate();
+}
 
-      els.rowSlider.addEventListener("input", () => { state.selectedRow = Number(els.rowSlider.value); updateUI(); });
-      els.scaleSlider.addEventListener("input", () => { state.visualScale = Number(els.scaleSlider.value); updateUI(); });
-      els.sortSlider.addEventListener("input", () => { state.sortMode = Number(els.sortSlider.value); updateUI(); });
+// ─── Code focus ───────────────────────────────────────────────────────────────
+function focusHTML() {
+  if (state.mode === 'encode') {
+    return '<span class="ct kw">let</span> r = <span class="ct fn">map</span>(<span class="ct num" id="v-mx">' + state.dataVal + '</span>, 0, 100, 10, <span class="ct num">120</span>);';
+  }
+  if (state.mode === 'scale') {
+    return '<span class="ct fn">map</span>(<span class="ct num" id="v-v">' + state.scaleVal + '</span>, <span class="ct num" id="v-in0">' + state.inMin + '</span>, <span class="ct num" id="v-in1">' + state.inMax + '</span>, <span class="ct num" id="v-out0">' + state.outMin + '</span>, <span class="ct num" id="v-out1">' + state.outMax + '</span>)';
+  }
+  if (state.mode === 'compare') {
+    return '<span class="ct kw">for</span> (<span class="ct kw">let</span> i = 0; i &lt; data.length; i++) {\n  <span class="ct fn">rect</span>(x, height - <span class="ct fn">map</span>(data[i], 0, 100, 0, 300), barW, ...);\n}';
+  }
+  // narrate
+  return '<span class="ct fn">text</span>(labels[i], x + barW/2, height + 18); <span class="ct cm">// label</span>';
+}
 
-      els.datasetButtons.forEach(button => button.addEventListener("click", () => {
-        state.datasetKey = button.dataset.dataset;
-        state.selectedRow = Math.min(state.selectedRow, data().rows.length - 1);
-        if (state.datasetKey !== "projects" && state.mode === "json") state.mode = "table";
-        updateUI();
-      }));
+function fullCodeText() {
+  if (state.mode === 'encode') {
+    return 'let data = ' + state.dataVal + ';\n\nfunction setup() {\n  createCanvas(620, 380);\n}\n\nfunction draw() {\n  background(245);\n  // Radius encoding\n  let r = map(data, 0, 100, 6, 120);\n  fill(74, 138, 124);\n  circle(120, 190, r * 2);\n\n  // Brightness encoding\n  let bright = map(data, 0, 100, 28, 228);\n  fill(bright);\n  circle(270, 190, 100);\n\n  // Bar height encoding\n  let h = map(data, 0, 100, 2, 200);\n  fill(74, 138, 124);\n  rect(380, 290 - h, 60, h);\n\n  // Opacity encoding\n  let alpha = map(data, 0, 100, 0, 255);\n  fill(74, 138, 124, alpha);\n  circle(530, 190, 100);\n}';
+  }
+  if (state.mode === 'scale') {
+    var result = Math.round(mapV(state.scaleVal, state.inMin, state.inMax, state.outMin, state.outMax));
+    return 'let inMin = ' + state.inMin + ';\nlet inMax = ' + state.inMax + ';\nlet outMin = ' + state.outMin + ';\nlet outMax = ' + state.outMax + ';\nlet value = ' + state.scaleVal + ';\n\nfunction draw() {\n  // map() preserves relative position across ranges\n  let result = map(value, inMin, inMax, outMin, outMax);\n  // result = ' + result + '\n}';
+  }
+  if (state.mode === 'compare') {
+    return 'let data = [' + state.bars.join(', ') + '];\n\nfunction draw() {\n  background(245);\n  let barW = 60;\n  for (let i = 0; i < data.length; i++) {\n    let x = 50 + i * 80;\n    let barH = map(data[i], 0, 100, 0, 300);\n    fill(74, 138, 124);\n    rect(x, height - barH - 40, barW, barH);\n    text(data[i], x + barW / 2, height - barH - 50);\n  }\n}';
+  }
+  return 'let data = [' + state.bars.join(', ') + '];\nlet labels = [\'A\',\'B\',\'C\',\'D\',\'E\',\'F\'];\n\nfunction draw() {\n  background(245);\n  textAlign(CENTER);\n  text(\'Sample Data Chart\', width/2, 24);\n\n  for (let i = 0; i < data.length; i++) {\n    let x = 50 + i * 80;\n    let barH = map(data[i], 0, 100, 0, 300);\n    fill(74, 138, 124);\n    rect(x, height - barH - 40, 50, barH);\n    text(labels[i], x + 25, height - 20);\n  }\n}';
+}
 
-      els.resetButton.addEventListener("click", () => {
-        state.datasetKey = "weather";
-        state.selectedRow = 2;
-        state.visualScale = 1;
-        state.sortMode = 0;
-        updateUI();
+function updateCode() {
+  document.getElementById('focus-code').innerHTML = focusHTML();
+  document.getElementById('full-code').textContent = fullCodeText();
+  document.getElementById('code-note').textContent = modes[state.mode].note;
+}
+
+// ─── Build controls ───────────────────────────────────────────────────────────
+function addSlider(parent, key, labelText, subLabel, min, max, step, value, onChange) {
+  var row = document.createElement('div');
+  row.className = 'ctrl-row';
+  var badgeId = 'vb_' + key;
+  var sliderId = 'sl_' + key;
+  row.innerHTML =
+    '<div><label for="' + sliderId + '">' + labelText +
+    '<small>' + subLabel + '</small></label></div>' +
+    '<span class="val-badge mono" id="' + badgeId + '">' + value + '</span>' +
+    '<input id="' + sliderId + '" type="range" min="' + min + '" max="' + max +
+    '" step="' + step + '" value="' + value + '" aria-label="' + labelText + '">';
+  parent.appendChild(row);
+  var slider = row.querySelector('input');
+  var badge = row.querySelector('.val-badge');
+  slider.addEventListener('input', function(e) {
+    var num = Number(e.target.value);
+    badge.textContent = num;
+    onChange(num);
+  });
+}
+
+function addSwitchesContainer(parent) {
+  var div = document.createElement('div');
+  div.className = 'switches';
+  parent.appendChild(div);
+  return div;
+}
+
+function addSwitch(container, labelText, checked, onChange) {
+  var lbl = document.createElement('label');
+  lbl.className = 'sw';
+  var cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.checked = checked;
+  cb.addEventListener('change', function(e) { onChange(e.target.checked); });
+  lbl.appendChild(cb);
+  lbl.appendChild(document.createTextNode(' ' + labelText));
+  container.appendChild(lbl);
+}
+
+function buildControls() {
+  var group = document.getElementById('controls');
+  var swArea = document.getElementById('switches-area');
+  group.innerHTML = '';
+  swArea.innerHTML = '';
+
+  if (state.mode === 'encode') {
+    addSlider(group, 'data', 'Data value', 'drives all four encodings', 0, 100, 1, state.dataVal, function(v) {
+      state.dataVal = v; updateCode(); render();
+    });
+  }
+
+  if (state.mode === 'scale') {
+    addSlider(group, 'inMin', 'inMin', 'input range minimum', 0, 50, 1, state.inMin, function(v) { state.inMin = v; updateCode(); render(); });
+    addSlider(group, 'inMax', 'inMax', 'input range maximum', 51, 200, 1, state.inMax, function(v) { state.inMax = v; updateCode(); render(); });
+    addSlider(group, 'outMin', 'outMin', 'output range minimum', 0, 100, 1, state.outMin, function(v) { state.outMin = v; updateCode(); render(); });
+    addSlider(group, 'outMax', 'outMax', 'output range maximum', 101, 500, 1, state.outMax, function(v) { state.outMax = v; updateCode(); render(); });
+    addSlider(group, 'scaleVal', 'value', 'value to map', 0, 200, 1, state.scaleVal, function(v) { state.scaleVal = v; updateCode(); render(); });
+  }
+
+  if (state.mode === 'compare') {
+    state.bars.forEach(function(val, i) {
+      addSlider(group, 'bar' + i, 'Bar ' + String.fromCharCode(65 + i), 'value ' + (i + 1), 0, 100, 1, val, function(v) {
+        state.bars[i] = v; updateCode(); render();
       });
+    });
+    var sw = addSwitchesContainer(swArea);
+    addSwitch(sw, 'Sort bars', state.sortBars, function(c) { state.sortBars = c; render(); });
+    addSwitch(sw, 'Highlight max', state.highlightMax, function(c) { state.highlightMax = c; render(); });
+  }
 
-      els.showLabels.addEventListener("change", () => { state.showLabels = els.showLabels.checked; });
-      els.showCode.addEventListener("change", () => { state.showCode = els.showCode.checked; updateUI(); });
+  if (state.mode === 'narrate') {
+    var sw2 = addSwitchesContainer(swArea);
+    addSwitch(sw2, 'Title', state.showTitle, function(c) { state.showTitle = c; render(); });
+    addSwitch(sw2, 'Axis Labels', state.showAxisLabels, function(c) { state.showAxisLabels = c; render(); });
+    addSwitch(sw2, 'Gridlines', state.showGridlines, function(c) { state.showGridlines = c; render(); });
+    addSwitch(sw2, 'Highlight', state.showHighlight, function(c) { state.showHighlight = c; render(); });
+  }
+}
 
-      setupTableEditor();
-      updateUI();
-    }
+// ─── Mode switching ───────────────────────────────────────────────────────────
+function setText(id, txt) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = txt;
+}
 
-    function setMode(mode) { state.mode = mode; updateUI(); }
+function setMode(modeName) {
+  state.mode = modeName;
 
-    function updateUI() {
-      const isEditTable = state.mode === "edittable";
-      els.tableEditorSection.classList.toggle("visible", isEditTable);
-      els.tableEditorSection.style.display = isEditTable ? "grid" : "none";
-      els.mainWorkspace.style.display = isEditTable ? "none" : "block";
+  document.querySelectorAll('.tab').forEach(function(tab) {
+    var active = tab.dataset.mode === modeName;
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    tab.tabIndex = active ? 0 : -1;
+  });
 
-      const buttons = [[els.modeEditTable,"edittable"],[els.modeFile,"file"],[els.modeTable,"table"],[els.modeColumn,"column"],[els.modeMap,"map"],[els.modeJson,"json"]];
-      for (const [button, mode] of buttons) button.classList.toggle("active", state.mode === mode);
-      els.datasetButtons.forEach(button => button.classList.toggle("active", button.dataset.dataset === state.datasetKey));
+  var m = modes[modeName];
+  setText('canvas-title', m.canvasTitle);
+  setText('canvas-sub', m.canvasSub);
+  setText('predict-text', m.predict);
+  setText('big-idea-text', m.big);
+  setText('bug-text', m.bug);
+  setText('try-text', m.tryIt);
 
-      if (isEditTable) {
-        els.modePill.textContent = "edit data → see drawing change";
-        drawTablePreview();
-        return;
-      }
+  var fullEl = document.getElementById('full-code');
+  var toggleBtn = document.getElementById('fullCodeToggle');
+  fullEl.classList.remove('open');
+  toggleBtn.textContent = '▸ See full p5.js sketch';
+  toggleBtn.setAttribute('aria-expanded', 'false');
 
-      els.rowSlider.max = String(data().rows.length - 1);
-      els.rowSlider.value = state.selectedRow;
-      els.scaleSlider.value = state.visualScale;
-      els.sortSlider.value = state.sortMode;
-      els.rowValue.textContent = String(state.selectedRow);
-      els.scaleValue.textContent = `${state.visualScale.toFixed(1)}×`;
-      els.sortValue.textContent = ["original", "low→high", "high→low"][state.sortMode];
-      els.showLabels.checked = state.showLabels;
-      els.showCode.checked = state.showCode;
-      els.codeCard.classList.toggle("visible", state.showCode);
+  buildControls();
+  updateCode();
+  render();
+}
 
-      const d = data();
-      const row = selected();
-      const num = firstNumericColumn();
-      const label = labelColumn();
+function selectAdjacentTab(direction) {
+  var tabs = Array.from(document.querySelectorAll('.tab'));
+  var cur = tabs.findIndex(function(t) { return t.dataset.mode === state.mode; });
+  var next = (cur + direction + tabs.length) % tabs.length;
+  tabs[next].focus();
+  setMode(tabs[next].dataset.mode);
+}
 
-      const lessons = {
-        file: {
-          pill: "data file → sketch",
-          title: "Data can come from outside the sketch",
-          text: "Instead of typing every value directly into your code, p5.js can load a CSV table or JSON file. The sketch then uses that data to decide what to draw.",
-          formula: `function preload() {\n  table = loadTable("${d.name}", "csv", "header");\n}`,
-          question: "Why might it be useful to keep data outside the code?",
-          caption: "preload() gets external data ready before setup() and draw() try to use it.",
-          code: `let table;\n\nfunction preload() {\n  table = loadTable("${d.name}", "csv", "header");\n}`
-        },
-        table: {
-          pill: "table = rows + columns",
-          title: "A table is rows and columns",
-          text: "A CSV table is like a small spreadsheet. Each row is one record. Each column is one kind of information.",
-          formula: `row ${state.selectedRow}:\n${JSON.stringify(row, null, 2)}`,
-          question: "What does one row represent in this dataset?",
-          caption: "Rows are records. Columns are fields. The sketch can read either one.",
-          code: `let row = table.getRow(${state.selectedRow});\nlet ${label || "name"} = row.getString("${label || d.columns[0]}");\nlet ${num || "value"} = row.getNum("${num || d.columns[1]}");`
-        },
-        column: {
-          pill: "columns name each type of data",
-          title: "Columns tell the sketch what each value means",
-          text: "Column names are labels for the data. Instead of remembering column 2, you can ask for a named value like temp, rain, red, or complexity.",
-          formula: `columns:\n${d.columns.join("\n")}`,
-          question: "Which column should control size? Which column should control color?",
-          caption: "Column names help code ask for meaningful values instead of anonymous numbers.",
-          code: `for (let row of table.rows) {\n  let value = row.getNum("${num || d.columns[1]}");\n}`
-        },
-        map: {
-          pill: "data values become visual properties",
-          title: "Data becomes drawing through map()",
-          text: "A data value usually has to be translated into a visual range. map() can turn temperature into height, rain into opacity, or RGB values into color.",
-          formula: `let value = ${row[num]};\nlet h = map(value, minValue, maxValue, 20, 260);`,
-          question: "What visual property is controlled by the numeric data?",
-          caption: "Visualization is a translation: data value in, visual property out.",
-          code: `let value = row.getNum("${num}");\nlet h = map(value, minValue, maxValue, 20, 260);\nrect(x, baseline - h, barWidth, h);`
-        },
-        json: {
-          pill: "JSON stores nested objects and arrays",
-          title: "JSON can store objects and arrays",
-          text: "JSON is useful when data has structure: arrays of objects, nested properties, labels, settings, and more complex records.",
-          formula: `let data = {\n  projects: ${JSON.stringify(d.rows.slice(0,2), null, 2)}\n};`,
-          question: "How is JSON different from a flat table?",
-          caption: "JSON is shaped like JavaScript objects and arrays, so it can represent more nested data.",
-          code: `let data;\n\nfunction preload() {\n  data = loadJSON("projects.json");\n}\n\nfor (let project of data.projects) {\n  circle(x, y, project.complexity * 10);\n}`
-        }
-      };
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() { setMode(tab.dataset.mode); });
+  tab.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); selectAdjacentTab(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); selectAdjacentTab(-1); }
+    if (e.key === 'Home') { e.preventDefault(); var first = document.querySelector('.tab'); first.focus(); setMode(first.dataset.mode); }
+    if (e.key === 'End') { e.preventDefault(); var all = document.querySelectorAll('.tab'); var last = all[all.length - 1]; last.focus(); setMode(last.dataset.mode); }
+  });
+});
 
-      const lesson = lessons[state.mode];
-      els.modePill.textContent = lesson.pill;
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.formulaBox.textContent = lesson.formula;
-      els.questionText.textContent = lesson.question;
-      els.caption.textContent = lesson.caption;
-      els.codeBox.textContent = lesson.code;
-    }
+document.getElementById('fullCodeToggle').addEventListener('click', function() {
+  var fullEl = document.getElementById('full-code');
+  var open = fullEl.classList.toggle('open');
+  this.textContent = open ? '▾ Hide full sketch' : '▸ See full p5.js sketch';
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) updateCode();
+});
 
-    setupUI();
-
-    const sketch = (p) => {
-      let canvas, holder, previousWidth = 0, previousHeight = 0;
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive visualization of loading data and turning rows and columns into drawings in p5.js.");
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
-      };
-      p.windowResized = () => resizeToHolder();
-      p.draw = () => {
-        if (state.mode === "edittable") return;
-        resizeToHolder();
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-        drawPanelTitle();
-        if (state.mode === "file") drawFileMode();
-        if (state.mode === "table") drawTableMode();
-        if (state.mode === "column") drawColumnMode();
-        if (state.mode === "map") drawMapMode();
-        if (state.mode === "json") drawJsonMode();
-        drawReadoutCards();
-      };
-
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-        if (w !== previousWidth || h !== previousHeight) { p.resizeCanvas(w, h); previousWidth = w; previousHeight = h; }
-      }
-
-      function drawSubtleGrid() {
-        p.push(); p.stroke(236,224,207); p.strokeWeight(1);
-        for (let x=0; x<p.width; x+=32) p.line(x,0,x,p.height);
-        for (let y=0; y<p.height; y+=32) p.line(0,y,p.width,y);
-        p.pop();
-      }
-
-      function drawPanelTitle() {
-        const titles = { file:["External File","Data can enter the sketch before drawing starts."], table:["Table Rows","A row is one record in the dataset."], column:["Columns","Columns name each kind of value."], map:["Map to Visuals","Numbers become heights, sizes, colors, and positions."], json:["JSON Shape","Objects and arrays can hold structured data."] };
-        const [title, subtitle] = titles[state.mode];
-        p.push(); p.noStroke(); p.fill("#222"); p.textStyle(p.BOLD); p.textSize(22); p.text(title,24,38); p.textStyle(p.NORMAL); p.textSize(14); p.fill("#6b6258"); p.text(subtitle,24,62); p.pop();
-      }
-
-      function getStage() { return { x:p.width*0.08, y:p.height*0.15, w:p.width*0.84, h:p.height*0.50 }; }
-      function drawStage() { const s=getStage(); p.push(); p.noStroke(); p.fill(255,255,255,235); p.rect(s.x,s.y,s.w,s.h,24); p.pop(); return s; }
-
-      function drawFileMode() {
-        const s = drawStage();
-        drawFileIcon(s.x + 60, s.y + 70, data().name);
-        drawArrow(s.x + 230, s.y + s.h*0.48, s.x + s.w*0.54, s.y + s.h*0.48, "#16a34a");
-        drawSketchBox(s.x + s.w*0.58, s.y + 58, s.w*0.32, s.h - 116);
-        if (state.showLabels) {
-          drawLabel("preload() loads before setup()", s.x + 48, s.y + s.h - 34, "#7c3aed", 14);
-          drawLabel("draw() can now use the data", s.x + s.w*0.58, s.y + s.h - 34, "#16a34a", 14);
-        }
-      }
-
-      function drawTableMode() {
-        const s = drawStage();
-        drawTable(s.x + 28, s.y + 36, s.w - 56, s.h - 72, true, false);
-      }
-
-      function drawColumnMode() {
-        const s = drawStage();
-        drawTable(s.x + 28, s.y + 36, s.w*0.56, s.h - 72, false, true);
-        drawColumnCards(s.x + s.w*0.66, s.y + 50, s.w*0.26, s.h - 100);
-      }
-
-      function drawMapMode() {
-        const s = drawStage();
-        drawBarChart(s.x + 40, s.y + 52, s.w - 80, s.h - 104);
-      }
-
-      function drawJsonMode() {
-        const s = drawStage();
-        drawJsonTree(s.x + 42, s.y + 44, s.w*0.44, s.h - 88);
-        drawJsonVisual(s.x + s.w*0.55, s.y + 44, s.w*0.38, s.h - 88);
-      }
-
-      function drawFileIcon(x, y, name) {
-        p.push(); p.noStroke(); p.fill("#f5f3ff"); p.rect(x,y,138,168,18); p.fill("#7c3aed"); p.triangle(x+98,y,x+138,y+40,x+98,y+40); p.stroke("#7c3aed"); p.strokeWeight(3); p.noFill(); p.rect(x,y,138,168,18); p.noStroke(); p.fill("#7c3aed"); p.textStyle(p.BOLD); p.textSize(15); p.text(name,x+16,y+84); p.fill("#6b6258"); p.textSize(12); p.text("external data",x+16,y+112); p.pop();
-      }
-
-      function drawSketchBox(x, y, w, h) {
-        p.push(); p.noStroke(); p.fill("#f0fdf4"); p.rect(x,y,w,h,20); p.stroke("#16a34a"); p.strokeWeight(3); p.noFill(); p.rect(x,y,w,h,20); p.noStroke(); p.fill("#16a34a"); p.textStyle(p.BOLD); p.textSize(18); p.text("p5.js sketch",x+20,y+34); p.fill("#334155"); p.textStyle(p.NORMAL); p.textSize(13); p.text("setup()",x+28,y+76); p.text("draw()",x+28,y+106); p.text("map data to shapes",x+28,y+136); p.pop();
-      }
-
-      function drawTable(x, y, w, h, highlightRow, highlightCols) {
-        const d=data(); const r=rows(); const cols=d.columns; const rowH=Math.min(38,(h-36)/(r.length+1)); const colW=w/cols.length;
-        p.push(); p.noStroke(); p.fill(255,250,242,245); p.rect(x,y,w,h,18);
-        for (let c=0;c<cols.length;c++) { p.fill(highlightCols ? "#ffe4e6" : "#f8fafc"); p.rect(x+c*colW,y,colW,rowH,8); p.fill("#e11d48"); p.textStyle(p.BOLD); p.textSize(12); p.text(cols[c],x+c*colW+10,y+24); }
-        for (let i=0;i<r.length;i++) {
-          const yy=y+(i+1)*rowH; const active=i===state.selectedRow;
-          p.fill(active&&highlightRow ? "#e0f2fe" : "#ffffff"); p.rect(x,yy,w,rowH,8);
-          p.stroke("#e6dac8"); p.strokeWeight(1); p.line(x,yy,x+w,yy); p.noStroke();
-          for (let c=0;c<cols.length;c++) { p.fill(active&&highlightRow ? "#0891b2" : "#334155"); p.textStyle(active&&highlightRow? p.BOLD : p.NORMAL); p.textSize(12); p.text(String(r[i][cols[c]]),x+c*colW+10,yy+24); }
-        }
-        if (state.showLabels && highlightRow) drawLabel(`selected row ${state.selectedRow}`,x+12,y+h-10,"#0891b2",13);
-        p.pop();
-      }
-
-      function drawColumnCards(x, y, w, h) {
-        const cols=data().columns; p.push(); p.noStroke(); p.fill(255,250,242,245); p.rect(x,y,w,h,18); p.fill("#e11d48"); p.textStyle(p.BOLD); p.textSize(15); p.text("columns",x+16,y+28);
-        for (let i=0;i<cols.length;i++) { const yy=y+62+i*42; p.fill("#ffe4e6"); p.rect(x+16,yy-22,w-32,30,10); p.fill("#334155"); p.textSize(13); p.text(cols[i],x+28,yy-2); }
-        p.pop();
-      }
-
-      function drawBarChart(x, y, w, h) {
-        const r=rows(); const num=firstNumericColumn(); const label=labelColumn(); const values=r.map(row=>row[num]); const min=Math.min(...values); const max=Math.max(...values); const baseline=y+h-36; const barW=(w-30)/r.length;
-        p.push(); p.noStroke(); p.fill(255,250,242,245); p.rect(x-18,y-30,w+36,h+48,20); p.stroke("#d8cbbb"); p.strokeWeight(2); p.line(x,baseline,x+w,baseline); p.noStroke();
-        for (let i=0;i<r.length;i++) { const row=r[i]; const val=row[num]; const bh=p.map(val,min,max,30,h-82)*state.visualScale; const bx=x+i*barW+8; const active=i===state.selectedRow; p.fill(active ? "#16a34a" : "#7c3aed"); p.rect(bx,baseline-bh,barW-16,bh,10,10,0,0); p.fill("#334155"); p.textSize(11); p.textAlign(p.CENTER,p.BASELINE); p.text(String(row[label]),bx+(barW-16)/2,baseline+18); if(active&&state.showLabels) drawLabel(`${num}: ${val}`,bx-8,baseline-bh-16,"#16a34a",13); }
-        p.textAlign(p.LEFT,p.BASELINE); if(state.showLabels) drawLabel(`${num} → bar height`,x+12,y+4,"#16a34a",14); p.pop();
-      }
-
-      function drawJsonTree(x, y, w, h) {
-        const r=data().rows; p.push(); p.noStroke(); p.fill("#f5f3ff"); p.rect(x,y,w,h,20); p.stroke("#7c3aed"); p.strokeWeight(3); p.noFill(); p.rect(x,y,w,h,20); p.noStroke(); p.fill("#7c3aed"); p.textStyle(p.BOLD); p.textSize(16); p.text("projects.json",x+18,y+30); p.fill("#334155"); p.textStyle(p.NORMAL); p.textSize(13); p.text("{",x+24,y+62); p.text("projects: [",x+40,y+88); for(let i=0;i<Math.min(4,r.length);i++){ const yy=y+118+i*36; p.fill(i===state.selectedRow?"#16a34a":"#334155"); p.text(`{ title: "${r[i].title}", ... }`,x+58,yy); } p.fill("#334155"); p.text("]",x+40,y+h-42); p.text("}",x+24,y+h-20); p.pop();
-      }
-
-      function drawJsonVisual(x, y, w, h) {
-        const r=rows(); p.push(); p.noStroke(); p.fill(255,250,242,245); p.rect(x,y,w,h,20); for(let i=0;i<r.length;i++){ const row=r[i]; const cx=x+40+(i%3)*(w-80)/2; const cy=y+58+Math.floor(i/3)*92; const size=row.complexity*7*state.visualScale; p.fill(i===state.selectedRow?"#16a34a":"#f59e0b"); p.circle(cx,cy,size); p.fill("#334155"); p.textSize(12); p.textAlign(p.CENTER,p.BASELINE); p.text(row.title,cx,cy+size/2+18); } p.textAlign(p.LEFT,p.BASELINE); if(state.showLabels) drawLabel("project.complexity → circle size",x+14,y+h-20,"#f59e0b",13); p.pop();
-      }
-
-      function drawArrow(x1,y1,x2,y2,color){ p.push(); p.stroke(color); p.strokeWeight(3); p.line(x1,y1,x2,y2); const angle=Math.atan2(y2-y1,x2-x1); p.noStroke(); p.fill(color); p.push(); p.translate(x2,y2); p.rotate(angle); p.triangle(0,0,-10,-6,-10,6); p.pop(); p.pop(); }
-
-      function drawReadoutCards(){ const row=selected(); const num=firstNumericColumn(); const label=labelColumn(); const cards=[{label:"file",value:data().name,color:"#7c3aed"},{label:"row",value:state.selectedRow,color:"#0891b2"},{label:num||"value",value:row[num]??row[label],color:"#f59e0b"}]; const cardW=Math.min(176,(p.width-70)/cards.length); const y=p.height-168; const x=28; p.push(); for(let i=0;i<cards.length;i++){ const cx=x+i*(cardW+10); p.noStroke(); p.fill(255,255,255,235); p.rect(cx,y,cardW,62,14); p.fill(cards[i].color); p.textStyle(p.BOLD); p.textSize(13); p.text(cards[i].label,cx+12,y+22); p.fill("#222"); p.textSize(16); p.text(String(cards[i].value),cx+12,y+48); } p.pop(); }
-
-      function drawLabel(text,x,y,color,size=13){ p.push(); p.textSize(size); p.textStyle(p.BOLD); const padX=7,padY=4,tw=p.textWidth(text); p.noStroke(); p.fill(255,250,242,238); p.rect(x-padX,y-size-padY+3,tw+padX*2,size+padY*2,9); p.fill(color); p.textAlign(p.LEFT,p.BASELINE); p.text(text,x,y); p.pop(); }
-    };
-
-    new p5(sketch);
-  </script>
+// ─── Init ─────────────────────────────────────────────────────────────────────
+setMode('encode');
+</script>
 </body>
 </html>

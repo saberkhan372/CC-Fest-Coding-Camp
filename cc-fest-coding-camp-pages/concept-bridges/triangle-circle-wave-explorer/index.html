@@ -1,1634 +1,1418 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triangle to Circle to Wave Explorer</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-    :root {
-      --bg: #f6f2ea;
-      --panel: #fffaf2;
-      --ink: #222222;
-      --muted: #6b6258;
-      --line: #ded2c1;
-      --accent: #2563eb;
-      --accent-soft: #dbeafe;
-      --sin: #e11d48;
-      --sin-soft: #ffe4e6;
-      --cos: #0891b2;
-      --cos-soft: #cffafe;
-      --radius: #7c3aed;
-      --triangle: #f59e0b;
-      --green: #16a34a;
-      --shadow: 0 12px 28px rgba(70, 50, 20, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../concept-bridge.css">
+<title>Triangle → Circle → Wave</title>
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --paper: #fffdf7;
+    --ink: #1d1b18;
+    --muted: #6d675f;
+    --faint: #9e9789;
+    --line: #ded4c3;
+    --line-light: #ece5d8;
+    --accent: #7a5ea8;
+    --accent-dark: #5b3f8a;
+    --accent-bg: #f3f0ff;
+    --green-bg: #eef8f2;
+    --green-border: #b8dcc8;
+    --green-text: #2a5e3e;
+    --warn-bg: #fff3e6;
+    --warn-border: #edbd83;
+    --predict-bg: #fef9ee;
+    --predict-border: #efd09e;
+    --try-bg: #f3f0ff;
+    --try-border: #d4cbff;
+    --code-bg: #1e1e2a;
+    --code-text: #e8e4da;
+    --code-kw: #c9a0f0;
+    --code-fn: #7dafe0;
+    --code-num: #f0a870;
+    --code-str: #90d0a0;
+    --code-cm: #6a6a7a;
+    --code-flash-bg: #ffd166;
+    --code-flash-text: #181512;
+    --shadow: 0 10px 32px rgba(45,33,20,0.09);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: 0.18s ease;
+  }
 
-    * {
-      box-sizing: border-box;
-    }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255, 221, 128, 0.35), transparent 28rem),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.28), transparent 32rem),
-        var(--bg);
-    }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    header {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 28px 20px 12px;
-    }
+  a { color: var(--accent-dark); }
+  code, .mono { font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 28px) 56px;
+  }
 
-    .subtitle {
-      margin: 0;
-      max-width: 840px;
-      font-size: 1.05rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-link:hover { color: var(--accent-dark); }
 
-    main {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 12px 20px 36px;
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-      align-items: start;
-    }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+  }
 
-    .workspace,
-    .side-panel,
-    .controls {
-      background: rgba(255, 250, 242, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
+  h1 {
+    font-size: clamp(1.6rem, 3.8vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
 
-    .controls {
-      grid-column: 1 / -1;
-      padding: 14px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
+  .subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
 
-    .mode-row,
-    .control-row,
-    .preset-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  .subtitle code,
+  .prose-section code,
+  .box-body code {
+    font-size: 0.88em;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
 
-    button,
-    .toggle-label,
-    .pill {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      font-size: 0.92rem;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
-      user-select: none;
-    }
-
-    button:hover,
-    .toggle-label:hover {
-      transform: translateY(-1px);
-      background: #fff7ed;
-    }
-
-    button.active {
-      color: white;
-      background: var(--ink);
-      border-color: var(--ink);
-    }
-
-    button:disabled {
-      opacity: 0.36;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    button:disabled:hover {
-      background: white;
-      transform: none;
-    }
-
-    .pill {
-      cursor: default;
-      background: #f8fafc;
-      color: var(--muted);
-      border-color: #e2e8f0;
-    }
-
-    .pill strong {
-      color: var(--ink);
-    }
-
-    .toggle-label input {
-      margin-right: 6px;
-      transform: translateY(1px);
-    }
-
-    .slider-wrap {
-      display: grid;
-      grid-template-columns: 72px minmax(160px, 1fr) 78px;
-      gap: 9px;
-      align-items: center;
-      min-width: min(460px, 100%);
-    }
-
-    .slider-wrap label,
-    .slider-value,
-    .preset-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-    }
-
-    .workspace {
-      position: relative;
-      height: 660px;
-      overflow: hidden;
-      padding: 12px;
-    }
-
-    #sketch-holder {
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    #sketch-holder canvas {
-      display: block;
-    }
-
-    .canvas-caption {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      right: 22px;
-      background: rgba(255, 250, 242, 0.93);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      backdrop-filter: blur(8px);
-    }
-
-    .side-panel {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      background: white;
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .card h2,
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .card h2 {
-      font-size: 1.15rem;
-    }
-
-    .card h3 {
-      font-size: 1rem;
-    }
-
-    .card p,
-    .card li {
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .card p {
-      margin: 0 0 8px;
-    }
-
-    .card p:last-child {
-      margin-bottom: 0;
-    }
-
-    .formula {
-      display: block;
-      margin: 8px 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-    }
-
-    .legend {
-      display: grid;
-      gap: 8px;
-    }
-
-    .legend-item {
-      display: grid;
-      grid-template-columns: 16px 1fr;
-      gap: 8px;
-      align-items: center;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .swatch {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-    }
-
-    .swatch.sin { background: var(--sin); }
-    .swatch.cos { background: var(--cos); }
-    .swatch.radius { background: var(--radius); }
-    .swatch.triangle { background: var(--triangle); }
-    .swatch.green { background: var(--green); }
-
-    .code-card {
-      display: none;
-    }
-
-    .code-card.visible {
-      display: block;
-    }
-
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 12px;
-      border-radius: 14px;
-      background: #111827;
-      color: #e5e7eb;
-      overflow-x: auto;
-    }
-
-    .note {
-      font-size: 0.86rem;
-      color: var(--muted);
-    }
-
-    @media (max-width: 980px) {
-      main {
-        grid-template-columns: 1fr;
-      }
-
-      .workspace {
-        height: 590px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      header,
-      main {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
-
-      .slider-wrap {
-        grid-template-columns: 1fr;
-        gap: 4px;
-      }
-
-      .workspace {
-        height: 540px;
-      }
-    }
-  
-  /* ── Bridge improvement additions ─────────────────────────────── */
   .unlocks {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 0 0 20px;
+    margin: 0 0 22px;
   }
+
   .unlock-pill {
     font-size: 0.75rem;
-    font-weight: 700;
-    color: #2a5e3e;
-    background: #eef8f2;
-    border: 1px solid #b8dcc8;
+    font-weight: 800;
+    color: var(--green-text);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
     padding: 5px 10px;
     border-radius: 999px;
   }
+
   .before-after {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     overflow: hidden;
     margin-bottom: 22px;
-    background: rgba(255,255,255,0.55);
+    background: var(--paper);
   }
-  .ba-col { padding: 14px 18px; }
-  .ba-col:first-child {
-    background: rgba(0,0,0,0.025);
-    border-right: 1px solid var(--line, #ded2c1);
-  }
+
+  .ba-col { padding: 16px 20px; }
+  .ba-col:first-child { background: rgba(0,0,0,0.02); border-right: 1px solid var(--line); }
+
   .ba-label {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #9e9789;
+    color: var(--faint);
     margin-bottom: 5px;
   }
-  .ba-col:last-child .ba-label { color: #2a5e3e; }
-  .ba-text { font-size: 0.9rem; line-height: 1.5; }
-  .predict-box {
-    background: #fef9ee;
-    border: 1px solid #efd09e;
-    border-radius: 10px;
-    padding: 11px 14px;
-    margin-bottom: 12px;
+  .ba-col:last-child .ba-label { color: var(--green-text); }
+  .ba-text { font-size: 0.92rem; line-height: 1.5; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    align-items: start;
   }
-  .predict-box .pbox-label {
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .canvas-panel { overflow: hidden; }
+
+  .canvas-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.6);
+  }
+
+  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
+  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+  .canvas-wrap {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #f1eadf;
+  }
+
+  #wave-canvas {
+    display: block;
+    width: 100%;
+    max-width: 620px;
+    height: auto;
+    border-radius: 14px;
+  }
+
+  .touch-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 6px;
+  }
+
+  .ctrl-panel { padding: 16px; }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    line-height: 1.3;
+  }
+
+  .tab:hover { transform: translateY(-1px); background: #f5f0ff; }
+  .tab[aria-selected="true"] { color: var(--ink); background: #e8e0ff; border-color: #a080d8; }
+
+  .tab .step {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
+
+  .tab:focus-visible,
+  .preset-btn:focus-visible,
+  .sw:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  .path-link:focus-visible,
+  .bottom-nav a:focus-visible,
+  .back-link:focus-visible {
+    outline: 3px solid rgba(122,94,168,0.4);
+    outline-offset: 2px;
+  }
+
+  .predict {
+    background: var(--predict-bg);
+    border: 1px solid var(--predict-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .box-label {
     display: block;
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    color: var(--ink);
     margin-bottom: 3px;
   }
-  .predict-box .pbox-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
+
+  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
+
+  .ctrl-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--line-light);
   }
-  .callout-mistake {
-    background: #fff3e6;
-    border: 1px solid #edbd83;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin: 10px 0 0;
-  }
-  .callout-mistake .cm-label {
+
+  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
+  .ctrl-row label small {
     display: block;
-    font-size: 0.72rem;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 1px;
+  }
+
+  .val-badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.82rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    min-width: 42px;
+    text-align: center;
   }
-  .callout-mistake .cm-body {
-    font-size: 0.88rem;
-    line-height: 1.5;
+
+  input[type="range"] {
+    width: 100%;
+    grid-column: 1 / -1;
+    accent-color: var(--accent);
+    height: 6px;
   }
-  .pathways-section {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 32px 20px 8px;
-  }
-  .pathways-title {
-    font-size: 0.72rem;
-    font-weight: 700;
+
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #9e9789;
-    margin-bottom: 12px;
+    color: var(--faint);
+    margin-bottom: 6px;
   }
-  .path-links { display: grid; gap: 8px; max-width: 820px; }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+  .preset-btn {
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
+  .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
+  .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
+
+  .code-section {
+    background: var(--code-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .code-focus-line {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--code-text);
+    white-space: pre-wrap;
+  }
+
+  .ct { display: inline-block; border-radius: 4px; padding: 0 2px; transition: background 220ms ease, color 220ms ease; }
+  .ct.flash { background: var(--code-flash-bg); color: var(--code-flash-text); }
+  .ct.kw { color: var(--code-kw); }
+  .ct.fn { color: var(--code-fn); }
+  .ct.num { color: var(--code-num); }
+  .ct.str { color: var(--code-str); }
+  .ct.cm { color: var(--code-cm); font-style: italic; }
+
+  .full-code-toggle {
+    width: 100%;
+    padding: 7px 14px;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.42);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: color var(--transition);
+  }
+  .full-code-toggle:hover { color: rgba(255,255,255,0.68); }
+
+  .full-code-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--code-text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .full-code-body.open { display: block; }
+
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
+  .callout.big-idea { background: var(--green-bg); border-color: var(--green-border); }
+  .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.try { background: var(--try-bg); border-color: var(--try-border); }
+
+  .prose-section { margin-top: 22px; }
+  .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 720px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+  .swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12); }
+
+  .pathways { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 20px; }
+  .pathways-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin-bottom: 12px; }
+  .path-links { display: grid; gap: 8px; }
+
   .path-link {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    border: 1px solid var(--line, #ded2c1);
-    border-radius: 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
     text-decoration: none;
-    color: var(--ink, #222);
-    background: rgba(255,250,242,0.92);
-    transition: border-color 0.14s ease, background 0.14s ease;
-    font-family: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all var(--transition);
   }
-  .path-link:hover {
-    border-color: var(--accent, #2563eb);
-    background: rgba(230,240,255,0.6);
-  }
+
+  .path-link:hover { border-color: var(--accent); background: var(--accent-bg); }
+
   .path-link-type {
     font-size: 0.7rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #9e9789;
+    color: var(--faint);
     flex-shrink: 0;
-    min-width: 82px;
+    min-width: 88px;
   }
-  .path-link:hover .path-link-type { color: var(--accent, #2563eb); }
+
+  .path-link:hover .path-link-type { color: var(--accent-dark); }
   .path-link-name { font-size: 0.9rem; font-weight: 700; }
-  .path-link-arrow { margin-left: auto; color: #9e9789; font-size: 1.1rem; }
+  .path-link-arrow { margin-left: auto; color: var(--faint); font-size: 1.1rem; }
+
   .bottom-nav {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 18px 20px 40px;
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    border-top: 1px solid var(--line, #ded2c1);
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-light);
   }
-  .bottom-nav a {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #6b6258;
-    text-decoration: none;
-    font-family: inherit;
+
+  .bottom-nav a { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color var(--transition); }
+  .bottom-nav a:hover { color: var(--accent-dark); }
+
+  @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .tabs { grid-template-columns: repeat(3, 1fr); }
   }
-  .bottom-nav a:hover { color: var(--accent, #2563eb); }
   @media (max-width: 560px) {
     .before-after { grid-template-columns: 1fr; }
-    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line, #ded2c1); }
+    .ba-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .path-link { align-items: flex-start; }
+    .path-link-type { min-width: 76px; }
     .bottom-nav { flex-direction: column; }
   }
+  @media (max-width: 480px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
 </style>
-  <link rel="stylesheet" href="../concept-bridge.css">
 </head>
 <body>
-  <div style="max-width:1220px;margin:0 auto;padding:18px 20px 0;font-family:DM Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;">
-    <a href="../../index.html#concept-bridges" style="color:#5c5751;text-decoration:none;">← Back to CC Fest Coding Camp</a>
-  </div>
-  <header>
-    <h1>Triangle → Circle → Wave</h1>
-    <p class="subtitle">
-      A beginner-friendly bridge from right triangles to the unit circle to sine and cosine waves.
-      Start with a simple 0°–90° triangle, then unlock the full circle and see how motion becomes a graph.
-    </p>
+<main class="page">
+  <a class="back-link" href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← Back to concept bridges</a>
+
+  <p class="eyebrow">Concept bridge · Math &amp; Motion</p>
+  <h1>Triangle → Circle → Wave</h1>
+  <p class="subtitle">
+    A concept bridge for <code>sin()</code>, <code>cos()</code>, <code>atan2()</code>, and circular motion.
+    In p5.js, triangles live inside circles, and circles become waves.
+  </p>
+
   <div class="unlocks" aria-label="What this bridge unlocks">
     <span class="unlock-pill">circular motion</span>
-    <span class="unlock-pill">sine waves</span>
-    <span class="unlock-pill">trigonometry in p5</span>
-    <span class="unlock-pill">oscillation patterns</span>
+    <span class="unlock-pill">oscillation</span>
+    <span class="unlock-pill">spirals</span>
+    <span class="unlock-pill">clocks</span>
+    <span class="unlock-pill">radial patterns</span>
+    <span class="unlock-pill">wave animation</span>
   </div>
+
   <section class="before-after" aria-label="Before and after mental model">
     <div class="ba-col">
       <div class="ba-label">Before this bridge, you might think</div>
-      <div class="ba-text">sin() and cos() are math functions from class — I don't know how to draw with them</div>
+      <div class="ba-text">sin() and cos() are math class functions. I don't see how they connect to animation.</div>
     </div>
     <div class="ba-col">
       <div class="ba-label">After this bridge</div>
-      <div class="ba-text">sin() produces a smooth wave between -1 and 1 — multiply it by any range to get oscillation, rotation, or circular motion</div>
+      <div class="ba-text">sin() and cos() are coordinates on a unit circle. Every circular motion, wave, and oscillation comes from the same simple relationship.</div>
     </div>
   </section>
-  </header>
 
-  <main>
-    <section class="controls" aria-label="Explorer controls">
-      <div class="predict-box" style="margin-bottom:12px;">
-        <span class="pbox-label">Before you interact — predict first</span>
-        <span class="pbox-body">Before you increase the frequency — how many complete waves will you see across the canvas?</span>
+  <section class="main-grid" aria-label="Interactive sin/cos concept bridge">
+    <article class="panel canvas-panel">
+      <div class="canvas-bar">
+        <div class="canvas-bar-title" id="canvas-title">Triangle: sin and cos as triangle sides</div>
+        <div class="canvas-bar-sub" id="canvas-sub">The angle θ defines a right triangle inside the unit circle.</div>
       </div>
-      <div class="mode-row">
-        <button id="mode-triangle" class="active">1. Triangle</button>
-        <button id="mode-circle">2. Circle</button>
-        <button id="mode-wave">3. Wave</button>
-        <button id="mode-all">Summary View</button>
-        <button id="play-button">▶ Play</button>
-        <button id="reset-button">Reset Trace</button>
-        <span id="mode-pill" class="pill"><strong>Triangle mode:</strong> 0°–90°</span>
+      <div class="canvas-wrap">
+        <canvas id="wave-canvas" width="620" height="420" aria-label="Interactive sin/cos visualization"></canvas>
+        <div class="touch-hint">Tap and drag the sliders on the right to explore.</div>
       </div>
+    </article>
 
-      <div class="control-row">
-        <div class="slider-wrap">
-          <label for="angle-slider">Angle</label>
-          <input id="angle-slider" type="range" min="0" max="90" value="35" step="1" />
-          <span id="angle-value" class="slider-value">35°</span>
+    <aside class="panel ctrl-panel">
+      <nav class="tabs" role="tablist" aria-label="Sin/cos concept tabs">
+        <button class="tab" role="tab" id="tab-triangle" data-mode="triangle" aria-selected="true" aria-controls="bridge-panel" tabindex="0">Triangle<span class="step">1 of 5</span></button>
+        <button class="tab" role="tab" id="tab-circle" data-mode="circle" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Circle<span class="step">2 of 5</span></button>
+        <button class="tab" role="tab" id="tab-wave" data-mode="wave" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Wave<span class="step">3 of 5</span></button>
+        <button class="tab" role="tab" id="tab-lissajous" data-mode="lissajous" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Lissajous<span class="step">4 of 5</span></button>
+        <button class="tab" role="tab" id="tab-spiral" data-mode="spiral" aria-selected="false" aria-controls="bridge-panel" tabindex="-1">Spiral<span class="step">5 of 5</span></button>
+      </nav>
+
+      <div id="bridge-panel" role="tabpanel" aria-live="polite">
+        <div class="predict">
+          <span class="box-label">Predict before changing</span>
+          <span class="box-body" id="predict-text">Before moving the angle — what are sin and cos equal to when the angle is 0°? What about 90°?</span>
         </div>
 
-        <div class="slider-wrap">
-          <label for="speed-slider">Speed</label>
-          <input id="speed-slider" type="range" min="0.2" max="4" value="1" step="0.1" />
-          <span id="speed-value" class="slider-value">1.0×</span>
+        <div class="ctrl-group" id="controls"></div>
+        <div id="presets-area"></div>
+
+        <div class="code-section">
+          <div class="code-header"><span>Live code</span><span id="code-note">cos() = x, sin() = y on the unit circle.</span></div>
+          <div class="code-focus-line mono" id="focus-code"></div>
+          <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">▸ See full p5.js sketch</button>
+          <div class="full-code-body mono" id="full-code"></div>
+        </div>
+
+        <div class="callout big-idea">
+          <span class="box-label">Big idea</span>
+          <span class="box-body" id="big-idea-text"></span>
+        </div>
+
+        <div class="callout bug">
+          <span class="box-label">⚠ Common mistake</span>
+          <span class="box-body" id="bug-text"></span>
+        </div>
+
+        <div class="callout try">
+          <span class="box-label">Try this</span>
+          <span class="box-body" id="try-text"></span>
         </div>
       </div>
-
-      <div class="preset-row">
-        <span class="preset-label">Presets:</span>
-        <button class="preset-button" data-angle="0">0°</button>
-        <button class="preset-button" data-angle="30">30°</button>
-        <button class="preset-button" data-angle="45">45°</button>
-        <button class="preset-button" data-angle="60">60°</button>
-        <button class="preset-button" data-angle="90">90°</button>
-        <button class="preset-button full-circle-only" data-angle="180">180°</button>
-        <button class="preset-button full-circle-only" data-angle="270">270°</button>
-        <button class="preset-button full-circle-only" data-angle="360">360°</button>
-      </div>
-
-      <div class="control-row">
-        <label class="toggle-label"><input id="show-labels" type="checkbox" checked />Labels</label>
-        <label class="toggle-label"><input id="show-formulas" type="checkbox" checked />Formulas</label>
-        <label class="toggle-label"><input id="show-sine" type="checkbox" checked />Sine / vertical</label>
-        <label class="toggle-label"><input id="show-cosine" type="checkbox" checked />Cosine / horizontal</label>
-        <label class="toggle-label"><input id="show-trace" type="checkbox" checked />Trace waves</label>
-        <label class="toggle-label"><input id="show-code" type="checkbox" />Show p5.js code</label>
-      </div>
-
-      <div id="wave-controls" class="control-row" style="display:none;">
-        <button id="record-button">⏺ Record</button>
-        <button id="show-snippet-button">Show Code</button>
-        <div class="slider-wrap">
-          <label for="wave-speed-slider">Wave speed</label>
-          <input id="wave-speed-slider" type="range" min="0.01" max="0.15" value="0.05" step="0.005" />
-          <span id="wave-speed-value" class="slider-value">0.05</span>
-        </div>
-      </div>
-
-      <div id="wave-snippet-box" style="display:none; margin-top: 4px; padding: 12px; background: #111827; color: #e5e7eb; border-radius: 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap;"></div>
-    </section>
-
-    <section class="workspace">
-      <div id="sketch-holder"></div>
-      <div id="canvas-caption" class="canvas-caption">
-        Move the angle from 0° to 90°. Cosine is the sideways part. Sine is the up/down part.
-      </div>
-    </section>
-
-    <aside class="side-panel">
-      <section class="card">
-        <h2 id="lesson-title">1. Start with a triangle</h2>
-        <p id="lesson-text">
-          In a right triangle, sine and cosine compare side lengths. This first view stays in the 0°–90° range so the sides are easy to see as positive lengths.
-        </p>
-        <span id="lesson-formula" class="formula">cos(θ) = adjacent / hypotenuse<br>sin(θ) = opposite / hypotenuse</span>
-      </section>
-
-      <section class="card">
-        <h3>Big idea</h3>
-        <p><strong>Cosine</strong> tells us how far sideways.</p>
-        <p><strong>Sine</strong> tells us how far up or down.</p>
-        <p><strong>A wave</strong> is what happens when we record one of those values over time.</p>
-      </section>
-
-      <section class="card">
-        <h3>Legend</h3>
-        <div class="legend">
-          <div class="legend-item"><span class="swatch radius"></span><span>radius / hypotenuse</span></div>
-          <div class="legend-item"><span class="swatch cos"></span><span>cosine: horizontal amount</span></div>
-          <div class="legend-item"><span class="swatch sin"></span><span>sine: vertical amount</span></div>
-          <div class="legend-item"><span class="swatch triangle"></span><span>right triangle</span></div>
-          <div class="legend-item"><span class="swatch green"></span><span>recording line / current time</span></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h3>Try this</h3>
-        <p id="question-text">As the angle grows from 0° to 90°, what happens to cosine? What happens to sine?</p>
-      </section>
-
-      <section id="code-card" class="card code-card">
-        <h3>p5.js connection</h3>
-        <pre><code>let angle = radians(degrees);
-let x = centerX + cos(angle) * radius;
-let y = centerY - sin(angle) * radius;</code></pre>
-        <p class="note">
-          In math, positive y goes up. In p5.js, positive y usually goes down, so this explorer subtracts sine to make the math view easier to read.
-        </p>
-      </section>
     </aside>
-  </main>
+  </section>
 
-  <script>
-    const state = {
-      mode: "triangle",
-      angleDeg: 35,
-      playing: false,
-      speed: 1,
-      triangleDirection: 1,
-      showLabels: true,
-      showFormulas: true,
-      showSine: true,
-      showCosine: true,
-      showTrace: true,
-      showCode: false,
-      waveHistory: [],
-      // Wave Record mode
-      recording: false,
-      recordDone: false,
-      recordAngle: 0,
-      recordPoints: [],
-      waveSpeed: 0.05,
-      showSnippet: false
-    };
+  <section class="prose-section">
+    <h2>Every circle hides a triangle</h2>
+    <p>The right triangle fits perfectly inside a unit circle. The angle θ at the center is the only thing that changes — the two legs always measure cos(θ) and sin(θ). Scale those legs by a radius, and you can reach any point on any circle. Let the angle grow over time, and circular motion emerges. Plot the y-value of that motion over time, and a sine wave appears. Triangles, circles, and waves are three views of the same relationship.</p>
+  </section>
 
-    const els = {};
+  <div class="legend" aria-label="Sin/cos visualization legend">
+    <div class="legend-item"><span class="swatch" style="background:#7a5ea8"></span> radius line</div>
+    <div class="legend-item"><span class="swatch" style="background:#3888c8"></span> cos leg (x)</div>
+    <div class="legend-item"><span class="swatch" style="background:#e06040"></span> sin leg (y)</div>
+    <div class="legend-item"><span class="swatch" style="background:#f0a840"></span> point on circle</div>
+    <div class="legend-item"><span class="swatch" style="background:#30aa60"></span> wave trace</div>
+  </div>
 
-    function setupUI() {
-      els.modeTriangle = document.querySelector("#mode-triangle");
-      els.modeCircle = document.querySelector("#mode-circle");
-      els.modeWave = document.querySelector("#mode-wave");
-      els.modeAll = document.querySelector("#mode-all");
-      els.playButton = document.querySelector("#play-button");
-      els.resetButton = document.querySelector("#reset-button");
-      els.modePill = document.querySelector("#mode-pill");
-      els.angleSlider = document.querySelector("#angle-slider");
-      els.angleValue = document.querySelector("#angle-value");
-      els.speedSlider = document.querySelector("#speed-slider");
-      els.speedValue = document.querySelector("#speed-value");
-      els.showLabels = document.querySelector("#show-labels");
-      els.showFormulas = document.querySelector("#show-formulas");
-      els.showSine = document.querySelector("#show-sine");
-      els.showCosine = document.querySelector("#show-cosine");
-      els.showTrace = document.querySelector("#show-trace");
-      els.showCode = document.querySelector("#show-code");
-      els.lessonTitle = document.querySelector("#lesson-title");
-      els.lessonText = document.querySelector("#lesson-text");
-      els.lessonFormula = document.querySelector("#lesson-formula");
-      els.questionText = document.querySelector("#question-text");
-      els.caption = document.querySelector("#canvas-caption");
-      els.codeCard = document.querySelector("#code-card");
-      els.presetButtons = Array.from(document.querySelectorAll(".preset-button"));
+  <section class="pathways" aria-label="Practice and remix links">
+    <div class="pathways-title">What's next</div>
+    <div class="path-links">
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
+        <span class="path-link-type">Practice →</span>
+        <span class="path-link-name">Open the tools library and look for wave, oscillation, or circular motion tools</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
+        <span class="path-link-type">Remix →</span>
+        <span class="path-link-name">Take a starter sketch and make shapes orbit or oscillate using sin/cos</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+      <a href="../map-range-translator/" class="path-link">
+        <span class="path-link-type">Related →</span>
+        <span class="path-link-name">map() Range Translator — use map() to convert the -1 to 1 output of sin/cos into useful screen ranges</span>
+        <span class="path-link-arrow">›</span>
+      </a>
+    </div>
+  </section>
 
-      els.modeTriangle.addEventListener("click", () => setMode("triangle"));
-      els.modeCircle.addEventListener("click", () => setMode("circle"));
-      els.modeWave.addEventListener("click", () => setMode("wave"));
-      els.modeAll.addEventListener("click", () => setMode("all"));
+  <nav class="bottom-nav" aria-label="Bridge navigation">
+    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
+    <a href="../noise-smooth-randomness/">Next: Noise: Smooth Randomness →</a>
+  </nav>
+</main>
 
-      els.playButton.addEventListener("click", () => {
-        state.playing = !state.playing;
-        els.playButton.textContent = state.playing ? "⏸ Pause" : "▶ Play";
-      });
+<script>
+'use strict';
 
-      els.resetButton.addEventListener("click", () => {
-        state.waveHistory = [];
-      });
+// ── State ─────────────────────────────────────────────────────────────────────
+const state = {
+  mode: 'triangle',
+  // triangle
+  angle: 45,
+  // circle
+  radius: 100,
+  circleSpeed: 1.5,
+  // wave
+  waveSpeed: 1,
+  amplitude: 80,
+  // lissajous
+  xFreq: 1,
+  yFreq: 2,
+  // spiral
+  step: 0.08,
+  turns: 4,
+  changedKey: 'angle'
+};
 
-      els.angleSlider.addEventListener("input", () => {
-        state.angleDeg = Number(els.angleSlider.value);
-        state.waveHistory = [];
-        updateUI();
-      });
+// ── Animation state ───────────────────────────────────────────────────────────
+let rafId = null;
+let circleAngle = 0;
+let waveAngle = 0;
+let lissAngle = 0;
+let waveHistory = [];
+const WAVE_HISTORY_MAX = 300;
 
-      els.speedSlider.addEventListener("input", () => {
-        state.speed = Number(els.speedSlider.value);
-        updateUI();
-      });
+// ── Mode definitions ──────────────────────────────────────────────────────────
+const modes = {
+  triangle: {
+    canvasTitle: 'Triangle: sin and cos as triangle sides',
+    canvasSub: 'The angle θ defines a right triangle inside the unit circle.',
+    predict: 'Before moving the angle — what are sin and cos equal to when the angle is 0°? What about 90°?',
+    big: 'sin and cos output the y and x coordinates of a point on a unit circle at angle θ. Multiply by a radius to scale up to any circle size.',
+    bug: 'p5.js uses radians by default. Passing degrees to sin()/cos() gives completely wrong results — always use radians() to convert, or call angleMode(DEGREES) at setup.',
+    tryIt: 'Drag the angle to 0°, 90°, 180°, 270°. What are the sin and cos values at each quarter turn? Note the pattern.',
+    note: 'cos() = x, sin() = y on the unit circle.',
+    controls: [
+      { key: 'angle', label: 'Angle θ (degrees)', code: 'radians(θ) → sin/cos', min: 0, max: 360, step: 1 }
+    ],
+    presets: [
+      { label: '45° classic', v: { angle: 45 } },
+      { label: '90° peak sin', v: { angle: 90 } },
+      { label: '⚠ 0° (zero y)', v: { angle: 0 }, isBreak: true }
+    ],
+    isAnimated: false
+  },
+  circle: {
+    canvasTitle: 'Circle: cos and sin trace a circle',
+    canvasSub: 'x = cos(angle) * R,  y = sin(angle) * R. The angle grows each frame.',
+    predict: 'Before changing the radius — what do you think changes about the circle? What stays the same?',
+    big: 'Multiplying cos(angle)*R and sin(angle)*R gives a point on a circle of radius R. Changing the angle over time makes the point move around the circle.',
+    bug: 'A common mistake: incrementing the angle in whole degrees per frame (e.g. angle += 1) without converting to radians. Motion appears super slow because 1 radian ≈ 57°.',
+    tryIt: 'What happens when you set radius to 0? To the edge of the canvas? Is the speed visually the same no matter what the radius is?',
+    note: 'angle += speed each frame (in radians).',
+    controls: [
+      { key: 'radius', label: 'Radius R', code: 'cos(a)*R, sin(a)*R', min: 20, max: 180, step: 1 },
+      { key: 'circleSpeed', label: 'Speed', code: 'angle += speed/100', min: 0.1, max: 5, step: 0.1 }
+    ],
+    presets: [
+      { label: 'Small orbit (R=40)', v: { radius: 40, circleSpeed: 2 } },
+      { label: 'Full canvas (R=180)', v: { radius: 180, circleSpeed: 1 } },
+      { label: '⚠ R=0 (collapsed)', v: { radius: 0, circleSpeed: 2 }, isBreak: true }
+    ],
+    isAnimated: true
+  },
+  wave: {
+    canvasTitle: 'Wave: circular motion becomes a sine wave',
+    canvasSub: 'The y-coordinate of circular motion, plotted over time, is a sine wave.',
+    predict: 'Before changing amplitude — what part of the sine wave do you expect to grow when amplitude increases?',
+    big: 'The y-coordinate of circular motion, plotted against time, is a sine wave. Every smooth oscillation in nature comes from this same circular relationship.',
+    bug: 'Forgetting to multiply sin() by an amplitude means the wave only oscillates by 1 pixel — nearly invisible. Always scale the output: y = sin(angle) * amplitude.',
+    tryIt: 'Set amplitude to 0. What does the wave look like? Set speed to 0. What happens to the animation?',
+    note: 'y = sin(angle) * amplitude.',
+    controls: [
+      { key: 'waveSpeed', label: 'Speed', code: 'angle += speed/60', min: 0.1, max: 3, step: 0.05 },
+      { key: 'amplitude', label: 'Amplitude', code: 'sin(a) * amplitude', min: 0, max: 150, step: 1 }
+    ],
+    presets: [
+      { label: 'Slow and tall', v: { waveSpeed: 0.3, amplitude: 140 } },
+      { label: 'Fast and short', v: { waveSpeed: 3, amplitude: 40 } },
+      { label: '⚠ Amplitude=0', v: { waveSpeed: 1, amplitude: 0 }, isBreak: true }
+    ],
+    isAnimated: true
+  },
+  lissajous: {
+    canvasTitle: 'Lissajous: two waves make looping patterns',
+    canvasSub: 'x = cos(xFreq * t), y = sin(yFreq * t). Different ratios make different shapes.',
+    predict: 'Before changing frequencies — what shape do you get when xFreq and yFreq are equal?',
+    big: 'When two sine waves with different frequencies control x and y, they make Lissajous figures. Integer frequency ratios create perfectly closed loops.',
+    bug: 'Non-integer frequency ratios make figures that never close — they precess slowly around the canvas, making a filled region over time instead of a clean shape.',
+    tryIt: 'Try frequencies 3:4, 1:3, 2:5. Which ones make a clean closed shape? What determines whether a figure closes?',
+    note: 'Integer ratios make closed figures.',
+    controls: [
+      { key: 'xFreq', label: 'X Frequency', code: 'cos(xFreq * t)', min: 1, max: 5, step: 1 },
+      { key: 'yFreq', label: 'Y Frequency', code: 'sin(yFreq * t)', min: 1, max: 5, step: 1 }
+    ],
+    presets: [
+      { label: '1:2 figure-8', v: { xFreq: 1, yFreq: 2 } },
+      { label: '3:2 trefoil', v: { xFreq: 3, yFreq: 2 } },
+      { label: '⚠ 1:1 circle', v: { xFreq: 1, yFreq: 1 }, isBreak: true }
+    ],
+    isAnimated: true
+  },
+  spiral: {
+    canvasTitle: 'Spiral: growing radius traces a spiral',
+    canvasSub: 'Each step: r increases, then x = cos(a)*r, y = sin(a)*r.',
+    predict: 'Before changing step — what happens if each step adds a large amount to r? What about a tiny amount?',
+    big: 'Increasing the radius as the angle grows traces a spiral. This pattern appears in clocks, galaxy visuals, nautilus shells, and growth patterns in nature.',
+    bug: 'Using a large angle increment for all turns makes outer loops too sparse and the spiral looks angular. Smaller increments give smoother, more natural spirals.',
+    tryIt: 'Set turns to maximum and step to minimum. How many loops appear? Is the spiral still smooth at the outer edge?',
+    note: 'r += step each iteration.',
+    controls: [
+      { key: 'step', label: 'R increment per step', code: 'r += step', min: 0.01, max: 0.5, step: 0.01 },
+      { key: 'turns', label: 'Turns', code: 'total angle = turns * TWO_PI', min: 1, max: 8, step: 1 }
+    ],
+    presets: [
+      { label: 'Tight spiral', v: { step: 0.02, turns: 6 } },
+      { label: 'Loose spiral', v: { step: 0.3, turns: 3 } },
+      { label: '⚠ Many turns', v: { step: 0.06, turns: 8 }, isBreak: true }
+    ],
+    isAnimated: false
+  }
+};
 
-      els.presetButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          if (button.disabled) return;
-          let angle = Number(button.dataset.angle);
-          if (angle === 360) angle = 0;
-          state.angleDeg = angle;
-          state.playing = false;
-          state.waveHistory = [];
-          els.playButton.textContent = "▶ Play";
-          updateUI();
-        });
-      });
+// ── Canvas setup ──────────────────────────────────────────────────────────────
+const canvas = document.getElementById('wave-canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width;
+const H = canvas.height;
+const CX = W / 2;
+const CY = H / 2;
 
-      els.showLabels.addEventListener("change", () => {
-        state.showLabels = els.showLabels.checked;
-      });
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
 
-      els.showFormulas.addEventListener("change", () => {
-        state.showFormulas = els.showFormulas.checked;
-        updateUI();
-      });
+function drawLabel(text, x, y, color, size) {
+  ctx.save();
+  ctx.fillStyle = color || '#333';
+  ctx.font = `700 ${size || 12}px "DM Sans", system-ui, sans-serif`;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
 
-      els.showSine.addEventListener("change", () => {
-        state.showSine = els.showSine.checked;
-      });
+function drawMonoLabel(text, x, y, color) {
+  ctx.save();
+  ctx.fillStyle = color || '#333';
+  ctx.font = '700 11px "DM Mono", monospace';
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
 
-      els.showCosine.addEventListener("change", () => {
-        state.showCosine = els.showCosine.checked;
-      });
+function renderBase() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#f1eadf';
+  ctx.fillRect(0, 0, W, H);
+  ctx.save();
+  ctx.fillStyle = '#fffdf7';
+  ctx.beginPath();
+  ctx.roundRect(12, 12, W - 24, H - 24, 14);
+  ctx.fill();
+  ctx.restore();
+}
 
-      els.showTrace.addEventListener("change", () => {
-        state.showTrace = els.showTrace.checked;
-      });
+function drawGrid() {
+  const step = 40;
+  ctx.save();
+  ctx.strokeStyle = '#e0d8cc';
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= W; x += step) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y <= H; y += step) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  ctx.restore();
+}
 
-      els.showCode.addEventListener("change", () => {
-        state.showCode = els.showCode.checked;
-        updateUI();
-      });
+// ── Triangle renderer ─────────────────────────────────────────────────────────
+function renderTriangle() {
+  renderBase();
+  drawGrid();
 
-      // Wave Record controls
-      els.recordButton = document.querySelector("#record-button");
-      els.showSnippetButton = document.querySelector("#show-snippet-button");
-      els.waveSpeedSlider = document.querySelector("#wave-speed-slider");
-      els.waveSpeedValue = document.querySelector("#wave-speed-value");
-      els.waveControls = document.querySelector("#wave-controls");
-      els.waveSnippetBox = document.querySelector("#wave-snippet-box");
+  const scale = 130;
+  const ox = CX - 30;
+  const oy = CY + 20;
+  const thetaRad = state.angle * Math.PI / 180;
+  const cosV = Math.cos(thetaRad);
+  const sinV = Math.sin(thetaRad);
+  const px = ox + cosV * scale;
+  const py = oy - sinV * scale;
 
-      els.recordButton.addEventListener("click", () => {
-        if (state.recording) {
-          // Stop early
-          state.recording = false;
-          state.recordDone = true;
-          els.recordButton.textContent = "⏺ Record";
-          updateSnippet();
-        } else {
-          state.recording = true;
-          state.recordDone = false;
-          state.recordAngle = 0;
-          state.recordPoints = [];
-          state.playing = false;
-          els.playButton.textContent = "▶ Play";
-          els.recordButton.textContent = "⏹ Stop";
-        }
-      });
+  // Unit circle
+  ctx.save();
+  ctx.strokeStyle = '#c0b0e0';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.arc(ox, oy, scale, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
 
-      els.showSnippetButton.addEventListener("click", () => {
-        state.showSnippet = !state.showSnippet;
-        els.waveSnippetBox.style.display = state.showSnippet ? "block" : "none";
-        els.showSnippetButton.textContent = state.showSnippet ? "Hide Code" : "Show Code";
-        if (state.showSnippet) updateSnippet();
-      });
+  // Axes
+  ctx.save();
+  ctx.strokeStyle = '#a0a0a0';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(ox - scale - 20, oy); ctx.lineTo(ox + scale + 20, oy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox, oy - scale - 20); ctx.lineTo(ox, oy + scale + 20); ctx.stroke();
+  ctx.restore();
 
-      els.waveSpeedSlider.addEventListener("input", () => {
-        state.waveSpeed = Number(els.waveSpeedSlider.value);
-        els.waveSpeedValue.textContent = state.waveSpeed.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
-        updateSnippet();
-      });
+  // cos leg (horizontal)
+  ctx.save();
+  ctx.strokeStyle = '#3888c8';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(px, oy); ctx.stroke();
+  ctx.restore();
+  drawMonoLabel(`cos(${state.angle}°) = ${cosV.toFixed(2)}`, ox + cosV * scale / 2 - 20, oy + 20, '#3888c8');
 
-      updateUI();
+  // sin leg (vertical)
+  ctx.save();
+  ctx.strokeStyle = '#e06040';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(px, oy); ctx.lineTo(px, py); ctx.stroke();
+  ctx.restore();
+  drawMonoLabel(`sin(${state.angle}°) = ${sinV.toFixed(2)}`, px + 6, oy - sinV * scale / 2, '#e06040');
+
+  // Radius line
+  ctx.save();
+  ctx.strokeStyle = '#7a5ea8';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(px, py); ctx.stroke();
+  ctx.restore();
+
+  // Angle arc
+  if (state.angle > 2) {
+    ctx.save();
+    ctx.strokeStyle = '#9b6fc0';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(ox, oy, 40, 0, -thetaRad, true);
+    ctx.stroke();
+    ctx.fillStyle = '#7a5ea8';
+    ctx.font = '700 12px "DM Sans"';
+    ctx.fillText(`θ=${state.angle}°`, ox + 44, oy - 10);
+    ctx.restore();
+  }
+
+  // Point on circle
+  ctx.save();
+  ctx.fillStyle = '#f0a840';
+  ctx.strokeStyle = '#c07820';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(px, py, 7, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+
+  // Origin dot
+  ctx.save();
+  ctx.fillStyle = '#555';
+  ctx.beginPath();
+  ctx.arc(ox, oy, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Readout
+  const readX = W - 170;
+  const readY = 50;
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,253,247,0.92)';
+  ctx.strokeStyle = '#ddd';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(readX - 8, readY - 20, 162, 64, 8);
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+  drawMonoLabel(`θ = ${state.angle}°`, readX, readY, '#7a5ea8');
+  drawMonoLabel(`cos(θ) = ${cosV.toFixed(3)}`, readX, readY + 18, '#3888c8');
+  drawMonoLabel(`sin(θ) = ${sinV.toFixed(3)}`, readX, readY + 36, '#e06040');
+}
+
+// ── Circle renderer (animated) ────────────────────────────────────────────────
+function renderCircleFrame() {
+  renderBase();
+  drawGrid();
+
+  const R = clamp(state.radius, 0, 190);
+  const px = CX + Math.cos(circleAngle) * R;
+  const py = CY + Math.sin(circleAngle) * R;
+
+  // Circle path
+  ctx.save();
+  ctx.strokeStyle = '#c0b0e0';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.arc(CX, CY, R, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Center
+  ctx.save();
+  ctx.strokeStyle = '#a0a0a0';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(CX - 220, CY); ctx.lineTo(CX + 220, CY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(CX, CY - 200); ctx.lineTo(CX, CY + 200); ctx.stroke();
+  ctx.restore();
+
+  // Radius line
+  ctx.save();
+  ctx.strokeStyle = '#7a5ea8';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(px, py); ctx.stroke();
+  ctx.restore();
+
+  // x leg (cos)
+  ctx.save();
+  ctx.strokeStyle = '#3888c8';
+  ctx.lineWidth = 2.5;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(px, CY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // y leg (sin)
+  ctx.save();
+  ctx.strokeStyle = '#e06040';
+  ctx.lineWidth = 2.5;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(px, CY); ctx.lineTo(px, py); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Point
+  ctx.save();
+  ctx.fillStyle = '#f0a840';
+  ctx.strokeStyle = '#c07820';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(px, py, 8, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+
+  // Origin
+  ctx.save();
+  ctx.fillStyle = '#555';
+  ctx.beginPath();
+  ctx.arc(CX, CY, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  const deg = Math.round(((circleAngle * 180 / Math.PI) % 360 + 360) % 360);
+  const cosV = Math.cos(circleAngle).toFixed(2);
+  const sinV = Math.sin(circleAngle).toFixed(2);
+  drawMonoLabel(`x = cx + cos(${deg}°)×${R} = ${Math.round(px - CX)}`, 30, H - 58, '#3888c8');
+  drawMonoLabel(`y = cy + sin(${deg}°)×${R} = ${Math.round(py - CY)}`, 30, H - 40, '#e06040');
+  drawMonoLabel(`R = ${R}`, 30, H - 22, '#7a5ea8');
+}
+
+// ── Wave renderer (animated) ──────────────────────────────────────────────────
+function renderWaveFrame() {
+  renderBase();
+
+  const leftW = W * 0.38;
+  const leftCX = leftW / 2;
+  const waveStartX = leftW + 10;
+
+  // Background divide
+  ctx.save();
+  ctx.fillStyle = '#f5f0e8';
+  ctx.fillRect(12, 12, leftW - 6, H - 24);
+  ctx.restore();
+
+  // Left: spinning circle
+  const R = 80;
+  const amp = clamp(state.amplitude, 0, 150);
+  const px = leftCX + Math.cos(waveAngle) * R;
+  const py = CY + Math.sin(waveAngle) * R;
+
+  ctx.save();
+  ctx.strokeStyle = '#c0b0e0';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.arc(leftCX, CY, R, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  ctx.save();
+  ctx.strokeStyle = '#7a5ea8';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(leftCX, CY); ctx.lineTo(px, py); ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.strokeStyle = '#e06040';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(px, CY); ctx.lineTo(px, py); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Horizontal dotted line from point to wave start
+  ctx.save();
+  ctx.strokeStyle = '#f0a840';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(waveStartX, py); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = '#f0a840';
+  ctx.strokeStyle = '#c07820';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(px, py, 6, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+
+  drawLabel('circle', leftCX - 20, 28, '#7a5ea8', 11);
+
+  // Right: wave history
+  // Add current sample
+  const scaledY = Math.sin(waveAngle) * amp;
+  waveHistory.unshift(scaledY);
+  if (waveHistory.length > WAVE_HISTORY_MAX) waveHistory.length = WAVE_HISTORY_MAX;
+
+  const waveW = W - waveStartX - 20;
+  const xStep = waveW / WAVE_HISTORY_MAX;
+
+  ctx.save();
+  ctx.strokeStyle = '#30aa60';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  waveHistory.forEach((yv, i) => {
+    const wx2 = waveStartX + i * xStep;
+    const wy2 = CY + yv;
+    if (i === 0) ctx.moveTo(wx2, wy2);
+    else ctx.lineTo(wx2, wy2);
+  });
+  ctx.stroke();
+  ctx.restore();
+
+  // Current dot on wave
+  if (waveHistory.length > 0) {
+    ctx.save();
+    ctx.fillStyle = '#f0a840';
+    ctx.strokeStyle = '#c07820';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(waveStartX, CY + waveHistory[0], 6, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+
+  // Divider line
+  ctx.save();
+  ctx.strokeStyle = '#ccc';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(waveStartX - 2, 14); ctx.lineTo(waveStartX - 2, H - 14); ctx.stroke();
+  ctx.restore();
+
+  drawLabel('wave (time →)', waveStartX + 10, 28, '#30aa60', 11);
+
+  // Center axis
+  ctx.save();
+  ctx.strokeStyle = '#ccc';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(waveStartX, CY); ctx.lineTo(W - 18, CY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  drawMonoLabel(`amp=${Math.round(amp)}`, W - 80, CY - amp - 6, '#e06040');
+}
+
+// ── Lissajous renderer (animated) ────────────────────────────────────────────
+function renderLissajousFrame() {
+  renderBase();
+  drawGrid();
+
+  const R = 160;
+  const totalPoints = 600;
+
+  ctx.save();
+  ctx.strokeStyle = '#7a5ea8';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath();
+  for (let i = 0; i <= totalPoints; i++) {
+    const t = (i / totalPoints) * Math.PI * 2 + lissAngle * 0.01;
+    const x = CX + Math.cos(state.xFreq * t) * R;
+    const y = CY + Math.sin(state.yFreq * t) * R;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  // Moving dot
+  const dotT = lissAngle * 0.05;
+  const dotX = CX + Math.cos(state.xFreq * dotT) * R;
+  const dotY = CY + Math.sin(state.yFreq * dotT) * R;
+  ctx.save();
+  ctx.fillStyle = '#f0a840';
+  ctx.strokeStyle = '#c07820';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(dotX, dotY, 8, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+
+  drawMonoLabel(`x:y = ${state.xFreq}:${state.yFreq}`, 30, H - 36, '#7a5ea8');
+  const name = (state.xFreq === 1 && state.yFreq === 1) ? 'circle' :
+               (state.xFreq === 1 && state.yFreq === 2) ? 'figure-8' :
+               (state.xFreq === 3 && state.yFreq === 2) ? 'trefoil' : 'Lissajous figure';
+  drawMonoLabel(name, 30, H - 20, '#9b6fc0');
+}
+
+// ── Spiral renderer (static) ──────────────────────────────────────────────────
+function renderSpiral() {
+  renderBase();
+
+  const totalAngle = state.turns * Math.PI * 2;
+  const angleInc = 0.05;
+  let r = 0;
+
+  const points = [];
+  for (let a = 0; a <= totalAngle; a += angleInc) {
+    const x = CX + Math.cos(a) * r;
+    const y = CY + Math.sin(a) * r;
+    points.push({ x, y });
+    r += state.step;
+  }
+
+  if (points.length < 2) return;
+
+  ctx.save();
+  ctx.strokeStyle = '#7a5ea8';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  points.forEach((pt, i) => {
+    if (i === 0) ctx.moveTo(pt.x, pt.y);
+    else ctx.lineTo(pt.x, pt.y);
+  });
+  ctx.stroke();
+  ctx.restore();
+
+  // Endpoint dot
+  const last = points[points.length - 1];
+  ctx.save();
+  ctx.fillStyle = '#f0a840';
+  ctx.strokeStyle = '#c07820';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(last.x, last.y, 6, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+
+  // Origin
+  ctx.save();
+  ctx.fillStyle = '#555';
+  ctx.beginPath();
+  ctx.arc(CX, CY, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  drawMonoLabel(`step=${state.step.toFixed(2)}, turns=${state.turns}`, 30, H - 36, '#7a5ea8');
+  drawMonoLabel(`r grows from 0 to ${(state.step * totalAngle / 0.05).toFixed(0)}px`, 30, H - 20, '#9b6fc0');
+}
+
+// ── Animation loop ────────────────────────────────────────────────────────────
+function stopAnimation() {
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+}
+
+function startAnimation(mode) {
+  stopAnimation();
+  waveHistory = [];
+
+  function loop() {
+    if (mode === 'circle') {
+      circleAngle += state.circleSpeed * 0.02;
+      renderCircleFrame();
+    } else if (mode === 'wave') {
+      waveAngle += state.waveSpeed * 0.025;
+      renderWaveFrame();
+    } else if (mode === 'lissajous') {
+      lissAngle += 1;
+      renderLissajousFrame();
     }
-
-    function updateSnippet() {
-      if (!els.waveSnippetBox) return;
-      const speed = state.waveSpeed.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
-      els.waveSnippetBox.textContent = `let t = 0;\nfunction draw() {\n  let y = sin(t) * radius;\n  circle(x + cos(t)*radius, height/2 + y, 8);\n  t += ${speed};\n}`;
-    }
-
-    function setMode(mode) {
-      const previousMode = state.mode;
-      state.mode = mode;
-      state.waveHistory = [];
-      // Reset recording state when leaving wave mode
-      if (mode !== "wave") {
-        state.recording = false;
-        state.recordDone = false;
-        state.recordPoints = [];
-        if (els.recordButton) els.recordButton.textContent = "⏺ Record";
-      }
-
-      if (mode === "triangle") {
-        state.angleDeg = Math.min(Math.max(state.angleDeg, 0), 90);
-        state.showSine = true;
-        state.showCosine = true;
-      }
-
-      if (mode === "circle") {
-        state.showSine = true;
-        state.showCosine = true;
-      }
-
-      if (mode === "wave" && previousMode !== "wave") {
-        state.showSine = true;
-        state.showCosine = false;
-      }
-
-      if (mode === "all") {
-        state.showSine = true;
-        state.showCosine = true;
-      }
-
-      updateUI();
-    }
-
-    function getAngleMax() {
-      return state.mode === "triangle" ? 90 : 360;
-    }
-
-    function clampAngleForMode() {
-      const max = getAngleMax();
-      state.angleDeg = Math.max(0, Math.min(max, state.angleDeg));
-      if (state.mode !== "triangle" && state.angleDeg === 360) state.angleDeg = 0;
-    }
-
-    function updateUI() {
-      clampAngleForMode();
-
-      const modeButtons = [
-        [els.modeTriangle, "triangle"],
-        [els.modeCircle, "circle"],
-        [els.modeWave, "wave"],
-        [els.modeAll, "all"]
-      ];
-
-      for (const [button, mode] of modeButtons) {
-        button.classList.toggle("active", state.mode === mode);
-      }
-
-      const maxAngle = getAngleMax();
-      els.angleSlider.max = String(maxAngle);
-      els.angleSlider.value = state.angleDeg;
-      els.angleValue.textContent = `${Math.round(state.angleDeg)}°`;
-      els.speedValue.textContent = `${state.speed.toFixed(1)}×`;
-      els.lessonFormula.style.display = state.showFormulas ? "block" : "none";
-      els.codeCard.classList.toggle("visible", state.showCode);
-      if (els.waveControls) els.waveControls.style.display = state.mode === "wave" ? "flex" : "none";
-      els.showSine.checked = state.showSine;
-      els.showCosine.checked = state.showCosine;
-
-      els.presetButtons.forEach((button) => {
-        const angle = Number(button.dataset.angle);
-        button.disabled = state.mode === "triangle" && angle > 90;
-      });
-
-      const modePills = {
-        triangle: "<strong>Triangle mode:</strong> 0°–90° side lengths",
-        circle: "<strong>Circle mode:</strong> 0°–360° signed position",
-        wave: "<strong>Wave mode:</strong> recording over time",
-        all: "<strong>Summary view:</strong> all representations"
-      };
-      els.modePill.innerHTML = modePills[state.mode];
-
-      const lessons = {
-        triangle: {
-          title: "1. Start with a triangle",
-          text: "In a right triangle, sine and cosine compare side lengths. This first view stays in the 0°–90° range so the sides are easy to see as positive lengths.",
-          formula: "cos(θ) = adjacent / hypotenuse<br>sin(θ) = opposite / hypotenuse",
-          question: "As the angle grows from 0° to 90°, what happens to cosine? What happens to sine?",
-          caption: "Move the angle from 0° to 90°. Cosine is the sideways part. Sine is the up/down part."
-        },
-        circle: {
-          title: "2. Put the triangle inside a circle",
-          text: "The radius becomes the hypotenuse. When the radius is 1, the side ratios become coordinates: cosine is x and sine is y. Around the full circle, they can be positive or negative.",
-          formula: "x = cos(θ)<br>y = sin(θ)",
-          question: "At 0°, 90°, 180°, and 270°, where are sine and cosine largest, smallest, or zero?",
-          caption: "Now the triangle idea becomes signed position. Right is positive cosine, left is negative cosine, up is positive sine, and down is negative sine."
-        },
-        wave: {
-          title: "3. Record circular motion as a wave",
-          text: "A wave appears when we record one part of circular motion over time. Start with sine: the dot’s height becomes the red wave. Then turn on cosine to compare.",
-          formula: "sine wave = vertical position over time<br>cosine wave = horizontal position over time",
-          question: "Why does the sine wave start near 0 when the point begins on the right side of the circle?",
-          caption: "The green recording line marks the current moment. The red dot’s height on the circle becomes the red point on the sine wave."
-        },
-        all: {
-          title: "Summary: triangle, circle, and wave",
-          text: "These are three views of the same relationship: an angle creates a triangle, the triangle fits inside a circle, and circular motion can be recorded as waves.",
-          formula: "x = cos(θ) · radius<br>y = sin(θ) · radius",
-          question: "Which view helps you understand sine and cosine best: the triangle, the circle, or the wave? Why?",
-          caption: "All three views show the same idea: cosine is sideways, sine is up/down, and waves come from tracking circular motion over time."
-        }
-      };
-
-      const lesson = lessons[state.mode];
-      els.lessonTitle.textContent = lesson.title;
-      els.lessonText.textContent = lesson.text;
-      els.lessonFormula.innerHTML = lesson.formula;
-      els.questionText.textContent = lesson.question;
-      els.caption.textContent = lesson.caption;
-    }
-
-    setupUI();
-
-    const sketch = (p) => {
-      let canvas;
-      let holder;
-      let previousWidth = 0;
-      let previousHeight = 0;
-      let draggingAngle = false;
-
-      p.setup = () => {
-        holder = document.querySelector("#sketch-holder");
-        const rect = holder.getBoundingClientRect();
-        canvas = p.createCanvas(rect.width, rect.height);
-        canvas.parent("sketch-holder");
-        canvas.elt.setAttribute("role", "img");
-        canvas.elt.setAttribute("aria-label", "Interactive triangle, circle, and wave visualization for sine and cosine.");
-        p.pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-        p.textFont("Inter, system-ui, sans-serif");
-      };
-
-      p.windowResized = () => {
-        resizeToHolder();
-      };
-
-      p.draw = () => {
-        resizeToHolder();
-        advanceAnimation();
-
-        p.background(255, 250, 242);
-        drawSubtleGrid();
-
-        if (state.mode === "triangle") {
-          drawTriangleOnly();
-        } else if (state.mode === "circle") {
-          drawCircleOnly();
-        } else if (state.mode === "wave") {
-          drawWaveMode();
-        } else {
-          drawAllTogether();
-        }
-      };
-
-      p.mousePressed = () => {
-        const hit = getActiveAngleHitZone();
-        const d = p.dist(p.mouseX, p.mouseY, hit.center.x, hit.center.y);
-        if (d < hit.radius) {
-          draggingAngle = true;
-          updateAngleFromMouse(hit.center);
-          state.playing = false;
-          els.playButton.textContent = "▶ Play";
-        }
-      };
-
-      p.mouseDragged = () => {
-        if (draggingAngle) {
-          const hit = getActiveAngleHitZone();
-          updateAngleFromMouse(hit.center);
-        }
-      };
-
-      p.mouseReleased = () => {
-        draggingAngle = false;
-      };
-
-      function resizeToHolder() {
-        const rect = holder.getBoundingClientRect();
-        const w = Math.max(320, Math.floor(rect.width));
-        const h = Math.max(320, Math.floor(rect.height));
-
-        if (w !== previousWidth || h !== previousHeight) {
-          p.resizeCanvas(w, h);
-          previousWidth = w;
-          previousHeight = h;
-        }
-      }
-
-      function advanceAnimation() {
-        // Handle record animation
-        if (state.mode === "wave" && state.recording) {
-          state.recordAngle += state.waveSpeed;
-          if (state.recordAngle >= Math.PI * 2) {
-            state.recordAngle = Math.PI * 2;
-            state.recording = false;
-            state.recordDone = true;
-            if (els.recordButton) els.recordButton.textContent = "⏺ Record";
-            updateSnippet();
-          }
-          state.angleDeg = (state.recordAngle * 180 / Math.PI) % 360;
-          els.angleSlider.value = state.angleDeg;
-          els.angleValue.textContent = `${Math.round(state.angleDeg)}°`;
-          return;
-        }
-
-        if (!state.playing) return;
-
-        if (state.mode === "triangle") {
-          state.angleDeg += state.speed * 0.5 * state.triangleDirection;
-          if (state.angleDeg >= 90) {
-            state.angleDeg = 90;
-            state.triangleDirection = -1;
-          }
-          if (state.angleDeg <= 0) {
-            state.angleDeg = 0;
-            state.triangleDirection = 1;
-          }
-        } else {
-          state.angleDeg = (state.angleDeg + state.speed) % 360;
-        }
-
-        els.angleSlider.value = state.angleDeg;
-        els.angleValue.textContent = `${Math.round(state.angleDeg)}°`;
-      }
-
-      function updateAngleFromMouse(center) {
-        const dx = p.mouseX - center.x;
-        const dy = center.y - p.mouseY;
-        let deg = p.degrees(Math.atan2(dy, dx));
-        if (deg < 0) deg += 360;
-        if (state.mode === "triangle") deg = Math.max(0, Math.min(90, deg));
-        state.angleDeg = deg;
-        state.waveHistory = [];
-        updateUI();
-      }
-
-      function getCenters() {
-        const w = p.width;
-        const h = p.height;
-        const radius = Math.min(w, h) * (w < 700 ? 0.22 : 0.18);
-
-        if (state.mode === "all") {
-          return {
-            radius: Math.min(w, h) * 0.13,
-            triangle: { x: w * 0.18, y: h * 0.43 },
-            circle: { x: w * 0.50, y: h * 0.43 },
-            wave: { x: w * 0.69, y: h * 0.19, width: w * 0.27, height: h * 0.48 },
-            main: { x: w * 0.5, y: h * 0.42 }
-          };
-        }
-
-        return {
-          radius,
-          main: { x: w * 0.5, y: h * 0.45 },
-          triangle: { x: w * 0.5, y: h * 0.48 },
-          circle: { x: w * 0.5, y: h * 0.45 },
-          wave: { x: w * 0.16, y: h * 0.18, width: w * 0.70, height: h * 0.52 }
-        };
-      }
-
-      function getTriangleGeometry() {
-        const centers = getCenters();
-        const radius = state.mode === "all" ? centers.radius : centers.radius * 1.35;
-        const anchor = state.mode === "all" ? centers.triangle : centers.main;
-        const base = {
-          x: anchor.x - radius * 0.65,
-          y: anchor.y + radius * 0.45
-        };
-        const trig = getTrig(radius);
-        const point = { x: base.x + trig.adjacent, y: base.y - trig.opposite };
-        const foot = { x: point.x, y: base.y };
-        return { base, foot, point, radius, trig };
-      }
-
-      function getWaveCircleGeometry() {
-        const radius = Math.min(p.width, p.height) * 0.13;
-        const center = { x: p.width * 0.22, y: p.height * 0.42 };
-        const trig = getTrig(radius);
-        const point = { x: center.x + trig.adjacent, y: center.y - trig.opposite };
-        const foot = { x: point.x, y: center.y };
-        const graph = { x: p.width * 0.42, y: p.height * 0.20, width: p.width * 0.48, height: p.height * 0.45 };
-        return { center, radius, trig, point, foot, graph };
-      }
-
-      function getActiveAngleHitZone() {
-        const centers = getCenters();
-
-        if (state.mode === "triangle") {
-          const tri = getTriangleGeometry();
-          return { center: tri.base, radius: tri.radius * 1.2 };
-        }
-
-        if (state.mode === "wave") {
-          const wave = getWaveCircleGeometry();
-          return { center: wave.center, radius: wave.radius * 1.5 };
-        }
-
-        if (state.mode === "all") {
-          return { center: centers.circle, radius: centers.radius * 1.55 };
-        }
-
-        return { center: centers.main, radius: centers.radius * 1.5 };
-      }
-
-      function getTrig(radius) {
-        const theta = p.radians(state.angleDeg);
-        const cosValue = Math.cos(theta);
-        const sinValue = Math.sin(theta);
-        return {
-          theta,
-          cosValue,
-          sinValue,
-          adjacent: cosValue * radius,
-          opposite: sinValue * radius
-        };
-      }
-
-      function drawSubtleGrid() {
-        p.push();
-        p.stroke(236, 224, 207);
-        p.strokeWeight(1);
-        for (let x = 0; x < p.width; x += 32) p.line(x, 0, x, p.height);
-        for (let y = 0; y < p.height; y += 32) p.line(0, y, p.width, y);
-        p.pop();
-      }
-
-      function drawTriangleOnly() {
-        const tri = getTriangleGeometry();
-
-        drawPanelTitle("Triangle View", "Sine and cosine begin as side ratios in a right triangle.", 24, 36);
-        drawTriangle(tri.base, tri.foot, tri.point, tri.radius, tri.trig, true);
-        drawAngleArc(tri.base, Math.max(46, tri.radius * 0.18), 0, state.angleDeg);
-        drawTriangleGuideText(tri.base, tri.radius);
-        drawValueCards([
-          { label: "angle", value: `${Math.round(state.angleDeg)}°`, color: "#2563eb" },
-          { label: "cos(θ)", value: tri.trig.cosValue.toFixed(2), color: "#0891b2" },
-          { label: "sin(θ)", value: tri.trig.sinValue.toFixed(2), color: "#e11d48" }
-        ], 28, p.height - 175);
-      }
-
-      function drawCircleOnly() {
-        const centers = getCenters();
-        const radius = centers.radius * 1.05;
-        const center = centers.main;
-        const trig = getTrig(radius);
-        const point = { x: center.x + trig.adjacent, y: center.y - trig.opposite };
-        const foot = { x: point.x, y: center.y };
-
-        drawPanelTitle("Circle View", "The right-triangle ratios become signed x/y positions.", 24, 36);
-        drawUnitCircle(center, radius, trig, point, foot, true, true);
-        drawValueCards([
-          { label: "x = cos(θ)", value: trig.cosValue.toFixed(2), color: "#0891b2" },
-          { label: "y = sin(θ)", value: trig.sinValue.toFixed(2), color: "#e11d48" },
-          { label: "radius", value: "1", color: "#7c3aed" }
-        ], 28, p.height - 175);
-      }
-
-      function drawWaveMode() {
-        const wave = getWaveCircleGeometry();
-
-        drawPanelTitle("Wave View", "Record the dot’s height or sideways position over time.", 24, 36);
-        drawUnitCircle(wave.center, wave.radius, wave.trig, wave.point, wave.foot, false, false);
-
-        if (state.recording || state.recordDone) {
-          drawRecordingWave(wave);
-        } else {
-          drawWaveGraph(wave.graph, wave.trig, wave.radius);
-          drawConnectorLines(wave.point, wave.graph, wave.trig);
-        }
-      }
-
-      function drawRecordingWave(wave) {
-        const graph = wave.graph;
-        const radius = wave.radius;
-        const midY = graph.y + graph.height / 2;
-        const amp = graph.height * 0.35;
-
-        // Collect record point
-        if (state.recording) {
-          state.recordPoints.push({ t: state.recordAngle, sin: wave.trig.sinValue });
-        }
-
-        // Draw graph background
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 232);
-        p.rect(graph.x, graph.y, graph.width, graph.height, 18);
-
-        // Grid
-        p.stroke("#e6dac8");
-        p.strokeWeight(1);
-        for (let i = 0; i <= 4; i++) {
-          const gy = p.map(i, 0, 4, graph.y, graph.y + graph.height);
-          p.line(graph.x + 12, gy, graph.x + graph.width - 12, gy);
-        }
-        p.stroke("#8b7d6c");
-        p.strokeWeight(1.5);
-        p.line(graph.x + 12, midY, graph.x + graph.width - 12, midY);
-
-        // Draw wave so far
-        if (state.recordPoints.length >= 2) {
-          p.noFill();
-          p.stroke("#e11d48");
-          p.strokeWeight(3);
-          p.beginShape();
-          for (let i = 0; i < state.recordPoints.length; i++) {
-            const gx = p.map(state.recordPoints[i].t, 0, Math.PI * 2, graph.x + 24, graph.x + graph.width - 24);
-            const gy = midY - state.recordPoints[i].sin * amp;
-            p.vertex(gx, gy);
-          }
-          p.endShape();
-        }
-
-        // Moving pen dot
-        if (state.recording && state.recordPoints.length > 0) {
-          const last = state.recordPoints[state.recordPoints.length - 1];
-          const penX = p.map(last.t, 0, Math.PI * 2, graph.x + 24, graph.x + graph.width - 24);
-          const penY = midY - last.sin * amp;
-          p.noStroke();
-          p.fill("#e11d48");
-          p.circle(penX, penY, 12);
-          // Connector dashed line from circle point to pen
-          p.drawingContext.setLineDash([5, 7]);
-          p.stroke("#e11d4888");
-          p.strokeWeight(2);
-          p.line(wave.point.x, wave.point.y, penX, penY);
-          p.drawingContext.setLineDash([]);
-        }
-
-        // Labels
-        if (state.showLabels) {
-          drawLabel(state.recording ? "recording..." : "recording complete", graph.x + 12, graph.y + 22, state.recording ? "#e11d48" : "#16a34a", 13);
-          drawLabel("value", graph.x + 10, graph.y + 42, "#6b6258", 12);
-          drawLabel("0°", graph.x + 24, graph.y + graph.height - 12, "#6b6258", 11);
-          drawLabel("360°", graph.x + graph.width - 40, graph.y + graph.height - 12, "#6b6258", 11);
-        }
-
-        p.pop();
-      }
-
-      function drawAllTogether() {
-        const centers = getCenters();
-        const radius = centers.radius;
-        const trig = getTrig(radius);
-
-        drawPanelTitle("Summary View", "The triangle, circle, and wave are different views of the same angle.", 24, 36);
-
-        const base = { x: centers.triangle.x - radius * 0.65, y: centers.triangle.y + radius * 0.45 };
-        const triPoint = { x: base.x + trig.adjacent, y: base.y - trig.opposite };
-        const triFoot = { x: triPoint.x, y: base.y };
-        drawMiniHeading("Triangle", centers.triangle.x - radius * 1.2, centers.triangle.y - radius * 1.45);
-        drawTriangle(base, triFoot, triPoint, radius, trig, false);
-        drawAngleArc(base, Math.max(26, radius * 0.16), 0, Math.min(state.angleDeg, 90));
-
-        const center = centers.circle;
-        const point = { x: center.x + trig.adjacent, y: center.y - trig.opposite };
-        const foot = { x: point.x, y: center.y };
-        drawMiniHeading("Circle", center.x - radius * 1.2, center.y - radius * 1.45);
-        drawUnitCircle(center, radius, trig, point, foot, false, true);
-
-        drawMiniHeading("Wave", centers.wave.x, centers.wave.y - 26);
-        drawWaveGraph(centers.wave, trig, radius);
-      }
-
-      function drawTriangle(base, foot, point, radius, trig, largeLabels) {
-        p.push();
-        p.noStroke();
-        p.fill(245, 158, 11, 42);
-        p.triangle(base.x, base.y, foot.x, foot.y, point.x, point.y);
-
-        p.strokeCap(p.ROUND);
-
-        p.stroke("#7c3aed");
-        p.strokeWeight(5);
-        p.line(base.x, base.y, point.x, point.y);
-
-        if (state.showCosine) {
-          p.stroke("#0891b2");
-          p.strokeWeight(6);
-          p.line(base.x, base.y, foot.x, foot.y);
-        }
-
-        if (state.showSine) {
-          p.stroke("#e11d48");
-          p.strokeWeight(6);
-          p.line(foot.x, foot.y, point.x, point.y);
-        }
-
-        p.stroke("#222222");
-        p.strokeWeight(1.5);
-        p.noFill();
-        const s = 18;
-        p.line(foot.x - s, foot.y, foot.x - s, foot.y - s);
-        p.line(foot.x - s, foot.y - s, foot.x, foot.y - s);
-
-        p.noStroke();
-        p.fill("#222222");
-        p.circle(base.x, base.y, 8);
-        p.fill("#2563eb");
-        p.circle(point.x, point.y, 12);
-
-        if (state.showLabels) {
-          const labelSize = largeLabels ? 15 : 12;
-          drawLabel("radius / hypotenuse = 1", (base.x + point.x) / 2 - 20, (base.y + point.y) / 2 - 18, "#7c3aed", labelSize);
-          if (state.showCosine) drawLabel("adjacent = cos(θ)", (base.x + foot.x) / 2 - 28, base.y + 30, "#0891b2", labelSize);
-          if (state.showSine) drawLabel("opposite = sin(θ)", foot.x + 18, (foot.y + point.y) / 2, "#e11d48", labelSize);
-          drawLabel("θ", base.x + 36, base.y - 14, "#2563eb", labelSize + 2);
-        }
-        p.pop();
-      }
-
-      function drawTriangleGuideText(base, radius) {
-        p.push();
-        p.noStroke();
-        p.fill("#6b6258");
-        p.textSize(13);
-        p.text("Triangle mode stays in Quadrant I so the sides behave like ordinary positive lengths.", base.x - 20, base.y + radius * 0.45);
-        p.pop();
-      }
-
-      function drawUnitCircle(center, radius, trig, point, foot, largeLabels, showQuadrants) {
-        p.push();
-
-        p.noFill();
-        p.stroke("#c7b9a6");
-        p.strokeWeight(2);
-        p.circle(center.x, center.y, radius * 2);
-
-        p.stroke("#d6c7b6");
-        p.strokeWeight(1.5);
-        p.line(center.x - radius * 1.35, center.y, center.x + radius * 1.35, center.y);
-        p.line(center.x, center.y - radius * 1.35, center.x, center.y + radius * 1.35);
-
-        if (showQuadrants) drawQuadrantLabels(center, radius);
-        drawCardinalAngleLabels(center, radius);
-
-        p.noStroke();
-        p.fill("#f59e0b22");
-        p.triangle(center.x, center.y, foot.x, foot.y, point.x, point.y);
-
-        p.strokeCap(p.ROUND);
-
-        if (state.showCosine) {
-          p.stroke("#0891b2");
-          p.strokeWeight(5);
-          p.line(center.x, center.y, foot.x, foot.y);
-          p.stroke("#0891b255");
-          p.strokeWeight(2);
-          p.line(point.x, point.y, foot.x, foot.y);
-        }
-
-        if (state.showSine) {
-          p.stroke("#e11d48");
-          p.strokeWeight(5);
-          p.line(foot.x, foot.y, point.x, point.y);
-          p.stroke("#e11d4855");
-          p.strokeWeight(2);
-          p.line(center.x, center.y, foot.x, foot.y);
-        }
-
-        p.stroke("#7c3aed");
-        p.strokeWeight(5);
-        p.line(center.x, center.y, point.x, point.y);
-
-        drawAngleArc(center, Math.max(30, radius * 0.20), 0, state.angleDeg);
-
-        p.noStroke();
-        p.fill("#222222");
-        p.circle(center.x, center.y, 7);
-        p.fill("#2563eb");
-        p.circle(point.x, point.y, 13);
-
-        if (state.showLabels) {
-          const labelSize = largeLabels ? 15 : 12;
-          drawLabel("radius = 1", (center.x + point.x) / 2 + 8, (center.y + point.y) / 2 - 12, "#7c3aed", labelSize);
-          if (state.showCosine) drawLabel("x = cos(θ)", (center.x + foot.x) / 2 - 24, center.y + 30, "#0891b2", labelSize);
-          if (state.showSine) drawLabel("y = sin(θ)", foot.x + 14, (foot.y + point.y) / 2, "#e11d48", labelSize);
-          drawLabel(`θ = ${Math.round(state.angleDeg)}°`, center.x + 34, center.y - 16, "#2563eb", labelSize);
-          drawLabel(`(${trig.cosValue.toFixed(2)}, ${trig.sinValue.toFixed(2)})`, point.x + 12, point.y - 14, "#222222", labelSize);
-        }
-
-        p.pop();
-      }
-
-      function drawQuadrantLabels(center, radius) {
-        p.push();
-        p.noStroke();
-        p.textSize(12);
-        p.textStyle(p.BOLD);
-        drawLabel("+cos", center.x + radius * 0.62, center.y + 22, "#0891b2", 12);
-        drawLabel("−cos", center.x - radius * 0.96, center.y + 22, "#0891b2", 12);
-        drawLabel("+sin", center.x + 12, center.y - radius * 0.76, "#e11d48", 12);
-        drawLabel("−sin", center.x + 12, center.y + radius * 0.85, "#e11d48", 12);
-        p.pop();
-      }
-
-      function drawCardinalAngleLabels(center, radius) {
-        if (!state.showLabels) return;
-        p.push();
-        drawLabel("0°", center.x + radius + 12, center.y + 5, "#6b6258", 11);
-        drawLabel("90°", center.x - 12, center.y - radius - 12, "#6b6258", 11);
-        drawLabel("180°", center.x - radius - 48, center.y + 5, "#6b6258", 11);
-        drawLabel("270°", center.x - 16, center.y + radius + 24, "#6b6258", 11);
-        p.pop();
-      }
-
-      function drawWaveGraph(graph, trig, radius) {
-        const sample = {
-          angle: state.angleDeg,
-          sin: trig.sinValue,
-          cos: trig.cosValue
-        };
-
-        if (state.playing || state.waveHistory.length === 0) {
-          state.waveHistory.push(sample);
-          const maxPoints = 420;
-          if (state.waveHistory.length > maxPoints) state.waveHistory.shift();
-        }
-
-        p.push();
-        p.noStroke();
-        p.fill(255, 255, 255, 232);
-        p.rect(graph.x, graph.y, graph.width, graph.height, 18);
-
-        p.stroke("#e6dac8");
-        p.strokeWeight(1);
-        for (let i = 0; i <= 4; i++) {
-          const y = p.map(i, 0, 4, graph.y, graph.y + graph.height);
-          p.line(graph.x + 12, y, graph.x + graph.width - 12, y);
-        }
-        for (let i = 0; i <= 8; i++) {
-          const x = p.map(i, 0, 8, graph.x + 12, graph.x + graph.width - 12);
-          p.line(x, graph.y + 10, x, graph.y + graph.height - 10);
-        }
-
-        const midY = graph.y + graph.height / 2;
-        p.stroke("#8b7d6c");
-        p.strokeWeight(1.5);
-        p.line(graph.x + 12, midY, graph.x + graph.width - 12, midY);
-
-        const amp = graph.height * 0.35;
-        const nowX = graph.x + graph.width - 24;
-        const sineY = midY - trig.sinValue * amp;
-        const cosY = midY - trig.cosValue * amp;
-
-        if (state.showTrace) {
-          if (state.showSine) drawWaveFromHistory(graph, "sin", "#e11d48", amp);
-          if (state.showCosine) drawWaveFromHistory(graph, "cos", "#0891b2", amp);
-        } else {
-          if (state.showSine) drawFullWave(graph, "sin", "#e11d48", amp);
-          if (state.showCosine) drawFullWave(graph, "cos", "#0891b2", amp);
-        }
-
-        drawRecordingLine(nowX, graph.y + 10, graph.y + graph.height - 10);
-
-        if (state.showSine) {
-          p.noStroke();
-          p.fill("#e11d48");
-          p.circle(nowX, sineY, 10);
-          if (state.showLabels) drawLabel("sin height", nowX - 66, sineY - 10, "#e11d48", 12);
-        }
-
-        if (state.showCosine) {
-          p.noStroke();
-          p.fill("#0891b2");
-          p.circle(nowX, cosY, 10);
-          if (state.showLabels) drawLabel("cos width", nowX - 70, cosY + 22, "#0891b2", 12);
-        }
-
-        if (state.showLabels) {
-          drawLabel("value", graph.x + 10, graph.y + 20, "#6b6258", 12);
-          drawLabel("time / angle", graph.x + graph.width - 94, graph.y + graph.height - 12, "#6b6258", 12);
-          drawLabel("1", graph.x + 16, graph.y + graph.height * 0.15, "#6b6258", 12);
-          drawLabel("0", graph.x + 16, midY - 6, "#6b6258", 12);
-          drawLabel("-1", graph.x + 16, graph.y + graph.height * 0.87, "#6b6258", 12);
-        }
-
-        p.pop();
-      }
-
-      function drawRecordingLine(x, y1, y2) {
-        p.push();
-        p.stroke("#16a34a");
-        p.strokeWeight(3);
-        p.line(x, y1, x, y2);
-        p.noStroke();
-        p.fill("#16a34a");
-        p.triangle(x - 6, y1 - 3, x + 6, y1 - 3, x, y1 - 13);
-        if (state.showLabels) drawLabel("now", x - 15, y1 - 20, "#16a34a", 12);
-        p.pop();
-      }
-
-      function drawWaveFromHistory(graph, key, color, amp) {
-        const points = state.waveHistory;
-        const midY = graph.y + graph.height / 2;
-        const left = graph.x + 52;
-        const right = graph.x + graph.width - 24;
-
-        if (points.length < 2) return;
-
-        p.push();
-        p.noFill();
-        p.stroke(color);
-        p.strokeWeight(3);
-        p.beginShape();
-        for (let i = 0; i < points.length; i++) {
-          const x = p.map(i, 0, Math.max(1, points.length - 1), left, right);
-          const y = midY - points[i][key] * amp;
-          p.vertex(x, y);
-        }
-        p.endShape();
-        p.pop();
-      }
-
-      function drawFullWave(graph, key, color, amp) {
-        const midY = graph.y + graph.height / 2;
-        const left = graph.x + 52;
-        const right = graph.x + graph.width - 24;
-        const cycles = 1.5;
-        const phase = p.radians(state.angleDeg);
-
-        p.push();
-        p.noFill();
-        p.stroke(color);
-        p.strokeWeight(3);
-        p.beginShape();
-        for (let i = 0; i <= 240; i++) {
-          const t = i / 240;
-          const x = p.lerp(left, right, t);
-          const angle = t * p.TWO_PI * cycles + phase;
-          const value = key === "sin" ? Math.sin(angle) : Math.cos(angle);
-          const y = midY - value * amp;
-          p.vertex(x, y);
-        }
-        p.endShape();
-        p.pop();
-      }
-
-      function drawConnectorLines(point, graph, trig) {
-        const midY = graph.y + graph.height / 2;
-        const amp = graph.height * 0.35;
-        const nowX = graph.x + graph.width - 24;
-
-        p.push();
-        p.drawingContext.setLineDash([6, 8]);
-        if (state.showSine) {
-          p.stroke("#e11d4888");
-          p.strokeWeight(2);
-          p.line(point.x, point.y, nowX, midY - trig.sinValue * amp);
-        }
-        if (state.showCosine) {
-          p.stroke("#0891b288");
-          p.strokeWeight(2);
-          p.line(point.x, point.y, nowX, midY - trig.cosValue * amp);
-        }
-        p.drawingContext.setLineDash([]);
-        p.pop();
-      }
-
-      function drawAngleArc(center, arcRadius, startDeg, endDeg) {
-        p.push();
-        p.noFill();
-        p.stroke("#2563eb");
-        p.strokeWeight(3);
-        const start = -p.radians(startDeg);
-        const end = -p.radians(endDeg);
-        p.arc(center.x, center.y, arcRadius * 2, arcRadius * 2, end, start);
-        p.pop();
-      }
-
-      function drawPanelTitle(title, subtitle, x, y) {
-        p.push();
-        p.noStroke();
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(22);
-        p.text(title, x, y);
-        p.textStyle(p.NORMAL);
-        p.textSize(14);
-        p.fill("#6b6258");
-        p.text(subtitle, x, y + 24);
-        p.pop();
-      }
-
-      function drawMiniHeading(text, x, y) {
-        p.push();
-        p.noStroke();
-        p.fill("#222222");
-        p.textStyle(p.BOLD);
-        p.textSize(16);
-        p.text(text, x, y);
-        p.pop();
-      }
-
-      function drawLabel(text, x, y, color, size = 13) {
-        p.push();
-        p.textSize(size);
-        p.textStyle(p.BOLD);
-        const padX = 7;
-        const padY = 4;
-        const tw = p.textWidth(text);
-        p.noStroke();
-        p.fill(255, 250, 242, 238);
-        p.rect(x - padX, y - size - padY + 3, tw + padX * 2, size + padY * 2, 9);
-        p.fill(color);
-        p.text(text, x, y);
-        p.pop();
-      }
-
-      function drawValueCards(items, x, y) {
-        const cardW = Math.min(176, (p.width - 60) / Math.max(1, items.length));
-        const cardH = 62;
-        p.push();
-        for (let i = 0; i < items.length; i++) {
-          const cx = x + i * (cardW + 10);
-          p.noStroke();
-          p.fill(255, 255, 255, 235);
-          p.rect(cx, y, cardW, cardH, 14);
-          p.fill(items[i].color);
-          p.textStyle(p.BOLD);
-          p.textSize(13);
-          p.text(items[i].label, cx + 12, y + 22);
-          p.fill("#222222");
-          p.textSize(20);
-          p.text(items[i].value, cx + 12, y + 48);
-        }
-        p.pop();
-      }
-    };
-
-    new p5(sketch);
-  </script>
+    rafId = requestAnimationFrame(loop);
+  }
+  rafId = requestAnimationFrame(loop);
+}
+
+function render() {
+  stopAnimation();
+  const m = state.mode;
+  if (m === 'triangle') { renderTriangle(); }
+  else if (m === 'circle') { startAnimation('circle'); }
+  else if (m === 'wave') { startAnimation('wave'); }
+  else if (m === 'lissajous') { startAnimation('lissajous'); }
+  else if (m === 'spiral') { renderSpiral(); }
+}
+
+// ── Code generators ───────────────────────────────────────────────────────────
+function flash(key) { return state.changedKey === key ? ' flash' : ''; }
+
+function focusHTML() {
+  const m = state.mode;
+  const ang = (state.angle * Math.PI / 180).toFixed(3);
+  if (m === 'triangle') {
+    return `<span class="ct kw">let</span> x = <span class="ct fn${flash('angle')}">cos</span>(<span class="ct num${flash('angle')}" id="v-angle">${ang}</span>); <span class="ct cm">// = ${Math.cos(state.angle * Math.PI / 180).toFixed(3)}</span>\n<span class="ct kw">let</span> y = <span class="ct fn${flash('angle')}">sin</span>(<span class="ct num${flash('angle')}">${ang}</span>); <span class="ct cm">// = ${Math.sin(state.angle * Math.PI / 180).toFixed(3)}</span>`;
+  }
+  if (m === 'circle') {
+    return `x = cx + <span class="ct fn">cos</span>(angle) * <span class="ct num${flash('radius')}" id="v-r">${state.radius}</span>;\ny = cy + <span class="ct fn">sin</span>(angle) * <span class="ct num${flash('radius')}">${state.radius}</span>;\nangle += <span class="ct num${flash('circleSpeed')}">${(state.circleSpeed * 0.02).toFixed(3)}</span>; <span class="ct cm">// radians/frame</span>`;
+  }
+  if (m === 'wave') {
+    return `y = <span class="ct fn">sin</span>(frameCount * <span class="ct num${flash('waveSpeed')}" id="v-spd">${(state.waveSpeed * 0.025).toFixed(3)}</span>) * <span class="ct num${flash('amplitude')}" id="v-amp">${state.amplitude}</span>;`;
+  }
+  if (m === 'lissajous') {
+    return `x = <span class="ct fn">cos</span>(<span class="ct num${flash('xFreq')}" id="v-xf">${state.xFreq}</span> * t);\ny = <span class="ct fn">sin</span>(<span class="ct num${flash('yFreq')}" id="v-yf">${state.yFreq}</span> * t);`;
+  }
+  return `r += <span class="ct num${flash('step')}" id="v-step">${state.step.toFixed(2)}</span>;\nx = <span class="ct fn">cos</span>(a) * r;\ny = <span class="ct fn">sin</span>(a) * r;`;
+}
+
+function fullCodeText() {
+  const m = state.mode;
+  if (m === 'triangle') {
+    return `function setup() {\n  createCanvas(400, 400);\n}\n\nfunction draw() {\n  background(245, 240, 230);\n  let angle = radians(${state.angle});\n  let cx = width / 2;\n  let cy = height / 2;\n  let r = 130;\n\n  // Point on unit circle, scaled by r\n  let px = cx + cos(angle) * r;\n  let py = cy - sin(angle) * r;\n\n  // Draw legs\n  stroke(56, 136, 200);\n  line(cx, cy, px, cy); // cos leg\n  stroke(224, 96, 64);\n  line(px, cy, px, py); // sin leg\n\n  stroke(122, 94, 168);\n  line(cx, cy, px, py); // radius\n\n  fill(240, 168, 64);\n  noStroke();\n  circle(px, py, 14); // point\n}`;
+  }
+  if (m === 'circle') {
+    return `let angle = 0;\n\nfunction setup() {\n  createCanvas(400, 400);\n}\n\nfunction draw() {\n  background(245, 240, 230);\n  let R = ${state.radius};\n  let cx = width / 2;\n  let cy = height / 2;\n\n  let x = cx + cos(angle) * R;\n  let y = cy + sin(angle) * R;\n\n  stroke(122, 94, 168);\n  line(cx, cy, x, y);\n\n  fill(240, 168, 64);\n  noStroke();\n  circle(x, y, 14);\n\n  angle += ${(state.circleSpeed * 0.02).toFixed(3)};\n}`;
+  }
+  if (m === 'wave') {
+    return `function setup() {\n  createCanvas(400, 200);\n}\n\nfunction draw() {\n  background(245, 240, 230);\n  let amplitude = ${state.amplitude};\n  let speed = ${(state.waveSpeed * 0.025).toFixed(3)};\n\n  // Draw sine wave across canvas\n  noFill();\n  stroke(48, 170, 96);\n  strokeWeight(2.5);\n  beginShape();\n  for (let x = 0; x < width; x++) {\n    let y = height / 2 + sin(frameCount * speed + x * 0.04) * amplitude;\n    vertex(x, y);\n  }\n  endShape();\n}`;
+  }
+  if (m === 'lissajous') {
+    return `let t = 0;\n\nfunction setup() {\n  createCanvas(400, 400);\n  background(245, 240, 230);\n}\n\nfunction draw() {\n  let R = 160;\n  let x = width/2 + cos(${state.xFreq} * t) * R;\n  let y = height/2 + sin(${state.yFreq} * t) * R;\n\n  fill(122, 94, 168);\n  noStroke();\n  circle(x, y, 4);\n\n  t += 0.02;\n}`;
+  }
+  return `function setup() {\n  createCanvas(400, 400);\n  background(245, 240, 230);\n}\n\nfunction draw() {\n  let totalAngle = ${state.turns} * TWO_PI;\n  let step = ${state.step.toFixed(2)};\n  let r = 0;\n\n  noFill();\n  stroke(122, 94, 168);\n  strokeWeight(2);\n  beginShape();\n  for (let a = 0; a <= totalAngle; a += 0.05) {\n    let x = width/2 + cos(a) * r;\n    let y = height/2 + sin(a) * r;\n    vertex(x, y);\n    r += step;\n  }\n  endShape();\n\n  noLoop(); // spiral is static\n}`;
+}
+
+function escapeHTML(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function updateCode() {
+  document.getElementById('focus-code').innerHTML = focusHTML();
+  document.getElementById('full-code').innerHTML = escapeHTML(fullCodeText());
+  document.getElementById('code-note').textContent = modes[state.mode].note;
+  setTimeout(() => {
+    document.querySelectorAll('.ct.flash').forEach(el => el.classList.remove('flash'));
+  }, 500);
+}
+
+// ── Controls builder ──────────────────────────────────────────────────────────
+function fmtV(key) {
+  const v = state[key];
+  if (key === 'step') return Number(v).toFixed(2);
+  if (key === 'circleSpeed' || key === 'waveSpeed') return Number(v).toFixed(1);
+  return Math.round(v);
+}
+
+function buildControls() {
+  const controlsEl = document.getElementById('controls');
+  controlsEl.innerHTML = '';
+  modes[state.mode].controls.forEach(control => {
+    const row = document.createElement('div');
+    row.className = 'ctrl-row';
+    row.innerHTML = `
+      <div>
+        <label for="sl_${control.key}">${control.label}<small>${control.code}</small></label>
+      </div>
+      <span class="val-badge mono" id="vb_${control.key}">${fmtV(control.key)}</span>
+      <input id="sl_${control.key}" type="range" min="${control.min}" max="${control.max}" step="${control.step}" value="${state[control.key]}" aria-label="${control.label}">
+    `;
+    controlsEl.appendChild(row);
+    row.querySelector('input').addEventListener('input', event => {
+      state[control.key] = Number(event.target.value);
+      state.changedKey = control.key;
+      document.getElementById(`vb_${control.key}`).textContent = fmtV(control.key);
+      updateCode();
+      // Static modes re-render immediately; animated modes read state in their loop
+      if (!modes[state.mode].isAnimated) render();
+    });
+  });
+}
+
+function buildPresets() {
+  const area = document.getElementById('presets-area');
+  area.innerHTML = '';
+  const lbl = document.createElement('div');
+  lbl.className = 'presets-label';
+  lbl.textContent = 'Try these';
+  area.appendChild(lbl);
+  const row = document.createElement('div');
+  row.className = 'preset-row';
+  modes[state.mode].presets.forEach(preset => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn' + (preset.isBreak ? ' break' : '');
+    btn.type = 'button';
+    btn.textContent = preset.label;
+    btn.addEventListener('click', () => {
+      Object.entries(preset.v).forEach(([key, value]) => { state[key] = value; });
+      buildControls();
+      updateCode();
+      render();
+    });
+    row.appendChild(btn);
+  });
+  area.appendChild(row);
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function setMode(modeName) {
+  state.mode = modeName;
+  const firstControl = modes[modeName].controls[0];
+  state.changedKey = firstControl ? firstControl.key : '';
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    const active = tab.dataset.mode === modeName;
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    tab.tabIndex = active ? 0 : -1;
+  });
+
+  const mode = modes[modeName];
+  setText('canvas-title', mode.canvasTitle);
+  setText('canvas-sub', mode.canvasSub);
+  setText('predict-text', mode.predict);
+  setText('big-idea-text', mode.big);
+  setText('bug-text', mode.bug);
+  setText('try-text', mode.tryIt);
+
+  buildControls();
+  buildPresets();
+  updateCode();
+  render();
+}
+
+function selectAdjacentTab(direction) {
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const currentIndex = tabs.findIndex(tab => tab.dataset.mode === state.mode);
+  const nextIndex = (currentIndex + direction + tabs.length) % tabs.length;
+  tabs[nextIndex].focus();
+  setMode(tabs[nextIndex].dataset.mode);
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => setMode(tab.dataset.mode));
+  tab.addEventListener('keydown', event => {
+    if (event.key === 'ArrowRight') { event.preventDefault(); selectAdjacentTab(1); }
+    if (event.key === 'ArrowLeft') { event.preventDefault(); selectAdjacentTab(-1); }
+    if (event.key === 'Home') { event.preventDefault(); const first = document.querySelector('.tab'); first.focus(); setMode(first.dataset.mode); }
+    if (event.key === 'End') { event.preventDefault(); const tabs2 = document.querySelectorAll('.tab'); const last = tabs2[tabs2.length - 1]; last.focus(); setMode(last.dataset.mode); }
+  });
+});
+
+document.getElementById('fullCodeToggle').addEventListener('click', function () {
+  const fullEl = document.getElementById('full-code');
+  const open = fullEl.classList.toggle('open');
+  this.textContent = open ? '▾ Hide full sketch' : '▸ See full p5.js sketch';
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) updateCode();
+});
+
+// Stop animation when page is hidden to save resources
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopAnimation();
+  else render();
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+setMode('triangle');
+</script>
 </body>
 </html>
