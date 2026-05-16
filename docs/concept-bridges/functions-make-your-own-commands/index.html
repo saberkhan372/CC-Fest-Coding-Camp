@@ -656,7 +656,7 @@ const modes = {
     note: '3 calls instead of 30 lines.',
     proseTitle: 'Name it once, use it everywhere',
     proseBody: 'A function is a named block of code that you define once and call many times. Parameters let you customize each call — the same function draws one flower here and a different one there. Return values let functions compute and hand back results for you to use. Composing your sketch from small, named functions makes it easier to read, debug, and change.',
-    controls: [{ key: 'repeatCount', label: 'Copies', hint: 'how many repeated drawings', min: 1, max: 6, step: 1 }],
+    controls: [{ key: 'repeatCount', label: 'Copies', hint: '· call count', min: 1, max: 6, step: 1 }],
     presets: [
       { label: 'Show 3×', v: { repeatCount: 3 } },
       { label: 'Show 6×', v: { repeatCount: 6 } },
@@ -691,10 +691,10 @@ const modes = {
     proseTitle: 'Name it once, use it everywhere',
     proseBody: 'A function is a named block of code that you define once and call many times. Parameters let you customize each call — the same function draws one flower here and a different one there. Return values let functions compute and hand back results for you to use. Composing your sketch from small, named functions makes it easier to read, debug, and change.',
     controls: [
-      { key: 'paramX', label: 'x', hint: 'horizontal position', min: 60, max: 560, step: 1 },
-      { key: 'paramY', label: 'y', hint: 'vertical position', min: 40, max: 380, step: 1 },
-      { key: 'paramSize', label: 'size', hint: '10–100', min: 10, max: 100, step: 1 },
-      { key: 'paramHue', label: 'hue', hint: '0–360', min: 0, max: 360, step: 1 }
+      { key: 'paramX', label: 'x', hint: '· x argument', min: 60, max: 560, step: 1 },
+      { key: 'paramY', label: 'y', hint: '· y argument', min: 40, max: 380, step: 1 },
+      { key: 'paramSize', label: 'size', hint: '· size argument', min: 10, max: 100, step: 1 },
+      { key: 'paramHue', label: 'hue', hint: '· hue argument', min: 0, max: 360, step: 1 }
     ],
     presets: [
       { label: 'Center', v: { paramX: 310, paramY: 210, paramSize: 50, paramHue: 150 } },
@@ -713,7 +713,7 @@ const modes = {
     proseTitle: 'Name it once, use it everywhere',
     proseBody: 'A function is a named block of code that you define once and call many times. Parameters let you customize each call — the same function draws one flower here and a different one there. Return values let functions compute and hand back results for you to use. Composing your sketch from small, named functions makes it either to read, debug, and change.',
     controls: [
-      { key: 'returnTemp', label: 'Temperature', hint: '0 = cold, 100 = hot', min: 0, max: 100, step: 1 }
+      { key: 'returnTemp', label: 'Temperature', hint: '· colorFromTemp(t)', min: 0, max: 100, step: 1 }
     ],
     presets: [
       { label: 'Cold (0)', v: { returnTemp: 0 } },
