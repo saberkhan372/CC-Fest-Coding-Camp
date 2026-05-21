@@ -281,6 +281,20 @@
   }
 })();
 
+// Credits disclosure
+(function() {
+  const button = document.querySelector(".credits-toggle");
+  const body = document.querySelector("#credits-body");
+  if (!button || !body) return;
+
+  button.addEventListener("click", () => {
+    const isOpen = button.getAttribute("aria-expanded") === "true";
+    button.setAttribute("aria-expanded", String(!isOpen));
+    button.textContent = isOpen ? "See credits ↓" : "Hide credits ↑";
+    body.hidden = isOpen;
+  });
+})();
+
 // Core tool badges
 (function() {
   const CORE = new Set([
