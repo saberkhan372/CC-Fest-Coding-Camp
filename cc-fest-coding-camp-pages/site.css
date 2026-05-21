@@ -519,7 +519,7 @@ a{color:inherit}
 
 .sequence{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(5,minmax(0,1fr));
   gap:14px;
   margin-top:20px;
 }
@@ -531,13 +531,14 @@ a{color:inherit}
   padding:18px;
   box-shadow:0 3px 10px rgba(53,43,32,.07);
   transition:transform .18s ease;
+  min-width:0;
 }
 
 .sequence-card:nth-child(1){transform:rotate(-1.2deg)}
 .sequence-card:nth-child(2){transform:rotate(.8deg)}
 .sequence-card:nth-child(3){transform:rotate(-0.5deg)}
 .sequence-card:nth-child(4){transform:rotate(1.1deg)}
-.sequence-card:nth-child(5){transform:rotate(-0.7deg)}
+.sequence-card:nth-child(5){transform:rotate(0)}
 .sequence-card:hover{transform:rotate(0) translateY(-2px)}
 
 .sequence-card strong{
@@ -573,7 +574,9 @@ a{color:inherit}
   color:var(--ink);
   text-decoration:none;
   transition:background .12s,border-color .12s,color .12s;
-  white-space:nowrap;
+  max-width:100%;
+  line-height:1.2;
+  white-space:normal;
 }
 
 .sequence-tools a:hover{
@@ -596,7 +599,9 @@ a{color:inherit}
   color:#2d6a4f;
   text-decoration:none;
   transition:background .12s,border-color .12s;
-  white-space:nowrap;
+  max-width:100%;
+  line-height:1.2;
+  white-space:normal;
 }
 .sequence-bridge:hover{
   background:rgba(45,106,79,.15);
