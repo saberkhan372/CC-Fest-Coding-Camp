@@ -1004,11 +1004,6 @@ body.search-active .station-peek-trigger{display:none !important}
   display:none;
 }
 
-/* Concept bridge stations: show only first 2 cards as a peek */
-#concept-bridges .station.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+3){
-  display:none;
-}
-
 /* Starter sketches: show first 3 cards as a peek */
 #starter-sketches.is-collapsible:not(.is-open) .tool-grid .tool-card:nth-child(n+4){
   display:none;

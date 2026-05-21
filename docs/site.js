@@ -169,7 +169,26 @@
     });
   };
 
-  // Concept bridge stations — collapsible, 2-card peek
+  const addGalleryPeek = (section) => {
+    const stationList = section.querySelector(".station-list");
+    if (!stationList) return;
+    const cards = section.querySelectorAll(".tool-card");
+    if (!cards.length) return;
+    const peek = document.createElement("div");
+    peek.className = "gallery-peek";
+    const grid = document.createElement("div");
+    grid.className = "tool-grid";
+    const count = Math.min(3, cards.length);
+    for (let i = 0; i < count; i++) {
+      const clone = cards[i].cloneNode(true);
+      clone.querySelectorAll(".station-peek-trigger").forEach(el => el.remove());
+      grid.appendChild(clone);
+    }
+    peek.appendChild(grid);
+    stationList.parentNode.insertBefore(peek, stationList);
+  };
+
+  // Concept bridge stations — collapsible, 3-card peek
   document.querySelectorAll("#concept-bridges .station").forEach((station, index) => {
     const header = station.querySelector(".station-header");
     const grid = station.querySelector(".tool-grid");
@@ -185,7 +204,7 @@
       openByDefault: false
     });
 
-    const previewCount = 2;
+    const previewCount = 3;
     const remaining = grid.querySelectorAll(".tool-card").length - previewCount;
     if (remaining > 0) {
       const trigger = document.createElement("div");
@@ -213,6 +232,7 @@
       label: "concept bridges",
       openByDefault: false
     });
+    addGalleryPeek(bridgesSection);
   }
 
   // Workshop tools stations — collapsible, 3-card peek
@@ -260,6 +280,7 @@
       label: "workshop tools",
       openByDefault: false
     });
+    addGalleryPeek(toolsSection);
   }
 
   // Starter sketches section — section-level collapse
