@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conway's Game of Life — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/conways-game-of-life/">
+  <meta property="og:title" content="Conway's Game of Life — CC Fest Coding Camp">
+  <meta property="og:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Conway's Game of Life — CC Fest Coding Camp">
+  <meta name="twitter:description" content="31 workshop tools and 26 starter sketches for educators learning p5.js and creative coding. Free, open, and remixable.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <div class="tool-topbar">
+      <a href="../../index.html">← Back to tool library</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+    </div>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">Session 3 / 4</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>Conway's Game of Life</h1>
+      <p class="tool-subtitle">A grid of cells lives or dies based on neighbor counts. Simple local rules create complex global patterns — the classic example of arrays, loops, and state.</p>
+      <div class="tool-tags">
+        <span class="tool-tag">arrays</span>
+        <span class="tool-tag">2D arrays</span>
+        <span class="tool-tag">state</span>
+        <span class="tool-tag">cellular automaton</span>
+        <span class="tool-tag">loops</span>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Main Workspace</h2>
+                <p>Click cells to toggle them alive/dead. Press Play to run. Try drawing a glider (5-cell L-shape).</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Code Preview</h2>
+                <p>The 2D grid array, neighbor-count loop, and the four rules.</p>
+              </div>
+              <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-panel">
+              <pre id="code-preview">// Loading...</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+              </div>
+            </div>
+            <div class="controls-grid">
+              <div class="button-row">
+                <button class="button primary" id="playBtn" onclick="togglePlay()">Play</button>
+                <button class="button ghost" onclick="stepOnce()">Step</button>
+                <button class="button ghost" onclick="randomize()">Randomize</button>
+                <button class="button ghost" onclick="clearGrid()">Clear</button>
+              </div>
+              <div class="control">
+                <label for="cellSize">Cell Size <span id="cellSizeValue">12</span>px</label>
+                <input id="cellSize" type="range" min="8" max="28" value="12" step="2" oninput="updateCellSize(this.value)">
+              </div>
+              <div class="control">
+                <label for="simSpeed">Speed <span id="simSpeedValue">8</span> fps</label>
+                <input id="simSpeed" type="range" min="1" max="30" value="8" step="1" oninput="updateSpeed(this.value)">
+              </div>
+              <div style="font-size:0.82rem;color:#777;line-height:1.5;">
+                Click canvas to toggle cells. Draw mode is always on.
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div><h2>The Four Rules</h2></div>
+            </div>
+            <div style="font-size:0.88rem;line-height:1.7;color:#555;">
+              <div style="padding:6px 0;border-bottom:1px solid #eee;">
+                <strong style="color:#e05a3a;">&lt; 2 neighbors</strong> → cell dies (underpopulation)
+              </div>
+              <div style="padding:6px 0;border-bottom:1px solid #eee;">
+                <strong style="color:#3d8a4e;">2–3 neighbors</strong> → cell survives
+              </div>
+              <div style="padding:6px 0;border-bottom:1px solid #eee;">
+                <strong style="color:#e05a3a;">&gt; 3 neighbors</strong> → cell dies (overcrowding)
+              </div>
+              <div style="padding:6px 0;">
+                <strong style="color:#3d5a80;">Exactly 3 neighbors</strong> → dead cell is born
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div><h2>Sketch State</h2></div>
+            </div>
+            <div class="stat-list" id="variables"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div><h2>Try / Notice / Remix</h2></div>
+            </div>
+            <div class="lesson-grid">
+              <div class="lesson-card">
+                <h3>Try this</h3>
+                <p>Clear the grid. Draw this glider (use Step to watch it move): row 0: col 1. row 1: col 2. row 2: cols 0,1,2. Press Play.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Notice this</h3>
+                <p>Each cell only checks its 8 neighbors — purely local rules. Yet gliders, oscillators, and still-lifes emerge from those same 4 rules applied across the whole grid.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Remix this</h3>
+                <p>Change the survival rule: cells survive with 2, 3, or 4 neighbors. That one-number change produces completely different behavior (Highlife rules).</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="tool-footer">CC Fest Coding Camp · Conway's Game of Life · Session 3/4 · 2D arrays, loops, and emergent behavior</footer>
+  </div>
+
+  <script>
+let grid = [];
+let nextGrid = [];
+let cols, rows;
+let cellSize = 12;
+let running = false;
+let generation = 0;
+let simSpeed = 8;
+let lastStep = 0;
+let p5ref = null;
+
+function makeGrid(c, r) {
+  return Array.from({length: c}, () => new Array(r).fill(0));
+}
+
+function randomize() {
+  for (let i = 0; i < cols; i++)
+    for (let j = 0; j < rows; j++)
+      grid[i][j] = Math.random() < 0.3 ? 1 : 0;
+  generation = 0;
+  updateVariableDisplay();
+}
+
+function clearGrid() {
+  for (let i = 0; i < cols; i++)
+    for (let j = 0; j < rows; j++)
+      grid[i][j] = 0;
+  generation = 0;
+  updateVariableDisplay();
+}
+
+function countNeighbors(g, x, y) {
+  let count = 0;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      if (dx === 0 && dy === 0) continue;
+      const nx = (x + dx + cols) % cols;
+      const ny = (y + dy + rows) % rows;
+      count += g[nx][ny];
+    }
+  }
+  return count;
+}
+
+function stepOnce() {
+  nextGrid = makeGrid(cols, rows);
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      const n = countNeighbors(grid, i, j);
+      const alive = grid[i][j] === 1;
+      if (alive && (n < 2 || n > 3)) nextGrid[i][j] = 0;       // underpop / overcrowding
+      else if (alive && (n === 2 || n === 3)) nextGrid[i][j] = 1; // survives
+      else if (!alive && n === 3) nextGrid[i][j] = 1;             // born
+      else nextGrid[i][j] = 0;
+    }
+  }
+  grid = nextGrid;
+  generation++;
+  updateVariableDisplay();
+}
+
+function togglePlay() {
+  running = !running;
+  document.getElementById("playBtn").textContent = running ? "Pause" : "Play";
+  document.getElementById("playBtn").className = running ? "button ghost" : "button primary";
+}
+
+function updateCellSize(v) {
+  cellSize = Number(v);
+  document.getElementById("cellSizeValue").textContent = cellSize;
+  if (p5ref) {
+    cols = Math.floor(400 / cellSize);
+    rows = Math.floor(400 / cellSize);
+    grid = makeGrid(cols, rows);
+    nextGrid = makeGrid(cols, rows);
+    generation = 0;
+    updateVariableDisplay();
+  }
+}
+
+function updateSpeed(v) {
+  simSpeed = Number(v);
+  document.getElementById("simSpeedValue").textContent = simSpeed;
+}
+
+function countLiveCells() {
+  let count = 0;
+  for (let i = 0; i < cols; i++)
+    for (let j = 0; j < rows; j++)
+      if (grid[i][j] === 1) count++;
+  return count;
+}
+
+function updateVariableDisplay() {
+  const variables = [
+    ["generation", generation],
+    ["liveCells", countLiveCells()],
+    ["cols", cols],
+    ["rows", rows],
+    ["cellSize", cellSize + "px"],
+    ["running", running],
+  ];
+  document.getElementById("variables").innerHTML = variables
+    .map(([key, value]) => `<div class="stat"><strong>${key}</strong><code>${value}</code></div>`)
+    .join("");
+}
+
+function updateCodePreview() {
+  const code = `// 2D grid as nested arrays
+let grid = [];
+let cols = ${cols};
+let rows = ${rows};
+let cellSize = ${cellSize};
+
+function setup() {
+  createCanvas(cols * cellSize, rows * cellSize);
+  frameRate(${simSpeed});
+
+  // build empty grid
+  for (let i = 0; i < cols; i++) {
+    grid[i] = [];
+    for (let j = 0; j < rows; j++) {
+      grid[i][j] = random() < 0.3 ? 1 : 0;
+    }
+  }
+}
+
+function draw() {
+  background(244, 239, 230);
+
+  // draw cells
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      if (grid[i][j] === 1) {
+        fill(61, 90, 128);
+        noStroke();
+        rect(i * cellSize, j * cellSize,
+             cellSize - 1, cellSize - 1);
+      }
+    }
+  }
+
+  // apply rules to build next generation
+  let next = makeEmptyGrid();
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      let n = countNeighbors(i, j);
+      let alive = grid[i][j] === 1;
+      if (alive && (n < 2 || n > 3)) next[i][j] = 0;
+      else if (alive) next[i][j] = 1;
+      else if (!alive && n === 3) next[i][j] = 1;
+      else next[i][j] = 0;
+    }
+  }
+  grid = next;
+}
+
+function countNeighbors(x, y) {
+  let count = 0;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      if (dx === 0 && dy === 0) continue;
+      let nx = (x + dx + cols) % cols;
+      let ny = (y + dy + rows) % rows;
+      count += grid[nx][ny];
+    }
+  }
+  return count;
+}`;
+  document.getElementById("code-preview").textContent = code;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById("code-preview").textContent);
+}
+
+new p5(function(p) {
+  p5ref = p;
+
+  p.setup = function() {
+    const canvas = p.createCanvas(400, 400);
+    canvas.parent("canvas-container");
+    p.frameRate(60);
+    cols = Math.floor(400 / cellSize);
+    rows = Math.floor(400 / cellSize);
+    grid = makeGrid(cols, rows);
+    nextGrid = makeGrid(cols, rows);
+    randomize();
+    updateCodePreview();
+  };
+
+  p.draw = function() {
+    p.background(244, 239, 230);
+
+    // draw grid lines
+    p.stroke(220, 213, 200);
+    p.strokeWeight(0.5);
+    for (let i = 0; i <= cols; i++) p.line(i * cellSize, 0, i * cellSize, p.height);
+    for (let j = 0; j <= rows; j++) p.line(0, j * cellSize, p.width, j * cellSize);
+
+    // draw live cells
+    p.noStroke();
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        if (grid[i][j] === 1) {
+          p.fill(61, 90, 128, 240);
+          p.rect(i * cellSize + 1, j * cellSize + 1, cellSize - 2, cellSize - 2, 2);
+        }
+      }
+    }
+
+    // step simulation at chosen rate
+    if (running) {
+      const now = p.millis();
+      if (now - lastStep > 1000 / simSpeed) {
+        stepOnce();
+        lastStep = now;
+        updateCodePreview();
+      }
+    }
+
+    // gen + cell count
+    p.noStroke();
+    p.fill(80);
+    p.textSize(11);
+    p.textAlign(p.LEFT);
+    p.text(`gen: ${generation}  live: ${countLiveCells()}`, 8, p.height - 6);
+  };
+
+  p.mousePressed = function() {
+    if (p.mouseX >= 0 && p.mouseX < p.width && p.mouseY >= 0 && p.mouseY < p.height) {
+      const ci = Math.floor(p.mouseX / cellSize);
+      const cj = Math.floor(p.mouseY / cellSize);
+      if (ci >= 0 && ci < cols && cj >= 0 && cj < rows) {
+        grid[ci][cj] = grid[ci][cj] === 1 ? 0 : 1;
+        updateVariableDisplay();
+      }
+    }
+  };
+
+  p.mouseDragged = function() {
+    if (p.mouseX >= 0 && p.mouseX < p.width && p.mouseY >= 0 && p.mouseY < p.height) {
+      const ci = Math.floor(p.mouseX / cellSize);
+      const cj = Math.floor(p.mouseY / cellSize);
+      if (ci >= 0 && ci < cols && cj >= 0 && cj < rows) {
+        grid[ci][cj] = 1;
+        updateVariableDisplay();
+      }
+    }
+  };
+});
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>
