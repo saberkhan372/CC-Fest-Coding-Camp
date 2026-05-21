@@ -169,121 +169,103 @@
     });
   };
 
-  const addGalleryPeek = (section) => {
-    const stationList = section.querySelector(".station-list");
-    if (!stationList) return;
-    const cards = section.querySelectorAll(".tool-card");
-    if (!cards.length) return;
-    const peek = document.createElement("div");
-    peek.className = "gallery-peek";
-    const grid = document.createElement("div");
-    grid.className = "tool-grid";
-    const count = Math.min(3, cards.length);
-    for (let i = 0; i < count; i++) {
-      const clone = cards[i].cloneNode(true);
-      clone.querySelectorAll(".station-peek-trigger").forEach(el => el.remove());
-      grid.appendChild(clone);
-    }
-    peek.appendChild(grid);
-    stationList.parentNode.insertBefore(peek, stationList);
+  const addSectionPeek = ({ section, label, itemLabel, emptyLabel }) => {
+    const header = section?.querySelector(".gallery-header");
+    const stationList = section?.querySelector(".station-list");
+    if (!section || !header || !stationList) return;
+
+    const peekCards = Array.from(section.querySelectorAll(".station .tool-card")).slice(0, 3);
+    if (peekCards.length === 0) return;
+
+    const peekGrid = document.createElement("div");
+    peekGrid.className = "gallery-peek tool-grid";
+    peekGrid.id = `${section.id}-peek-grid`;
+
+    peekCards.forEach((card) => {
+      peekGrid.appendChild(card.cloneNode(true));
+    });
+
+    const totalItems = section.querySelectorAll(".station .tool-card").length;
+    const remaining = Math.max(0, totalItems - peekCards.length);
+    const trigger = document.createElement("div");
+    trigger.className = "station-peek-trigger";
+    trigger.setAttribute("aria-hidden", "true");
+    const btn = document.createElement("span");
+    btn.className = "station-peek-btn";
+    btn.textContent = remaining > 0
+      ? `Show ${remaining} more ${itemLabel} →`
+      : emptyLabel;
+    trigger.appendChild(btn);
+    peekGrid.appendChild(trigger);
+
+    stationList.before(peekGrid);
+
+    makeCollapsible({
+      container: section,
+      header,
+      grid: peekGrid,
+      label,
+      openByDefault: false
+    });
+
+    trigger.addEventListener("click", () => header.click());
   };
 
-  // Concept bridge stations — collapsible, 3-card peek
-  document.querySelectorAll("#concept-bridges .station").forEach((station, index) => {
-    const header = station.querySelector(".station-header");
-    const grid = station.querySelector(".tool-grid");
-    if (!header || !grid) return;
-
-    const label = station.querySelector(".station-name")?.textContent?.trim() || `Bridge section ${index + 1}`;
-    grid.id = grid.id || `station-bridges-${index + 1}`;
-    makeCollapsible({
-      container: station,
-      header,
-      grid,
-      label: `${label} bridges`,
-      openByDefault: false
-    });
-
-    const previewCount = 3;
-    const remaining = grid.querySelectorAll(".tool-card").length - previewCount;
-    if (remaining > 0) {
-      const trigger = document.createElement("div");
-      trigger.className = "station-peek-trigger";
-      trigger.setAttribute("aria-hidden", "true");
-      const btn = document.createElement("span");
-      btn.className = "station-peek-btn";
-      btn.textContent = `Show ${remaining} more bridge${remaining !== 1 ? "s" : ""} →`;
-      trigger.appendChild(btn);
-      grid.appendChild(trigger);
-      trigger.addEventListener("click", () => header.click());
-    }
+  addSectionPeek({
+    section: document.querySelector("#concept-bridges"),
+    label: "concept bridges",
+    itemLabel: "concept bridges by section",
+    emptyLabel: "Show concept bridges by section →"
   });
 
-  // Concept bridges section — section-level collapse
-  const bridgesSection = document.querySelector("#concept-bridges");
-  const bridgesHeader = bridgesSection?.querySelector(".gallery-header");
-  const bridgesStationList = bridgesSection?.querySelector(".station-list");
-  if (bridgesSection && bridgesHeader && bridgesStationList) {
-    bridgesStationList.id = bridgesStationList.id || "concept-bridges-station-list";
-    makeCollapsible({
-      container: bridgesSection,
-      header: bridgesHeader,
-      grid: bridgesStationList,
-      label: "concept bridges",
-      openByDefault: false
-    });
-    addGalleryPeek(bridgesSection);
-  }
+  addSectionPeek({
+    section: document.querySelector("#interactive-tools"),
+    label: "workshop tools",
+    itemLabel: "workshop tools by section",
+    emptyLabel: "Show workshop tools by section →"
+  });
 
-  // Workshop tools stations — collapsible, 3-card peek
-  document.querySelectorAll("#interactive-tools .station").forEach((station, index) => {
+  document.querySelectorAll("#interactive-tools .station, #concept-bridges .station").forEach((station, index) => {
     const header = station.querySelector(".station-header");
     const grid = station.querySelector(".tool-grid");
     if (!header || !grid) return;
 
     const label = station.querySelector(".station-name")?.textContent?.trim() || `Tool section ${index + 1}`;
-    const gridId = `station-tools-${index + 1}`;
+    const sectionType = station.closest("#concept-bridges") ? "bridge" : "tool";
+    const gridId = `station-${sectionType}s-${index + 1}`;
     grid.id = grid.id || gridId;
     makeCollapsible({
       container: station,
       header,
       grid,
-      label: `${label} tools`,
+      label: `${label} ${sectionType}s`,
       openByDefault: false
     });
 
+    const totalCards = grid.querySelectorAll(".tool-card").length;
     const previewCount = 3;
-    const remaining = grid.querySelectorAll(".tool-card").length - previewCount;
-    if (remaining > 0) {
-      const trigger = document.createElement("div");
-      trigger.className = "station-peek-trigger";
-      trigger.setAttribute("aria-hidden", "true");
-      const btn = document.createElement("span");
-      btn.className = "station-peek-btn";
-      btn.textContent = `Show ${remaining} more tool${remaining !== 1 ? "s" : ""} →`;
-      trigger.appendChild(btn);
-      grid.appendChild(trigger);
-      trigger.addEventListener("click", () => header.click());
+    const remaining = totalCards - previewCount;
+    if (totalCards === 1) {
+      station.setAttribute("data-card-count", "1");
+    } else if (totalCards === 2) {
+      station.setAttribute("data-card-count", "2");
+    } else {
+      station.removeAttribute("data-card-count");
     }
+    if (remaining <= 0) {
+      return;
+    }
+    const trigger = document.createElement("div");
+    trigger.className = "station-peek-trigger";
+    trigger.setAttribute("aria-hidden", "true");
+    const btn = document.createElement("span");
+    btn.className = "station-peek-btn";
+    btn.textContent = `Show ${remaining} more ${label} ${sectionType}${remaining !== 1 ? "s" : ""} →`;
+    trigger.appendChild(btn);
+    grid.appendChild(trigger);
+    trigger.addEventListener("click", () => header.click());
   });
 
-  // Workshop tools section — section-level collapse
-  const toolsSection = document.querySelector("#interactive-tools");
-  const toolsHeader = toolsSection?.querySelector(".gallery-header");
-  const toolsStationList = toolsSection?.querySelector(".station-list");
-  if (toolsSection && toolsHeader && toolsStationList) {
-    toolsStationList.id = toolsStationList.id || "interactive-tools-station-list";
-    makeCollapsible({
-      container: toolsSection,
-      header: toolsHeader,
-      grid: toolsStationList,
-      label: "workshop tools",
-      openByDefault: false
-    });
-    addGalleryPeek(toolsSection);
-  }
-
-  // Starter sketches section — section-level collapse
   const starterSection = document.querySelector("#starter-sketches");
   const starterHeader = starterSection?.querySelector(".gallery-header");
   const starterGrid = starterSection?.querySelector(".tool-grid");
@@ -345,6 +327,7 @@
 
   const stations = document.querySelectorAll("#interactive-tools .station");
   const sketchCards = document.querySelectorAll("#starter-sketches .tool-card");
+  const toolSection = document.querySelector("#interactive-tools");
 
   filterBar.addEventListener("click", function(e) {
     const btn = e.target.closest(".suit-btn");
@@ -355,11 +338,77 @@
     btn.classList.add("active");
 
     if (filter === "all") {
+      toolSection?.classList.remove("is-open");
       stations.forEach(s => s.hidden = false);
       sketchCards.forEach(c => c.hidden = false);
     } else {
+      toolSection?.classList.add("is-open");
       stations.forEach(s => { s.hidden = s.dataset.suit !== filter; });
       sketchCards.forEach(c => { c.hidden = !c.classList.contains("suit-" + filter); });
+    }
+  });
+})();
+
+// Live search
+(function() {
+  const searchInput = document.querySelector(".tool-search");
+  if (!searchInput) return;
+
+  const allCards = document.querySelectorAll(".tool-card");
+  const stations = document.querySelectorAll("#interactive-tools .station, #concept-bridges .station");
+  const bridgeSection = document.querySelector("#concept-bridges");
+  const toolSection = document.querySelector("#interactive-tools");
+  const sketchSection = document.querySelector("#starter-sketches");
+
+  searchInput.addEventListener("input", function() {
+    const q = this.value.trim().toLowerCase();
+
+    document.querySelector(".suit-filter-bar")?.querySelectorAll(".suit-btn")
+      .forEach(b => b.classList.toggle("active", b.dataset.filter === "all"));
+
+    if (!q) {
+      document.body.classList.remove("search-active");
+      allCards.forEach(c => c.hidden = false);
+      stations.forEach(s => s.hidden = false);
+      bridgeSection?.classList.remove("is-open");
+      toolSection?.classList.remove("is-open");
+      sketchSection?.classList.remove("is-open");
+      if (bridgeSection) bridgeSection.hidden = false;
+      if (toolSection) toolSection.hidden = false;
+      if (sketchSection) sketchSection.hidden = false;
+      return;
+    }
+
+    document.body.classList.add("search-active");
+    bridgeSection?.classList.add("is-open");
+    toolSection?.classList.add("is-open");
+    allCards.forEach(c => {
+      const title = c.querySelector("h3")?.textContent.toLowerCase() || "";
+      const desc  = c.querySelector(".tool-description")?.textContent.toLowerCase() || "";
+      const meta  = Array.from(c.querySelectorAll(".pill")).map(t => t.textContent.toLowerCase()).join(" ");
+      const tags  = Array.from(c.querySelectorAll(".tag")).map(t => t.textContent.toLowerCase()).join(" ");
+      c.hidden = !(title.includes(q) || desc.includes(q) || tags.includes(q) || meta.includes(q));
+    });
+
+    stations.forEach(s => {
+      const visible = Array.from(s.querySelectorAll(".tool-card")).some(c => !c.hidden);
+      s.hidden = !visible;
+      if (!s.hidden) s.classList.add("is-open");
+    });
+    if (bridgeSection) {
+      const visible = Array.from(bridgeSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
+      bridgeSection.hidden = !visible;
+      if (!bridgeSection.hidden) bridgeSection.classList.add("is-open");
+    }
+    if (toolSection) {
+      const visible = Array.from(toolSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
+      toolSection.hidden = !visible;
+      if (!toolSection.hidden) toolSection.classList.add("is-open");
+    }
+    if (sketchSection) {
+      const visible = Array.from(sketchSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
+      sketchSection.hidden = !visible;
+      if (!sketchSection.hidden) sketchSection.classList.add("is-open");
     }
   });
 })();
