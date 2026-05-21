@@ -1046,9 +1046,7 @@ body.search-active .station-peek-trigger{display:none !important}
 }
 
 .station.is-collapsible.is-open .station-peek-trigger,
-#starter-sketches.is-collapsible.is-open .station-peek-trigger,
-#interactive-tools.is-collapsible.is-open .station-peek-trigger,
-#concept-bridges.is-collapsible.is-open .station-peek-trigger{
+#starter-sketches.is-collapsible.is-open .station-peek-trigger{
   display:none;
 }
 
