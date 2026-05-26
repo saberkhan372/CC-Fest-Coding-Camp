@@ -1,47 +1,24 @@
-/* Shared CC Fest components.
-   Rules are copied from existing page styles first; source files keep their
-   originals until the cascade is verified and Phase 8 deletion choices are made. */
+/* ─── CC Fest shared component layer ──────────────────────────────────────
+   Portable across homepage, bridge pages, tool pages, and starter pages.
+   Depends on tokens defined in site.css / tool-page.css :root.
+   Fallback values cover pages that only load one stylesheet.
+   Do not add page-layout or position rules here.
+   ─────────────────────────────────────────────────────────────────────── */
 
-/* CC Fest poster tradition: credit the visual in the corner */
-.maker-credit{
-  position:absolute;
-  bottom:14px;
-  right:18px;
-  margin:0;
-  font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:11px;
-  color:var(--ink-light);
-  letter-spacing:.04em;
-  pointer-events:none;
-  user-select:none;
-}
+/* ─── TRY-NEXT ─────────────────────────────────────────────────────────── */
 
-.artifact-caption{
-  margin:0;
-  font:500 0.68rem/1.3 "DM Sans",system-ui;
-  color:var(--ink-light);
-  padding-left:2px;
-}
-
-.try-next,
-.teaching-note {
+.try-next {
   margin-top: 18px;
   padding: 16px;
-  border: 1.5px solid var(--bridge-line);
+  border: 2px solid var(--ink, #201c1a);
   border-radius: 12px;
-  background: var(--bridge-white);
-  box-shadow: 3px 3px 0 rgba(32, 28, 26, 0.08);
+  background: var(--panel, #fffdf7);
+  box-shadow: 3px 3px 0 rgba(32,28,26,.08);
 }
 
-.try-next h2,
-.teaching-note h2 {
+.try-next h2 {
   margin: 0 0 8px;
   font-size: 1.1rem;
-}
-
-.try-next p,
-.teaching-note p {
-  margin: 0;
 }
 
 .related-grid {
@@ -51,34 +28,60 @@
   margin-top: 12px;
 }
 
+.related-group {
+  display: grid;
+  gap: 8px;
+}
+
 .related-link {
   display: grid;
   gap: 3px;
   padding: 12px;
-  border: 1.5px solid var(--bridge-line);
-  border-radius: 10px;
-  background: #fffdf8;
-  color: var(--bridge-ink);
+  border: 2px solid var(--cream-deep, #e4dccf);
+  border-radius: 8px;
+  background: #fff;
   text-decoration: none;
-  box-shadow: 2px 2px 0 rgba(32, 28, 26, 0.07);
+  box-shadow: 3px 3px 0 rgba(44,42,38,.08);
 }
 
 .related-link:hover {
-  border-color: var(--bridge-accent);
   transform: translateY(-1px);
+  border-color: var(--accent, #c8391d);
 }
 
 .related-link span {
-  color: var(--bridge-accent);
-  font-size: 0.68rem;
+  color: var(--accent, #c8391d);
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: .08em;
   text-transform: uppercase;
 }
 
 .related-link strong {
-  color: var(--bridge-ink);
-  font-size: 0.92rem;
+  color: var(--ink, #201c1a);
+  font-size: 14px;
+}
+
+/* ─── TEACHING NOTE ─────────────────────────────────────────────────────── */
+
+.teaching-note {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1.5px solid var(--cream-deep, #e4dccf);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 3px 3px 0 rgba(44,42,38,.08);
+}
+
+.teaching-note h2 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.teaching-note p {
+  margin: 0;
+  color: var(--ink-light, #5c5751);
+  font-size: 14px;
 }
 
 .teaching-note-grid {
@@ -91,26 +94,75 @@
 .teaching-note-card {
   padding: 12px;
   border-radius: 10px;
-  border: 1.5px solid var(--bridge-line);
+  border: 1.5px solid var(--cream-deep, #e4dccf);
   background: #fff7ed;
 }
 
 .teaching-note-card strong {
   display: block;
   margin-bottom: 4px;
-  color: var(--bridge-ink);
-  font-size: 0.7rem;
-  letter-spacing: 0.07em;
+  color: var(--ink, #201c1a);
+  font-size: 11px;
+  letter-spacing: .07em;
   text-transform: uppercase;
 }
 
 .teaching-note-card span {
-  color: var(--bridge-muted);
-  font-size: 0.85rem;
+  color: var(--ink-light, #5c5751);
+  font-size: 13px;
 }
 
 @media (max-width: 860px) {
-  .teaching-note-grid {
-    grid-template-columns: 1fr;
-  }
+  .teaching-note-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── MAKER CREDIT ──────────────────────────────────────────────────────── */
+/* CC Fest poster tradition: credit the visual in the corner */
+
+.maker-credit {
+  position: absolute;
+  bottom: 14px;
+  right: 18px;
+  margin: 0;
+  font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--ink-light, #5c5751);
+  letter-spacing: .04em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ─── ARTIFACT CAPTION ──────────────────────────────────────────────────── */
+
+.artifact-caption {
+  margin: 0;
+  font: 500 0.68rem/1.3 "DM Sans", system-ui;
+  color: var(--ink-light, #5c5751);
+  padding-left: 2px;
+}
+
+/* ─── POSTER PROOF ──────────────────────────────────────────────────────── */
+/* Filled artifact card for Phase 9 real images.
+   Replaces the dashed .artifact-frame placeholder when a real image exists.
+   Use inside .artifact-slot alongside .artifact-caption. */
+
+.poster-proof {
+  position: relative;
+  border: 2px solid var(--ink, #201c1a);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 3px 3px 0 rgba(32,28,26,.10);
+}
+
+.poster-proof img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.poster-proof .artifact-caption {
+  padding: 8px 10px 10px;
+  border-top: 1px solid var(--line, #d8cdbf);
+  background: var(--cream, #f6f0e7);
 }
