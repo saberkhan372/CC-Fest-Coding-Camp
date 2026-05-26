@@ -264,6 +264,11 @@ Rules:
 
 Keep the Camp Archive image fill in the roadmap, but do not let it block cross-linking and template improvements.
 
+**Pre-flight checklist before shipping Phase 9:**
+- Bump cache keys on `site.css` and `tool-page.css` (currently not bumped since Phase 8; low risk now but required when real image assets land).
+- Use `.poster-proof` (in `site-components.css`) for each filled slot — replace `.artifact-frame` dashed placeholders.
+- Ensure each filled image has a visible `.artifact-caption` with credit.
+
 The current artifact slots can be filled with real public/event poster images when ready. Use the existing archive-wall pattern:
 
 - Real image where public/permission status is clear.
