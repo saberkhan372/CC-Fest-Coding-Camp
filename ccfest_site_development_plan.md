@@ -1,10 +1,21 @@
 # CC Fest Coding Camp Tools - Site Development Plan
 
-*Last updated: 2026-05-25*
+*Last updated: 2026-05-26*
 
 This document captures the development roadmap for the Creative Coding Tools website, grounded in Saber Khan's design practice, the CC Fest aesthetic tradition, and the current state of the codebase.
 
 The plan prioritizes **visible, useful navigation and teaching improvements** without letting metadata, cross-linking, or infrastructure become a rabbit hole.
+
+## Completed in the 2026-05-26 build session
+
+- Repo workflow cleaned up: READMEs now explain source vs. `docs/`, and `deploy.sh` syncs nested site directories from `cc-fest-coding-camp-pages/` to `docs/`.
+- Relationship data shipped: priority bridges now have authored `try-next` and `teaching-note` panels; starter sketch metadata and related-resource fallbacks are in place.
+- Homepage orientation shipped: JS-driven "Where to start" path, "Best first" row, footer language, local About page, and Sessions link.
+- Teaching/copy pass shipped: teacher move panels, selective "Break it on purpose" prompts, and two batches of static tool subtitle rewrites with review fixes.
+- Shared CSS layer shipped: `site-components.css` carries reusable components; JS-rendered tool pages link it directly.
+- Phase 10 shipped: local `about.html` and footer polish.
+- Phase 11 shipped: `/sessions/` listing renders cards from `SESSIONS`, `/sessions/template/` generates editable p5.js posters, and `deploy.sh` syncs sessions.
+- The placeholder Camp Archive strip was removed. Phase 9 now waits on real, permission-safe images.
 
 Core direction:
 
@@ -13,7 +24,7 @@ Core direction:
 - Keep "Teacher move" and "Break it on purpose" tightly scoped.
 - Add the hero maker-credit immediately.
 - Treat homepage and representative page templates as parallel work.
-- Keep the Camp Archive image fill and generative poster engine in the roadmap, but scoped separately.
+- Keep the Camp Archive image fill scoped as a content/design phase; the generative poster engine now has a working v1.
 
 ---
 
@@ -76,15 +87,15 @@ Replaced the Perlin-noise canvas (which had timing bugs and felt cliché) with a
 
 ### Archive slots
 
-Five artifact slots exist in the Camp Arc section with visitor-facing labels. HTML comment is internal-only. No authoring language visible to visitors. Real images to be added in Phase 9.
+The placeholder archive strip was removed from the homepage after Phase 10/11 review. Phase 9 should return only when real, permission-safe images are available, using the `.poster-proof` component rather than dashed placeholders.
 
 ---
 
 ## Phase 2A - Homepage signal
 
-**Status: Next**
+**Status: ✅ Done — folded into Phases 1, 5, 10, and 11**
 
-This track handles fast homepage improvements that make the page feel more like a CC Fest poster and less like a product index.
+This track handled fast homepage improvements that make the page feel more like a CC Fest poster and less like a product index.
 
 ### Hero maker-credit ✅ Done
 
@@ -92,7 +103,7 @@ This track handles fast homepage improvements that make the page feel more like 
 
 ### Reframe "What this site is" as optional and restrained
 
-The three-line framing is useful only if it helps first-time visitors who arrive confused. Do not add it as a feature row.
+The three-line framing stayed optional and was not added as a feature row. Orientation moved into the hero, the "Where to start" path, the "Best first" row, and the About page.
 
 If included, style it as a tight horizontal strip like the current `.hero-steps`, not as cards:
 
@@ -104,11 +115,11 @@ Do not repeat the hero lede. Do not turn it into SaaS-style value props.
 
 ### Footer language
 
-The footer should say something real and short:
+The footer now says something real and short:
 
 > CC Fest is a free creative coding community for educators and learners. Sessions happen throughout the year.
 
-Keep links direct: CC Fest, Notion, GitHub, contact/sign-up if available.
+Links are direct: About this site, CC Fest, Spring 2026 Camp, Session Tools, Cohort Roadmap, GitHub.
 
 ---
 
@@ -184,9 +195,9 @@ Tag-based fallback is live in both `workshop-tool-pages.js` and `starter-seed-pa
 
 ## Phase 6 - Teacher move panels
 
-**Status: Expand after templates prove the pattern**
+**Status: ✅ Done — shipped 2026-05-26**
 
-Add to bridge pages and featured/standard tool pages, but keep the scope strict.
+Teacher move panels were expanded without turning them into full curriculum blocks.
 
 Each panel has exactly three items:
 
@@ -196,34 +207,43 @@ Each panel has exactly three items:
 
 Do not expand this into a full curriculum block. If it gets bigger than three items, it becomes a different product.
 
-Good example:
+Shipped:
 
-- **Prompt:** Make the ball stop, then make it start again.
-- **Misconception:** Students may think speed is the object instead of a value controlling position.
-- **Ask:** What number changed, and what did your eye notice first?
+- Teaching-note panels added to the remaining 7 JS-rendered workshop tools, bringing all 11 JS-rendered tools to coverage.
+- Teaching-note panels added to 6 foundational bridge pages: events, distance, random, conditionals, functions, and variable scope.
+- All panels keep the same three-part structure: Prompt / Misconception / Ask.
 
 ---
 
 ## Phase 7 - Tool copy pass and selective "Break it on purpose"
 
-**Status: Ongoing**
+**Status: ✅ Done — shipped 2026-05-26**
 
 ### Tool subtitles
 
-Rewrite tool subtitles so they make a claim about what the learner can do, not just what the function is.
+Static tool subtitles were rewritten in careful batches so they make a claim about what the learner can do, not just what the function is.
 
 - **Before:** Controls how opacity is applied to a shape.
 - **After:** Change how visible anything is - 0 is invisible, 255 is solid, and everything in between is yours.
 
+Coverage shipped:
+
+- 12 highly visible static tool subtitles in the first batch.
+- 10 additional static tool subtitles in the second batch.
+- 4 follow-up subtitle fixes where review found copy that referenced non-existent controls or modes.
+- 11 JS-rendered workshop tool pages handled through `workshop-tool-pages.js` teaching/copy patterns.
+
 ### Break it on purpose
 
-Add these prompts only where an edge case teaches something real.
+These prompts were added only where an edge case teaches something real.
 
-Good prompts:
+Prompts shipped for:
 
-- "Set speed to 0. What stops? What doesn't?"
-- "Make alpha 0. Is the shape gone, or just invisible?"
-- "Reverse the map range. What flips?"
+- `map-explorer`: `map()` does not clamp unless constrained.
+- `rgb-hsb-color-lab`: saturation 0 makes hue irrelevant.
+- `if-else-decision-studio`: exact-threshold behavior.
+- `animation-explorer`: removing `background()` makes frames accumulate.
+- `simple-array-explorer`: out-of-bounds array access returns `undefined`.
 
 Rules:
 
@@ -260,19 +280,20 @@ Rules:
 
 ## Phase 9 - Camp Archive real-image fill
 
-**Status: Separate content/design phase**
+**Status: Separate content/design phase — blocked on real images**
 
-Keep the Camp Archive image fill in the roadmap, but do not let it block cross-linking and template improvements.
+Keep the Camp Archive image fill in the roadmap, but do not let it block site structure, navigation, or session-poster work.
 
 **Pre-flight checklist before shipping Phase 9:**
-- Bump cache keys on `site.css` and `tool-page.css` (currently not bumped since Phase 8; low risk now but required when real image assets land).
-- Use `.poster-proof` (in `site-components.css`) for each filled slot — replace `.artifact-frame` dashed placeholders.
-- Ensure each filled image has a visible `.artifact-caption` with credit.
+- Gather real public or permission-safe event/poster/participant images.
+- Bump cache keys on `site.css` and any page CSS touched by the image rollout.
+- Use `.poster-proof` (in `site-components.css`) for each filled image.
+- Ensure each filled image has a visible `.artifact-caption` with credit or permission-safe context.
 
-The current artifact slots can be filled with real public/event poster images when ready. Use the existing archive-wall pattern:
+The old dashed placeholder strip has been removed. When Phase 9 is ready, add back only real image slots:
 
 - Real image where public/permission status is clear.
-- Labeled dashed slot where the artifact is missing or permission-dependent.
+- No placeholder slot where the artifact is missing or permission-dependent.
 - Visible caption and credit for every real image.
 
 This remains important because CC Fest is artifact-rich, but it is not the bottleneck for the next navigation/design push.
@@ -329,19 +350,19 @@ What shipped:
 | Phase | Work |
 |---|---|
 | 1 ✅ | Rhythm rollout (110 pages), count audit (66/44), maker-credit, dot-grid hero background. |
-| 2A | Homepage: optional "What this site is" strip if needed; footer already done. |
+| 2A ✅ | Homepage signal: maker-credit, orientation through path/rows/About, footer language. |
 | 2B ✅ | Representative templates: noise-smooth-randomness bridge, noise-lab tool, mini-generative-poster-seed — all with try-next cross-links and teaching-note panels. |
-| 3 | Resource relationships v1: 5-6 complete bridge-to-tool-to-sketch paths. |
-| 4 | Tag-based related-resource fallback using existing metadata. |
-| 5 | Bridge index "Start here" pathway and homepage "Best first" curated row. |
-| 6 | Expand relationships and teaching panels across remaining high-value pages. |
-| 7 | Tool copy pass and selective "Break it on purpose" prompts. |
+| 3 ✅ | Resource relationships v1: 6 complete bridge-to-tool-to-sketch paths. |
+| 4 ✅ | Tag-based related-resource fallback using existing metadata. |
+| 5 ✅ | Bridge index "Start here" pathway and homepage "Best first" curated row. |
+| 6 ✅ | Teacher move panels across foundational bridges and all JS-rendered workshop tools. |
+| 7 ✅ | Tool copy pass and selective "Break it on purpose" prompts. |
 | 8 ✅ | Reusable visual components in a small component CSS layer. |
-| 9 | Camp Archive real-image fill, kept as its own content/design phase. |
-| 10 | About page and footer polish. |
+| 9 | Camp Archive real-image fill, blocked on permission-safe images. |
+| 10 ✅ | About page and footer polish. |
 | 11 ✅ | Generative poster engine — /sessions/ listing + template poster page. |
 
-The first visible improvements should be: hero maker-credit, one complete bridge/tool/starter relationship path, and one representative page template of each type. That proves the direction before scaling it across the full library.
+The major site-improvement arc is now complete. The only remaining roadmap item is Phase 9, which is content/design work rather than site infrastructure.
 
 ---
 
@@ -354,7 +375,7 @@ Before treating this plan as current, verify:
 - No recommendation requires a backend, CMS, user account system, or non-static infrastructure.
 - The "What this site is" band is optional and strip-like, not a SaaS feature row.
 - `maker-credit`, teacher move, break-it prompts, best-first row, and tag fallback recommendations are all present.
-- Camp Archive image fill and generative poster engine remain in the plan but are scoped separately.
+- Camp Archive image fill remains in the plan but is scoped separately and depends on real permission-safe images.
 
 When implementing site changes from this plan, also verify:
 
