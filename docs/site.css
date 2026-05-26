@@ -24,7 +24,7 @@
 
 *{box-sizing:border-box}
 
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden}
 
 body{
   margin:0;
@@ -1603,5 +1603,14 @@ body.search-active .station-peek-trigger{display:none !important}
   .gallery-count{display:inline-flex;margin-top:12px}
   .topbar-link{display:inline-block;margin-top:10px}
   .tool-card{min-height:unset}
-  .hero-poster{min-height:320px}
+  /* Flatten 3D transforms so overflow:hidden reliably clips poster children */
+  .hero-poster{
+    min-height:320px;
+    transform:none;
+    transform-style:flat;
+  }
+  /* Flatten card and artifact rotations — rotated full-width elements
+     paint outside their layout box and defeat overflow containment */
+  .sequence-card:nth-child(n){transform:none}
+  .artifact-slot:nth-child(n) .artifact-frame{transform:none}
 }
