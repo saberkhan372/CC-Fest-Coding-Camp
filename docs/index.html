@@ -334,14 +334,14 @@
                 <article class="tool-card">
                   <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
                   <h3>How p5.js Thinks About Time</h3>
-                  <p class="tool-description">A bridge for <code>setup()</code>, <code>draw()</code>, and <code>frameCount</code>, showing how p5.js keeps sketch time moving even when you do nothing.</p>
+                  <p class="tool-description">p5.js has a heartbeat: <code>setup()</code> runs once, <code>draw()</code> runs 60 times a second. This bridge shows how that loop creates animation — and how <code>frameCount</code> lets your sketch know where it is in time.</p>
                   <div class="tag-row"><span class="tag">setup()</span><span class="tag">draw()</span><span class="tag">frameCount</span></div>
                   <div class="tool-actions"><a class="button primary" href="concept-bridges/how-p5-thinks-about-time/">Open Bridge</a></div>
                 </article>
                 <article class="tool-card">
                   <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
                   <h3>World Coordinates vs Local Coordinates</h3>
-                  <p class="tool-description">A bridge for <code>translate()</code>, <code>rotate()</code>, <code>push()</code>, and <code>pop()</code>, clarifying the difference between moving the world and moving your local drawing space.</p>
+                  <p class="tool-description">Your canvas has a coordinate system — but you can move it. This bridge shows how <code>translate()</code> and <code>rotate()</code> shift your drawing space, and why <code>push()</code> and <code>pop()</code> let you change without breaking everything else.</p>
                   <div class="tag-row"><span class="tag">translate()</span><span class="tag">rotate()</span><span class="tag">push()/pop()</span></div>
                   <div class="tool-actions"><a class="button primary" href="concept-bridges/world-vs-local-coordinates/">Open Bridge</a></div>
                 </article>
@@ -369,7 +369,7 @@
                 <article class="tool-card">
                   <div class="tool-meta"><span class="pill session">Core</span><span class="pill bridge">Concept Bridge</span></div>
                   <h3>random(): Controlled Surprise</h3>
-                  <p class="tool-description">A bridge for <code>random()</code>, <code>floor(random(N))</code>, seeded randomness, and the difference between one-time and every-frame calls.</p>
+                  <p class="tool-description">Randomness isn't chaos — it's a choice. This bridge shows <code>random()</code> in ranges, seeded runs, and the key difference between calling it once in <code>setup()</code> versus every frame in <code>draw()</code>.</p>
                   <div class="tag-row"><span class="tag">random()</span><span class="tag">seed</span><span class="tag">chance</span></div>
                   <div class="tool-actions"><a class="button primary" href="concept-bridges/random-controlled-surprise/">Open Bridge</a></div>
                 </article>
@@ -415,7 +415,7 @@
                 <article class="tool-card">
                   <div class="tool-meta"><span class="pill session">Programming</span><span class="pill bridge">Concept Bridge</span></div>
                   <h3>Arrays: One Thing to Many Things</h3>
-                  <p class="tool-description">A bridge for arrays, indexes, loops, and arrays of objects. One variable becomes many related values you can update together.</p>
+                  <p class="tool-description">One name, many values. This bridge shows how arrays, indexes, and loops let you track a whole collection of things — positions, sizes, colors — and update them all at once.</p>
                   <div class="tag-row"><span class="tag">arrays</span><span class="tag">indexes</span><span class="tag">loops</span></div>
                   <div class="tool-actions"><a class="button primary" href="concept-bridges/arrays-one-thing-to-many-things/">Open Bridge</a></div>
                 </article>
@@ -466,14 +466,14 @@
                 <article class="tool-card">
                   <div class="tool-meta"><span class="pill session">Data + Media</span><span class="pill bridge">Concept Bridge</span></div>
                   <h3>Pixels: Pictures Are Data</h3>
-                  <p class="tool-description">A bridge for images, RGB values, <code>get()</code>, <code>pixels[]</code>, <code>loadPixels()</code>, and video frames. Pictures become numbers you can manipulate.</p>
+                  <p class="tool-description">Every image is secretly a grid of numbers. This bridge opens <code>pixels[]</code>, <code>get()</code>, and <code>loadPixels()</code> — so you can read, change, and redraw pictures one color at a time.</p>
                   <div class="tag-row"><span class="tag">pixels[]</span><span class="tag">RGB</span><span class="tag">images</span></div>
                   <div class="tool-actions"><a class="button primary" href="concept-bridges/pixels-pictures-are-data/">Open Bridge</a></div>
                 </article>
                 <article class="tool-card">
                   <div class="tool-meta"><span class="pill session">Data + Media</span><span class="pill bridge">Concept Bridge</span></div>
                   <h3>Data In, Drawing Out</h3>
-                  <p class="tool-description">A bridge for <code>preload()</code>, <code>loadTable()</code>, <code>loadJSON()</code>, rows, columns, and how outside data turns into visual structure.</p>
+                  <p class="tool-description">A spreadsheet becomes a drawing. This bridge shows <code>preload()</code>, <code>loadTable()</code>, and <code>loadJSON()</code> — how a row of numbers turns into a column of shapes.</p>
                   <div class="tag-row"><span class="tag">preload()</span><span class="tag">loadTable()</span><span class="tag">loadJSON()</span></div>
                   <div class="tool-actions"><a class="button primary" href="concept-bridges/data-in-drawing-out/">Open Bridge</a></div>
                 </article>
