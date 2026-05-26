@@ -117,6 +117,7 @@ a{color:inherit}
 .topbar-link:hover{color:var(--accent)}
 
 .hero{
+  position:relative;
   background-color:var(--cream);
   /* Offset dot grid — dot-grid notebook texture, workshop-surface register */
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='2' cy='2' r='1.1' fill='%232c2a26' fill-opacity='0.09'/%3E%3Ccircle cx='12' cy='12' r='1.1' fill='%232c2a26' fill-opacity='0.09'/%3E%3C/svg%3E");
@@ -126,6 +127,20 @@ a{color:inherit}
   padding:44px;
   box-shadow:var(--shadow);
   margin-bottom:26px;
+}
+
+/* CC Fest poster tradition: credit the visual in the corner */
+.maker-credit{
+  position:absolute;
+  bottom:14px;
+  right:18px;
+  margin:0;
+  font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px;
+  color:var(--ink-light);
+  letter-spacing:.04em;
+  pointer-events:none;
+  user-select:none;
 }
 
 .eyebrow{
