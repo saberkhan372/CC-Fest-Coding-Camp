@@ -366,6 +366,41 @@ The major site-improvement arc is now complete. The only remaining roadmap item 
 
 ---
 
+## Next work plan
+
+### Repo hygiene
+
+- Keep the repo synced with `origin/main` before starting the next site pass.
+- Leave `.claude/` uncommitted unless it becomes an intentional part of the workflow.
+- After future edits, verify that `cc-fest-coding-camp-pages/` and `docs/` still match everywhere they are meant to match.
+
+### Phase 9 prep: Camp Archive
+
+- Treat Phase 9 as the only open roadmap phase.
+- Do not rebuild the archive strip until real, permission-safe images are available.
+- For each candidate image, collect a title, date or session, credit, permission context, caption, and source file.
+- Use `.poster-proof` and visible `.artifact-caption` styles when the archive returns.
+
+### Sessions system next step
+
+- Add future sessions by appending entries to the existing `SESSIONS` array in `/sessions/index.html`.
+- Create each real session page by copying `sessions/template/` into a session-specific directory.
+- Replace template resource links with the relevant tools, concept bridges, and starter sketches for that session.
+
+### Public link QA
+
+- Verify the Notion footer links are public before treating them as finished public navigation.
+- Replace private or brittle Notion links with public share URLs, local site pages, or no link until the resource is ready.
+- Check homepage, About, Sessions, concept bridge, tool, and starter sketch links after each public navigation pass.
+
+### Final polish pass
+
+- Bump CSS or JS cache keys whenever public-facing CSS or JavaScript changes.
+- Smoke test the local site before pushing and the GitHub Pages site after pushing.
+- Prioritize visible regressions, broken links, mobile overflow, and confusing public copy over new feature work.
+
+---
+
 ## Test plan
 
 Before treating this plan as current, verify:
