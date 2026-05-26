@@ -1589,7 +1589,7 @@ body.search-active .station-peek-trigger{display:none !important}
   .gallery-section{padding:22px}
   .hero{overflow:hidden}
   .hero-grid{display:block}
-  .hero h1{font-size:clamp(48px,16vw,72px);letter-spacing:-.03em}
+  .hero h1{font-size:clamp(32px,9vw,48px);letter-spacing:-.02em;overflow-wrap:break-word;word-break:break-word}
   .lede{font-size:18px}
   .hero-actions{display:grid;grid-template-columns:1fr}
   .hero-actions .button{width:100%}
