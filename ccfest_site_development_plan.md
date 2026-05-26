@@ -235,7 +235,7 @@ Rules:
 
 ## Phase 8 - Reusable visual components
 
-**Status: Low-scope, high reuse**
+**Status: ✅ Done — shipped 2026-05-26**
 
 Add a small reusable CSS component layer, preferably `site-components.css`, rather than overloading `site.css`.
 
@@ -341,7 +341,7 @@ Keep this separate from the near-term site improvement work. It should not delay
 | 5 | Bridge index "Start here" pathway and homepage "Best first" curated row. |
 | 6 | Expand relationships and teaching panels across remaining high-value pages. |
 | 7 | Tool copy pass and selective "Break it on purpose" prompts. |
-| 8 | Reusable visual components in a small component CSS layer. |
+| 8 ✅ | Reusable visual components in a small component CSS layer. |
 | 9 | Camp Archive real-image fill, kept as its own content/design phase. |
 | 10 | About page and footer polish. |
 | 11 | Generative poster engine, aspirational/separate. |
