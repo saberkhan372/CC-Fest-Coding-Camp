@@ -302,7 +302,7 @@ This remains important because CC Fest is artifact-rich, but it is not the bottl
 
 ## Phase 10 - About page and footer polish
 
-**Status: Done - shipped 2026-05-26**
+**Status: ✅ Done — shipped 2026-05-26**
 
 The About page now lives in the site itself, with a short CC Fest frame, audience notes, session rhythm, a note from Saber, and direct next-step links back into the tool library.
 
