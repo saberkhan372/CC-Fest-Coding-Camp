@@ -102,8 +102,14 @@
 
   // ── Resize ────────────────────────────────────────────────────────────
   function resize() {
-    W = canvas.width  = canvas.offsetWidth;
-    H = canvas.height = canvas.offsetHeight;
+    // canvas.offsetWidth can be 0 if layout hasn't computed yet (absolute positioning).
+    // Fall back to the hero parent's dimensions.
+    const hero = canvas.parentElement;
+    W = canvas.offsetWidth  || (hero ? hero.clientWidth  : window.innerWidth);
+    H = canvas.offsetHeight || (hero ? hero.clientHeight : 480);
+
+    canvas.width  = W;
+    canvas.height = H;
 
     particles.length = 0;
     for (let i = 0; i < NUM; i++) particles.push(makeParticle());
@@ -129,11 +135,14 @@
   }, { threshold: 0.05 });
 
   // ── Init ─────────────────────────────────────────────────────────────
-  resize();
+  // Defer first resize until after layout so canvas.offsetWidth is valid.
   window.addEventListener('resize', resize, { passive: true });
   observer.observe(canvas);
 
-  if (!prefersReduced) {
-    animId = requestAnimationFrame(draw);
-  }
+  requestAnimationFrame(() => {
+    resize();
+    if (!prefersReduced) {
+      animId = requestAnimationFrame(draw);
+    }
+  });
 })();
