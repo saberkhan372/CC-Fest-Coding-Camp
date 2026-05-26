@@ -296,7 +296,7 @@ Shipped:
 
 ## Phase 11 - Generative poster engine
 
-**Status: Aspirational and separate**
+**Status: ✅ Done (v1) — shipped 2026-05-26**
 
 The long-term aspiration remains strong: every CC Fest session can have a generated poster page, and the poster is produced by a p5.js sketch that runs in the browser.
 
@@ -339,7 +339,7 @@ Keep this separate from the near-term site improvement work. It should not delay
 | 8 ✅ | Reusable visual components in a small component CSS layer. |
 | 9 | Camp Archive real-image fill, kept as its own content/design phase. |
 | 10 | About page and footer polish. |
-| 11 | Generative poster engine, aspirational/separate. |
+| 11 ✅ | Generative poster engine — /sessions/ listing + template poster page. |
 
 The first visible improvements should be: hero maker-credit, one complete bridge/tool/starter relationship path, and one representative page template of each type. That proves the direction before scaling it across the full library.
 
