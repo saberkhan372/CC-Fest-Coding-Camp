@@ -639,24 +639,60 @@
     <div class="legend-item"><span class="swatch" style="background:#22c55e"></span> phase badge (green)</div>
   </div>
 
-  <section class="pathways" aria-label="Practice and remix links">
-    <div class="pathways-title">What's next</div>
-    <div class="path-links">
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
-        <span class="path-link-type">Practice →</span>
-        <span class="path-link-name">Look for interactive game or multi-screen tools in the workshop library</span>
-        <span class="path-link-arrow">›</span>
-      </a>
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
-        <span class="path-link-type">Remix →</span>
-        <span class="path-link-name">Take a starter sketch and add a 'paused' state that stops animation on space bar press</span>
-        <span class="path-link-arrow">›</span>
-      </a>
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/events-sketches-listen/" class="path-link">
-        <span class="path-link-type">Related →</span>
-        <span class="path-link-name">Events: Sketches Listen — events trigger state transitions</span>
-        <span class="path-link-arrow">›</span>
-      </a>
+  <section class="try-next" aria-label="Try these next">
+    <h2>Try these next</h2>
+    <div class="related-grid">
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Workshop Tools</p>
+        <a class="related-link" href="../../tools/game-state-studio/">
+          <span>Tool</span>
+          <strong>Game State Studio</strong>
+        </a>
+        <a class="related-link" href="../../tools/if-else-decision-studio/">
+          <span>Tool</span>
+          <strong>if/else Decision Studio</strong>
+        </a>
+      </div>
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Starter Sketches</p>
+        <a class="related-link" href="../../tools/game-state-starter/">
+          <span>Sketch</span>
+          <strong>Game State Starter</strong>
+        </a>
+        <a class="related-link" href="../../tools/state-machine-game-seed/">
+          <span>Sketch</span>
+          <strong>State Machine Game Seed</strong>
+        </a>
+        <a class="related-link" href="../../tools/keyboard-controlled-character/">
+          <span>Sketch</span>
+          <strong>Keyboard-Controlled Character</strong>
+        </a>
+      </div>
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Related Bridge</p>
+        <a class="related-link" href="../events-sketches-listen/">
+          <span>Bridge</span>
+          <strong>Events: Sketches Listen — events are what trigger state transitions</strong>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="teaching-note" aria-label="Teacher move">
+    <h2>Teacher move</h2>
+    <div class="teaching-note-grid">
+      <div class="teaching-note-card">
+        <strong>Prompt</strong>
+        <span>The sketch has three modes: title, playing, game over. Click through each one. What single variable decides which mode you're in — and where does it change?</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Misconception</strong>
+        <span>Students think they need a separate sketch for each screen. Clarify: one state variable and a few if/else checks handle everything. The canvas doesn't know about screens — only your code does.</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Ask</strong>
+        <span>What happens if you forget to change state after a collision? The game keeps playing. Draw the transition diagram first — missing arrows become the bugs.</span>
+      </div>
     </div>
   </section>
 

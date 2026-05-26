@@ -17,6 +17,11 @@
       tags: ["gravity", "acceleration", "velocity", "physics", "bounce"],
       relatedBridges: ["vectors-arrows-that-store-motion"],
       relatedSketches: ["gravity-bounce-seed", "particle-system-seed"],
+      teachingNote: {
+        prompt: "Ask learners to narrate the chain out loud: acceleration changes velocity, velocity changes position.",
+        misconception: "If the ball falls faster, the velocity slider did not necessarily change; gravity may be adding speed every frame.",
+        ask: "What would have to change if this were a balloon, a raindrop, or a character jumping on a moon?"
+      },
       controls: [
         { id: "gravity", label: "gravity", type: "range", min: 0, max: 0.9, step: 0.01, value: 0.22 },
         { id: "vx", label: "x velocity", type: "range", min: -8, max: 8, step: 0.1, value: 3.4 },
@@ -56,6 +61,11 @@
       relatedBridges: ["triangle-circle-wave-explorer", "how-p5-thinks-about-time"],
       relatedTools: ["easing-types-comparison"],
       relatedSketches: ["sine-oscillation-seed", "circular-motion-orbit-seed"],
+      teachingNote: {
+        prompt: "Have everyone freeze the animation and point to center, radius, angle, and wave height before naming sin() or cos().",
+        misconception: "Sine is not random wiggling. It is a repeated relationship between angle and position.",
+        ask: "Which control changes the size of the motion, and which one changes how quickly the cycle repeats?"
+      },
       controls: [
         { id: "amplitude", label: "amplitude", type: "range", min: 20, max: 150, step: 1, value: 92 },
         { id: "frequency", label: "frequency", type: "range", min: 0.01, max: 0.12, step: 0.005, value: 0.04 },
@@ -77,6 +87,11 @@
       relatedBridges: ["arrays-one-thing-to-many-things", "objects-data-plus-behavior"],
       relatedTools: ["agents-rules-playground"],
       relatedSketches: ["particle-system-seed", "particle-emitter-seed"],
+      teachingNote: {
+        prompt: "Pause aging, raise the spawn rate, and let learners predict what the array length will do before unpausing.",
+        misconception: "Removing an object from the canvas and removing it from the array are two different ideas.",
+        ask: "Why does this loop count backward when it removes old particles?"
+      },
       controls: [
         { id: "spawnRate", label: "spawn rate", type: "range", min: 1, max: 12, step: 1, value: 4 },
         { id: "lifespan", label: "lifespan", type: "range", min: 40, max: 240, step: 1, value: 120 },
@@ -133,6 +148,11 @@
       tags: ["state", "games", "conditionals", "screens"],
       relatedBridges: ["state-machines-sketches-have-modes", "conditionals-code-makes-choices"],
       relatedSketches: ["game-state-starter", "state-machine-game-seed"],
+      teachingNote: {
+        prompt: "Ask learners to draw the screen map first: start, play, pause, win, lose, and the button or rule that moves between them.",
+        misconception: "A state variable is not the whole game; it is the label that decides which rules are active right now.",
+        ask: "What should be impossible in each state? For example, can the player score on the win screen?"
+      },
       controls: [
         { id: "state", label: "state", type: "select", value: "start", options: [["start", "start"], ["play", "play"], ["pause", "pause"], ["win", "win"], ["lose", "lose"]] },
         { id: "score", label: "score", type: "range", min: 0, max: 5, step: 1, value: 2 },
@@ -355,6 +375,7 @@
 
     const lessonCards = workshopLessons(tool).map(([heading, body]) => `<div class="lesson-card"><h3>${heading}</h3><p>${body}</p></div>`).join("");
     const relatedPanel = renderRelatedResources(tool);
+    const teachingPanel = renderTeachingNote(tool);
     const state = stateFrom(tool);
     document.title = `${tool.title} - CC Fest Coding Camp`;
     document.getElementById("app").innerHTML = `
@@ -396,6 +417,7 @@
             <article class="card"><div class="card-inner"><div class="card-header"><div><h2>What Changed?</h2><p>Watch the values change as the sketch runs.</p></div></div><div class="stat-list" id="stats"></div></div></article>
             <article class="card"><div class="card-inner"><div class="card-header"><div><h2>Open / Change / Predict / Remix / Teach</h2><p>A workshop rhythm for using the tool with beginners.</p></div></div><div class="lesson-grid">${lessonCards}</div></div></article>
             ${relatedPanel}
+            ${teachingPanel}
           </aside>
         </section>
         <footer class="tool-footer">CC Fest Coding Camp · Workshop Tool · ${tool.title}</footer>
@@ -463,6 +485,31 @@
             </div>
           </div>
           <div class="related-grid">${groups}</div>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderTeachingNote(tool) {
+    if (!tool.teachingNote) return "";
+    const note = tool.teachingNote;
+    return `
+      <article class="teaching-note">
+        <h2>Teacher move</h2>
+        <p>A focused way to turn this tool into a short classroom conversation.</p>
+        <div class="teaching-note-grid">
+          <div class="teaching-note-card">
+            <strong>Prompt</strong>
+            <span>${note.prompt}</span>
+          </div>
+          <div class="teaching-note-card">
+            <strong>Misconception</strong>
+            <span>${note.misconception}</span>
+          </div>
+          <div class="teaching-note-card">
+            <strong>Ask</strong>
+            <span>${note.ask}</span>
+          </div>
         </div>
       </article>
     `;

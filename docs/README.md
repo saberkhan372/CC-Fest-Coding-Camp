@@ -1,6 +1,16 @@
 # CC Fest Coding Camp Tools
 
-A static GitHub Pages library of p5.js teaching tools and starter sketches for CC Fest Coding Camp.
+Published GitHub Pages output for the CC Fest Coding Camp p5.js teaching tools, concept bridges, and starter sketches.
+
+## Important
+
+This directory is synced output. Make normal content, design, tool, and shared asset edits in `cc-fest-coding-camp-pages/`, then run the root deploy script:
+
+```sh
+./deploy.sh "Describe the update"
+```
+
+Direct edits in `docs/` should be rare live-site hotfixes. If you make one, immediately backfill the same change into `cc-fest-coding-camp-pages/`.
 
 ## Live site
 
@@ -14,7 +24,10 @@ https://saberkhan372.github.io/CC-Fest-Coding-Camp/
 - `site.css` — shared homepage styling and design tokens
 - `tool-page.css` — shared layout shell for the main interactive tools
 - `starter-sketch.css` — lighter shell for sketch seeds and remix prompts
+- `concept-bridges/` — published concept bridge pages and bridge-specific CSS
 - `tools/` — one folder per tool or starter sketch
+- `workshop-tool-pages.js` — published data and renderer for JS-rendered workshop tools
+- `starter-seed-pages.js` — published data and renderer for JS-rendered starter sketches
 
 ## Library organization
 
@@ -25,8 +38,8 @@ https://saberkhan372.github.io/CC-Fest-Coding-Camp/
 ## Publishing notes
 
 - GitHub Pages serves this `docs/` directory.
-- The repo also contains a duplicate source copy in `cc-fest-coding-camp-pages/` for the original site files.
-- When making content or design changes, update `docs/` first so the published site stays correct.
+- The source copy lives in `cc-fest-coding-camp-pages/`.
+- Keep source and this published copy synced through `deploy.sh`.
 
 ## Notes
 

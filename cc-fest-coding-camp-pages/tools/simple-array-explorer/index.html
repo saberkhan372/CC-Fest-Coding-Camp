@@ -28,7 +28,7 @@
 <body>
   <div class="tool-shell">
     <div class="tool-topbar">
-      <a href="../../index.html">← Back to tool library</a>
+      <a href="../../index.html">← Back to tool library</a><a href="https://www.notion.so/a5ab09e8d8184b038f02262e19157be0" target="_blank" rel="noopener">Notion Notes</a>
       <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
     </div>
 
@@ -44,6 +44,13 @@
         <span class="tool-tag">sorting</span>
         <span class="tool-tag">data</span>
         <span class="tool-tag">visualization</span>
+      <section class="tool-rhythm" aria-label="How to use this workshop tool">
+        <span class="tool-rhythm-card"><strong>Open it</strong> Start with the canvas before the code.</span>
+        <span class="tool-rhythm-card"><strong>Change it</strong> Move one control or value at a time.</span>
+        <span class="tool-rhythm-card"><strong>Predict it</strong> Name what you expect before you run it.</span>
+        <span class="tool-rhythm-card"><strong>Remix it</strong> Turn the pattern toward your own sketch.</span>
+        <span class="tool-rhythm-card"><strong>Teach it</strong> Ask what changed and why.</span>
+      </section>
       </div>
     </header>
 
@@ -310,67 +317,10 @@ function updateMaxArraySize(value) {
 }
 
 function updateArrayDisplay() {
-  let drawBlock = "";
-  if (visualizationType === "bars") {
-    drawBlock = `
-  let barWidth = width / numbers.length;
-  for (let i = 0; i < numbers.length; i++) {
-    let x = i * barWidth;
-    let h = map(numbers[i], 0, 10, 0, height - 70);
-    fill(61, 90, 128);
-    noStroke();
-    rect(x + 4, height - h - 24, barWidth - 8, h, 12);
-    fill(44, 42, 38);
-    textAlign(CENTER);
-    text(numbers[i], x + barWidth / 2, height - h - 36);
-  }`;
-  } else if (visualizationType === "circles") {
-    drawBlock = `
-  let angle = TWO_PI / numbers.length;
-  let radius = min(width, height) * 0.3;
-  for (let i = 0; i < numbers.length; i++) {
-    let a = angle * i - PI / 2;
-    let x = width / 2 + cos(a) * radius;
-    let y = height / 2 + sin(a) * radius;
-    let sz = map(numbers[i], 0, 10, 16, 70);
-    fill(61, 90, 128);
-    noStroke();
-    circle(x, y, sz);
-    fill(250, 246, 240);
-    textAlign(CENTER, CENTER);
-    text(numbers[i], x, y);
-  }`;
-  } else {
-    drawBlock = `
-  stroke(61, 90, 128);
-  strokeWeight(2.5);
-  for (let i = 0; i < numbers.length - 1; i++) {
-    let x1 = map(i,     0, numbers.length - 1, 50, width - 50);
-    let y1 = map(numbers[i],     0, 10, height - 60, 50);
-    let x2 = map(i + 1, 0, numbers.length - 1, 50, width - 50);
-    let y2 = map(numbers[i + 1], 0, 10, height - 60, 50);
-    line(x1, y1, x2, y2);
+  let code = `let numbers = [${numbers.join(", ")}];\nlet visualizationType = "${visualizationType}";`;
+  if (highlighted >= 0) {
+    code += `\n\n// highlighted element\nnumbers[${highlighted}] = ${numbers[highlighted]};`;
   }
-  for (let i = 0; i < numbers.length; i++) {
-    let x = map(i, 0, numbers.length - 1, 50, width - 50);
-    let y = map(numbers[i], 0, 10, height - 60, 50);
-    fill(61, 90, 128);
-    noStroke();
-    circle(x, y, 14);
-    fill(44, 42, 38);
-    textAlign(CENTER);
-    text(numbers[i], x, y - 14);
-  }`;
-  }
-  const code = `let numbers = [${numbers.join(", ")}];
-
-function setup() {
-  createCanvas(500, 400);
-}
-
-function draw() {
-  background(250, 246, 240);${drawBlock}
-}`;
   document.getElementById("array-display").textContent = code;
 }
 

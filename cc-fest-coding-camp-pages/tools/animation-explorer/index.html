@@ -28,7 +28,7 @@
 <body>
   <div class="tool-shell">
     <div class="tool-topbar">
-      <a href="../../index.html">← Back to tool library</a>
+      <a href="../../index.html">← Back to tool library</a><a href="https://www.notion.so/737b045021594880ad59c7b0a4a9a647" target="_blank" rel="noopener">Notion Notes</a>
       <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
     </div>
 
@@ -44,6 +44,13 @@
         <span class="tool-tag">motion</span>
         <span class="tool-tag">conditionals</span>
         <span class="tool-tag">coordinates</span>
+      <section class="tool-rhythm" aria-label="How to use this workshop tool">
+        <span class="tool-rhythm-card"><strong>Open it</strong> Start with the canvas before the code.</span>
+        <span class="tool-rhythm-card"><strong>Change it</strong> Move one control or value at a time.</span>
+        <span class="tool-rhythm-card"><strong>Predict it</strong> Name what you expect before you run it.</span>
+        <span class="tool-rhythm-card"><strong>Remix it</strong> Turn the pattern toward your own sketch.</span>
+        <span class="tool-rhythm-card"><strong>Teach it</strong> Ask what changed and why.</span>
+      </section>
       </div>
     </header>
 
@@ -277,31 +284,28 @@ function updateVariableDisplay() {
 }
 
 function updateCodePreview() {
-  const code = `let x, y;
+  const code = `let x = width / 2;
+let y = height / 2;
 let speedX = ${speedX.toFixed(1)};
 let speedY = ${speedY.toFixed(1)};
 let ballSize = ${ballSize};
 let showPath = ${showPath};
 let paused = ${paused};
 
-function setup() {
-  createCanvas(400, 400);
-  x = width / 2;
-  y = height / 2;
-}
-
 function draw() {
   if (paused) return;
-  background(244, 239, 230);
 
   x += speedX;
   y += speedY;
 
-  if (x < 0 || x > width) speedX *= -1;
-  if (y < 0 || y > height) speedY *= -1;
+  if (x < 0 || x > width) {
+    speedX *= -1;
+  }
 
-  fill(224, 122, 95);
-  noStroke();
+  if (y < 0 || y > height) {
+    speedY *= -1;
+  }
+
   circle(x, y, ballSize);
 }`;
 

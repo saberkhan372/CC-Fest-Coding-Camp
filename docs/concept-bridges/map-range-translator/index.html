@@ -641,6 +641,71 @@
     </aside>
   </section>
 
+  <section class="try-next" aria-label="Try these next">
+    <h2>Try these next</h2>
+    <div class="related-grid">
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Workshop Tools</p>
+        <a class="related-link" href="../../tools/map-explorer/">
+          <span>Tool</span>
+          <strong>Map Explorer</strong>
+        </a>
+        <a class="related-link" href="../../tools/dist-map-lerp-chain/">
+          <span>Tool</span>
+          <strong>dist / map / lerp Chain</strong>
+        </a>
+        <a class="related-link" href="../../tools/lerp-explorer/">
+          <span>Tool</span>
+          <strong>lerp Explorer</strong>
+        </a>
+      </div>
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Starter Sketches</p>
+        <a class="related-link" href="../../tools/color-from-position/">
+          <span>Sketch</span>
+          <strong>Color From Position</strong>
+        </a>
+        <a class="related-link" href="../../tools/dist-proximity-seed/">
+          <span>Sketch</span>
+          <strong>dist() Proximity Seed</strong>
+        </a>
+        <a class="related-link" href="../../tools/lerp-follow-seed/">
+          <span>Sketch</span>
+          <strong>lerp() Follow Seed</strong>
+        </a>
+      </div>
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Related Bridges</p>
+        <a class="related-link" href="../noise-smooth-randomness/">
+          <span>Bridge</span>
+          <strong>Noise: Smooth Randomness — map the 0–1 noise output into any useful range</strong>
+        </a>
+        <a class="related-link" href="../distance-becomes-behavior/">
+          <span>Bridge</span>
+          <strong>Distance Becomes Behavior — use map() to turn a measured distance into visual change</strong>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="teaching-note" aria-label="Teacher move">
+    <h2>Teacher move</h2>
+    <div class="teaching-note-grid">
+      <div class="teaching-note-card">
+        <strong>Prompt</strong>
+        <span>Set the output range from 0 to 20. Move the input slider all the way across. Now change the output max to 200. What's the same between the two runs, and what changed?</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Misconception</strong>
+        <span>Students expect map() to clamp. It doesn't — if the input goes past its stated range, the output goes past too. Use constrain() afterward, or toggle "Constrain output" here and predict what happens before you do.</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Ask</strong>
+        <span>If the input is exactly halfway through its range and you swap the output min and max, where does the output land? Write your prediction, then try it.</span>
+      </div>
+    </div>
+  </section>
+
   <nav class="bottom-nav" aria-label="Bridge navigation">
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/">Next: Distance Becomes Behavior →</a>

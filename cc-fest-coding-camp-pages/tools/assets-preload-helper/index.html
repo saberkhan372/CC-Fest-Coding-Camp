@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assets + preload() Helper - CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:24px;background:#faf6f0;color:#2c2a26;font-family:"DM Sans",system-ui,sans-serif;line-height:1.5}.wrap{max-width:1120px;margin:auto}.top{display:flex;justify-content:space-between;gap:16px;margin-bottom:22px}.top a{color:#6b6760;text-decoration:none}.tag{display:inline-block;padding:5px 10px;border-radius:6px;background:#edf1f5;color:#3d5a80;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase}h1{font-size:clamp(28px,4vw,48px);line-height:1;margin:10px 0 8px}.lede{max-width:780px;color:#6b6760}.chips{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 22px}.chips span{font:12px "DM Mono";background:#f0ebe3;border:1px solid #e5dfd5;border-radius:999px;padding:5px 9px}.grid{display:grid;grid-template-columns:minmax(360px,1fr) minmax(320px,1.1fr);gap:18px}@media(max-width:900px){.grid{grid-template-columns:1fr}body{padding:17px}}.card{background:#fff;border:1px solid #e5dfd5;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}.head{padding:16px 18px;border-bottom:1px solid #f0ebe3}.head b{display:block}.head span{color:#6b6760;font-size:13px}.controls{padding:14px;display:grid;gap:14px}.group{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:12px}.group h2{margin:0 0 10px;font:700 11px "DM Mono";letter-spacing:.08em;text-transform:uppercase;color:#3d5a80}.url-row{display:flex;gap:8px}.url-input{flex:1;border:1px solid #e5dfd5;border-radius:6px;padding:8px 10px;font:13px "DM Mono";color:#2c2a26;background:#fff}.url-input:focus{outline:2px solid #3d5a80;outline-offset:-1px}.load-btn{border:none;border-radius:8px;background:#3d5a80;color:#fff;padding:8px 14px;font:700 13px "DM Sans";cursor:pointer;white-space:nowrap;transition:background .15s}.load-btn:hover{background:#2e4568}.example-btns{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.ex-btn{border:1px solid #e5dfd5;border-radius:999px;background:#fff;padding:6px 12px;font:13px "DM Sans";color:#6b6760;cursor:pointer;transition:all .15s}.ex-btn:hover{border-color:#3d5a80;color:#3d5a80;background:#edf1f5}.canvas-wrap{position:relative;display:inline-block;width:100%}.canvas-wrap canvas{display:block;width:100%;height:auto;border:1px solid #e5dfd5;border-radius:10px}.cors-msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(44,42,38,.85);color:#f2cc8f;font:12px "DM Mono";padding:10px 14px;border-radius:8px;text-align:center;pointer-events:none;display:none;width:80%}.row{display:grid;grid-template-columns:110px 1fr 52px;gap:10px;align-items:center;margin:7px 0}.row label{font:12px "DM Mono";color:#6b6760}.val{font:12px "DM Mono";color:#2c2a26;text-align:right}input[type=range]{width:100%;accent-color:#e07a5f}.anchor-row{display:flex;gap:12px;align-items:center;margin-top:4px}.anchor-row label{font:13px "DM Sans";color:#6b6760;display:flex;align-items:center;gap:6px;cursor:pointer}.anchor-row input[type=radio]{accent-color:#3d5a80}.lock-row{display:flex;align-items:center;gap:8px;margin-top:6px}.lock-row label{font:13px "DM Sans";color:#6b6760;cursor:pointer;display:flex;align-items:center;gap:7px}.lock-row input[type=checkbox]{accent-color:#3d5a80;width:15px;height:15px}.readout-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.rcard{background:#faf6f0;border:1px solid #e5dfd5;border-radius:10px;padding:9px 12px}.rcard small{display:block;font:10px "DM Mono";color:#9e998f;text-transform:uppercase;letter-spacing:.06em}.rcard strong{font:13px "DM Mono";color:#2c2a26;word-break:break-all}.code-panel{padding:14px;height:100%;display:flex;flex-direction:column}.code-scroll{flex:1;overflow:auto;background:#2c2a26;border-radius:12px;padding:16px;min-height:360px;max-height:600px}.code-scroll pre{margin:0;font:12.5px/1.65 "DM Mono";color:#f0ebe3;white-space:pre}.copy-btn{display:block;width:100%;margin-top:14px;background:#3d5a80;color:#fff;border:none;border-radius:10px;padding:12px;font:700 14px "DM Sans";cursor:pointer;transition:all .15s}.copy-btn:hover{background:#2e4568}.copy-btn.copied{background:#81b29a}.lesson-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}@media(max-width:700px){.lesson-cards{grid-template-columns:1fr}}.lcard{background:#fff;border:1px solid #e5dfd5;border-radius:14px;padding:16px}.lcard .lc-label{font:700 10px "DM Mono";letter-spacing:.08em;text-transform:uppercase;color:#e07a5f;margin-bottom:6px}.lcard p{margin:0;font-size:13px;color:#6b6760;line-height:1.55}.readout-full{grid-column:1/-1}
+  .tool-rhythm{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin:18px 0 22px;overflow:hidden;border:2px solid #2c2a26;border-radius:10px;background:#fff;box-shadow:4px 4px 0 rgba(44,42,38,.12)}.tool-rhythm-card{min-height:88px;padding:12px;border-right:2px solid #2c2a26;color:#5f5a54;font-size:13px}.tool-rhythm-card:last-child{border-right:0}.tool-rhythm-card:nth-child(1){background:#fff7d7}.tool-rhythm-card:nth-child(2){background:#eaf5ff}.tool-rhythm-card:nth-child(3){background:#eef8f2}.tool-rhythm-card:nth-child(4){background:#fceaf2}.tool-rhythm-card:nth-child(5){background:#f5efff}.tool-rhythm-card strong{display:block;margin-bottom:4px;color:#2c2a26;font-size:12px;letter-spacing:.06em;text-transform:uppercase}@media(max-width:900px){.tool-rhythm{grid-template-columns:1fr 1fr}.tool-rhythm-card:nth-child(2n){border-right:0}.tool-rhythm-card:nth-child(n+3){border-top:2px solid #2c2a26}}@media(max-width:620px){.tool-rhythm{grid-template-columns:1fr}.tool-rhythm-card,.tool-rhythm-card:nth-child(2n){border-right:0}.tool-rhythm-card:nth-child(n+2){border-top:2px solid #2c2a26}}
+</style>
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+  <nav class="top">
+    <a href="../../index.html">← Back to tool library</a>
+    <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
+  </nav>
+  <span class="tag">◎ Motion · Move + Listen</span>
+  <h1>Assets + preload() Helper</h1>
+  <p class="lede">Paste an image URL to get the preload() + image() scaffold with your exact size, position, and rotation values ready to copy.</p>
+<section class="tool-rhythm" aria-label="How to use this workshop tool"><span class="tool-rhythm-card"><strong>Open it</strong> Start with the canvas before the code.</span><span class="tool-rhythm-card"><strong>Change it</strong> Move one control or value at a time.</span><span class="tool-rhythm-card"><strong>Predict it</strong> Name what you expect before you run it.</span><span class="tool-rhythm-card"><strong>Remix it</strong> Turn the pattern toward your own sketch.</span><span class="tool-rhythm-card"><strong>Teach it</strong> Ask what changed and why.</span></section>
+  <div class="chips"><span>preload</span><span>loadImage</span><span>assets</span><span>images</span><span>scaffold</span><span>code generator</span></div>
+
+  <main class="grid">
+    <!-- LEFT: Canvas + Controls -->
+    <section class="card">
+      <div class="head"><b>Canvas Preview</b><span>Configure your image placement.</span></div>
+      <div class="controls">
+
+        <!-- URL input -->
+        <div class="group">
+          <h2>Image URL</h2>
+          <div class="url-row">
+            <input type="text" class="url-input" id="urlInput" placeholder="https://..." value="">
+            <button class="load-btn" id="loadBtn">Load</button>
+          </div>
+          <div class="example-btns">
+            <button class="ex-btn" data-url="https://picsum.photos/seed/sunflower/300/200">🌿 Plant photo</button>
+            <button class="ex-btn" data-url="https://picsum.photos/seed/texture/300/200">🎨 Color texture</button>
+            <button class="ex-btn" data-url="https://picsum.photos/seed/ocean/300/200">🌊 Wave pattern</button>
+          </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="group" style="padding:10px">
+          <h2>Preview</h2>
+          <div class="canvas-wrap">
+            <canvas id="previewCanvas" width="400" height="400" style="max-height:300px;object-fit:contain"></canvas>
+            <div class="cors-msg" id="corsMsg">Preview unavailable — CORS restriction.<br>The code is still correct!</div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="group">
+          <h2>Position &amp; Size</h2>
+          <div class="row">
+            <label>X position</label>
+            <input type="range" id="posX" min="0" max="400" value="100">
+            <span class="val" id="posXVal">100</span>
+          </div>
+          <div class="row">
+            <label>Y position</label>
+            <input type="range" id="posY" min="0" max="400" value="100">
+            <span class="val" id="posYVal">100</span>
+          </div>
+          <div class="row">
+            <label>Width</label>
+            <input type="range" id="imgW" min="20" max="400" value="200">
+            <span class="val" id="imgWVal">200</span>
+          </div>
+          <div class="row">
+            <label>Height</label>
+            <input type="range" id="imgH" min="20" max="400" value="150">
+            <span class="val" id="imgHVal">150</span>
+          </div>
+          <div class="lock-row">
+            <label>
+              <input type="checkbox" id="lockAspect" checked>
+              Lock aspect ratio
+            </label>
+          </div>
+        </div>
+
+        <div class="group">
+          <h2>Transform</h2>
+          <div class="row">
+            <label>Rotation</label>
+            <input type="range" id="rotation" min="-180" max="180" value="0">
+            <span class="val" id="rotationVal">0°</span>
+          </div>
+          <div style="margin-top:10px">
+            <span style="font:700 11px 'DM Mono';letter-spacing:.06em;text-transform:uppercase;color:#9e998f;display:block;margin-bottom:6px">Anchor</span>
+            <div class="anchor-row">
+              <label><input type="radio" name="anchor" value="topleft"> Top-Left</label>
+              <label><input type="radio" name="anchor" value="center" checked> Center</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Readout -->
+        <div class="readout-grid">
+          <div class="rcard readout-full">
+            <small>Image URL</small>
+            <strong id="readUrl">none</strong>
+          </div>
+          <div class="rcard">
+            <small>Position</small>
+            <strong id="readPos">(100, 100)</strong>
+          </div>
+          <div class="rcard">
+            <small>Size</small>
+            <strong id="readSize">200 × 150</strong>
+          </div>
+          <div class="rcard">
+            <small>Rotation</small>
+            <strong id="readRot">0°</strong>
+          </div>
+          <div class="rcard">
+            <small>Anchor</small>
+            <strong id="readAnchor">Center</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Code output -->
+    <aside class="card">
+      <div class="head"><b>Generated p5.js Code</b><span>Copy this into your sketch.</span></div>
+      <div class="code-panel">
+        <div class="code-scroll"><pre id="codeOut"></pre></div>
+        <button class="copy-btn" id="copyBtn">Copy Code</button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Lesson Cards -->
+  <div class="lesson-cards">
+    <div class="lcard">
+      <div class="lc-label">Try this</div>
+      <p>Click a sample image button, then drag the position sliders. Watch the image move on the canvas preview in real time.</p>
+    </div>
+    <div class="lcard">
+      <div class="lc-label">Notice this</div>
+      <p><strong>preload()</strong> runs BEFORE setup(). If you put <code>loadImage()</code> inside setup() or draw(), the image might not be ready when you try to display it.</p>
+    </div>
+    <div class="lcard">
+      <div class="lc-label">Remix this</div>
+      <p>Enable rotation and set it to 45°. Notice how <strong>push()/pop()</strong> wraps the rotation so it doesn't affect other shapes in your sketch.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────
+let state = {
+  url: '',
+  x: 100, y: 100,
+  w: 200, h: 150,
+  rotation: 0,
+  anchor: 'center',
+  lockAspect: true,
+  imgNaturalW: 0, imgNaturalH: 0,
+};
+
+let loadedImg = null;
+let corsError = false;
+
+// ── Canvas ───────────────────────────────────────────────────────────────
+const canvas = document.getElementById('previewCanvas');
+const ctx = canvas.getContext('2d');
+const corsMsg = document.getElementById('corsMsg');
+
+function drawGrid() {
+  ctx.strokeStyle = '#e5dfd5';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x <= 400; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 400); ctx.stroke();
+  }
+  for (let y = 0; y <= 400; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(400, y); ctx.stroke();
+  }
+}
+
+function renderCanvas() {
+  ctx.clearRect(0, 0, 400, 400);
+  ctx.fillStyle = '#faf6f0';
+  ctx.fillRect(0, 0, 400, 400);
+  drawGrid();
+
+  const { x, y, w, h, rotation, anchor } = state;
+  const rad = rotation * Math.PI / 180;
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rad);
+
+  const dx = anchor === 'center' ? -w/2 : 0;
+  const dy = anchor === 'center' ? -h/2 : 0;
+
+  if (loadedImg && !corsError) {
+    ctx.drawImage(loadedImg, dx, dy, w, h);
+  } else {
+    // Placeholder
+    ctx.fillStyle = corsError ? '#f2cc8f' : '#ddd8d0';
+    ctx.fillRect(dx, dy, w, h);
+    ctx.fillStyle = '#6b6760';
+    ctx.font = '13px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(corsError ? 'CORS error' : 'Image preview', dx + w/2, dy + h/2);
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'start';
+  }
+  ctx.restore();
+
+  // Crosshair at anchor
+  ctx.strokeStyle = '#e07a5f';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(x - 7, y); ctx.lineTo(x + 7, y);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x, y - 7); ctx.lineTo(x, y + 7);
+  ctx.stroke();
+
+  // Dimensions label
+  ctx.fillStyle = '#3d5a80';
+  ctx.font = '11px DM Mono, monospace';
+  ctx.fillText(`w=${w}, h=${h}`, 6, 392);
+
+  corsMsg.style.display = corsError ? 'block' : 'none';
+}
+
+// ── Code generation ──────────────────────────────────────────────────────
+function generateCode() {
+  const { url, x, y, w, h, rotation, anchor } = state;
+  const safeUrl = url || 'YOUR_IMAGE_URL_HERE';
+  const hasRotation = rotation !== 0;
+  const varName = 'img';
+
+  let drawLine = '';
+  if (hasRotation) {
+    const iX = anchor === 'center' ? `-${Math.round(w/2)}` : '0';
+    const iY = anchor === 'center' ? `-${Math.round(h/2)}` : '0';
+    drawLine =
+`  push();
+  translate(${x}, ${y});
+  rotate(radians(${rotation}));
+  image(${varName}, ${iX}, ${iY}, ${w}, ${h});
+  pop();`;
+  } else {
+    if (anchor === 'center') {
+      const iX = x + ' - ' + Math.round(w/2);
+      const iY = y + ' - ' + Math.round(h/2);
+      drawLine = `  // Center anchor: subtract half width/height\n  image(${varName}, ${iX}, ${iY}, ${w}, ${h});`;
+    } else {
+      drawLine = `  image(${varName}, ${x}, ${y}, ${w}, ${h});`;
+    }
+  }
+
+  return `let ${varName};
+
+function preload() {
+  ${varName} = loadImage('${safeUrl}');
+}
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(250);
+${drawLine}
+}`;
+}
+
+function updateCode() {
+  document.getElementById('codeOut').textContent = generateCode();
+  updateReadout();
+  renderCanvas();
+}
+
+function updateReadout() {
+  const { url, x, y, w, h, rotation, anchor } = state;
+  const urlEl = document.getElementById('readUrl');
+  if (url) {
+    const display = url.length > 48 ? url.slice(0, 48) + '…' : url;
+    urlEl.textContent = display;
+  } else {
+    urlEl.textContent = 'none';
+  }
+  document.getElementById('readPos').textContent = `(${x}, ${y})`;
+  document.getElementById('readSize').textContent = `${w} × ${h}`;
+  document.getElementById('readRot').textContent = `${rotation}°`;
+  document.getElementById('readAnchor').textContent = anchor === 'center' ? 'Center' : 'Top-Left';
+}
+
+// ── Image loading ────────────────────────────────────────────────────────
+function loadImage(url) {
+  corsError = false;
+  loadedImg = null;
+  corsMsg.style.display = 'none';
+  if (!url.trim()) {
+    updateCode();
+    return;
+  }
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    loadedImg = img;
+    corsError = false;
+    state.imgNaturalW = img.naturalWidth;
+    state.imgNaturalH = img.naturalHeight;
+    // Set initial aspect if lock is on
+    if (state.lockAspect && img.naturalWidth && img.naturalHeight) {
+      const aspect = img.naturalW / img.naturalH;
+      // keep current width, adjust height
+      state.h = Math.round(state.w * img.naturalHeight / img.naturalWidth);
+      state.h = Math.max(20, Math.min(400, state.h));
+      document.getElementById('imgH').value = state.h;
+      document.getElementById('imgHVal').textContent = state.h;
+    }
+    updateCode();
+  };
+  img.onerror = () => {
+    corsError = true;
+    loadedImg = null;
+    updateCode();
+  };
+  img.src = url;
+}
+
+document.getElementById('loadBtn').onclick = () => {
+  state.url = document.getElementById('urlInput').value.trim();
+  loadImage(state.url);
+};
+
+document.getElementById('urlInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('loadBtn').click();
+});
+
+document.querySelectorAll('.ex-btn').forEach(btn => {
+  btn.onclick = () => {
+    const url = btn.dataset.url;
+    document.getElementById('urlInput').value = url;
+    state.url = url;
+    loadImage(url);
+  };
+});
+
+// ── Sliders ──────────────────────────────────────────────────────────────
+document.getElementById('posX').oninput = e => {
+  state.x = parseInt(e.target.value);
+  document.getElementById('posXVal').textContent = state.x;
+  updateCode();
+};
+document.getElementById('posY').oninput = e => {
+  state.y = parseInt(e.target.value);
+  document.getElementById('posYVal').textContent = state.y;
+  updateCode();
+};
+document.getElementById('imgW').oninput = e => {
+  const newW = parseInt(e.target.value);
+  if (state.lockAspect && state.imgNaturalW && state.imgNaturalH) {
+    state.h = Math.max(20, Math.min(400, Math.round(newW * state.imgNaturalH / state.imgNaturalW)));
+    document.getElementById('imgH').value = state.h;
+    document.getElementById('imgHVal').textContent = state.h;
+  } else if (state.lockAspect && state.w > 0) {
+    const aspect = state.h / state.w;
+    state.h = Math.max(20, Math.min(400, Math.round(newW * aspect)));
+    document.getElementById('imgH').value = state.h;
+    document.getElementById('imgHVal').textContent = state.h;
+  }
+  state.w = newW;
+  document.getElementById('imgWVal').textContent = state.w;
+  updateCode();
+};
+document.getElementById('imgH').oninput = e => {
+  const newH = parseInt(e.target.value);
+  if (state.lockAspect && state.imgNaturalW && state.imgNaturalH) {
+    state.w = Math.max(20, Math.min(400, Math.round(newH * state.imgNaturalW / state.imgNaturalH)));
+    document.getElementById('imgW').value = state.w;
+    document.getElementById('imgWVal').textContent = state.w;
+  } else if (state.lockAspect && state.h > 0) {
+    const aspect = state.w / state.h;
+    state.w = Math.max(20, Math.min(400, Math.round(newH * aspect)));
+    document.getElementById('imgW').value = state.w;
+    document.getElementById('imgWVal').textContent = state.w;
+  }
+  state.h = newH;
+  document.getElementById('imgHVal').textContent = state.h;
+  updateCode();
+};
+document.getElementById('rotation').oninput = e => {
+  state.rotation = parseInt(e.target.value);
+  document.getElementById('rotationVal').textContent = state.rotation + '°';
+  updateCode();
+};
+document.getElementById('lockAspect').onchange = e => {
+  state.lockAspect = e.target.checked;
+};
+document.querySelectorAll('input[name="anchor"]').forEach(r => {
+  r.onchange = e => {
+    state.anchor = e.target.value;
+    updateCode();
+  };
+});
+
+// ── Copy button ──────────────────────────────────────────────────────────
+document.getElementById('copyBtn').onclick = () => {
+  const code = generateCode();
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Code';
+      btn.classList.remove('copied');
+    }, 1800);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+};
+
+// ── Init ─────────────────────────────────────────────────────────────────
+updateCode();
+</script>
+<script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

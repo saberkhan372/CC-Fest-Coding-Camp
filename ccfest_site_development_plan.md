@@ -144,36 +144,25 @@ Three `.related-group` columns inside `.related-grid` inside `.try-next`. Each g
 
 ## Phase 3 - Resource relationships v1
 
-**Status: Highest-value navigation work**
+**Status: ✅ Done — shipped 2026-05-26**
 
-Make the three resource types visibly and clickably connected:
+All 6 priority bridges now have `try-next` (3-column: Workshop Tools / Starter Sketches / Related Bridge) and `teaching-note` (Prompt / Misconception / Ask) panels. Starter seed `relatedBridges` and `relatedTools` metadata added for all linked sketches.
 
-- **Concept Bridges:** understand the idea.
-- **Workshop Tools:** try the idea.
-- **Starter Sketches:** remix into a project.
+### Bridges completed
 
-### First pass: hand-author a small complete set
+| Bridge | Tools linked | Sketches linked | Bridge linked |
+|--------|-------------|-----------------|---------------|
+| Noise: Smooth Randomness | noise-lab, noise-walker, noise-vs-random-explorer | wander-agent-seed, generative-tile-pattern-seed, mini-generative-poster-seed | map-range-translator |
+| How p5.js Thinks About Time | animation-explorer, framerate-visualizer, framecount-animation-seed | — | events-sketches-listen |
+| Color: Numbers Become Feeling | rgb-hsb-color-lab, color-blend-modes-explorer, shape-and-color-explorer | hsb-color-seed, color-from-position, code-postcard-from-my-world | map-range-translator |
+| map() Range Translator | map-explorer, dist-map-lerp-chain, lerp-explorer | color-from-position, dist-proximity-seed, lerp-follow-seed | noise-smooth-randomness, distance-becomes-behavior |
+| Arrays: One Thing to Many Things | simple-array-explorer, for-loop-stepper, polished-array-explorer | click-to-create-shapes, array-position-dot-field, particle-system-seed | arrays-loops-as-system |
+| State Machines: Sketches Have Modes | game-state-studio, if-else-decision-studio | game-state-starter, state-machine-game-seed, keyboard-controlled-character | events-sketches-listen |
 
-Start with 5-6 high-priority concept bridges. For each one:
+### Also fixed
 
-- Hand-author 2-4 related tools.
-- Hand-author 1-3 related starter sketches.
-- Add a "Try next" panel to the bridge page.
-- Link from related tools back to the bridge.
-- Link from related starter sketches back to the bridge/tool idea when the template supports it.
-
-Do not block shipping on authoring all relationships across the site.
-
-### Suggested first bridges
-
-Use bridges that map cleanly to existing beginner paths:
-
-- Color: Numbers Become Feeling.
-- How p5.js Thinks About Time.
-- map() Range Translator.
-- Noise: Smooth Randomness.
-- Arrays: One Thing to Many Things.
-- State Machines: Sketches Have Modes.
+- Corrected broken `../../starter-sketches/` paths in the noise bridge (all sketches are under `../../tools/`).
+- Added `relatedBridges` + `relatedTools` metadata to 9 starter sketches in `starter-seed-pages.js`.
 
 ---
 

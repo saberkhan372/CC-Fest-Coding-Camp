@@ -28,7 +28,7 @@
 <body>
   <div class="tool-shell">
     <div class="tool-topbar">
-      <a href="../../index.html">← Back to tool library</a>
+      <a href="../../index.html">← Back to tool library</a><a href="https://www.notion.so/036fcd306d1e4e6483a9e92dee23112b" target="_blank" rel="noopener">Notion Notes</a>
       <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
     </div>
 
@@ -44,6 +44,13 @@
         <span class="tool-tag">patterns</span>
         <span class="tool-tag">grid</span>
         <span class="tool-tag">nested loops</span>
+      <section class="tool-rhythm" aria-label="How to use this workshop tool">
+        <span class="tool-rhythm-card"><strong>Open it</strong> Start with the canvas before the code.</span>
+        <span class="tool-rhythm-card"><strong>Change it</strong> Move one control or value at a time.</span>
+        <span class="tool-rhythm-card"><strong>Predict it</strong> Name what you expect before you run it.</span>
+        <span class="tool-rhythm-card"><strong>Remix it</strong> Turn the pattern toward your own sketch.</span>
+        <span class="tool-rhythm-card"><strong>Teach it</strong> Ask what changed and why.</span>
+      </section>
       </div>
     </header>
 
@@ -306,56 +313,21 @@ function syncControls() {
 }
 
 function updateCodePreview() {
-  const fillLine = paletteMode === "rainbow"
-    ? `fill(map(row * cols + col, 0, rows * cols, 0, 360), 55, 88);`
-    : paletteMode === "gradient"
-    ? `fill(map(x, 0, width, 10, 220), map(y, 0, height, 40, 80), 88);`
-    : `fill((row * 41 + col * 23 + frameCount) % 360, 55, 88);`;
-
-  const shapeLine = shape === "rect"
-    ? `rectMode(CENTER);\n    rect(0, 0, size, size);`
-    : shape === "circle"
-    ? `circle(0, 0, size);`
-    : `triangle(-size / 2, size / 2, 0, -size / 2, size / 2, size / 2);`;
-
-  const rotateBlock = rotateShapes
-    ? `\n    rotate(angle + row * 8 + col * 8);` : ``;
-
-  const angleVars = rotateShapes
-    ? `\nlet angle = 0;\n` : ``;
-
-  const angleIncrement = rotateShapes
-    ? `\n  angle += 0.5;` : ``;
-
   const code = `let rows = ${rows};
 let cols = ${cols};
 let size = ${size};
-let rotateShapes = ${rotateShapes};${angleVars}
-function setup() {
-  createCanvas(500, 400);
-  colorMode(HSB, 360, 100, 100);
-  angleMode(DEGREES);
-}
+let colorMode = "${paletteMode}";
+let shape = "${shape}";
+let rotateShapes = ${rotateShapes};
 
-function draw() {
-  background(250, 246, 240);
+for (let row = 0; row < rows; row++) {
+  for (let col = 0; col < cols; col++) {
+    let x = (col + 1) * width / (cols + 1);
+    let y = (row + 1) * height / (rows + 1);
 
-  let spacingX = width / (cols + 1);
-  let spacingY = height / (rows + 1);
-
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      let x = (col + 1) * spacingX;
-      let y = (row + 1) * spacingY;
-
-      ${fillLine}
-      noStroke();
-      push();
-      translate(x, y);${rotateBlock}
-      ${shapeLine}
-      pop();
-    }
-  }${angleIncrement}
+    // choose fill based on ${paletteMode}
+    // draw ${labelForShape(shape).toLowerCase()} at x, y
+  }
 }`;
 
   document.getElementById("code-preview").textContent = code;

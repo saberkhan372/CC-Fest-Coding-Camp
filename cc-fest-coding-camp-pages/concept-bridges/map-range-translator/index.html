@@ -155,10 +155,6 @@
     align-items: start;
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 36bd71d (tighten concept bridge layout)
   .main-left {
     display: grid;
     gap: 18px;
@@ -243,20 +239,6 @@
   }
 
   .tab[aria-selected="true"] .step { color: var(--accent-dark); }
-  .tab-progress {
-    height: 3px;
-    background: #ede8df;
-    border-radius: 2px;
-    margin: -4px 0 6px;
-    overflow: hidden;
-  }
-  .tab-progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width 0.3s ease;
-  }
-
 
   .tab:focus-visible,
   .preset-btn:focus-visible,
@@ -339,167 +321,6 @@
     margin-bottom: 6px;
   }
 
-=======
-  .panel {
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-  }
-
-  .canvas-panel { overflow: hidden; }
-
-  .canvas-bar {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--line);
-    background: rgba(255,255,255,0.6);
-  }
-
-  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
-  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
-
-  .canvas-wrap {
-    width: 100%;
-    display: grid;
-    place-items: center;
-    padding: 16px;
-    background: #f1eadf;
-  }
-
-  #map-canvas {
-    display: block;
-    width: 100%;
-    max-width: 620px;
-    height: auto;
-    border-radius: 14px;
-  }
-
-  .touch-hint {
-    display: none;
-    text-align: center;
-    font-size: 0.78rem;
-    color: var(--faint);
-    margin-top: 6px;
-  }
-
-  .ctrl-panel { padding: 16px; }
-
-  .tabs {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 5px;
-    margin-bottom: 14px;
-  }
-
-  .tab {
-    border: 1px solid var(--line);
-    background: #fff;
-    border-radius: var(--radius-sm);
-    padding: 8px 4px;
-    cursor: pointer;
-    font-weight: 800;
-    font-size: 0.82rem;
-    color: var(--muted);
-    text-align: center;
-    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
-    line-height: 1.3;
-  }
-
-  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
-  .tab[aria-selected="true"] { color: var(--ink); background: #edf4ff; border-color: #90b4e2; }
-
-  .tab .step {
-    display: block;
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: var(--faint);
-    margin-top: 1px;
-  }
-
-  .tab[aria-selected="true"] .step { color: var(--accent-dark); }
-
-  .tab:focus-visible,
-  .preset-btn:focus-visible,
-  .sw:focus-visible,
-  input:focus-visible,
-  button:focus-visible,
-  .path-link:focus-visible,
-  .bottom-nav a:focus-visible,
-  .back-link:focus-visible {
-    outline: 3px solid rgba(49,92,146,0.35);
-    outline-offset: 2px;
-  }
-
-  .predict {
-    background: var(--predict-bg);
-    border: 1px solid var(--predict-border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    margin-bottom: 14px;
-  }
-
-  .box-label {
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--ink);
-    margin-bottom: 3px;
-  }
-
-  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
-
-  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
-
-  .ctrl-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    background: rgba(255,255,255,0.65);
-    border: 1px solid var(--line-light);
-  }
-
-  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
-  .ctrl-row label small {
-    display: block;
-    font-weight: 600;
-    font-size: 0.78rem;
-    color: var(--faint);
-    margin-top: 1px;
-  }
-
-  .val-badge {
-    background: var(--ink);
-    color: #fff;
-    padding: 3px 8px;
-    border-radius: 999px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    min-width: 42px;
-    text-align: center;
-  }
-
-  input[type="range"] {
-    width: 100%;
-    grid-column: 1 / -1;
-    accent-color: var(--accent);
-    height: 6px;
-  }
-
-  .presets-label {
-    font-size: 0.7rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--faint);
-    margin-bottom: 6px;
-  }
-
->>>>>>> f9d93c8 (redesign first concept bridge batch)
   .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 
   .preset-btn {
@@ -516,22 +337,6 @@
   }
 
   .preset-btn:hover { border-color: var(--accent); color: var(--accent-dark); background: var(--accent-bg); }
-  .snapshot-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 12px;
-    border: 1.5px solid var(--rule, #d8d0c4);
-    border-radius: 6px;
-    background: #fff;
-    color: var(--ink, #23201c);
-    font: 600 0.76rem/1 "DM Sans", system-ui, sans-serif;
-    cursor: pointer;
-    margin-bottom: 8px;
-    align-self: flex-start;
-  }
-  .snapshot-btn:hover { border-color: var(--accent); color: var(--accent-dark, var(--accent)); background: var(--accent-bg, #fffbf2); }
-
   .preset-btn.break { border-color: var(--warn-border); color: #8a5a10; background: var(--warn-bg); }
   .preset-btn.break:hover { background: #ffecc8; border-color: #d4a030; }
 
@@ -626,15 +431,7 @@
   .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
   .callout.try { background: var(--try-bg); border-color: var(--try-border); }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   .prose-section { margin-top: 0; }
-=======
-  .prose-section { margin-top: 22px; }
->>>>>>> f9d93c8 (redesign first concept bridge batch)
-=======
-  .prose-section { margin-top: 0; }
->>>>>>> 36bd71d (tighten concept bridge layout)
   .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
   .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 760px; }
 
@@ -700,14 +497,7 @@
   @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
   @media (max-width: 860px) {
     .main-grid { grid-template-columns: 1fr; }
-<<<<<<< HEAD
-<<<<<<< HEAD
     .main-left { gap: 18px; }
-=======
->>>>>>> f9d93c8 (redesign first concept bridge batch)
-=======
-    .main-left { gap: 18px; }
->>>>>>> 36bd71d (tighten concept bridge layout)
     .tabs { grid-template-columns: repeat(3, 1fr); }
   }
   @media (max-width: 560px) {
@@ -749,93 +539,14 @@
       <div class="ba-text"><code>map()</code> is a translator. It keeps the same relative position while moving a value from one range into another.</div>
     </div>
   </section>
-<<<<<<< HEAD
 
-  <section class="main-grid" aria-label="Interactive map concept bridge">
-    <div class="main-left">
-      <article class="panel canvas-panel">
-        <div class="canvas-bar">
-          <div class="canvas-bar-title" id="canvas-title">Size: mouse position becomes circle size</div>
-          <div class="canvas-bar-sub" id="canvas-sub">The input stays the same percent through its new range.</div>
-        </div>
-        <div class="canvas-wrap">
-          <canvas id="map-canvas" width="620" height="420" aria-label="Interactive map() visualization"></canvas>
-          <div class="touch-hint">Tap and drag the sliders on the right to explore.</div>
-        </div>
-      </article>
-
-      <section class="prose-section">
-        <h2 id="prose-title">The same relative position moves to a new world</h2>
-        <p id="prose-body">If an input is 25% of the way through its original range, <code>map()</code> places the output 25% of the way through the new range. That is the whole idea. Once you feel that relationship, <code>map()</code> stops being a formula and starts becoming a wiring move.</p>
-      </section>
-
-      <div class="legend" aria-label="map concept legend">
-        <div class="legend-item"><span class="swatch" style="background:#7a5ea8"></span> input range</div>
-        <div class="legend-item"><span class="swatch" style="background:#315c92"></span> translator / mapping</div>
-        <div class="legend-item"><span class="swatch" style="background:#e07a5f"></span> output value</div>
-        <div class="legend-item"><span class="swatch" style="background:#81b29a"></span> same percent through</div>
-      </div>
-
-      <section class="pathways" aria-label="Practice and remix links">
-        <div class="pathways-title">What's next</div>
-        <div class="path-links">
-          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/map-explorer/" class="path-link">
-            <span class="path-link-type">Practice →</span>
-            <span class="path-link-name">Map() Explorer — use range translation in a full workshop tool with more guided controls</span>
-            <span class="path-link-arrow">›</span>
-          </a>
-          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/color-from-position/" class="path-link">
-            <span class="path-link-type">Remix →</span>
-            <span class="path-link-name">Color From Position — let mouse position map directly into brightness, hue, or size</span>
-            <span class="path-link-arrow">›</span>
-          </a>
-          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/" class="path-link">
-            <span class="path-link-type">Related →</span>
-            <span class="path-link-name">Distance Becomes Behavior — use one measured number to drive many visual behaviors</span>
-            <span class="path-link-arrow">›</span>
-          </a>
-        </div>
-      </section>
-    </div>
-
-    <aside class="panel ctrl-panel">
-      <nav class="tabs" role="tablist" aria-label="map() modes">
-        <button class="tab" role="tab" data-mode="size" aria-selected="true" tabindex="0">Size<span class="step">1 of 5</span></button>
-        <button class="tab" role="tab" data-mode="color" aria-selected="false" tabindex="-1">Color<span class="step">2 of 5</span></button>
-        <button class="tab" role="tab" data-mode="bar" aria-selected="false" tabindex="-1">Bar<span class="step">3 of 5</span></button>
-        <button class="tab" role="tab" data-mode="opacity" aria-selected="false" tabindex="-1">Opacity<span class="step">4 of 5</span></button>
-        <button class="tab" role="tab" data-mode="wire" aria-selected="false" tabindex="-1">Wire It<span class="step">5 of 5</span></button>
-      </nav>
-      <div class="tab-progress" aria-hidden="true"><div class="tab-progress-fill" id="tab-progress-fill"></div></div>
-
-
-      <div class="predict">
-        <span class="box-label">Predict before changing</span>
-        <span class="box-body" id="predict-text">Before you move the input slider, where do you think the output will land when the input is halfway through its range?</span>
-      </div>
-
-      <div class="ctrl-group" id="controls"></div>
-        <button class="snapshot-btn" id="snapshotBtn" type="button" title="Save canvas + code + Big Idea as PNG">📷 Save snapshot</button>
-      <div id="presets-area"></div>
-
-      <div class="switches">
-        <label class="sw"><input type="checkbox" id="animateToggle"> Animate input</label>
-        <label class="sw"><input type="checkbox" id="clampToggle" checked> Constrain output</label>
-      </div>
-
-      <div class="code-section">
-        <div class="code-header"><span>Live code</span><span id="code-note">One input value becomes one new number.</span></div>
-        <div class="code-focus-line mono" id="focus-code"></div>
-        <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">▸ See full p5.js sketch</button>
-        <div class="full-code-body mono" id="full-code"></div>
-      </div>
-
-      <div class="callout big-idea">
-        <span class="box-label">Big idea</span>
-        <span class="box-body" id="big-idea-text"></span>
-      </div>
-
-=======
+  <section class="bridge-rhythm" aria-label="How to use this concept bridge">
+    <span class="bridge-rhythm-card"><strong>Fuzzy idea</strong> <code>map()</code> feels like a formula to memorize.</span>
+    <span class="bridge-rhythm-card"><strong>See it</strong> Watch one range translate into another range.</span>
+    <span class="bridge-rhythm-card"><strong>Change it</strong> Adjust input, output minimum, and output maximum.</span>
+    <span class="bridge-rhythm-card"><strong>Code idea</strong> <code>map()</code> keeps the same relative position in a new range.</span>
+    <span class="bridge-rhythm-card"><strong>Go next</strong> Remix size, color, data bars, opacity, and motion controls.</span>
+  </section>
 
   <section class="main-grid" aria-label="Interactive map concept bridge">
     <div class="main-left">
@@ -918,7 +629,6 @@
         <span class="box-body" id="big-idea-text"></span>
       </div>
 
->>>>>>> f9d93c8 (redesign first concept bridge batch)
       <div class="callout bug">
         <span class="box-label">⚠ Common mistake</span>
         <span class="box-body" id="bug-text"></span>
@@ -931,179 +641,71 @@
     </aside>
   </section>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  <nav class="bottom-nav" aria-label="Bridge navigation">
-    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
-    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/">Next: Distance Becomes Behavior →</a>
-  </nav>
-</main>
-
-<script>
-'use strict';
-
-const state = {
-  mode: "size",
-  input: 35,
-  inMin: 0,
-  inMax: 100,
-  outMin: 20,
-  outMax: 140,
-  animate: false,
-  direction: 1,
-  changedKey: "input",
-  wireTarget: "size"
-};
-
-const modes = {
-  size: {
-    canvasTitle: "Size: mouse position becomes circle size",
-    canvasSub: "The input stays the same percent through its new range.",
-    predict: "Before you move the input slider, where do you think the output will land when the input is halfway through its range?",
-    big: "map() is not about size. It is about translation. Size is just one easy place to feel the translation happen.",
-    bug: "A common mistake is assuming map() clamps values automatically. It does not. If your input goes outside the expected range, the output can go outside too.",
-    tryIt: "Set the input to 25, 50, and 75. Describe where each output lands in the new range before you check the result.",
-    note: "Translate mouse position into size.",
-    proseTitle: "One range becomes another range",
-    proseBody: "When a value moves from 0–100 into 20–140, it keeps its relative position. An input 50% of the way through its range becomes an output 50% of the way through the new range.",
-    controls: [
-      { key: "input", label: "Input value", code: "value", min: 0, max: 100, step: 1 },
-      { key: "outMin", label: "Output minimum", code: "outMin", min: 0, max: 200, step: 1 },
-      { key: "outMax", label: "Output maximum", code: "outMax", min: 20, max: 240, step: 1 }
-    ],
-    presets: [
-      { label: "Balanced influence", v: { input: 50, outMin: 20, outMax: 140 } },
-      { label: "Edge case", v: { input: 0, outMin: 20, outMax: 140 } },
-      { label: "Whole-canvas effect", v: { input: 100, outMin: 10, outMax: 210 } },
-      { label: "⚠ What goes wrong?", v: { input: 120, outMin: 20, outMax: 140 }, isBreak: true }
-    ]
-  },
-  color: {
-    canvasTitle: "Color: one input becomes one brightness value",
-    canvasSub: "The same translation can control lightness instead of size.",
-    predict: "Before you move the input, do you think the shape will get brighter smoothly or in jumps?",
-    big: "map() does not care what the output means. A mapped number can become a color channel just as easily as a size.",
-    bug: "Learners often think map() changes the color directly. It only returns a number. You still decide how to use that number in fill(), stroke(), or HSB.",
-    tryIt: "Find an input that feels dim, one that feels balanced, and one that feels almost glowing.",
-    note: "Translate input into brightness.",
-    proseTitle: "The output meaning is up to you",
-    proseBody: "The same mapped value can become brightness, alpha, hue, speed, bar height, or rotation. The relationship stays the same. Only the destination property changes.",
-    controls: [
-      { key: "input", label: "Input value", code: "value", min: 0, max: 100, step: 1 },
-      { key: "outMin", label: "Brightness minimum", code: "outMin", min: 0, max: 255, step: 1 },
-      { key: "outMax", label: "Brightness maximum", code: "outMax", min: 0, max: 255, step: 1 }
-    ],
-    presets: [
-      { label: "Soft range", v: { input: 50, outMin: 50, outMax: 180 } },
-      { label: "High contrast", v: { input: 50, outMin: 0, outMax: 255 } },
-      { label: "Mostly bright", v: { input: 30, outMin: 150, outMax: 255 } },
-      { label: "⚠ Inverted light", v: { input: 85, outMin: 255, outMax: 20 }, isBreak: true }
-    ]
-  },
-  bar: {
-    canvasTitle: "Bar height: how charts are really made",
-    canvasSub: "Data values become visual height through range translation.",
-    predict: "Before changing the input, where do you think a middle data value should land if the output range is tall?",
-    big: "This is the move behind nearly every beginner chart: a data value becomes a drawable height on the canvas.",
-    bug: "A common mistake is drawing raw data values directly. If your data is 88 and your canvas is 400px tall, you still need map() to decide where that 88 belongs visually.",
-    tryIt: "Treat the input like a survey score. What output range would make the differences easiest to read?",
-    note: "Translate data into bar height.",
-    proseTitle: "Data becomes drawing",
-    proseBody: "A chart is just a mapping decision. Raw values live in one world. Pixels live in another. <code>map()</code> is the bridge between them.",
-    controls: [
-      { key: "input", label: "Data value", code: "dataValue", min: 0, max: 100, step: 1 },
-      { key: "outMin", label: "Bar minimum", code: "outMin", min: 0, max: 80, step: 1 },
-      { key: "outMax", label: "Bar maximum", code: "outMax", min: 100, max: 280, step: 1 }
-    ],
-    presets: [
-      { label: "Small difference", v: { input: 50, outMin: 20, outMax: 120 } },
-      { label: "Whole chart", v: { input: 50, outMin: 20, outMax: 260 } },
-      { label: "Starts above zero", v: { input: 60, outMin: 60, outMax: 240 } },
-      { label: "⚠ Flat chart", v: { input: 60, outMin: 120, outMax: 120 }, isBreak: true }
-    ]
-  },
-  opacity: {
-    canvasTitle: "Opacity: the output can become transparency",
-    canvasSub: "A fourth color value can fade layers in and out.",
-    predict: "Before moving the input, what do you think will happen when the output range is tiny? What about when it spans 0 to 255?",
-    big: "map() is often invisible in finished sketches because it quietly drives alpha, softness, motion, and atmosphere.",
-    bug: "Another common mistake is forgetting that alpha is just another number. If you want transparency, the mapped value still needs somewhere to go: <code>fill(r, g, b, alpha)</code>.",
-    tryIt: "Find an output range where the circles feel ghostly but still readable.",
-    note: "Translate input into transparency.",
-    proseTitle: "Mapped values can become atmosphere",
-    proseBody: "Opacity is a great reminder that not every mapped value becomes position or size. Some become mood, visibility, or layering.",
-    controls: [
-      { key: "input", label: "Input value", code: "value", min: 0, max: 100, step: 1 },
-      { key: "outMin", label: "Alpha minimum", code: "outMin", min: 0, max: 255, step: 1 },
-      { key: "outMax", label: "Alpha maximum", code: "outMax", min: 0, max: 255, step: 1 }
-    ],
-    presets: [
-      { label: "Ghost trail", v: { input: 40, outMin: 18, outMax: 80 } },
-      { label: "Clear fade", v: { input: 40, outMin: 0, outMax: 255 } },
-      { label: "Mostly visible", v: { input: 70, outMin: 120, outMax: 255 } },
-      { label: "⚠ Invisible floor", v: { input: 50, outMin: 0, outMax: 0 }, isBreak: true }
-    ]
-  },
-  wire: {
-    canvasTitle: "Wire It: the same input can drive anything",
-    canvasSub: "Change what property receives the mapped output.",
-    predict: "Before switching targets, what do you think will feel most dramatic: mapping to x position, size, rotation, or color?",
-    big: "The real mental model is not “map() makes size.” It is “map() translates one world of numbers into another.” You choose the destination.",
-    bug: "Learners often think each property needs a different kind of mapping. Usually it does not. The same translated number can drive many outputs with only one line changed.",
-    tryIt: "Keep the input range the same and switch targets. Which output feels easiest to predict? Which feels most expressive?",
-    note: "One input can wire into many properties.",
-    proseTitle: "map() feels like wiring",
-    proseBody: "A mouse position, sensor reading, or dataset value can be wired into size, x position, rotation, hue, opacity, or timing. The math stays the same while the meaning changes.",
-    controls: [
-      { key: "input", label: "Input value", code: "value", min: 0, max: 100, step: 1 },
-      { key: "outMin", label: "Output minimum", code: "outMin", min: 0, max: 220, step: 1 },
-      { key: "outMax", label: "Output maximum", code: "outMax", min: 20, max: 260, step: 1 }
-    ],
-    presets: [
-      { label: "Map to size", v: { input: 50, outMin: 20, outMax: 140, wireTarget: "size" } },
-      { label: "Map to x", v: { input: 50, outMin: 80, outMax: 300, wireTarget: "x" } },
-      { label: "Map to rotation", v: { input: 50, outMin: -1.2, outMax: 1.2, wireTarget: "rotation" } },
-      { label: "Map to brightness", v: { input: 50, outMin: 20, outMax: 255, wireTarget: "brightness" } }
-    ]
-  }
-};
-
-=======
-  <section class="prose-section">
-    <h2 id="prose-title">The same relative position moves to a new world</h2>
-    <p id="prose-body">If an input is 25% of the way through its original range, <code>map()</code> places the output 25% of the way through the new range. That is the whole idea. Once you feel that relationship, <code>map()</code> stops being a formula and starts becoming a wiring move.</p>
-  </section>
-
-  <div class="legend" aria-label="map concept legend">
-    <div class="legend-item"><span class="swatch" style="background:#7a5ea8"></span> input range</div>
-    <div class="legend-item"><span class="swatch" style="background:#315c92"></span> translator / mapping</div>
-    <div class="legend-item"><span class="swatch" style="background:#e07a5f"></span> output value</div>
-    <div class="legend-item"><span class="swatch" style="background:#81b29a"></span> same percent through</div>
-  </div>
-
-  <section class="pathways" aria-label="Practice and remix links">
-    <div class="pathways-title">What's next</div>
-    <div class="path-links">
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/map-explorer/" class="path-link">
-        <span class="path-link-type">Practice →</span>
-        <span class="path-link-name">Map() Explorer — use range translation in a full workshop tool with more guided controls</span>
-        <span class="path-link-arrow">›</span>
-      </a>
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/color-from-position/" class="path-link">
-        <span class="path-link-type">Remix →</span>
-        <span class="path-link-name">Color From Position — let mouse position map directly into brightness, hue, or size</span>
-        <span class="path-link-arrow">›</span>
-      </a>
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/" class="path-link">
-        <span class="path-link-type">Related →</span>
-        <span class="path-link-name">Distance Becomes Behavior — use one measured number to drive many visual behaviors</span>
-        <span class="path-link-arrow">›</span>
-      </a>
+  <section class="try-next" aria-label="Try these next">
+    <h2>Try these next</h2>
+    <div class="related-grid">
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Workshop Tools</p>
+        <a class="related-link" href="../../tools/map-explorer/">
+          <span>Tool</span>
+          <strong>Map Explorer</strong>
+        </a>
+        <a class="related-link" href="../../tools/dist-map-lerp-chain/">
+          <span>Tool</span>
+          <strong>dist / map / lerp Chain</strong>
+        </a>
+        <a class="related-link" href="../../tools/lerp-explorer/">
+          <span>Tool</span>
+          <strong>lerp Explorer</strong>
+        </a>
+      </div>
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Starter Sketches</p>
+        <a class="related-link" href="../../tools/color-from-position/">
+          <span>Sketch</span>
+          <strong>Color From Position</strong>
+        </a>
+        <a class="related-link" href="../../tools/dist-proximity-seed/">
+          <span>Sketch</span>
+          <strong>dist() Proximity Seed</strong>
+        </a>
+        <a class="related-link" href="../../tools/lerp-follow-seed/">
+          <span>Sketch</span>
+          <strong>lerp() Follow Seed</strong>
+        </a>
+      </div>
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Related Bridges</p>
+        <a class="related-link" href="../noise-smooth-randomness/">
+          <span>Bridge</span>
+          <strong>Noise: Smooth Randomness — map the 0–1 noise output into any useful range</strong>
+        </a>
+        <a class="related-link" href="../distance-becomes-behavior/">
+          <span>Bridge</span>
+          <strong>Distance Becomes Behavior — use map() to turn a measured distance into visual change</strong>
+        </a>
+      </div>
     </div>
   </section>
 
-=======
->>>>>>> 36bd71d (tighten concept bridge layout)
+  <section class="teaching-note" aria-label="Teacher move">
+    <h2>Teacher move</h2>
+    <div class="teaching-note-grid">
+      <div class="teaching-note-card">
+        <strong>Prompt</strong>
+        <span>Set the output range from 0 to 20. Move the input slider all the way across. Now change the output max to 200. What's the same between the two runs, and what changed?</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Misconception</strong>
+        <span>Students expect map() to clamp. It doesn't — if the input goes past its stated range, the output goes past too. Use constrain() afterward, or toggle "Constrain output" here and predict what happens before you do.</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Ask</strong>
+        <span>If the input is exactly halfway through its range and you swap the output min and max, where does the output land? Write your prediction, then try it.</span>
+      </div>
+    </div>
+  </section>
+
   <nav class="bottom-nav" aria-label="Bridge navigation">
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/distance-becomes-behavior/">Next: Distance Becomes Behavior →</a>
@@ -1239,7 +841,6 @@ const modes = {
   }
 };
 
->>>>>>> f9d93c8 (redesign first concept bridge batch)
 const wireTargets = [
   { key: "size", label: "size" },
   { key: "x", label: "x position" },
@@ -1775,103 +1376,6 @@ function tick() {
 window.addEventListener("resize", renderCanvas);
 renderUI();
 requestAnimationFrame(tick);
-
-// Tab progress bar
-(function() {
-  function updateProgress() {
-    var tabs = document.querySelectorAll('[role="tab"]');
-    var fill = document.getElementById('tab-progress-fill');
-    if (!fill || !tabs.length) return;
-    var idx = Array.from(tabs).findIndex(function(t) { return t.getAttribute('aria-selected') === 'true'; });
-    if (idx < 0) idx = 0;
-    fill.style.width = ((idx + 1) / tabs.length * 100) + '%';
-  }
-  var tl = document.querySelector('[role="tablist"]');
-  if (tl) tl.addEventListener('click', function() { setTimeout(updateProgress, 0); });
-  updateProgress();
-})();
-
-
-// ── Snapshot export ───────────────────────────────────────────────────────────
-(function() {
-  var btn = document.getElementById('snapshotBtn');
-  if (!btn) return;
-
-  function wrapText(ctx, text, x, y, maxW, lineH) {
-    var words = text.split(' ');
-    var line = '';
-    for (var i = 0; i < words.length; i++) {
-      var test = line + words[i] + ' ';
-      if (ctx.measureText(test).width > maxW && i > 0) {
-        ctx.fillText(line, x, y);
-        line = words[i] + ' ';
-        y += lineH;
-      } else {
-        line = test;
-      }
-    }
-    if (line.trim()) ctx.fillText(line, x, y);
-  }
-
-  btn.addEventListener('click', function() {
-    var bridgeCanvas = document.querySelector('canvas');
-    if (!bridgeCanvas) return;
-
-    var cw = bridgeCanvas.width;
-    var ch = bridgeCanvas.height;
-    var panelH = 100;
-
-    var out = document.createElement('canvas');
-    out.width = cw;
-    out.height = ch + panelH;
-    var oc = out.getContext('2d');
-
-    // Bridge canvas
-    oc.drawImage(bridgeCanvas, 0, 0);
-
-    // Text panel
-    oc.fillStyle = '#faf7f2';
-    oc.fillRect(0, ch, cw, panelH);
-    oc.strokeStyle = '#ddd8cc';
-    oc.lineWidth = 1;
-    oc.beginPath(); oc.moveTo(0, ch); oc.lineTo(cw, ch); oc.stroke();
-
-    // Code focus line
-    var focusEl = document.querySelector('.code-focus, .focus-line, [id*="focus"]');
-    if (!focusEl) focusEl = document.querySelector('.ct');
-    var focusText = focusEl ? focusEl.closest('.code-focus, .focus-line, pre, code') ? focusEl.closest('.code-focus, .focus-line, pre, code').textContent.trim().slice(0, 120) : focusEl.textContent.trim().slice(0, 120) : '';
-    if (focusText) {
-      oc.font = '600 12px "DM Mono", monospace';
-      oc.fillStyle = '#2a4a6a';
-      oc.textBaseline = 'top';
-      oc.fillText(focusText.slice(0, 100), 14, ch + 12, cw - 28);
-    }
-
-    // Big Idea text
-    var bigEl = document.getElementById('big-idea-text');
-    var bigText = bigEl ? bigEl.textContent.trim() : '';
-    if (bigText) {
-      oc.font = '400 11px "DM Sans", sans-serif';
-      oc.fillStyle = '#4a4535';
-      wrapText(oc, bigText, 14, ch + 36, cw - 28, 15);
-    }
-
-    // Watermark
-    oc.font = '400 10px "DM Sans", sans-serif';
-    oc.fillStyle = '#aaa9a0';
-    oc.textAlign = 'right';
-    oc.textBaseline = 'bottom';
-    oc.fillText('CC Fest Coding Camp', cw - 12, ch + panelH - 8);
-
-    // Download
-    var link = document.createElement('a');
-    var h1 = document.querySelector('h1');
-    link.download = 'ccfest-' + (h1 ? h1.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30) : 'bridge') + '.png';
-    link.href = out.toDataURL('image/png');
-    link.click();
-  });
-})();
-
 </script>
 </body>
 </html>

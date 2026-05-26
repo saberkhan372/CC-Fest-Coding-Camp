@@ -157,10 +157,6 @@
     align-items: start;
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 36bd71d (tighten concept bridge layout)
   .main-left {
     display: grid;
     gap: 18px;
@@ -246,20 +242,6 @@
   }
 
   .tab[aria-selected="true"] .step { color: var(--accent); }
-  .tab-progress {
-    height: 3px;
-    background: #ede8df;
-    border-radius: 2px;
-    margin: -4px 0 6px;
-    overflow: hidden;
-  }
-  .tab-progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width 0.3s ease;
-  }
-
 
   .tab:focus-visible,
   .preset-btn:focus-visible,
@@ -333,159 +315,6 @@
     height: 6px;
   }
 
-=======
-  .panel {
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-  }
-
-  .canvas-panel { overflow: hidden; }
-
-  .canvas-bar {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--line);
-    background: rgba(255,255,255,0.6);
-  }
-
-  .canvas-bar-title { font-size: 0.92rem; font-weight: 800; }
-  .canvas-bar-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
-
-  .canvas-wrap {
-    width: 100%;
-    display: grid;
-    place-items: center;
-    padding: 16px;
-    background: #f1eadf;
-  }
-
-  #distance-canvas {
-    display: block;
-    width: 100%;
-    max-width: 620px;
-    height: auto;
-    border-radius: 14px;
-    cursor: crosshair;
-  }
-
-  .touch-hint {
-    display: none;
-    text-align: center;
-    font-size: 0.78rem;
-    color: var(--faint);
-    margin-top: 6px;
-  }
-
-  .ctrl-panel { padding: 16px; }
-
-  .tabs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-    margin-bottom: 14px;
-  }
-
-  .tab {
-    border: 1px solid var(--line);
-    background: #fff;
-    border-radius: var(--radius-sm);
-    padding: 8px 4px;
-    cursor: pointer;
-    font-weight: 800;
-    font-size: 0.8rem;
-    color: var(--muted);
-    text-align: center;
-    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
-    line-height: 1.3;
-  }
-
-  .tab:hover { transform: translateY(-1px); background: #fffbf2; }
-  .tab[aria-selected="true"] { color: var(--ink); background: #edf4ff; border-color: #90b4e2; }
-
-  .tab .step {
-    display: block;
-    font-size: 0.66rem;
-    font-weight: 600;
-    color: var(--faint);
-    margin-top: 1px;
-  }
-
-  .tab[aria-selected="true"] .step { color: var(--accent); }
-
-  .tab:focus-visible,
-  .preset-btn:focus-visible,
-  .sw:focus-visible,
-  input:focus-visible,
-  button:focus-visible,
-  .path-link:focus-visible,
-  .bottom-nav a:focus-visible,
-  .back-link:focus-visible {
-    outline: 3px solid rgba(49,92,146,0.35);
-    outline-offset: 2px;
-  }
-
-  .predict {
-    background: var(--predict-bg);
-    border: 1px solid var(--predict-border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    margin-bottom: 14px;
-  }
-
-  .box-label {
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--ink);
-    margin-bottom: 3px;
-  }
-
-  .box-body { display: block; font-size: 0.88rem; color: var(--ink); line-height: 1.5; }
-
-  .ctrl-group { display: grid; gap: 10px; margin-bottom: 14px; }
-
-  .ctrl-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    background: rgba(255,255,255,0.65);
-    border: 1px solid var(--line-light);
-  }
-
-  .ctrl-row label { font-weight: 800; font-size: 0.88rem; }
-  .ctrl-row label small {
-    display: block;
-    font-weight: 600;
-    font-size: 0.78rem;
-    color: var(--faint);
-    margin-top: 1px;
-  }
-
-  .val-badge {
-    background: var(--ink);
-    color: #fff;
-    padding: 3px 8px;
-    border-radius: 999px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    min-width: 42px;
-    text-align: center;
-  }
-
-  input[type="range"] {
-    width: 100%;
-    grid-column: 1 / -1;
-    accent-color: var(--accent);
-    height: 6px;
-  }
-
->>>>>>> f9d93c8 (redesign first concept bridge batch)
   .presets-label {
     font-size: 0.7rem;
     font-weight: 800;
@@ -605,15 +434,7 @@
   .callout.bug { background: var(--warn-bg); border-color: var(--warn-border); }
   .callout.try { background: var(--try-bg); border-color: var(--try-border); }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   .prose-section { margin-top: 0; }
-=======
-  .prose-section { margin-top: 22px; }
->>>>>>> f9d93c8 (redesign first concept bridge batch)
-=======
-  .prose-section { margin-top: 0; }
->>>>>>> 36bd71d (tighten concept bridge layout)
   .prose-section h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
   .prose-section p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; max-width: 760px; }
 
@@ -679,14 +500,7 @@
   @media (hover: none) and (pointer: coarse) { .touch-hint { display: block; } }
   @media (max-width: 860px) {
     .main-grid { grid-template-columns: 1fr; }
-<<<<<<< HEAD
-<<<<<<< HEAD
     .main-left { gap: 18px; }
-=======
->>>>>>> f9d93c8 (redesign first concept bridge batch)
-=======
-    .main-left { gap: 18px; }
->>>>>>> 36bd71d (tighten concept bridge layout)
     .tabs { grid-template-columns: repeat(3, 1fr); }
   }
   @media (max-width: 560px) {
@@ -729,11 +543,15 @@
     </div>
   </section>
 
+  <section class="bridge-rhythm" aria-label="How to use this concept bridge">
+    <span class="bridge-rhythm-card"><strong>Fuzzy idea</strong> <code>dist()</code> feels like measurement, not behavior.</span>
+    <span class="bridge-rhythm-card"><strong>See it</strong> Watch closeness become a live number on canvas.</span>
+    <span class="bridge-rhythm-card"><strong>Change it</strong> Move the target, range, and behavior mode.</span>
+    <span class="bridge-rhythm-card"><strong>Code idea</strong> Distance can drive size, brightness, collision, and thresholds.</span>
+    <span class="bridge-rhythm-card"><strong>Go next</strong> Remix hover fields, games, ripples, doors, and reactive scenes.</span>
+  </section>
+
   <section class="main-grid" aria-label="Interactive distance concept bridge">
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 36bd71d (tighten concept bridge layout)
     <div class="main-left">
       <article class="panel canvas-panel">
         <div class="canvas-bar">
@@ -757,81 +575,6 @@
         <div class="legend-item"><span class="swatch" style="background:#e07a5f"></span>near / active</div>
         <div class="legend-item"><span class="swatch" style="background:#81b29a"></span>far / inactive</div>
         <div class="legend-item"><span class="swatch" style="background:#315c92"></span>mapped behavior</div>
-<<<<<<< HEAD
-      </div>
-
-      <section class="pathways" aria-label="Practice and remix links">
-        <div class="pathways-title">What's next</div>
-        <div class="path-links">
-          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/collision-detection-explorer/" class="path-link">
-            <span class="path-link-type">Practice →</span>
-            <span class="path-link-name">Collision Detection Explorer — use distance as a full workshop tool for collisions and interactive play</span>
-            <span class="path-link-arrow">›</span>
-          </a>
-          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/simple-collision-game/" class="path-link">
-            <span class="path-link-type">Remix →</span>
-            <span class="path-link-name">Simple Collision Game Seed — turn one distance check into a mini game loop</span>
-            <span class="path-link-arrow">›</span>
-          </a>
-          <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/map-range-translator/" class="path-link">
-            <span class="path-link-type">Related →</span>
-            <span class="path-link-name">map() Range Translator — turn the distance number into size, brightness, opacity, or motion</span>
-            <span class="path-link-arrow">›</span>
-          </a>
-        </div>
-      </section>
-    </div>
-
-    <aside class="panel ctrl-panel">
-      <nav class="tabs" role="tablist" aria-label="distance modes">
-        <button class="tab" role="tab" data-mode="measure" aria-selected="true" tabindex="0">Measure<span class="step">1 of 6</span></button>
-        <button class="tab" role="tab" data-mode="size" aria-selected="false" tabindex="-1">Size<span class="step">2 of 6</span></button>
-        <button class="tab" role="tab" data-mode="brightness" aria-selected="false" tabindex="-1">Brightness<span class="step">3 of 6</span></button>
-        <button class="tab" role="tab" data-mode="collision" aria-selected="false" tabindex="-1">Collision<span class="step">4 of 6</span></button>
-        <button class="tab" role="tab" data-mode="door" aria-selected="false" tabindex="-1">Door Lock<span class="step">5 of 6</span></button>
-        <button class="tab" role="tab" data-mode="ripple" aria-selected="false" tabindex="-1">Ripple<span class="step">6 of 6</span></button>
-      </nav>
-      <div class="tab-progress" aria-hidden="true"><div class="tab-progress-fill" id="tab-progress-fill"></div></div>
-
-
-      <div class="predict">
-        <span class="box-label">Predict before changing</span>
-        <span class="box-body" id="predict-text">Before you move anything, when do you think the distance number becomes small: when the pointer is a little closer, or only when it is almost touching?</span>
-      </div>
-
-      <div class="ctrl-group" id="controls"></div>
-        <button class="snapshot-btn" id="snapshotBtn" type="button" title="Save canvas + code + Big Idea as PNG">📷 Save snapshot</button>
-      <div id="presets-area"></div>
-
-      <div class="switches">
-        <label class="sw"><input type="checkbox" id="showRangeToggle" checked> Show range circle</label>
-        <label class="sw"><input type="checkbox" id="showLabelsToggle" checked> Show labels</label>
-      </div>
-
-      <div class="code-section">
-        <div class="code-header"><span>Live code</span><span id="code-note">dist() gives one usable number: how far apart are these points?</span></div>
-        <div class="code-focus-line mono" id="focus-code"></div>
-        <button class="full-code-toggle" id="fullCodeToggle" type="button" aria-expanded="false" aria-controls="full-code">▸ See full p5.js sketch</button>
-        <div class="full-code-body mono" id="full-code"></div>
-      </div>
-
-      <div class="callout big-idea">
-        <span class="box-label">Big idea</span>
-        <span class="box-body" id="big-idea-text"></span>
-      </div>
-
-      <div class="callout bug">
-        <span class="box-label">⚠ Common mistake</span>
-        <span class="box-body" id="bug-text"></span>
-      </div>
-
-=======
-    <article class="panel canvas-panel">
-      <div class="canvas-bar">
-        <div class="canvas-bar-title" id="canvas-title">Measure: how far is the pointer from the target?</div>
-        <div class="canvas-bar-sub" id="canvas-sub">Move inside the canvas. Drag the gold target to place the second point.</div>
-=======
->>>>>>> 36bd71d (tighten concept bridge layout)
       </div>
 
       <section class="pathways" aria-label="Practice and remix links">
@@ -896,7 +639,6 @@
         <span class="box-body" id="bug-text"></span>
       </div>
 
->>>>>>> f9d93c8 (redesign first concept bridge batch)
       <div class="callout try">
         <span class="box-label">Try this</span>
         <span class="box-body" id="try-text"></span>
@@ -904,8 +646,6 @@
     </aside>
   </section>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   <nav class="bottom-nav" aria-label="Bridge navigation">
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/map-range-translator/">← Previous: map() Range Translator</a>
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/conditionals-code-makes-choices/">Next: Conditionals: Code Makes Choices →</a>
@@ -1108,246 +848,6 @@ function createToken(className, text) {
   return `<span class="ct ${className}">${text}</span>`;
 }
 
-=======
-  <section class="prose-section">
-    <h2 id="prose-title">Distance is input for decisions and feeling</h2>
-    <p id="prose-body">Once you have <code>let d = dist(...)</code>, your sketch can react to the world. That one number can become scale, brightness, collision, a locked door, or a whole ripple field. The geometry stays the same while the meaning changes.</p>
-  </section>
-
-  <div class="legend" aria-label="distance concept legend">
-    <div class="legend-item"><span class="swatch" style="background:#7a5ea8"></span>distance line</div>
-    <div class="legend-item"><span class="swatch" style="background:#f3a340"></span>target point</div>
-    <div class="legend-item"><span class="swatch" style="background:#e07a5f"></span>near / active</div>
-    <div class="legend-item"><span class="swatch" style="background:#81b29a"></span>far / inactive</div>
-    <div class="legend-item"><span class="swatch" style="background:#315c92"></span>mapped behavior</div>
-  </div>
-
-  <section class="pathways" aria-label="Practice and remix links">
-    <div class="pathways-title">What's next</div>
-    <div class="path-links">
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/collision-detection-explorer/" class="path-link">
-        <span class="path-link-type">Practice →</span>
-        <span class="path-link-name">Collision Detection Explorer — use distance as a full workshop tool for collisions and interactive play</span>
-        <span class="path-link-arrow">›</span>
-      </a>
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/tools/simple-collision-game/" class="path-link">
-        <span class="path-link-type">Remix →</span>
-        <span class="path-link-name">Simple Collision Game Seed — turn one distance check into a mini game loop</span>
-        <span class="path-link-arrow">›</span>
-      </a>
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/map-range-translator/" class="path-link">
-        <span class="path-link-type">Related →</span>
-        <span class="path-link-name">map() Range Translator — turn the distance number into size, brightness, opacity, or motion</span>
-        <span class="path-link-arrow">›</span>
-      </a>
-    </div>
-  </section>
-
-=======
->>>>>>> 36bd71d (tighten concept bridge layout)
-  <nav class="bottom-nav" aria-label="Bridge navigation">
-    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/map-range-translator/">← Previous: map() Range Translator</a>
-    <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/conditionals-code-makes-choices/">Next: Conditionals: Code Makes Choices →</a>
-  </nav>
-</main>
-
-<script>
-'use strict';
-
-const state = {
-  mode: "measure",
-  targetX: 410,
-  targetY: 210,
-  range: 150,
-  pointerX: 190,
-  pointerY: 270,
-  pointerInside: true,
-  draggingTarget: false,
-  showRange: true,
-  showLabels: true,
-  changedKey: "range"
-};
-
-const modes = {
-  measure: {
-    canvasTitle: "Measure: how far is the pointer from the target?",
-    canvasSub: "Move inside the canvas. Drag the gold target to place the second point.",
-    predict: "Before you move anything, when do you think the distance number becomes small: when the pointer is a little closer, or only when it is almost touching?",
-    big: "dist() gives one useful number: how far apart are two positions? That number becomes input for the rest of your sketch.",
-    bug: "A common mistake is thinking <code>dist()</code> changes the sketch by itself. It does not. It only returns a number. You still decide what behavior that number should control.",
-    tryIt: "Move the target to a corner, then compare the distance when the pointer is nearby versus across the canvas.",
-    note: "Measure closeness with dist().",
-    proseTitle: "Distance is a question your sketch can ask every frame",
-    proseBody: "The question is simple: how far is this thing from that thing? Once your sketch knows the answer as a number, it can use that answer for behavior.",
-    controls: [
-      { key: "range", label: "Reference range", code: "activeRange", min: 50, max: 240, step: 1 },
-      { key: "targetX", label: "Target x", code: "targetX", min: 100, max: 520, step: 1 },
-      { key: "targetY", label: "Target y", code: "targetY", min: 90, max: 330, step: 1 }
-    ],
-    presets: [
-      { label: "Center target", v: { targetX: 410, targetY: 210, range: 150 } },
-      { label: "Left wall", v: { targetX: 200, targetY: 210, range: 150 } },
-      { label: "Top corner", v: { targetX: 175, targetY: 125, range: 150 } },
-      { label: "Long reach", v: { targetX: 430, targetY: 210, range: 220 } }
-    ]
-  },
-  size: {
-    canvasTitle: "Size: the closer you are, the larger the response",
-    canvasSub: "Distance becomes a value that can drive scale.",
-    predict: "Before you move closer, do you think the circle should grow steadily, or only jump in size near the target?",
-    big: "Once distance becomes a number, <code>map()</code> can turn that number into size. Near can mean big. Far can mean small.",
-    bug: "Learners often expect the effect to stop exactly at the range edge. If you do not constrain the mapped value, it can keep shrinking or growing outside the intended zone.",
-    tryIt: "Move the target and ask: where does the growth feel strongest? What range makes it feel gentle instead of dramatic?",
-    note: "Map distance into size.",
-    proseTitle: "One measurement can become visible behavior",
-    proseBody: "The distance line is invisible in many finished sketches. Instead of seeing the number directly, you feel it through scale, softness, brightness, or reaction.",
-    controls: [
-      { key: "range", label: "Active range", code: "activeRange", min: 50, max: 260, step: 1 },
-      { key: "targetX", label: "Target x", code: "targetX", min: 100, max: 520, step: 1 },
-      { key: "targetY", label: "Target y", code: "targetY", min: 90, max: 330, step: 1 }
-    ],
-    presets: [
-      { label: "Gentle scaling", v: { targetX: 410, targetY: 210, range: 200 } },
-      { label: "Tight hotspot", v: { targetX: 410, targetY: 210, range: 100 } },
-      { label: "Off-center", v: { targetX: 240, targetY: 180, range: 150 } },
-      { label: "⚠ Huge field", v: { targetX: 410, targetY: 210, range: 260 }, isBreak: true }
-    ]
-  },
-  brightness: {
-    canvasTitle: "Brightness: closeness can become light",
-    canvasSub: "The same distance number can drive color intensity instead of size.",
-    predict: "Before moving the pointer, do you think a brighter response should happen only inside the ring, or fade gradually as you approach?",
-    big: "dist() is not tied to geometry alone. The same measured value can become brightness, alpha, color temperature, or glow.",
-    bug: "A common mistake is treating color changes as separate from math. They are just number changes. Distance gives the number. Your sketch chooses what that number means visually.",
-    tryIt: "Find a target position where the glow feels dramatic, then soften it by increasing the range.",
-    note: "Map distance into brightness.",
-    proseTitle: "Distance can feel like atmosphere",
-    proseBody: "Hover states, glows, ghost trails, and spotlight effects often come from measured closeness. The geometry becomes mood.",
-    controls: [
-      { key: "range", label: "Glow range", code: "activeRange", min: 50, max: 260, step: 1 },
-      { key: "targetX", label: "Target x", code: "targetX", min: 100, max: 520, step: 1 },
-      { key: "targetY", label: "Target y", code: "targetY", min: 90, max: 330, step: 1 }
-    ],
-    presets: [
-      { label: "Soft glow", v: { targetX: 410, targetY: 210, range: 200 } },
-      { label: "Hot center", v: { targetX: 410, targetY: 210, range: 100 } },
-      { label: "Wide field", v: { targetX: 260, targetY: 210, range: 240 } },
-      { label: "⚠ Narrow flash", v: { targetX: 410, targetY: 210, range: 60 }, isBreak: true }
-    ]
-  },
-  collision: {
-    canvasTitle: "Collision: touching is a distance comparison",
-    canvasSub: "Two circles collide when the distance between centers is smaller than their radii combined.",
-    predict: "Before you touch the target, when do you think the collision should turn true: when edges overlap, or when centers overlap?",
-    big: "Collision is often not a special built-in feature. It is a distance question: are the centers close enough for the edges to touch?",
-    bug: "A common mistake is comparing the distance to one radius instead of the sum of both radii. Touching depends on both circles.",
-    tryIt: "Move the target and predict exactly where the collision flips from false to true before you cross the edge.",
-    note: "Compare distance to combined radii.",
-    proseTitle: "Touching is a threshold, not a mystery",
-    proseBody: "When the pointer circle and target circle overlap, the sketch is really checking one relationship: is <code>d &lt; r1 + r2</code>?",
-    controls: [
-      { key: "range", label: "Guide range", code: "guideRange", min: 50, max: 220, step: 1 },
-      { key: "targetX", label: "Target x", code: "targetX", min: 100, max: 520, step: 1 },
-      { key: "targetY", label: "Target y", code: "targetY", min: 90, max: 330, step: 1 }
-    ],
-    presets: [
-      { label: "Center test", v: { targetX: 410, targetY: 210, range: 150 } },
-      { label: "Near edge", v: { targetX: 500, targetY: 210, range: 150 } },
-      { label: "High target", v: { targetX: 410, targetY: 140, range: 150 } },
-      { label: "⚠ Tight path", v: { targetX: 410, targetY: 210, range: 90 }, isBreak: true }
-    ]
-  },
-  door: {
-    canvasTitle: "Door Lock: distance can unlock a threshold",
-    canvasSub: "This is the same distance math, but now the metaphor is a door that opens when you enter the radius.",
-    predict: "Before you move inside the ring, when do you think the door should switch state: gradually, or at one exact threshold?",
-    big: "This is the real-world shape of many distance checks. A trigger zone, collectible, hover state, or proximity alarm is a threshold built on distance.",
-    bug: "A common mistake is expecting an on/off threshold to feel gradual. If you want a smooth response, map the distance. If you want a switch, compare it directly.",
-    tryIt: "Try a tiny lock zone and then a wide one. Which one feels forgiving? Which one feels game-like?",
-    note: "Compare distance to a trigger radius.",
-    proseTitle: "A threshold is one clean comparison",
-    proseBody: "Not every behavior needs a smooth ramp. Sometimes you only want to know whether the pointer is inside the zone or not. That is still distance becoming behavior.",
-    controls: [
-      { key: "range", label: "Unlock radius", code: "unlockRadius", min: 50, max: 240, step: 1 },
-      { key: "targetX", label: "Door x", code: "doorX", min: 100, max: 520, step: 1 },
-      { key: "targetY", label: "Door y", code: "doorY", min: 90, max: 330, step: 1 }
-    ],
-    presets: [
-      { label: "Door in center", v: { targetX: 410, targetY: 210, range: 120 } },
-      { label: "Narrow unlock", v: { targetX: 410, targetY: 210, range: 80 } },
-      { label: "Wide unlock", v: { targetX: 410, targetY: 210, range: 180 } },
-      { label: "Side doorway", v: { targetX: 260, targetY: 210, range: 120 } }
-    ]
-  },
-  ripple: {
-    canvasTitle: "Ripple: many points can measure distance from one target",
-    canvasSub: "Each dot asks the same dist() question, creating rings and fields.",
-    predict: "Before you move the target, what do you think will happen to the rings: will they stretch, follow, or stay fixed?",
-    big: "Loops plus <code>dist()</code> create fields. Each point measures itself against the same target, and the whole surface responds together.",
-    bug: "Learners often see a ripple field as a separate visual trick. Underneath, each dot is just using the same distance formula with different x and y positions.",
-    tryIt: "Move the target near an edge. How does the pattern change when the distances to nearby dots become uneven?",
-    note: "Many dots use dist() together.",
-    proseTitle: "The same question repeated becomes a pattern",
-    proseBody: "One measured relationship creates one behavior. A grid of measured relationships creates a field. That is how distance grows from one interaction into a full generative system.",
-    controls: [
-      { key: "range", label: "Field influence", code: "fieldRange", min: 70, max: 260, step: 1 },
-      { key: "targetX", label: "Target x", code: "targetX", min: 100, max: 520, step: 1 },
-      { key: "targetY", label: "Target y", code: "targetY", min: 90, max: 330, step: 1 }
-    ],
-    presets: [
-      { label: "Centered field", v: { targetX: 410, targetY: 210, range: 150 } },
-      { label: "Wide echo", v: { targetX: 410, targetY: 210, range: 240 } },
-      { label: "Offset pulse", v: { targetX: 270, targetY: 170, range: 150 } },
-      { label: "⚠ Dense wave", v: { targetX: 410, targetY: 210, range: 90 }, isBreak: true }
-    ]
-  }
-};
-
-const canvas = document.getElementById("distance-canvas");
-const ctx = canvas.getContext("2d");
-
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function dist(x1, y1, x2, y2) {
-  return Math.hypot(x2 - x1, y2 - y1);
-}
-
-function mapValue(value, inMin, inMax, outMin, outMax) {
-  const t = (value - inMin) / (inMax - inMin);
-  return outMin + t * (outMax - outMin);
-}
-
-function roundedRect(x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
-
-function drawLabel(text, x, y, color) {
-  if (!state.showLabels) return;
-  ctx.save();
-  ctx.font = "700 13px 'DM Sans', sans-serif";
-  const padX = 7;
-  const tw = ctx.measureText(text).width;
-  ctx.fillStyle = "rgba(255, 250, 242, 0.94)";
-  roundedRect(x - padX, y - 18, tw + padX * 2, 24, 9);
-  ctx.fill();
-  ctx.fillStyle = color;
-  ctx.fillText(text, x, y);
-  ctx.restore();
-}
-
-function createToken(className, text) {
-  return `<span class="ct ${className}">${text}</span>`;
-}
-
->>>>>>> f9d93c8 (redesign first concept bridge batch)
 function getDistance() {
   return dist(state.pointerX, state.pointerY, state.targetX, state.targetY);
 }
@@ -1854,103 +1354,6 @@ document.getElementById("fullCodeToggle").addEventListener("click", () => {
 
 window.addEventListener("resize", renderCanvas);
 renderUI();
-
-// Tab progress bar
-(function() {
-  function updateProgress() {
-    var tabs = document.querySelectorAll('[role="tab"]');
-    var fill = document.getElementById('tab-progress-fill');
-    if (!fill || !tabs.length) return;
-    var idx = Array.from(tabs).findIndex(function(t) { return t.getAttribute('aria-selected') === 'true'; });
-    if (idx < 0) idx = 0;
-    fill.style.width = ((idx + 1) / tabs.length * 100) + '%';
-  }
-  var tl = document.querySelector('[role="tablist"]');
-  if (tl) tl.addEventListener('click', function() { setTimeout(updateProgress, 0); });
-  updateProgress();
-})();
-
-
-// ── Snapshot export ───────────────────────────────────────────────────────────
-(function() {
-  var btn = document.getElementById('snapshotBtn');
-  if (!btn) return;
-
-  function wrapText(ctx, text, x, y, maxW, lineH) {
-    var words = text.split(' ');
-    var line = '';
-    for (var i = 0; i < words.length; i++) {
-      var test = line + words[i] + ' ';
-      if (ctx.measureText(test).width > maxW && i > 0) {
-        ctx.fillText(line, x, y);
-        line = words[i] + ' ';
-        y += lineH;
-      } else {
-        line = test;
-      }
-    }
-    if (line.trim()) ctx.fillText(line, x, y);
-  }
-
-  btn.addEventListener('click', function() {
-    var bridgeCanvas = document.querySelector('canvas');
-    if (!bridgeCanvas) return;
-
-    var cw = bridgeCanvas.width;
-    var ch = bridgeCanvas.height;
-    var panelH = 100;
-
-    var out = document.createElement('canvas');
-    out.width = cw;
-    out.height = ch + panelH;
-    var oc = out.getContext('2d');
-
-    // Bridge canvas
-    oc.drawImage(bridgeCanvas, 0, 0);
-
-    // Text panel
-    oc.fillStyle = '#faf7f2';
-    oc.fillRect(0, ch, cw, panelH);
-    oc.strokeStyle = '#ddd8cc';
-    oc.lineWidth = 1;
-    oc.beginPath(); oc.moveTo(0, ch); oc.lineTo(cw, ch); oc.stroke();
-
-    // Code focus line
-    var focusEl = document.querySelector('.code-focus, .focus-line, [id*="focus"]');
-    if (!focusEl) focusEl = document.querySelector('.ct');
-    var focusText = focusEl ? focusEl.closest('.code-focus, .focus-line, pre, code') ? focusEl.closest('.code-focus, .focus-line, pre, code').textContent.trim().slice(0, 120) : focusEl.textContent.trim().slice(0, 120) : '';
-    if (focusText) {
-      oc.font = '600 12px "DM Mono", monospace';
-      oc.fillStyle = '#2a4a6a';
-      oc.textBaseline = 'top';
-      oc.fillText(focusText.slice(0, 100), 14, ch + 12, cw - 28);
-    }
-
-    // Big Idea text
-    var bigEl = document.getElementById('big-idea-text');
-    var bigText = bigEl ? bigEl.textContent.trim() : '';
-    if (bigText) {
-      oc.font = '400 11px "DM Sans", sans-serif';
-      oc.fillStyle = '#4a4535';
-      wrapText(oc, bigText, 14, ch + 36, cw - 28, 15);
-    }
-
-    // Watermark
-    oc.font = '400 10px "DM Sans", sans-serif';
-    oc.fillStyle = '#aaa9a0';
-    oc.textAlign = 'right';
-    oc.textBaseline = 'bottom';
-    oc.fillText('CC Fest Coding Camp', cw - 12, ch + panelH - 8);
-
-    // Download
-    var link = document.createElement('a');
-    var h1 = document.querySelector('h1');
-    link.download = 'ccfest-' + (h1 ? h1.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30) : 'bridge') + '.png';
-    link.href = out.toDataURL('image/png');
-    link.click();
-  });
-})();
-
 </script>
 </body>
 </html>
