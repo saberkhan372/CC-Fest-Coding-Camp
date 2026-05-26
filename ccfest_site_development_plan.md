@@ -168,71 +168,17 @@ All 6 priority bridges now have `try-next` (3-column: Workshop Tools / Starter S
 
 ## Phase 4 - Tag-based related-resource fallback
 
-**Status: After Phase 3**
+**Status: ✅ Done — shipped 2026-05-26**
 
-Use tags as a fallback so every page can suggest something useful without hand-authoring every relationship.
-
-Behavior:
-
-- Show hand-authored links first.
-- If no hand-authored links exist, show resources that share tags.
-- Keep recommendations short: 3-5 items is enough.
-- Do not show huge auto-generated lists.
-
-Implementation direction:
-
-- Extend existing JS data objects rather than creating a separate data system.
-- Keep data co-located with rendering logic in `workshop-tool-pages.js` and `starter-seed-pages.js`.
-- Add equivalent bridge metadata only where bridge rendering needs it.
-
-Fields to add where useful:
-
-```js
-relatedBridges: []
-relatedTools: []
-relatedSketches: []
-firstChangePrompt: ""
-teachingPrompt: ""
-```
-
-A separate JSON file is not necessary unless the current JS object structure becomes painful to maintain.
+Tag-based fallback is live in both `workshop-tool-pages.js` and `starter-seed-pages.js`. When no hand-authored `relatedBridges`, `relatedTools`, or `relatedSketches` are present, each renderer finds up to 4 resources sharing tags from the same data object and renders a "Similar tools/sketches" card. `RESOURCE_LINKS` lookup tables expanded to cover 15–17 slugs in each renderer so titles display correctly instead of falling through to `titleize()`.
 
 ---
 
 ## Phase 5 - Bridge index "Start here" and homepage "Best first"
 
-**Status: After representative templates**
+**Status: ✅ Done — shipped 2026-05-26**
 
-### Bridge index "Start here" pathway
-
-Keep this from the original development plan.
-
-Add a recommended first path of 5-6 concept bridges. Display it as a numbered Fraunces list, not another grid.
-
-Use copy like:
-
-> If you're new, start here.
-
-Each item should link to:
-
-- The bridge.
-- One matching tool.
-- One matching starter sketch when available.
-
-Store the list as one editable JS array of slugs, not embedded throughout HTML.
-
-### Homepage "Best first" row
-
-Add a small curated beginner entry point near the resource sections.
-
-Rules:
-
-- Store as one editable array of 5-6 slugs.
-- Put the array near the top of `site.js` or in a small `curated.js`.
-- Render one "Best first" row.
-- Do not hard-code the same list in multiple HTML locations.
-
-This is a small feature with high orientation value.
+`CURATED` constant added to `site.js` holding 6 bridge entries (each with paired tool + sketch slug) and 4 `bestFirst` entries. An IIFE renders `.beginner-path` and `.best-first-links` from `CURATED` at page load. Hardcoded `<li>` items removed from `index.html`; `.beginner-path` CSS grid changed from `repeat(5,…)` to `repeat(3,…)` for a clean 2×3 layout with 6 entries. All edits are in one place in `site.js`.
 
 ---
 

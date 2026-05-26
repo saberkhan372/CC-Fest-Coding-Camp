@@ -233,30 +233,58 @@
 
   const RESOURCE_LINKS = {
     bridges: {
-      "arrays-one-thing-to-many-things": "Arrays: One Thing to Many Things",
-      "conditionals-code-makes-choices": "Conditionals: Code Makes Choices",
-      "data-in-drawing-out": "Data In, Drawing Out",
-      "distance-becomes-behavior": "Distance Becomes Behavior",
-      "how-p5-thinks-about-time": "How p5.js Thinks About Time",
-      "objects-data-plus-behavior": "Objects: Data + Behavior",
+      "arrays-loops-as-system":           "Arrays + Loops: A System",
+      "arrays-one-thing-to-many-things":  "Arrays: One Thing to Many Things",
+      "color-numbers-become-feeling":     "Color: Numbers Become Feeling",
+      "conditionals-code-makes-choices":  "Conditionals: Code Makes Choices",
+      "data-as-argument":                 "Data as Argument",
+      "data-in-drawing-out":              "Data In, Drawing Out",
+      "distance-becomes-behavior":        "Distance Becomes Behavior",
+      "events-sketches-listen":           "Events: Sketches Listen",
+      "functions-make-your-own-commands": "Functions: Make Your Own Commands",
+      "how-p5-thinks-about-time":         "How p5.js Thinks About Time",
+      "map-range-translator":             "map() Range Translator",
+      "noise-smooth-randomness":          "Noise: Smooth Randomness",
+      "objects-data-plus-behavior":       "Objects: Data + Behavior",
+      "random-controlled-surprise":       "random(): Controlled Surprise",
       "state-machines-sketches-have-modes": "State Machines: Sketches Have Modes",
-      "triangle-circle-wave-explorer": "Triangle to Circle to Wave Explorer",
+      "triangle-circle-wave-explorer":    "Triangle to Circle to Wave Explorer",
       "vectors-arrows-that-store-motion": "Vectors: Arrows That Store Motion"
     },
     tools: {
-      "agents-rules-playground": "Agents + Rules Playground",
-      "easing-types-comparison": "Easing Types Comparison"
+      "agents-rules-playground":        "Agents + Rules Playground",
+      "animation-explorer":             "Animation Explorer",
+      "color-blend-modes-explorer":     "Color Blend Modes Explorer",
+      "dist-map-lerp-chain":            "dist / map / lerp Chain",
+      "easing-types-comparison":        "Easing Types Comparison",
+      "for-loop-stepper":               "for Loop Stepper",
+      "framerate-visualizer":           "frameRate() Visualizer",
+      "game-state-studio":              "Game State Studio",
+      "if-else-decision-studio":        "if/else Decision Studio",
+      "lerp-explorer":                  "lerp Explorer",
+      "map-explorer":                   "Map Explorer",
+      "noise-lab":                      "Noise Lab",
+      "noise-vs-random-explorer":       "Noise vs Random Explorer",
+      "polished-array-explorer":        "Polished Array Explorer",
+      "rgb-hsb-color-lab":              "RGB / HSB Color Lab",
+      "shape-and-color-explorer":       "Shape + Color Explorer",
+      "simple-array-explorer":          "Simple Array Explorer"
     },
     sketches: {
-      "circular-motion-orbit-seed": "Circular Motion Orbit Seed",
-      "one-dataset-three-views": "One Dataset, Three Views",
-      "game-state-starter": "Game State Starter",
-      "gravity-bounce-seed": "Gravity Bounce Seed",
+      "circular-motion-orbit-seed":     "Circular Motion Orbit Seed",
+      "click-to-create-shapes":         "Click to Create Shapes",
+      "generative-tile-pattern-seed":   "Generative Tile Pattern Seed",
+      "game-state-starter":             "Game State Starter",
+      "gravity-bounce-seed":            "Gravity Bounce Seed",
+      "mini-generative-poster-seed":    "Mini Generative Poster Seed",
+      "noise-walker":                   "Noise Walker",
+      "one-dataset-three-views":        "One Dataset, Three Views",
       "parallel-arrays-bar-chart-seed": "Parallel Arrays Bar Chart Seed",
-      "particle-emitter-seed": "Particle Emitter Seed",
-      "particle-system-seed": "Particle System Seed",
-      "sine-oscillation-seed": "Sine Oscillation Seed",
-      "state-machine-game-seed": "State Machine Game Seed"
+      "particle-emitter-seed":          "Particle Emitter Seed",
+      "particle-system-seed":           "Particle System Seed",
+      "sine-oscillation-seed":          "Sine Oscillation Seed",
+      "state-machine-game-seed":        "State Machine Game Seed",
+      "wander-agent-seed":              "Wander Agent Seed"
     }
   };
 
@@ -374,7 +402,7 @@
     }
 
     const lessonCards = workshopLessons(tool).map(([heading, body]) => `<div class="lesson-card"><h3>${heading}</h3><p>${body}</p></div>`).join("");
-    const relatedPanel = renderRelatedResources(tool);
+    const relatedPanel = renderRelatedResources(tool, slug);
     const teachingPanel = renderTeachingNote(tool);
     const state = stateFrom(tool);
     document.title = `${tool.title} - CC Fest Coding Camp`;
@@ -461,15 +489,39 @@
     requestAnimationFrame(frame);
   }
 
-  function renderRelatedResources(tool) {
+  function renderRelatedResources(tool, slug) {
+    const hasHand = (tool.relatedBridges || []).length +
+                    (tool.relatedTools   || []).length +
+                    (tool.relatedSketches|| []).length > 0;
+
+    if (!hasHand) {
+      const myTags = new Set(tool.tags || []);
+      const matches = Object.entries(TOOLS)
+        .filter(([s, t]) => s !== slug && (t.tags || []).some(tag => myTags.has(tag)))
+        .slice(0, 4)
+        .map(([s, t]) => `<a class="related-link" href="../${s}/"><span>Tool</span><strong>${t.title}</strong></a>`)
+        .join("");
+      if (!matches) return "";
+      return `
+        <article class="card try-next">
+          <div class="card-inner">
+            <div class="card-header"><div>
+              <h2>Related tools</h2>
+              <p>Other tools that share related ideas.</p>
+            </div></div>
+            <div class="related-grid"><div class="related-group">${matches}</div></div>
+          </div>
+        </article>`;
+    }
+
     const groups = [
       ["Bridge", "relatedBridges", "bridges", "../../concept-bridges/"],
-      ["Tool", "relatedTools", "tools", "../"],
-      ["Sketch", "relatedSketches", "sketches", "../"]
+      ["Tool",   "relatedTools",   "tools",   "../"],
+      ["Sketch", "relatedSketches","sketches", "../"]
     ].map(([label, key, type, base]) => {
-      const items = (tool[key] || []).map((slug) => {
-        const title = RESOURCE_LINKS[type][slug] || titleize(slug);
-        return `<a class="related-link" href="${base}${slug}/"><span>${label}</span><strong>${title}</strong></a>`;
+      const items = (tool[key] || []).map((s) => {
+        const title = RESOURCE_LINKS[type][s] || titleize(s);
+        return `<a class="related-link" href="${base}${s}/"><span>${label}</span><strong>${title}</strong></a>`;
       }).join("");
       return items ? `<div class="related-group">${items}</div>` : "";
     }).join("");
@@ -478,16 +530,13 @@
     return `
       <article class="card try-next">
         <div class="card-inner">
-          <div class="card-header">
-            <div>
-              <h2>Try next</h2>
-              <p>Follow this idea from concept to tool to remix.</p>
-            </div>
-          </div>
+          <div class="card-header"><div>
+            <h2>Try next</h2>
+            <p>Follow this idea from concept to tool to remix.</p>
+          </div></div>
           <div class="related-grid">${groups}</div>
         </div>
-      </article>
-    `;
+      </article>`;
   }
 
   function renderTeachingNote(tool) {

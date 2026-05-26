@@ -2406,18 +2406,39 @@ function mousePressed() {
 
   const RESOURCE_LINKS = {
     bridges: {
-      "arrays-one-thing-to-many-things": "Arrays: One Thing to Many Things",
-      "conditionals-code-makes-choices": "Conditionals: Code Makes Choices",
-      "how-p5-thinks-about-time": "How p5.js Thinks About Time",
-      "objects-data-plus-behavior": "Objects: Data + Behavior",
+      "arrays-loops-as-system":           "Arrays + Loops: A System",
+      "arrays-one-thing-to-many-things":  "Arrays: One Thing to Many Things",
+      "color-numbers-become-feeling":     "Color: Numbers Become Feeling",
+      "conditionals-code-makes-choices":  "Conditionals: Code Makes Choices",
+      "data-in-drawing-out":              "Data In, Drawing Out",
+      "distance-becomes-behavior":        "Distance Becomes Behavior",
+      "events-sketches-listen":           "Events: Sketches Listen",
+      "functions-make-your-own-commands": "Functions: Make Your Own Commands",
+      "how-p5-thinks-about-time":         "How p5.js Thinks About Time",
+      "map-range-translator":             "map() Range Translator",
+      "noise-smooth-randomness":          "Noise: Smooth Randomness",
+      "objects-data-plus-behavior":       "Objects: Data + Behavior",
+      "random-controlled-surprise":       "random(): Controlled Surprise",
       "state-machines-sketches-have-modes": "State Machines: Sketches Have Modes",
-      "triangle-circle-wave-explorer": "Triangle to Circle to Wave Explorer"
+      "triangle-circle-wave-explorer":    "Triangle to Circle to Wave Explorer"
     },
     tools: {
-      "animation-explorer": "Animation Explorer",
-      "framerate-visualizer": "frameRate() Visualizer",
-      "game-state-studio": "Game State Studio",
+      "animation-explorer":          "Animation Explorer",
+      "color-blend-modes-explorer":  "Color Blend Modes Explorer",
+      "dist-map-lerp-chain":         "dist / map / lerp Chain",
+      "for-loop-stepper":            "for Loop Stepper",
+      "framerate-visualizer":        "frameRate() Visualizer",
+      "game-state-studio":           "Game State Studio",
+      "if-else-decision-studio":     "if/else Decision Studio",
+      "lerp-explorer":               "lerp Explorer",
+      "map-explorer":                "Map Explorer",
+      "noise-lab":                   "Noise Lab",
+      "noise-vs-random-explorer":    "Noise vs Random Explorer",
       "object-lifecycle-visualizer": "Object Lifecycle Visualizer",
+      "polished-array-explorer":     "Polished Array Explorer",
+      "rgb-hsb-color-lab":           "RGB / HSB Color Lab",
+      "shape-and-color-explorer":    "Shape + Color Explorer",
+      "simple-array-explorer":       "Simple Array Explorer",
       "sine-cosine-motion-explorer": "Sine + Cosine Motion Explorer"
     }
   };
@@ -2477,7 +2498,7 @@ ${code}
     const app = document.getElementById("app");
     if (!seed || !app) return;
 
-    const relatedPanel = renderRelatedResources(seed);
+    const relatedPanel = renderRelatedResources(seed, slug);
     document.title = `${seed.title} — CC Fest Coding Camp`;
     app.innerHTML = `
       <div class="sketch-shell">
@@ -2637,14 +2658,37 @@ ${code}
     runCurrentCode();
   }
 
-  function renderRelatedResources(seed) {
+  function renderRelatedResources(seed, slug) {
+    const hasHand = (seed.relatedBridges || []).length +
+                    (seed.relatedTools   || []).length > 0;
+
+    if (!hasHand) {
+      const myTags = new Set(seed.tags || []);
+      const matches = Object.entries(seeds)
+        .filter(([s, sd]) => s !== slug && (sd.tags || []).some(t => myTags.has(t)))
+        .slice(0, 4)
+        .map(([s, sd]) => `<a class="related-link" href="../${s}/"><span>Sketch</span><strong>${sd.title}</strong></a>`)
+        .join("");
+      if (!matches) return "";
+      return `
+        <section class="card try-next" style="margin-top:22px;">
+          <div class="card-inner">
+            <div class="card-header"><div>
+              <h2>Similar sketches</h2>
+              <p>These share related ideas and tags.</p>
+            </div></div>
+            <div class="related-grid"><div class="related-group">${matches}</div></div>
+          </div>
+        </section>`;
+    }
+
     const groups = [
       ["Bridge", "relatedBridges", "bridges", "../../concept-bridges/"],
-      ["Tool", "relatedTools", "tools", "../"]
+      ["Tool",   "relatedTools",   "tools",   "../"]
     ].map(([label, key, type, base]) => {
-      const items = (seed[key] || []).map((slug) => {
-        const title = RESOURCE_LINKS[type][slug] || titleize(slug);
-        return `<a class="related-link" href="${base}${slug}/"><span>${label}</span><strong>${title}</strong></a>`;
+      const items = (seed[key] || []).map((s) => {
+        const title = RESOURCE_LINKS[type][s] || titleize(s);
+        return `<a class="related-link" href="${base}${s}/"><span>${label}</span><strong>${title}</strong></a>`;
       }).join("");
       return items ? `<div class="related-group">${items}</div>` : "";
     }).join("");
@@ -2653,16 +2697,13 @@ ${code}
     return `
       <section class="card try-next" style="margin-top:22px;">
         <div class="card-inner">
-          <div class="card-header">
-            <div>
-              <h2>Try next</h2>
-              <p>Trace this sketch back to the idea, then forward into a workshop tool.</p>
-            </div>
-          </div>
+          <div class="card-header"><div>
+            <h2>Try next</h2>
+            <p>Trace this sketch back to the idea, then forward into a workshop tool.</p>
+          </div></div>
           <div class="related-grid">${groups}</div>
         </div>
-      </section>
-    `;
+      </section>`;
   }
 
   function titleize(slug) {

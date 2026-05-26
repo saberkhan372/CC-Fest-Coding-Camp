@@ -412,3 +412,67 @@
     }
   });
 })();
+
+// ─── Curated path data (edit here to update Start here + Best first) ──────────
+const CURATED = {
+  bridges: [
+    { slug: "color-numbers-become-feeling",       title: "Color: Numbers Become Feeling",
+      tool:   { slug: "rgb-hsb-color-lab",         title: "RGB / HSB Color Lab" },
+      sketch: { slug: "hsb-color-seed",            title: "HSB Color Seed" },
+      teaser: "Start with color — instant feedback." },
+    { slug: "how-p5-thinks-about-time",           title: "How p5.js Thinks About Time",
+      tool:   { slug: "animation-explorer",        title: "Animation Explorer" },
+      sketch: { slug: "framecount-animation-seed", title: "frameCount Animation Seed" },
+      teaser: "See how setup(), draw(), and frameCount create motion." },
+    { slug: "map-range-translator",               title: "map() Range Translator",
+      tool:   { slug: "map-explorer",             title: "Map Explorer" },
+      sketch: { slug: "color-from-position",      title: "Color From Position" },
+      teaser: "Translate mouse, distance, and data into size, color, and motion." },
+    { slug: "noise-smooth-randomness",            title: "Noise: Smooth Randomness",
+      tool:   { slug: "noise-lab",               title: "Noise Lab" },
+      sketch: { slug: "noise-walker",            title: "Noise Walker" },
+      teaser: "See why noise() flows while random() jumps." },
+    { slug: "arrays-one-thing-to-many-things",    title: "Arrays: One Thing to Many Things",
+      tool:   { slug: "simple-array-explorer",   title: "Simple Array Explorer" },
+      sketch: { slug: "click-to-create-shapes",  title: "Click to Create Shapes" },
+      teaser: "Move from one shape to a collection." },
+    { slug: "state-machines-sketches-have-modes", title: "State Machines: Sketches Have Modes",
+      tool:   { slug: "game-state-studio",       title: "Game State Studio" },
+      sketch: { slug: "game-state-starter",      title: "Game State Starter" },
+      teaser: "Learn how sketches switch between screens and rules." }
+  ],
+  bestFirst: [
+    { slug: "coordinate-system-explorer",  title: "Coordinate System Explorer", type: "Tool" },
+    { slug: "shape-and-color-explorer",    title: "Shape + Color Explorer",      type: "Tool" },
+    { slug: "animation-explorer",          title: "Animation Explorer",          type: "Tool" },
+    { slug: "framecount-animation-seed",   title: "frameCount Animation Seed",   type: "Sketch" }
+  ]
+};
+
+(() => {
+  const pathEl    = document.querySelector(".beginner-path");
+  const linksEl   = document.querySelector(".best-first-links");
+  const copyP     = document.querySelector(".best-first-copy p");
+  if (!pathEl && !linksEl) return;
+
+  if (pathEl) {
+    pathEl.innerHTML = CURATED.bridges.map((b, i) => `
+      <li>
+        <span class="path-number">${i + 1}</span>
+        <div>
+          <h3><a href="concept-bridges/${b.slug}/">${b.title}</a></h3>
+          <p>${b.teaser} Then try <a href="tools/${b.tool.slug}/">${b.tool.title}</a> and remix <a href="tools/${b.sketch.slug}/">${b.sketch.title}</a>.</p>
+        </div>
+      </li>`).join("");
+  }
+
+  if (linksEl) {
+    linksEl.innerHTML = CURATED.bestFirst.map(t =>
+      `<a href="tools/${t.slug}/"><span>${t.type}</span><strong>${t.title}</strong></a>`
+    ).join("");
+  }
+
+  if (copyP) {
+    copyP.textContent = `${CURATED.bestFirst.length} friendly places to click when you just want to begin.`;
+  }
+})();

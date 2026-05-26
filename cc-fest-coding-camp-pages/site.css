@@ -726,63 +726,130 @@ a{color:inherit}
 }
 .library-stat-bar a:hover{color:var(--accent)}
 .library-stat-bar span{color:var(--ink-light);font-weight:400}
-.start-grid{
+.beginner-path{
+  list-style:none;
+  padding:0;
+  margin:0;
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
 }
-@media(max-width:640px){.start-grid{grid-template-columns:1fr}}
-.start-card{
+.beginner-path li{
   background:#fff;
   border:2px solid var(--ink);
   border-radius:var(--radius-sm);
-  padding:18px 20px;
+  padding:14px;
   display:flex;
-  flex-direction:column;
-  gap:8px;
+  align-items:flex-start;
+  gap:10px;
+  min-width:0;
+  box-shadow:3px 3px 0 rgba(32,28,26,.08);
 }
-.start-card-icon{
-  font-size:22px;
-  line-height:1;
-  margin-bottom:2px;
-}
-.start-card h3{
-  font-size:15px;
-  font-weight:800;
-  margin:0;
+.path-number{
+  flex:0 0 auto;
+  display:inline-grid;
+  place-items:center;
+  width:28px;
+  height:28px;
+  border:2px solid var(--ink);
+  border-radius:50%;
+  background:var(--gold);
+  font:800 13px/1 "DM Sans",system-ui;
   color:var(--ink);
 }
-.start-card p{
+.beginner-path h3{
+  font-size:14px;
+  font-weight:800;
+  margin:0 0 5px;
+  line-height:1;
+}
+.beginner-path h3 a{
+  color:var(--ink);
+  text-decoration:none;
+}
+.beginner-path h3 a:hover{text-decoration:underline}
+.beginner-path p{
   font-size:13px;
   color:var(--ink-light);
   margin:0;
-  line-height:1.5;
+  line-height:1.42;
 }
-.start-links{
-  list-style:none;
-  padding:0;
-  margin:4px 0 8px;
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-.start-links li a{
-  font-size:13px;
-  font-weight:600;
+.beginner-path p a{
   color:var(--accent);
+  font-weight:700;
   text-decoration:none;
 }
-.start-links li a:hover{text-decoration:underline}
-.start-links li::before{
-  content:"→ ";
-  color:var(--ink-light);
-  font-size:12px;
+.beginner-path p a:hover{text-decoration:underline}
+.best-first{
+  margin-top:16px;
+  padding:14px;
+  border:2px dashed var(--ink);
+  border-radius:var(--radius-sm);
+  background:var(--paper);
+  display:flex;
+  align-items:center;
+  gap:16px;
 }
-.start-card .button{
-  align-self:flex-start;
-  margin-top:auto;
-  font-size:12px;
-  padding:6px 14px;
+.best-first-copy{
+  flex:0 0 180px;
+}
+.best-first-copy h3{
+  margin:0 0 4px;
+  font-size:15px;
+  font-weight:900;
+  color:var(--ink);
+}
+.best-first-copy p{
+  margin:0;
+  font-size:13px;
+  line-height:1.4;
+  color:var(--ink-light);
+}
+.best-first-links{
+  flex:1 1 auto;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.best-first-links a{
+  display:block;
+  min-width:0;
+  padding:11px 12px;
+  border:2px solid var(--line);
+  border-radius:var(--radius-sm);
+  background:#fff;
+  text-decoration:none;
+  color:var(--ink);
+  transition:transform .12s, border-color .12s, box-shadow .12s;
+}
+.best-first-links a:hover{
+  transform:translateY(-2px);
+  border-color:var(--accent);
+  box-shadow:3px 3px 0 rgba(224,122,95,.18);
+}
+.best-first-links span{
+  display:block;
+  margin-bottom:4px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--ink-light);
+}
+.best-first-links strong{
+  display:block;
+  font-size:13px;
+  line-height:1.25;
+}
+@media(max-width:1100px){
+  .beginner-path{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .best-first{align-items:flex-start;flex-direction:column}
+  .best-first-copy{flex:auto}
+  .best-first-links{width:100%;grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:640px){
+  .beginner-path,
+  .best-first-links{grid-template-columns:1fr}
 }
 
 /* ─── LIBRARY SUMMARY STAT CARDS ─── */
