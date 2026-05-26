@@ -2446,6 +2446,12 @@ ${code}
           <div class="tag-row">
             ${seed.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
           </div>
+          <div class="sketch-pathway" aria-label="Starter sketch remix path">
+            <span><strong>See</strong> A working sketch you can run right away.</span>
+            <span><strong>Code idea</strong> ${seed.tags.slice(0, 2).join(" + ")}</span>
+            <span><strong>First remix</strong> ${seed.tryText}</span>
+            <span><strong>Next remix</strong> ${seed.remixText}</span>
+          </div>
         </header>
 
         <main class="sketch-layout">
@@ -2491,22 +2497,30 @@ ${code}
           <div class="card-inner">
             <div class="card-header">
               <div>
-                <h2>Try / Notice / Remix</h2>
+                <h2>See / Change / Remix / Teach</h2>
                 <p>Keep the code small, visible, and easy to remix live, just like a p5.js Web Editor sketch.</p>
               </div>
             </div>
             <div class="lesson-grid">
               <div class="lesson-card">
-                <h3>Try this</h3>
+                <h3>See</h3>
+                <p>${seed.liveSeed}</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Change</h3>
                 <p>${seed.tryText}</p>
               </div>
               <div class="lesson-card">
-                <h3>Notice this</h3>
+                <h3>Code idea</h3>
                 <p>${seed.noticeText}</p>
               </div>
               <div class="lesson-card">
-                <h3>Remix this</h3>
+                <h3>Remix</h3>
                 <p>${seed.remixText}</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Teach</h3>
+                <p>Ask learners to predict one change, run it, then name what the canvas taught them about the code.</p>
               </div>
             </div>
           </div>

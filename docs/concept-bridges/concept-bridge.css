@@ -169,3 +169,37 @@ input[type="range"] {
 .swatch {
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7);
 }
+
+.bridge-rhythm {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 22px;
+}
+
+.bridge-rhythm-card {
+  display: block;
+  padding: 12px;
+  border: 1.5px solid var(--bridge-line);
+  border-radius: 10px;
+  background: var(--bridge-white);
+  color: var(--bridge-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  box-shadow: 2px 2px 0 rgba(32, 28, 26, 0.08);
+}
+
+.bridge-rhythm-card strong {
+  display: block;
+  color: var(--bridge-ink);
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 860px) {
+  .bridge-rhythm {
+    grid-template-columns: 1fr;
+  }
+}

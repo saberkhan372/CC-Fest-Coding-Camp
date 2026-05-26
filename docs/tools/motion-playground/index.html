@@ -23,6 +23,13 @@
 <nav class="top"><a href="../../index.html">Back to tool library</a><a href="https://www.notion.so/3599950a7da981da8d06dfbe6c90c535" target="_blank" rel="noopener">Notion Notes</a><a href="https://editor.p5js.org/">p5.js editor</a></nav>
 <span class="tag">Session 2 - map() as translation</span><h1>Motion Playground</h1>
 <p class="lede">Move across the canvas and decide what mouseX means. The same input can become size, hue, speed, opacity, rotation, stroke weight, or y position.</p>
+<section class="tool-rhythm" aria-label="How to use this workshop tool">
+  <span class="tool-rhythm-card"><strong>Open it</strong> Start with the canvas before the code.</span>
+  <span class="tool-rhythm-card"><strong>Change it</strong> Move one control or value at a time.</span>
+  <span class="tool-rhythm-card"><strong>Predict it</strong> Name what you expect before you run it.</span>
+  <span class="tool-rhythm-card"><strong>Remix it</strong> Turn the pattern toward your own sketch.</span>
+  <span class="tool-rhythm-card"><strong>Teach it</strong> Ask what changed and why.</span>
+</section>
 <main class="grid"><section class="card"><canvas id="canvas" width="680" height="420"></canvas><div class="stats"><div class="stat"><small>mouseX</small><strong id="mouseRead">0</strong></div><div class="stat"><small>mapped</small><strong id="mapRead">0</strong></div><div class="stat"><small>output</small><strong id="outRead">size</strong></div></div></section>
 <aside class="card"><h2>Controls</h2><div class="row"><label>mouse controls</label><select id="mode"><option>size</option><option>hue</option><option>speed</option><option>opacity</option><option>rotation</option><option>stroke weight</option><option>y position</option></select><span></span></div><div class="row"><label>map from</label><input id="outMin" type="range" min="-200" max="360" value="20"><span id="minVal">20</span></div><div class="row"><label>map to</label><input id="outMax" type="range" min="-200" max="360" value="180"><span id="maxVal">180</span></div><p><button id="freeze">Freeze</button> <button id="trail" class="active">Trail On</button></p><p style="color:#6b6760">Magic moment: mouseX is just a number until map() gives it a job.</p></aside></main><pre id="code"></pre></div>
 <script>

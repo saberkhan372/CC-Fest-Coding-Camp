@@ -38,12 +38,19 @@
         <span class="tool-pill type">Interactive Tool</span>
       </div>
       <h1>Coordinate System Explorer</h1>
-      <p class="tool-subtitle">Learn how coordinates, shapes, and drawing modes work together by sketching directly on a gridded p5.js canvas.</p>
+      <p class="tool-subtitle">Open the canvas, change one thing, and watch coordinates become p5.js shape code. You can sketch, predict, erase, and remix without needing to be a programmer first.</p>
       <div class="tool-tags">
         <span class="tool-tag">coordinates</span>
         <span class="tool-tag">shapes</span>
         <span class="tool-tag">drawing</span>
         <span class="tool-tag">grid</span>
+      <section class="tool-rhythm" aria-label="How to use this workshop tool">
+        <span class="tool-rhythm-card"><strong>Open it</strong> Start with the canvas before the code.</span>
+        <span class="tool-rhythm-card"><strong>Change it</strong> Move one control or value at a time.</span>
+        <span class="tool-rhythm-card"><strong>Predict it</strong> Name what you expect before you run it.</span>
+        <span class="tool-rhythm-card"><strong>Remix it</strong> Turn the pattern toward your own sketch.</span>
+        <span class="tool-rhythm-card"><strong>Teach it</strong> Ask what changed and why.</span>
+      </section>
       </div>
     </header>
 
@@ -53,8 +60,8 @@
           <div class="card-inner">
             <div class="card-header">
               <div>
-                <h2>Main Workspace</h2>
-                <p>Switch tools, draw on the canvas, and watch the coordinate logic update in real time.</p>
+                <h2>Try the Sketch</h2>
+                <p>Switch tools, draw on the canvas, and notice how position and size become visible.</p>
               </div>
             </div>
             <div class="canvas-frame">
@@ -67,7 +74,7 @@
           <div class="card-inner">
             <div class="card-header">
               <div>
-                <h2>Code Preview</h2>
+                <h2>What the Canvas Is Saying in Code</h2>
                 <p>The most recent drawing action is translated into p5.js shape code here.</p>
               </div>
               <button class="button ghost copy-button" onclick="copyCode()">Copy Code</button>
@@ -84,7 +91,7 @@
           <div class="card-inner">
             <div class="card-header">
               <div>
-                <h2>Controls</h2>
+                <h2>Change One Thing</h2>
                 <p>Turn the grid on or off, choose a drawing mode, and adjust the colors you sketch with.</p>
               </div>
             </div>
@@ -124,7 +131,7 @@
           <div class="card-inner">
             <div class="card-header">
               <div>
-                <h2>Sketch State</h2>
+                <h2>What Changed?</h2>
                 <p>These values track the current tool, grid behavior, and how much has been drawn.</p>
               </div>
             </div>
@@ -136,30 +143,43 @@
           <div class="card-inner">
             <div class="card-header">
               <div>
-                <h2>Try / Notice / Remix</h2>
+                <h2>Open / Change / Predict / Remix / Teach</h2>
                 <p>Use the prompts to turn the drawing canvas into a mini-lesson.</p>
               </div>
             </div>
             <div class="lesson-grid">
               <div class="lesson-card">
-                <h3>Try this</h3>
+                <h3>Open</h3>
+                <p>Start with the grid visible and move your mouse around before drawing. Read the coordinate label like a map.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Change</h3>
                 <p>Turn the grid on, choose <code>Rectangle</code>, and draw three different shapes while reading the coordinate labels.</p>
               </div>
               <div class="lesson-card">
-                <h3>Notice this</h3>
+                <h3>Predict</h3>
                 <p>The numbers in each shape function describe position and size. The same grid helps you predict where each shape will land.</p>
               </div>
               <div class="lesson-card">
-                <h3>Remix this</h3>
+                <h3>Remix</h3>
                 <p>Switch to <code>Line</code> mode and try drawing a letter, a map, or a tiny scene using only coordinates and shapes.</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Teach</h3>
+                <p>Ask someone else to point to a spot first, predict the x/y pair, then draw and compare the guess with the canvas.</p>
               </div>
             </div>
           </div>
         </article>
+
+        <article class="care-note">
+          <h2>Beginner-safe note</h2>
+          <p>You can just watch the numbers move. Questions count as participation, and unfinished sketches are welcome.</p>
+        </article>
       </aside>
     </main>
 
-    <footer class="tool-footer">CC Fest Coding Camp · Coordinate System Explorer · Coordinates, shapes, and drawing logic</footer>
+    <footer class="tool-footer">CC Fest Coding Camp · Coordinate System Explorer · Free and friendly · Open to remix · Creative coding for all</footer>
   </div>
 
   <script>

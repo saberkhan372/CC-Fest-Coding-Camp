@@ -312,6 +312,7 @@
       return;
     }
 
+    const lessonCards = workshopLessons(tool).map(([heading, body]) => `<div class="lesson-card"><h3>${heading}</h3><p>${body}</p></div>`).join("");
     const state = stateFrom(tool);
     document.title = `${tool.title} - CC Fest Coding Camp`;
     document.getElementById("app").innerHTML = `
@@ -325,26 +326,33 @@
           <h1>${tool.title}</h1>
           <p class="tool-subtitle">${tool.subtitle}</p>
           <div class="tool-tags">${tool.tags.map((tag) => `<span class="tool-tag">${tag}</span>`).join("")}</div>
+          <section class="tool-rhythm" aria-label="How to use this workshop tool">
+            <span class="tool-rhythm-card"><strong>Open it</strong> Start with the canvas before the code.</span>
+            <span class="tool-rhythm-card"><strong>Change it</strong> Move one control or value at a time.</span>
+            <span class="tool-rhythm-card"><strong>Predict it</strong> Name what you expect before you run it.</span>
+            <span class="tool-rhythm-card"><strong>Remix it</strong> Turn the pattern toward your own sketch.</span>
+            <span class="tool-rhythm-card"><strong>Teach it</strong> Ask what changed and why.</span>
+          </section>
         </header>
         <section class="tool-layout">
           <div class="workspace-panel">
             <article class="card">
               <div class="card-inner">
-                <div class="card-header"><div><h2>Live Canvas</h2><p>Move the pointer over the canvas and adjust the controls.</p></div><button class="button ghost" id="resetBtn">Reset</button></div>
+                <div class="card-header"><div><h2>Try the Sketch</h2><p>Move the pointer over the canvas and adjust the controls.</p></div><button class="button ghost" id="resetBtn">Reset</button></div>
                 <div class="canvas-frame"><div id="canvas-container"><canvas id="toolCanvas" width="640" height="420"></canvas></div></div>
               </div>
             </article>
             <article class="card">
               <div class="card-inner">
-                <div class="card-header"><div><h2>Code Preview</h2><p>Copy this pattern into a p5.js sketch and remix the values.</p></div></div>
+                <div class="card-header"><div><h2>What the Canvas Is Saying in Code</h2><p>Copy this pattern into a p5.js sketch and remix the values.</p></div></div>
                 <div class="code-panel"><pre id="codeOutput"></pre></div>
               </div>
             </article>
           </div>
           <aside class="stack-panel">
-            <article class="card"><div class="card-inner"><div class="card-header"><div><h2>Controls</h2><p>Small changes, visible consequences.</p></div></div><div class="controls-grid" id="controls"></div></div></article>
-            <article class="card"><div class="card-inner"><div class="card-header"><div><h2>Readouts</h2><p>Watch the values change as the sketch runs.</p></div></div><div class="stat-list" id="stats"></div></div></article>
-            <article class="card"><div class="card-inner"><div class="lesson-grid">${tool.lessons.map(([heading, body]) => `<div class="lesson-card"><h3>${heading}</h3><p>${body}</p></div>`).join("")}</div></div></article>
+            <article class="card"><div class="card-inner"><div class="card-header"><div><h2>Change One Thing</h2><p>Small changes, visible consequences.</p></div></div><div class="controls-grid" id="controls"></div></div></article>
+            <article class="card"><div class="card-inner"><div class="card-header"><div><h2>What Changed?</h2><p>Watch the values change as the sketch runs.</p></div></div><div class="stat-list" id="stats"></div></div></article>
+            <article class="card"><div class="card-inner"><div class="card-header"><div><h2>Open / Change / Predict / Remix / Teach</h2><p>A workshop rhythm for using the tool with beginners.</p></div></div><div class="lesson-grid">${lessonCards}</div></div></article>
           </aside>
         </section>
         <footer class="tool-footer">CC Fest Coding Camp · Workshop Tool · ${tool.title}</footer>
@@ -386,6 +394,20 @@
 
     updateCode();
     requestAnimationFrame(frame);
+  }
+
+  function workshopLessons(tool) {
+    const find = (name, fallback) => {
+      const hit = tool.lessons.find(([heading]) => heading.toLowerCase() === name);
+      return hit ? hit[1] : fallback;
+    };
+    return [
+      ["Open", find("try", "Start with the running sketch and describe what the canvas is doing before touching the code.")],
+      ["Change", "Adjust one control or value, then pause long enough to see the consequence."],
+      ["Predict", find("notice", "Name the relationship between the control, the code, and the visible behavior.")],
+      ["Remix", find("remix", "Borrow the pattern for a personal sketch, classroom prompt, or tiny experiment.")],
+      ["Teach", "Invite learners to explain the change in their own words before moving to the next idea."]
+    ];
   }
 
   function controlEl(control, state, onUpdate) {
