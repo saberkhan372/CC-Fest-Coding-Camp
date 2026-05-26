@@ -660,6 +660,25 @@
     </div>
   </section>
 
+
+  <section class="teaching-note" aria-label="Teacher move">
+    <h2>Teacher move</h2>
+    <div class="teaching-note-grid">
+      <div class="teaching-note-card">
+        <strong>Prompt</strong>
+        <span>Ask learners to write a prediction: if let count = 0 is declared inside draw() and count++ follows it, what will count show on frame 1000? Collect the predictions, then run it and ask someone to explain what actually happened.</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Misconception</strong>
+        <span>Students see "x is not defined" and assume they misspelled the variable. Often the real cause is scope: the variable was declared inside one function and read inside another. Each function has its own local scope — a variable born in setup() is invisible in draw().</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Ask</strong>
+        <span>You want a ball to cross the screen — x increases by 2 each frame. Where should you declare x: inside draw(), inside setup(), or outside both? What breaks in each of the wrong two cases, and why?</span>
+      </div>
+    </div>
+  </section>
+
   <nav class="bottom-nav" aria-label="Bridge navigation">
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">&#8592; All bridges</a>
     <a href="../arrays-loops-as-system/">Next: Arrays + Loops: A System &#8594;</a>

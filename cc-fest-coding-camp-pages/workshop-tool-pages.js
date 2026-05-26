@@ -40,6 +40,11 @@
       type: "Interactive",
       subtitle: "Point an arrow, eye, creature, or spaceship toward the cursor while seeing the translate() -> rotate() -> draw sequence.",
       tags: ["atan2()", "rotate()", "translate()", "push()", "pop()"],
+      teachingNote: {
+        prompt: "Ask learners to move the origin sliders before moving the mouse, then describe what the arrow is rotating around.",
+        misconception: "Rotation does not happen around the shape by magic; it happens around the translated drawing origin.",
+        ask: "What breaks if you rotate first and translate second?"
+      },
       controls: [
         { id: "originX", label: "origin x", type: "range", min: 80, max: 560, step: 1, value: 320 },
         { id: "originY", label: "origin y", type: "range", min: 70, max: 350, step: 1, value: 210 },
@@ -112,6 +117,11 @@
       tags: ["data", "hover", "tooltip", "dist()", "interaction"],
       relatedBridges: ["distance-becomes-behavior", "data-in-drawing-out"],
       relatedSketches: ["parallel-arrays-bar-chart-seed", "one-dataset-three-views"],
+      teachingNote: {
+        prompt: "Have learners hover slowly and call out when the selected mark changes, then connect that moment to the radius value.",
+        misconception: "The tooltip is not attached to the mouse; the code is testing distance from the mouse to each data mark.",
+        ask: "What should happen if two points are inside the hover radius at the same time?"
+      },
       controls: [
         { id: "chart", label: "chart", type: "select", value: "bars", options: [["bars", "Bars"], ["dots", "Dots"]] },
         { id: "radius", label: "hover radius", type: "range", min: 18, max: 90, step: 1, value: 46 },
@@ -129,6 +139,11 @@
       type: "Interactive",
       subtitle: "Compare linear, ease-in, ease-out, ease-in-out, elastic, and bounce motion side by side with curve graphs and code snippets.",
       tags: ["easing", "motion design", "animation", "curves"],
+      teachingNote: {
+        prompt: "Set all curves to the same distance and duration, then ask learners which one feels fastest and why.",
+        misconception: "Easing does not change the destination. It changes how progress is distributed over time.",
+        ask: "Where on the graph is the object moving slowly, and where is it moving quickly?"
+      },
       controls: [
         { id: "duration", label: "duration", type: "range", min: 40, max: 180, step: 1, value: 100 },
         { id: "distance", label: "distance", type: "range", min: 120, max: 420, step: 1, value: 270 },
@@ -170,6 +185,11 @@
       type: "Interactive",
       subtitle: "Give many simple agents one rule at a time and watch local behavior create global patterns.",
       tags: ["agents", "rules", "emergence", "systems", "simulation"],
+      teachingNote: {
+        prompt: "Switch one rule at a time and ask learners to name the rule before describing the whole pattern.",
+        misconception: "The agents are not planning together. Each one follows a small local instruction every frame.",
+        ask: "What new pattern appears when the same rule is copied across many agents?"
+      },
       controls: [
         { id: "count", label: "agents", type: "range", min: 8, max: 80, step: 1, value: 32 },
         { id: "speed", label: "speed", type: "range", min: 0.2, max: 3, step: 0.1, value: 1.2 },
@@ -187,6 +207,11 @@
       type: "Practice Lab",
       subtitle: "Compare cryptic and readable versions of the same sketch. Naming, comments, and structure become debugging tools.",
       tags: ["debugging", "naming", "comments", "structure"],
+      teachingNote: {
+        prompt: "Show the cryptic version first and ask learners what each variable might mean before revealing the readable version.",
+        misconception: "Readable code is not just code with more comments. Names, spacing, and structure do most of the teaching.",
+        ask: "Which single rename would make this sketch easier to debug tomorrow?"
+      },
       controls: [
         { id: "view", label: "view", type: "select", value: "compare", options: [["compare", "Compare"], ["cryptic", "Cryptic only"], ["readable", "Readable only"]] },
         { id: "highlight", label: "highlight changes", type: "checkbox", value: true }
@@ -203,6 +228,11 @@
       type: "Interactive",
       subtitle: "Treat language as data with split(), join(), slice(), replace(), template literals, and controlled sentence generation.",
       tags: ["strings", "split()", "join()", "text data", "generative text"],
+      teachingNote: {
+        prompt: "Start with one sentence, run split(), then point to the moment the string becomes an array of words.",
+        misconception: "Text on screen is not always one fixed block. Code can take it apart, rearrange it, and rebuild it.",
+        ask: "What changes when the separator is a space, a comma, or an empty string?"
+      },
       controls: [
         { id: "input", label: "text", type: "text", value: "creative coding connects people" },
         { id: "operation", label: "operation", type: "select", value: "split", options: [["split", "split words"], ["join", "join with +"], ["slice", "slice first 12"], ["replace", "replace coding"], ["template", "template literal"]] }
@@ -219,6 +249,11 @@
       type: "Advanced",
       subtitle: "See parent and child classes side by side, with inherited properties, overridden methods, and super() highlighted.",
       tags: ["classes", "extends", "super()", "inheritance", "OOP"],
+      teachingNote: {
+        prompt: "Turn on duplication and ask learners what code both child classes would otherwise have to repeat.",
+        misconception: "Inheritance is not required just because objects look similar. It helps when they share behavior and setup.",
+        ask: "Which method belongs in the parent class, and which method should the child override?"
+      },
       controls: [
         { id: "child", label: "child class", type: "select", value: "enemy", options: [["enemy", "Enemy extends Character"], ["sparkle", "Sparkle extends Particle"], ["button", "Button extends Widget"]] },
         { id: "showDupes", label: "show duplication", type: "checkbox", value: false }

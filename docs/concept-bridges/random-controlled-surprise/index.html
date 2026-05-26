@@ -658,6 +658,25 @@
     </div>
   </section>
 
+
+  <section class="teaching-note" aria-label="Teacher move">
+    <h2>Teacher move</h2>
+    <div class="teaching-note-grid">
+      <div class="teaching-note-card">
+        <strong>Prompt</strong>
+        <span>Switch to the "Once vs draw()" tab. Reload the sketch twice and observe what stays the same and what changes each run. Ask learners to locate where random() is called — once at startup, or once per frame — before explaining why the results differ.</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Misconception</strong>
+        <span>Students expect random() to avoid repeating values and to spread evenly over time. It has no memory — each call is independent, so the same value can appear back to back. It's not "unfair"; it's stateless.</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Ask</strong>
+        <span>You want each circle to choose a color once when it's created and keep it forever. Should random() be called in setup(), inside draw() every frame, or at the moment the circle is made? What changes about the sketch's look in each case?</span>
+      </div>
+    </div>
+  </section>
+
   <nav class="bottom-nav" aria-label="Bridge navigation">
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">&#8592; All bridges</a>
     <a href="../noise-smooth-randomness/">Next: Noise: Smooth Randomness &#8594;</a>

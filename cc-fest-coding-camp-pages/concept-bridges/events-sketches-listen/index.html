@@ -637,6 +637,25 @@
     </div>
   </section>
 
+
+  <section class="teaching-note" aria-label="Teacher move">
+    <h2>Teacher move</h2>
+    <div class="teaching-note-grid">
+      <div class="teaching-note-card">
+        <strong>Prompt</strong>
+        <span>Hold the mouse button and drag slowly across the canvas for 3 seconds. Predict how many times mousePressed() fires before you release. Then check the click counter and compare.</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Misconception</strong>
+        <span>Students use mouseIsPressed inside draw() expecting it to behave like mousePressed() — but mouseIsPressed is true every frame the button is held, not once per click. One captures a continuous state; the other captures a single moment.</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Ask</strong>
+        <span>You want a light toggle: click once to turn on, click again to turn off. Would you put the flip inside mousePressed() or check mouseIsPressed inside draw()? What single line of code inside mousePressed() would switch the state?</span>
+      </div>
+    </div>
+  </section>
+
   <nav class="bottom-nav">
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#concept-bridges">← All concept bridges</a>
     <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/vectors-arrows-that-store-motion/">Next: Vectors: Arrows That Store Motion →</a>
