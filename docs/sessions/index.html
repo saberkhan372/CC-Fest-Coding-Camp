@@ -24,39 +24,50 @@
       <p>Each session has a generative poster. Open one to customize it, download a flyer, and find the tools and bridges used that day.</p>
     </header>
 
-    <div class="sessions-grid" id="sessions-grid">
-      <a class="session-card" href="template/">
-        <div class="session-card-thumb" id="thumb-template"></div>
-        <div class="session-card-meta">
-          <p class="session-label">Template</p>
-          <h2>Session Template</h2>
-          <p class="session-date">Start here to build a new session →</p>
-        </div>
-      </a>
-    </div>
+    <!-- Cards are rendered from SESSIONS array below. To add a session:
+         add one object to SESSIONS and create its directory. No HTML changes needed. -->
+    <div class="sessions-grid" id="sessions-grid"></div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script>
-  // Render a small thumbnail poster for each session card
+  // ── Add a session: append one object here and create its directory. ──────
   const SESSIONS = [
     {
-      id: 'template',
-      topic: 'Your Session\nTopic Here',
-      date: 'Month DD, YYYY',
-      accent: '#c8391d',
-      seed: 42
+      id:       'template',
+      href:     'template/',
+      label:    'Template',
+      title:    'Session Template',
+      subtitle: 'Start here to build a new session →',
+      topic:    'Your Session\nTopic Here',
+      date:     'Month DD, YYYY',
+      accent:   '#c8391d',
+      seed:     42
     }
   ];
 
   document.fonts.ready.then(() => {
+    const grid = document.getElementById('sessions-grid');
+
     SESSIONS.forEach(s => {
-      const el = document.getElementById('thumb-' + s.id);
-      if (!el) return;
+      // Build the full card element from data — no matching HTML required
+      const card = document.createElement('a');
+      card.className = 'session-card';
+      card.href = s.href;
+      card.innerHTML = `
+        <div class="session-card-thumb" id="thumb-${s.id}"></div>
+        <div class="session-card-meta">
+          <p class="session-label">${s.label}</p>
+          <h2>${s.title}</h2>
+          <p class="session-date">${s.subtitle}</p>
+        </div>`;
+      grid.appendChild(card);
+
+      // Draw thumbnail into the newly created container
       new p5(p => {
         p.setup = () => {
           const cnv = p.createCanvas(520, 200);
-          cnv.parent(el);
+          cnv.parent(document.getElementById('thumb-' + s.id));
           p.noLoop();
           drawThumb(p, s);
         };

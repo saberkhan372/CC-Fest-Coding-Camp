@@ -298,17 +298,17 @@ Shipped:
 
 **Status: ✅ Done (v1) — shipped 2026-05-26**
 
-The long-term aspiration remains strong: every CC Fest session can have a generated poster page, and the poster is produced by a p5.js sketch that runs in the browser.
+What shipped:
 
-Possible implementation:
+- `/sessions/index.html` — listing page. Cards are fully generated from a `SESSIONS` JS array (id, href, label, title, subtitle, topic, date, accent, seed). To add a session: append one object to the array and create its directory. No HTML changes needed.
+- `/sessions/template/index.html` — poster page with live-editable fields (session #, topic, date, location, accent color), a p5.js sketch that redraws on every change, a "Shuffle design" seed randomizer, and a `saveCanvas()` download button. Sketch is inline; no separate `sketch.js` file.
+- `/sessions.css` — session-specific styles (listing and poster layouts).
+- `deploy.sh` updated to sync `sessions/` alongside `tools/` and `concept-bridges/`.
+- Homepage topbar gains a Sessions link.
 
-- A `/sessions/` directory.
-- Each session has an `index.html` with date, location, facilitator, topic, and a `sketch.js`.
-- The session listing page shows session tiles as generated poster thumbnails.
-- Sessions link to the tools and bridges used.
-- A Save button calls `saveCanvas()` so facilitators can download an event flyer.
+**Poster design:** cream background, double-offset dot grid, accent top bar with DM Mono label, Fraunces headline with auto-scaling, ink rule, two seeded rows of circles (accent-filled and outline), DM Mono date/location, maker credit bottom right. Fonts loaded via Google Fonts; sketch waits on `document.fonts.ready`.
 
-Keep this separate from the near-term site improvement work. It should not delay resource relationships, page templates, or homepage orientation.
+**To extend:** add an entry to `SESSIONS` in `sessions/index.html`, create `sessions/[slug]/index.html` by copying the template and hardcoding the session data.
 
 ---
 
