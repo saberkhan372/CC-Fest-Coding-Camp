@@ -116,6 +116,70 @@ a{color:inherit}
   font-weight:600;
 }
 
+.sketch-pathway{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-top:18px;
+}
+
+.sketch-pathway span{
+  display:block;
+  padding:10px 12px;
+  border:1.5px solid var(--cream-deep);
+  border-radius:10px;
+  background:#fff;
+  color:var(--ink-light);
+  font-size:12px;
+  line-height:1.35;
+}
+
+.sketch-pathway strong{
+  display:block;
+  color:var(--ink);
+  font-size:11px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin-bottom:3px;
+}
+
+/* Seed rhythm strip — 4-column, matches tool-rhythm visual language */
+.seed-rhythm{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;
+  margin-top:22px;
+  overflow:hidden;
+  border:2px solid var(--ink);
+  border-radius:8px;
+  background:#fff;
+}
+
+.seed-rhythm-card{
+  min-height:88px;
+  padding:14px;
+  border-right:2px solid var(--ink);
+  color:var(--ink-light);
+  font-size:13px;
+  line-height:1.35;
+}
+
+.seed-rhythm-card:last-child{border-right:none}
+
+.seed-rhythm-card:nth-child(1){background:#fff7d7}
+.seed-rhythm-card:nth-child(2){background:#eaf5ff}
+.seed-rhythm-card:nth-child(3){background:#eef8f2}
+.seed-rhythm-card:nth-child(4){background:#fceaf2}
+
+.seed-rhythm-card strong{
+  display:block;
+  margin-bottom:4px;
+  color:var(--ink);
+  font-size:11px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
 .sketch-layout{
   display:block;
 }
@@ -373,6 +437,7 @@ a{color:inherit}
 
 .lesson-grid{
   display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
   gap:12px;
 }
 
@@ -382,6 +447,12 @@ a{color:inherit}
   background:linear-gradient(180deg,var(--cream),#fff);
   border:1px solid var(--cream-dark);
 }
+
+.lesson-card:nth-child(1){background:#fff7d7;border-color:#f0c94b}
+.lesson-card:nth-child(2){background:#eaf5ff;border-color:#9ec7ec}
+.lesson-card:nth-child(3){background:#eef8f2;border-color:#9bc9aa}
+.lesson-card:nth-child(4){background:#fceaf2;border-color:#e5a8bf}
+.lesson-card:nth-child(5){background:#f5efff;border-color:#cbb8ef}
 
 .lesson-card h3{
   margin:0 0 6px;
@@ -421,6 +492,10 @@ a{color:inherit}
 
 @media(max-width:960px){
   .editor-layout{grid-template-columns:1fr}
+  .lesson-grid,.sketch-pathway{grid-template-columns:1fr 1fr}
+  .seed-rhythm{grid-template-columns:repeat(2,1fr)}
+  .seed-rhythm-card:nth-child(2n){border-right:none}
+  .seed-rhythm-card:nth-child(n+3){border-top:2px solid var(--ink)}
   .editor-pane{border-right:none;border-bottom:1px solid rgba(255,255,255,.05)}
   .preview-pane{border-left:none;border-top:1px solid var(--cream-dark)}
 }
@@ -429,6 +504,10 @@ a{color:inherit}
   .sketch-shell{padding:20px 16px 48px}
   .sketch-header,.card-inner{padding:20px}
   .card-header,.sketch-topbar{display:block}
+  .lesson-grid,.sketch-pathway{grid-template-columns:1fr}
+  .seed-rhythm{grid-template-columns:1fr}
+  .seed-rhythm-card,.seed-rhythm-card:nth-child(2n){border-right:none}
+  .seed-rhythm-card:nth-child(n+2){border-top:2px solid var(--ink)}
   .sketch-topbar a{display:inline-block;margin-top:10px}
   .chrome-right{gap:4px}
   .edbtn{padding:5px 10px;font-size:11px}

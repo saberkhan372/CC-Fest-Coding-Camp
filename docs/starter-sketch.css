@@ -143,6 +143,43 @@ a{color:inherit}
   margin-bottom:3px;
 }
 
+/* Seed rhythm strip — 4-column, matches tool-rhythm visual language */
+.seed-rhythm{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;
+  margin-top:22px;
+  overflow:hidden;
+  border:2px solid var(--ink);
+  border-radius:8px;
+  background:#fff;
+}
+
+.seed-rhythm-card{
+  min-height:88px;
+  padding:14px;
+  border-right:2px solid var(--ink);
+  color:var(--ink-light);
+  font-size:13px;
+  line-height:1.35;
+}
+
+.seed-rhythm-card:last-child{border-right:none}
+
+.seed-rhythm-card:nth-child(1){background:#fff7d7}
+.seed-rhythm-card:nth-child(2){background:#eaf5ff}
+.seed-rhythm-card:nth-child(3){background:#eef8f2}
+.seed-rhythm-card:nth-child(4){background:#fceaf2}
+
+.seed-rhythm-card strong{
+  display:block;
+  margin-bottom:4px;
+  color:var(--ink);
+  font-size:11px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
 .sketch-layout{
   display:block;
 }
@@ -456,6 +493,9 @@ a{color:inherit}
 @media(max-width:960px){
   .editor-layout{grid-template-columns:1fr}
   .lesson-grid,.sketch-pathway{grid-template-columns:1fr 1fr}
+  .seed-rhythm{grid-template-columns:repeat(2,1fr)}
+  .seed-rhythm-card:nth-child(2n){border-right:none}
+  .seed-rhythm-card:nth-child(n+3){border-top:2px solid var(--ink)}
   .editor-pane{border-right:none;border-bottom:1px solid rgba(255,255,255,.05)}
   .preview-pane{border-left:none;border-top:1px solid var(--cream-dark)}
 }
@@ -465,6 +505,9 @@ a{color:inherit}
   .sketch-header,.card-inner{padding:20px}
   .card-header,.sketch-topbar{display:block}
   .lesson-grid,.sketch-pathway{grid-template-columns:1fr}
+  .seed-rhythm{grid-template-columns:1fr}
+  .seed-rhythm-card,.seed-rhythm-card:nth-child(2n){border-right:none}
+  .seed-rhythm-card:nth-child(n+2){border-top:2px solid var(--ink)}
   .sketch-topbar a{display:inline-block;margin-top:10px}
   .chrome-right{gap:4px}
   .edbtn{padding:5px 10px;font-size:11px}

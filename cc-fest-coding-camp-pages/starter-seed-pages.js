@@ -2446,6 +2446,12 @@ ${code}
           <div class="tag-row">
             ${seed.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
           </div>
+          <div class="seed-rhythm" aria-label="How to use this starter sketch">
+            <span class="seed-rhythm-card"><strong>See it</strong> A working sketch — run it before reading the code.</span>
+            <span class="seed-rhythm-card"><strong>Change it</strong> ${seed.tryText}</span>
+            <span class="seed-rhythm-card"><strong>Remix it</strong> ${seed.remixText}</span>
+            <span class="seed-rhythm-card"><strong>Teach it</strong> Ask: what did you change, what moved, and what would you try next?</span>
+          </div>
         </header>
 
         <main class="sketch-layout">
@@ -2491,22 +2497,30 @@ ${code}
           <div class="card-inner">
             <div class="card-header">
               <div>
-                <h2>Try / Notice / Remix</h2>
-                <p>Keep the code small, visible, and easy to remix live, just like a p5.js Web Editor sketch.</p>
+                <h2>See it · Change it · Remix it · Teach it</h2>
+                <p>Four moves that turn any starter sketch into a full session.</p>
               </div>
             </div>
             <div class="lesson-grid">
               <div class="lesson-card">
-                <h3>Try this</h3>
+                <h3>See it</h3>
+                <p>${seed.liveSeed}</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Change it</h3>
                 <p>${seed.tryText}</p>
               </div>
               <div class="lesson-card">
-                <h3>Notice this</h3>
+                <h3>Code idea</h3>
                 <p>${seed.noticeText}</p>
               </div>
               <div class="lesson-card">
-                <h3>Remix this</h3>
+                <h3>Remix it</h3>
                 <p>${seed.remixText}</p>
+              </div>
+              <div class="lesson-card">
+                <h3>Teach it</h3>
+                <p>Ask learners to predict one change, run it, then name what the canvas taught them about the code.</p>
               </div>
             </div>
           </div>
