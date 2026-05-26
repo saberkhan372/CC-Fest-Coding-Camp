@@ -58,6 +58,9 @@
     "state-machines-sketches-have-modes": { family: "gameState", label: "States" },
     "pixels-pictures-are-data": { family: "pixels", label: "Pixels" },
     "data-in-drawing-out": { family: "dataMap", label: "Data" },
+    "random-controlled-surprise": { family: "randomSeed", label: "random()" },
+    "variable-scope-where-variables-live": { family: "varScope", label: "Scope" },
+    "data-as-argument": { family: "dataArg", label: "args" },
     "mouse-trail-drawing-seed": { family: "trailSeed", label: "Trail" },
     "draw-your-name-seed": { family: "nameSeed", label: "Name" },
     "code-postcard-from-my-world": { family: "postcard", label: "Postcard" },
@@ -1020,6 +1023,251 @@
         ctx.fillStyle = "rgba(44,42,38,.72)";
         ctx.font = "11px DM Mono, monospace";
         ctx.fillText("textAlign(CENTER, CENTER)", w / 2, h - 16);
+        break;
+      }
+      case "sineWave": {
+        // Unit circle on left, sine wave unrolling on right
+        const cx = w * 0.28, cy = h * 0.5, r = Math.min(w * 0.18, h * 0.32);
+        const angle = t * 1.4;
+        const dotX = cx + Math.cos(angle) * r;
+        const dotY = cy + Math.sin(angle) * r;
+        // Circle
+        ctx.strokeStyle = "rgba(61,90,128,.28)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+        // Cross-hairs
+        ctx.strokeStyle = "rgba(44,42,38,.12)";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cx - r - 4, cy); ctx.lineTo(cx + r + 4, cy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx, cy - r - 4); ctx.lineTo(cx, cy + r + 4); ctx.stroke();
+        // Horizontal dashed connector to wave
+        ctx.setLineDash([3, 4]);
+        ctx.strokeStyle = "rgba(224,122,95,.5)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(dotX, dotY);
+        ctx.lineTo(w * 0.46, dotY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        // Sine wave on right
+        const waveX0 = w * 0.46, waveW = w - waveX0 - 10;
+        ctx.strokeStyle = "#3d5a80";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        for (let i = 0; i <= 48; i++) {
+          const x = waveX0 + (i / 48) * waveW;
+          const y = cy + Math.sin((i / 48) * Math.PI * 2.5 + angle + Math.PI) * r;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        // Moving dot on circle
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, 5.5, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+      }
+      case "scope": {
+        // World axis (fixed, subtle) and local axis (rotated, vivid)
+        const ox = w * 0.35, oy = h * 0.52;
+        const len = Math.min(w, h) * 0.26;
+        const localAngle = Math.sin(t * 0.8) * 0.6;
+        // World axes (gray)
+        ctx.strokeStyle = "rgba(44,42,38,.18)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(12, oy); ctx.lineTo(12 + len * 0.7, oy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(12, oy); ctx.lineTo(12, oy - len * 0.7); ctx.stroke();
+        ctx.fillStyle = "rgba(44,42,38,.3)";
+        ctx.font = "700 9px DM Mono, monospace";
+        ctx.fillText("(0,0)", 14, oy - 4);
+        // Local axes (blue, rotated around ox,oy)
+        ctx.save();
+        ctx.translate(ox, oy);
+        ctx.rotate(localAngle);
+        ctx.strokeStyle = "#3d5a80";
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(len, 0); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -len); ctx.stroke();
+        // Arrow heads
+        ctx.fillStyle = "#3d5a80";
+        ctx.beginPath(); ctx.moveTo(len, 0); ctx.lineTo(len - 7, -4); ctx.lineTo(len - 7, 4); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(0, -len); ctx.lineTo(-4, -len + 7); ctx.lineTo(4, -len + 7); ctx.closePath(); ctx.fill();
+        // Small rect drawn in local space
+        ctx.fillStyle = "rgba(224,122,95,.72)";
+        ctx.fillRect(len * 0.38, -len * 0.52, len * 0.3, len * 0.28);
+        ctx.restore();
+        // Pivot dot
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(ox, oy, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(44,42,38,.55)";
+        ctx.font = "700 9px DM Mono, monospace";
+        ctx.fillText("LOCAL", ox + 4, oy + h * 0.22);
+        break;
+      }
+      case "gravityPhysics": {
+        // Ball with velocity arrow showing vector motion
+        const bx = w * 0.3 + Math.sin(t * 1.1) * w * 0.22;
+        const by = h * 0.45 + Math.cos(t * 0.9) * h * 0.2;
+        const vx = Math.cos(t * 1.1) * w * 0.22;
+        const vy = -Math.sin(t * 0.9) * h * 0.2;
+        const speed = Math.sqrt(vx * vx + vy * vy);
+        const nvx = speed > 0 ? vx / speed : 0;
+        const nvy = speed > 0 ? vy / speed : 0;
+        const arrLen = 32 + speed * 0.45;
+        // Velocity arrow (blue)
+        ctx.strokeStyle = "#3d5a80";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx + nvx * arrLen, by + nvy * arrLen);
+        ctx.stroke();
+        ctx.fillStyle = "#3d5a80";
+        ctx.beginPath();
+        ctx.moveTo(bx + nvx * arrLen, by + nvy * arrLen);
+        ctx.lineTo(bx + nvx * (arrLen - 9) - nvy * 5, by + nvy * (arrLen - 9) + nvx * 5);
+        ctx.lineTo(bx + nvx * (arrLen - 9) + nvy * 5, by + nvy * (arrLen - 9) - nvx * 5);
+        ctx.closePath();
+        ctx.fill();
+        // Ball
+        ctx.fillStyle = "#e07a5f";
+        ctx.beginPath();
+        ctx.arc(bx, by, 9, 0, Math.PI * 2);
+        ctx.fill();
+        // Labels
+        ctx.fillStyle = "#3d5a80";
+        ctx.font = "700 9px DM Mono, monospace";
+        ctx.fillText("velocity", bx + nvx * arrLen + 4, by + nvy * arrLen + 4);
+        break;
+      }
+      case "moduloFrame": {
+        // Grid cells colored by (index % N) — shows wrapping rhythm
+        const cols = 7, rows = 4;
+        const cw = (w - 16) / cols, ch = (h - 16) / rows;
+        const N = 3 + Math.floor(Math.abs(Math.sin(t * 0.4)) * 3);
+        for (let r2 = 0; r2 < rows; r2++) {
+          for (let c2 = 0; c2 < cols; c2++) {
+            const idx = r2 * cols + c2;
+            const rem = idx % N;
+            const hue = (rem / N) * 240 + 180;
+            ctx.fillStyle = `hsla(${hue},55%,62%,.72)`;
+            roundedRect(ctx, 8 + c2 * cw, 8 + r2 * ch, cw - 4, ch - 4, 5);
+            ctx.fill();
+          }
+        }
+        ctx.fillStyle = "rgba(44,42,38,.65)";
+        ctx.font = "700 10px DM Mono, monospace";
+        ctx.fillText(`i % ${N}`, 12, h - 7);
+        break;
+      }
+      case "randomSeed": {
+        // Left side: chaotic random dots; Right side: seeded (still)
+        const mid2 = w * 0.52;
+        ctx.strokeStyle = "rgba(44,42,38,.1)";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(mid2, 8); ctx.lineTo(mid2, h - 8); ctx.stroke();
+        // Seeded side (right) — deterministic positions using a simple lcg
+        const seed = 42;
+        let s = seed;
+        const lcg = () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+        for (let i = 0; i < 8; i++) {
+          const x = mid2 + 10 + lcg() * (w - mid2 - 20);
+          const y = 14 + lcg() * (h - 28);
+          ctx.fillStyle = "rgba(61,90,128,.75)";
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // Random side (left) — animated with time-varying jitter
+        for (let i = 0; i < 8; i++) {
+          const baseX = 10 + (i % 4) * ((mid2 - 16) / 4) + 6;
+          const baseY = 16 + Math.floor(i / 4) * (h * 0.44) + 10;
+          const jx = baseX + Math.sin(t * 7.3 + i * 2.1) * 12;
+          const jy = baseY + Math.cos(t * 5.8 + i * 3.4) * 12;
+          ctx.fillStyle = "rgba(224,122,95,.75)";
+          ctx.beginPath();
+          ctx.arc(jx, jy, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = "rgba(224,122,95,.8)";
+        ctx.font = "700 9px DM Mono, monospace";
+        ctx.fillText("random()", 8, h - 8);
+        ctx.fillStyle = "rgba(61,90,128,.8)";
+        ctx.fillText("seed", mid2 + 8, h - 8);
+        break;
+      }
+      case "varScope": {
+        // Two boxes: global (outer) and local/function (inner)
+        const pad = 10;
+        const globalW = w - pad * 2, globalH = h - pad * 2;
+        // Global box
+        ctx.strokeStyle = "rgba(61,90,128,.35)";
+        ctx.lineWidth = 1.5;
+        roundedRect(ctx, pad, pad, globalW, globalH, 10);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(61,90,128,.06)";
+        ctx.fill();
+        ctx.fillStyle = "rgba(61,90,128,.6)";
+        ctx.font = "700 9px DM Mono, monospace";
+        ctx.fillText("let x = 10", pad + 9, pad + 16);
+        // Function inner box
+        const fx = pad + 16, fy = pad + 26, fw = globalW - 32, fh = globalH - 48;
+        ctx.strokeStyle = "rgba(224,122,95,.4)";
+        ctx.lineWidth = 1.5;
+        roundedRect(ctx, fx, fy, fw, fh, 8);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(224,122,95,.08)";
+        ctx.fill();
+        ctx.fillStyle = "rgba(224,122,95,.7)";
+        ctx.font = "700 9px DM Mono, monospace";
+        ctx.fillText("function draw() {", fx + 7, fy + 15);
+        // Variable indicator — pulses in draw box
+        const pulse2 = 0.55 + Math.sin(t * 2.2) * 0.45;
+        ctx.fillStyle = `rgba(224,122,95,${pulse2})`;
+        ctx.beginPath();
+        ctx.arc(fx + fw * 0.5, fy + fh * 0.55, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(44,42,38,.65)";
+        ctx.font = "700 9px DM Mono, monospace";
+        ctx.fillText("x", fx + fw * 0.5 - 3, fy + fh * 0.55 + 4);
+        break;
+      }
+      case "dataArg": {
+        // Data values feeding into a drawing function as arguments
+        const vals = [0.38, 0.65, 0.82, 0.5, 0.71];
+        const barW = (w - 28) / vals.length;
+        const maxH = h * 0.52;
+        const baseY = h - 22;
+        vals.forEach((v, i) => {
+          const bh = v * maxH;
+          const x = 14 + i * barW;
+          const highlight = Math.floor(t * 1.5) % vals.length === i;
+          ctx.fillStyle = highlight ? "#e07a5f" : "rgba(61,90,128,.55)";
+          roundedRect(ctx, x, baseY - bh, barW - 5, bh, 5);
+          ctx.fill();
+          if (highlight) {
+            // Arrow from bar to top label
+            ctx.strokeStyle = "rgba(224,122,95,.7)";
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(x + (barW - 5) / 2, baseY - bh - 4);
+            ctx.lineTo(x + (barW - 5) / 2, 12);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = "#e07a5f";
+            ctx.font = "700 10px DM Mono, monospace";
+            ctx.textAlign = "center";
+            ctx.fillText(Math.round(v * 100), x + (barW - 5) / 2, 11);
+            ctx.textAlign = "left";
+          }
+        });
+        ctx.fillStyle = "rgba(44,42,38,.55)";
+        ctx.font = "700 9px DM Mono, monospace";
+        ctx.fillText("rect(x, y, data)", 10, h - 8);
         break;
       }
       default:
