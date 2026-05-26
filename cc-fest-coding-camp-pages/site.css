@@ -117,12 +117,32 @@ a{color:inherit}
 .topbar-link:hover{color:var(--accent)}
 
 .hero{
-  background:var(--panel);
+  position:relative;
+  overflow:hidden;
+  background:var(--cream);
   border:2px solid var(--ink);
   border-radius:var(--radius);
   padding:44px;
   box-shadow:var(--shadow);
   margin-bottom:26px;
+}
+
+/* Live Perlin-noise background sketch — the generative visual IS the hero */
+#hero-canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+  display:block;
+  pointer-events:none;
+}
+
+/* All hero content floats above the canvas */
+.hero-grid,
+.hero-steps{
+  position:relative;
+  z-index:1;
 }
 
 .eyebrow{
@@ -141,6 +161,12 @@ a{color:inherit}
   letter-spacing:-.04em;
   font-weight:900;
   max-width:860px;
+  /* Inline cream behind each line of text so it reads over the sketch */
+  display:inline;
+  background:var(--cream);
+  padding:0 6px 6px;
+  -webkit-box-decoration-break:clone;
+  box-decoration-break:clone;
 }
 
 .lede{
@@ -148,6 +174,9 @@ a{color:inherit}
   max-width:780px;
   font-size:clamp(18px,2vw,24px);
   color:var(--ink-light);
+  display:inline-block;
+  background:var(--cream);
+  padding:4px 6px;
 }
 
 .lede a{
