@@ -143,8 +143,7 @@
 
 /* ─── POSTER PROOF ──────────────────────────────────────────────────────── */
 /* Filled artifact card for Phase 9 real images.
-   Replaces the dashed .artifact-frame placeholder when a real image exists.
-   Use inside .artifact-slot alongside .artifact-caption. */
+   Use alongside .artifact-caption when permission-safe camp images exist. */
 
 .poster-proof {
   position: relative;
