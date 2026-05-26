@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sessions — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../site.css?v=20260526-phase10">
+  <link rel="stylesheet" href="../sessions.css?v=20260526-phase11">
+  <meta name="description" content="CC Fest Coding Camp session posters — each session as a generative artifact.">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="session-shell">
+    <div class="session-topbar">
+      <a href="../index.html">← Back to tool library</a>
+      <a href="https://ccfest.rocks">ccfest.rocks</a>
+    </div>
+
+    <header class="sessions-header">
+      <h1>CC Fest Sessions</h1>
+      <p>Each session has a generative poster. Open one to customize it, download a flyer, and find the tools and bridges used that day.</p>
+    </header>
+
+    <div class="sessions-grid" id="sessions-grid">
+      <a class="session-card" href="template/">
+        <div class="session-card-thumb" id="thumb-template"></div>
+        <div class="session-card-meta">
+          <p class="session-label">Template</p>
+          <h2>Session Template</h2>
+          <p class="session-date">Start here to build a new session →</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script>
+  // Render a small thumbnail poster for each session card
+  const SESSIONS = [
+    {
+      id: 'template',
+      topic: 'Your Session\nTopic Here',
+      date: 'Month DD, YYYY',
+      accent: '#c8391d',
+      seed: 42
+    }
+  ];
+
+  document.fonts.ready.then(() => {
+    SESSIONS.forEach(s => {
+      const el = document.getElementById('thumb-' + s.id);
+      if (!el) return;
+      new p5(p => {
+        p.setup = () => {
+          const cnv = p.createCanvas(520, 200);
+          cnv.parent(el);
+          p.noLoop();
+          drawThumb(p, s);
+        };
+      });
+    });
+  });
+
+  function drawThumb(p, s) {
+    p.background(250, 246, 240);
+    // dot grid
+    p.fill(44, 42, 38, 23);
+    p.noStroke();
+    for (let x = 2; x < p.width; x += 20) {
+      for (let y = 2; y < p.height; y += 20) {
+        p.circle(x, y, 3);
+        p.circle(x + 10, y + 10, 3);
+      }
+    }
+    // accent bar
+    const col = p.color(s.accent);
+    p.fill(col);
+    p.noStroke();
+    p.rect(0, 0, p.width, 36);
+    // label
+    p.fill(255, 253, 247);
+    p.textFont('DM Mono');
+    p.textSize(10);
+    p.text('CC FEST · CODING CAMP', 14, 23);
+    // topic
+    p.fill(44, 42, 38);
+    p.textFont('Fraunces');
+    p.textSize(28);
+    p.textLeading(30);
+    p.text(s.topic, 14, 72);
+    // circles
+    p.randomSeed(s.seed);
+    const n = 7, m = 14, sp = (p.width - 2 * m) / (n - 1);
+    for (let i = 0; i < n; i++) {
+      const x = m + i * sp;
+      const d = 14 + p.random(-4, 4);
+      if (p.random() > 0.55) {
+        p.fill(col); p.noStroke();
+      } else {
+        p.noFill(); p.stroke(44, 42, 38); p.strokeWeight(1.5);
+      }
+      p.circle(x, 165, d);
+    }
+    // date
+    p.noStroke();
+    p.fill(107, 103, 96);
+    p.textFont('DM Mono');
+    p.textSize(9);
+    p.text(s.date, 14, 190);
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Session Template — CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../site.css?v=20260526-phase10">
+  <link rel="stylesheet" href="../../sessions.css?v=20260526-phase11">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="poster-shell">
+    <div class="session-topbar">
+      <a href="../index.html">← All sessions</a>
+      <a href="../../index.html">Tool library</a>
+    </div>
+
+    <header class="poster-page-header">
+      <h1>Session Template</h1>
+      <p>Edit the fields to customize the poster. Download a PNG to use as a session flyer.</p>
+    </header>
+
+    <div class="poster-layout">
+      <div class="poster-frame">
+        <div id="poster-canvas"></div>
+      </div>
+
+      <aside class="poster-stack">
+        <div class="poster-card">
+          <h3>Session info</h3>
+          <div class="poster-field">
+            <label for="f-session">Session #</label>
+            <input id="f-session" type="text" value="01" maxlength="6">
+          </div>
+          <div class="poster-field">
+            <label for="f-topic">Topic / headline</label>
+            <input id="f-topic" type="text" value="Creative Coding">
+          </div>
+          <div class="poster-field">
+            <label for="f-date">Date</label>
+            <input id="f-date" type="text" value="Month DD, YYYY">
+          </div>
+          <div class="poster-field">
+            <label for="f-location">Location</label>
+            <input id="f-location" type="text" value="Your City">
+          </div>
+          <div class="poster-field">
+            <label for="f-accent">Accent color</label>
+            <input id="f-accent" type="color" value="#c8391d">
+          </div>
+        </div>
+
+        <div class="poster-card">
+          <h3>Poster</h3>
+          <div class="poster-btn-row">
+            <button class="poster-btn" onclick="randomizeSeed()">Shuffle design</button>
+            <button class="poster-btn primary" onclick="savePoster()">Download PNG</button>
+          </div>
+        </div>
+
+        <div class="poster-card">
+          <h3>Session resources</h3>
+          <ul class="resource-list" id="resource-list">
+            <li><a href="../../index.html#concept-bridges">
+              <span class="resource-type">Concept bridge</span>
+              <span>Add a bridge link here</span>
+            </a></li>
+            <li><a href="../../index.html#interactive-tools">
+              <span class="resource-type">Workshop tool</span>
+              <span>Add a tool link here</span>
+            </a></li>
+            <li><a href="../../index.html#starter-sketches">
+              <span class="resource-type">Starter sketch</span>
+              <span>Add a sketch link here</span>
+            </a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script>
+  let sketch;
+  let currentSeed = Math.floor(Math.random() * 10000);
+
+  const POSTER_W = 600;
+  const POSTER_H = 840;
+
+  document.fonts.ready.then(() => {
+    sketch = new p5(p => {
+      p.setup = () => {
+        const cnv = p.createCanvas(POSTER_W, POSTER_H);
+        cnv.parent('poster-canvas');
+        p.noLoop();
+        drawPoster(p);
+      };
+    });
+  });
+
+  function getPosterData() {
+    return {
+      session: document.getElementById('f-session').value || '01',
+      topic:   document.getElementById('f-topic').value   || 'Creative Coding',
+      date:    document.getElementById('f-date').value    || 'Month DD, YYYY',
+      location:document.getElementById('f-location').value|| 'Your City',
+      accent:  document.getElementById('f-accent').value  || '#c8391d',
+      seed:    currentSeed
+    };
+  }
+
+  function redraw() {
+    if (sketch) drawPoster(sketch);
+  }
+
+  function randomizeSeed() {
+    currentSeed = Math.floor(Math.random() * 10000);
+    redraw();
+  }
+
+  function savePoster() {
+    if (sketch) sketch.saveCanvas('cc-fest-session-poster', 'png');
+  }
+
+  // Wire up all inputs
+  ['f-session','f-topic','f-date','f-location','f-accent'].forEach(id => {
+    document.getElementById(id).addEventListener('input', redraw);
+  });
+
+  // ─── Poster drawing ───────────────────────────────────────────────────────
+
+  function drawPoster(p) {
+    const d = getPosterData();
+    const accent = p.color(d.accent);
+
+    // Background
+    p.background(250, 246, 240);
+
+    // Dot grid
+    p.fill(44, 42, 38, 23);
+    p.noStroke();
+    for (let x = 2; x < POSTER_W; x += 20) {
+      for (let y = 2; y < POSTER_H; y += 20) {
+        p.circle(x, y, 3);
+        p.circle(x + 10, y + 10, 3);
+      }
+    }
+
+    // Accent top bar
+    p.fill(accent);
+    p.noStroke();
+    p.rect(0, 0, POSTER_W, 90);
+
+    // CC FEST label in bar
+    p.fill(255, 253, 247);
+    p.textFont('DM Mono');
+    p.textSize(12);
+    p.textStyle(p.NORMAL);
+    p.textAlign(p.LEFT, p.TOP);
+    p.text('CC FEST · CODING CAMP', 28, 36);
+
+    // Session # label
+    p.fill(44, 42, 38);
+    p.textFont('DM Mono');
+    p.textSize(11);
+    p.textAlign(p.LEFT, p.TOP);
+    p.text('SESSION ' + d.session.toUpperCase(), 28, 118);
+
+    // Ink rule below session label
+    p.stroke(44, 42, 38);
+    p.strokeWeight(1.5);
+    p.line(28, 134, POSTER_W - 28, 134);
+
+    // Topic headline — Fraunces
+    p.noStroke();
+    p.fill(44, 42, 38);
+    p.textFont('Fraunces');
+    p.textAlign(p.LEFT, p.TOP);
+
+    // Scale font size to fit
+    const maxW = POSTER_W - 56;
+    let fsize = 88;
+    p.textSize(fsize);
+    p.textLeading(fsize * 0.92);
+    while (p.textWidth(d.topic) > maxW && fsize > 32) {
+      fsize -= 4;
+      p.textSize(fsize);
+      p.textLeading(fsize * 0.92);
+    }
+    p.text(d.topic, 28, 152, maxW);
+
+    // ─── Generative mark ──────────────────────────────────────────────────
+    p.randomSeed(d.seed);
+
+    const circleY = 590;
+    const margin = 28;
+    const count = 8;
+    const spacing = (POSTER_W - 2 * margin) / (count - 1);
+
+    for (let i = 0; i < count; i++) {
+      const x = margin + i * spacing;
+      const baseD = 38 + p.random(-10, 10);
+      const filled = p.random() > 0.52;
+      const double = p.random() > 0.7;
+
+      if (filled) {
+        p.fill(accent);
+        p.noStroke();
+      } else {
+        p.noFill();
+        p.stroke(44, 42, 38);
+        p.strokeWeight(2);
+      }
+      p.circle(x, circleY, baseD);
+
+      // Inner echo ring on some circles
+      if (double) {
+        p.noFill();
+        p.stroke(44, 42, 38);
+        p.strokeWeight(1.5);
+        p.circle(x, circleY, baseD * 0.5);
+      }
+    }
+
+    // Second row — offset smaller circles
+    p.randomSeed(d.seed + 1);
+    const count2 = 5;
+    const spacing2 = (POSTER_W - 2 * margin) / (count2 - 1);
+    for (let i = 0; i < count2; i++) {
+      const x = margin + i * spacing2 + spacing2 * 0.5;
+      if (x > POSTER_W - margin) continue;
+      const baseD = 22 + p.random(-6, 6);
+      const filled = p.random() > 0.6;
+      if (filled) {
+        p.fill(accent);
+        p.noStroke();
+      } else {
+        p.noFill();
+        p.stroke(44, 42, 38);
+        p.strokeWeight(1.5);
+      }
+      p.circle(x, circleY + 50, baseD);
+    }
+
+    // ─── Bottom metadata ──────────────────────────────────────────────────
+    // Ink rule above metadata
+    p.stroke(44, 42, 38);
+    p.strokeWeight(1);
+    p.line(28, 730, POSTER_W - 28, 730);
+
+    p.noStroke();
+    p.fill(107, 103, 96);
+    p.textFont('DM Mono');
+    p.textSize(12);
+    p.textAlign(p.LEFT, p.TOP);
+    p.text(d.date, 28, 742);
+    p.text(d.location, 28, 762);
+
+    // Maker credit — bottom right
+    p.textSize(10);
+    p.textAlign(p.RIGHT, p.BOTTOM);
+    p.text('CC FEST · 2026', POSTER_W - 28, POSTER_H - 22);
+  }
+  </script>
+</body>
+</html>

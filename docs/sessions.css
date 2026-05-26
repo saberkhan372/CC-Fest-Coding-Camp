@@ -1,0 +1,279 @@
+/* ─── CC Fest Sessions ──────────────────────────────────────────────────────
+   Applies to sessions/index.html (listing) and sessions/*/index.html (poster).
+   Depends on tokens from site.css :root. Load site.css before this file.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ─── SHARED SHELL ─────────────────────────────────────────────────────────── */
+
+.session-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+}
+
+.session-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.session-topbar a {
+  text-decoration: none;
+  color: var(--ink-light, #6b6760);
+}
+
+.session-topbar a:hover { color: var(--accent, #c8391d); }
+
+/* ─── SESSION LISTING ──────────────────────────────────────────────────────── */
+
+.sessions-header {
+  margin-bottom: 32px;
+}
+
+.sessions-header h1 {
+  margin: 0 0 8px;
+  font-size: clamp(36px, 5vw, 52px);
+  letter-spacing: -.04em;
+  line-height: 1;
+}
+
+.sessions-header p {
+  margin: 0;
+  color: var(--ink-light, #6b6760);
+  max-width: 620px;
+  font-size: 16px;
+}
+
+.sessions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.session-card {
+  border: 2px solid var(--ink, #2c2a26);
+  border-radius: 14px;
+  background: var(--panel, #fffdf7);
+  box-shadow: 6px 6px 0 rgba(44,42,38,.12);
+  overflow: hidden;
+  text-decoration: none;
+  display: block;
+  color: inherit;
+  transition: transform .1s;
+}
+
+.session-card:hover { transform: translateY(-2px); }
+
+.session-card-thumb {
+  height: 200px;
+  background: var(--cream, #faf6f0);
+  border-bottom: 2px solid var(--ink, #2c2a26);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.session-card-thumb canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+.session-card-meta {
+  padding: 16px;
+}
+
+.session-label {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent, #c8391d);
+}
+
+.session-card-meta h2 {
+  margin: 0 0 4px;
+  font-size: 19px;
+  letter-spacing: -.02em;
+}
+
+.session-date {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-light, #6b6760);
+  font-family: 'DM Mono', ui-monospace, monospace;
+}
+
+/* ─── POSTER PAGE ──────────────────────────────────────────────────────────── */
+
+.poster-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+}
+
+.poster-page-header {
+  margin-bottom: 22px;
+}
+
+.poster-page-header h1 {
+  margin: 0 0 4px;
+  font-size: 28px;
+  letter-spacing: -.03em;
+}
+
+.poster-page-header p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-light, #6b6760);
+}
+
+.poster-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 270px;
+  gap: 22px;
+  align-items: start;
+}
+
+.poster-frame {
+  border: 2px solid var(--ink, #2c2a26);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 6px 6px 0 rgba(44,42,38,.12);
+  background: var(--cream, #faf6f0);
+}
+
+.poster-frame canvas {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+}
+
+.poster-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.poster-card {
+  background: var(--panel, #fffdf7);
+  border: 2px solid var(--ink, #2c2a26);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 4px 4px 0 rgba(44,42,38,.10);
+}
+
+.poster-card h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  letter-spacing: -.01em;
+}
+
+.poster-field {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.poster-field:last-child { margin-bottom: 0; }
+
+.poster-field label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-light, #6b6760);
+}
+
+.poster-field input[type="text"] {
+  width: 100%;
+  border: 1.5px solid var(--cream-deep, #e4dccf);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 14px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.poster-field input[type="color"] {
+  width: 100%;
+  min-height: 36px;
+  border: 1.5px solid var(--cream-deep, #e4dccf);
+  border-radius: 8px;
+  padding: 3px;
+  background: #fff;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.poster-btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.poster-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: 2px solid var(--ink, #2c2a26);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 rgba(44,42,38,.10);
+}
+
+.poster-btn.primary {
+  background: var(--accent, #c8391d);
+  border-color: var(--accent, #c8391d);
+  color: #fff;
+}
+
+.poster-btn:hover { transform: translateY(-1px); }
+
+.resource-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.resource-list a {
+  display: grid;
+  gap: 1px;
+  padding: 9px 12px;
+  border: 1.5px solid var(--cream-deep, #e4dccf);
+  border-radius: 8px;
+  background: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  color: var(--ink, #2c2a26);
+}
+
+.resource-list a:hover { border-color: var(--accent, #c8391d); }
+
+.resource-type {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--accent, #c8391d);
+}
+
+/* ─── RESPONSIVE ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 760px) {
+  .session-shell,
+  .poster-shell { padding: 20px 16px 40px; }
+  .poster-layout { grid-template-columns: 1fr; }
+  .session-topbar { display: block; }
+  .session-topbar a { display: inline-block; margin-top: 8px; }
+}

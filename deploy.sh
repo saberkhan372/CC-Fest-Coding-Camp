@@ -15,7 +15,7 @@ for f in "$SRC"/*.css "$SRC"/*.js "$SRC"/*.html; do
   echo "  copied $(basename "$f")"
 done
 
-for dir in tools concept-bridges; do
+for dir in tools concept-bridges sessions; do
   if [ -d "$SRC/$dir" ]; then
     echo "Syncing $dir/ ..."
     mkdir -p "$DST/$dir"
