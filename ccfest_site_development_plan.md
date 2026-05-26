@@ -1,406 +1,441 @@
-# CC Fest Coding Camp Tools — Site Development Plan
+# CC Fest Coding Camp Tools - Site Development Plan
 
 *Last updated: 2026-05-25*
 
-This document captures the detailed development roadmap for the Creative Coding Tools website, grounded in Saber Khan's design practice, the CC Fest aesthetic tradition, and the current state of the codebase.
+This document captures the development roadmap for the Creative Coding Tools website, grounded in Saber Khan's design practice, the CC Fest aesthetic tradition, and the current state of the codebase.
+
+The plan prioritizes **visible, useful navigation and teaching improvements** without letting metadata, cross-linking, or infrastructure become a rabbit hole.
+
+Core direction:
+
+- Cross-links across **Bridges -> Tools -> Sketches** are the highest-value change.
+- Start with 5-6 complete examples, then expand.
+- Keep "Teacher move" and "Break it on purpose" tightly scoped.
+- Add the hero maker-credit immediately.
+- Treat homepage and representative page templates as parallel work.
+- Keep the Camp Archive image fill and generative poster engine in the roadmap, but scoped separately.
 
 ---
 
 ## What the site is now vs. what it could become
 
-The current site is a well-structured tool index with solid bones: the paper texture, Fraunces headlines, hard offset shadows, and cream-ink palette are all working. The Care Callout is tool-specific. All 110 tool and seed pages now have rhythm strips. The hero has a live Perlin-flow sketch as its background.
+The current site has strong bones: paper texture, Fraunces headlines, hard offset shadows, a cream-and-ink palette, a tool-specific care strip, bridge rhythm strips, and consistent tool/starter learning rhythms.
 
-But it reads more like a polished catalog than a place. CC Fest was never a catalog — it was a room where something was happening. The development plan below is about making the site feel like you walked into that room.
+The next step is not to make it more polished. The next step is to make it more connected and more obviously useful:
 
----
+- A first-time visitor should know where to begin.
+- A learner should see how an idea becomes a tool and then a remix.
+- A teacher should see how to turn a tool into a classroom prompt.
+- The site should feel like CC Fest: poster-bright, human-first, beginner-safe, artifact-rich, and open to remix.
 
-## Site purpose (three lines)
-
-These three framings should stay visible somewhere near the top of the homepage:
-
-- *A free workshop archive.*
-- *A tool shelf for learning p5.js.*
-- *A place to remix and teach from.*
-
-Not a product. Not a curriculum. An archive and a toolkit.
+The site should become a learning network, not just a catalog.
 
 ---
 
-## Phase 1 — Complete the rhythm ✅ Done
+## Phase 1 - Foundation cleanup ✅ Done
 
-**Status: Complete — shipped 2026-05-25**
+**Status: Complete — shipped 2026-05-26**
 
-All 110 tool and seed pages now have rhythm strips:
-- 55 static HTML pages: `tool-rhythm` hardcoded
-- 11 workshop pages: `tool-rhythm` injected by `workshop-tool-pages.js`
-- 44 seed pages: `seed-rhythm` (See it / Change it / Remix it / Teach it) injected by `starter-seed-pages.js`
+Three tasks: rhythm rollout, count audit, maker-credit.
 
-`.seed-rhythm` uses the same 4-column pastel-band visual language as `.tool-rhythm`. CSS in `starter-sketch.css`. Responsive: 2-col at 960px, 1-col at 720px.
+### Rhythm rollout
+
+All 110 tool and seed pages have rhythm strips:
+
+- 55 static HTML tool pages: `tool-rhythm` hardcoded in HTML
+- 11 JS-rendered workshop tool pages: `tool-rhythm` injected by `workshop-tool-pages.js`
+- 44 JS-rendered starter sketch pages: `seed-rhythm` (See it / Change it / Remix it / Teach it) injected by `starter-seed-pages.js`
+
+Seed rhythm is 4-column with pastel bands, matching the visual language of `tool-rhythm`. CSS in `starter-sketch.css`. Responsive at 960px (2-col) and 720px (1-col).
+
+### Resource count audit
+
+Corrected all stale counts from the old 60/40 figures to the actual library state:
+
+| Location | Was | Now |
+|----------|-----|-----|
+| Meta description | 60 tools, 40 sketches | 66 tools, 44 sketches |
+| og:description | 60 tools, 40 sketches | 66 tools, 44 sketches |
+| twitter:description | 60 tools, 40 sketches | 66 tools, 44 sketches |
+| Hero summary cards | 60, 40 | 66, 44 |
+| Lede link | "40 starter sketches" | "44 starter sketches" |
+| Gallery headers | already correct (66, 44) | unchanged |
+| Footer | already good | unchanged |
+
+Actual library: **21 bridges · 66 workshop tools · 44 starter sketches · 5 sessions**
+
+(66 = 55 static + 11 JS-rendered workshop pages. 44 = all pages using `renderStarterSeedPage`.)
+
+### Maker-credit
+
+Added `<p class="maker-credit">CC Fest · 2026</p>` to the hero, positioned bottom-right. 11px DM Mono, `ink-light`, no pointer-events. Matches the CC Fest poster tradition of crediting the visual in the corner. CSS class added to `site.css`.
+
+### Hero background
+
+Replaced the Perlin-noise canvas (which had timing bugs and felt cliché) with a pure CSS offset dot-grid pattern: SVG background, 20×20px tile, dots at `(2,2)` and `(12,12)`, 9% opacity. Dot-grid notebook register — workshop surface, not digital polish. Zero JS, no timing risk.
+
+### Archive slots
+
+Five artifact slots exist in the Camp Arc section with visitor-facing labels. HTML comment is internal-only. No authoring language visible to visitors. Real images to be added in Phase 9.
 
 ---
 
-## Phase 2 — The homepage as a poster ✅ Done
+## Phase 2A - Homepage signal
 
-**Status: Complete — shipped 2026-05-25**
+**Status: Next**
 
-`hero-sketch.js` (139 lines, plain canvas 2D, no library): a Perlin-style flow field using layered sine functions. 140 particles follow smooth noise vectors, drawing thin ink-on-cream strokes. Canvas fades with `rgba(250,246,240,0.055)` each tick — dissolves old trails rather than clearing, matching `thing.pde`. Pauses off-screen via `IntersectionObserver`. Static tick-mark grid on `prefers-reduced-motion`.
+This track handles fast homepage improvements that make the page feel more like a CC Fest poster and less like a product index.
 
-CSS: `#hero-canvas` is `position:absolute; inset:0; z-index:0`. `.hero-grid` and `.hero-steps` sit at `z-index:1`. H1 and lede get `background:var(--cream)` with `box-decoration-break:clone` so each text line has its own cream backing over the sketch.
+### Hero maker-credit ✅ Done
 
-### Still to do in Phase 2
+`<p class="maker-credit">CC Fest · 2026</p>` — bottom-right of the hero, 11px DM Mono, `ink-light`. Shipped in Phase 1.
 
-- **Maker-credit line.** Add `<p class="maker-credit">drawn with noise() · p5.js</p>` in the bottom-right corner of the hero. CC Fest posters always credited the generative work. One CSS class, immediate. Use `position:absolute; bottom:12px; right:16px; z-index:1` inside `.hero`.
-- **"What this site is" band.** A tight horizontal strip (styled like `hero-steps`, not a card) directly after the hero with the three purpose lines above. Only build this if visitor testing reveals confusion about the site's purpose — it risks being redundant with a clear hero.
-- **Resource count audit.** Confirm the visible counts (21 bridges, 60 tools, 40 sketches, 5 sessions) match actual library state across: meta tags, hero summary cards, stat bars, and gallery section headers. Search for `31`, `40`, `60`, `66` and confirm all are intentional.
+### Reframe "What this site is" as optional and restrained
+
+The three-line framing is useful only if it helps first-time visitors who arrive confused. Do not add it as a feature row.
+
+If included, style it as a tight horizontal strip like the current `.hero-steps`, not as cards:
+
+- A free workshop archive.
+- A tool shelf for learning p5.js.
+- A place to remix and teach from.
+
+Do not repeat the hero lede. Do not turn it into SaaS-style value props.
+
+### Footer language
+
+The footer should say something real and short:
+
+> CC Fest is a free creative coding community for educators and learners. Sessions happen throughout the year.
+
+Keep links direct: CC Fest, Notion, GitHub, contact/sign-up if available.
 
 ---
 
-## Phase 3 — Camp Archive wall (content + design, ongoing)
+## Phase 2B - Representative page templates
 
-**Status: Slots exist with visitor-facing labels, no real images yet**
+**Status: Next, in parallel with Phase 2A**
 
-Five artifact slots exist in the homepage Camp Arc section. They need real content.
+Do not finish the homepage before touching learning pages. The homepage is the first impression; bridge, tool, and starter pages are where people actually spend time.
 
-### Immediate fills available
+Pick one representative page of each type:
 
-- CC Fest posters 2017–2020 are in the archive on Desktop. Four (NYC 2017, LA 2018, SF 2019, Virtual 2020) can go directly in as `<img>` elements with the existing `.artifact-frame` border treatment.
-- ethicalCS poster/animation assets (in `ethicalCS/images/`) as a fifth slot documenting the broader program lineage.
+- One concept bridge.
+- One workshop tool.
+- One starter sketch.
 
-### Artifact metadata shape
+Add the new page-level patterns to those first:
 
-Each artifact slot needs a small metadata record. Keep it as a JS object alongside the existing render data:
+- Cross-links.
+- Teacher move panel.
+- Try-next/remix structure.
+- Selective "Break it on purpose" prompt where it teaches a real edge case.
+
+Use these pages as templates before scaling across the full site.
+
+---
+
+## Phase 3 - Resource relationships v1
+
+**Status: Highest-value navigation work**
+
+Make the three resource types visibly and clickably connected:
+
+- **Concept Bridges:** understand the idea.
+- **Workshop Tools:** try the idea.
+- **Starter Sketches:** remix into a project.
+
+### First pass: hand-author a small complete set
+
+Start with 5-6 high-priority concept bridges. For each one:
+
+- Hand-author 2-4 related tools.
+- Hand-author 1-3 related starter sketches.
+- Add a "Try next" panel to the bridge page.
+- Link from related tools back to the bridge.
+- Link from related starter sketches back to the bridge/tool idea when the template supports it.
+
+Do not block shipping on authoring all relationships across the site.
+
+### Suggested first bridges
+
+Use bridges that map cleanly to existing beginner paths:
+
+- Color: Numbers Become Feeling.
+- How p5.js Thinks About Time.
+- map() Range Translator.
+- Noise: Smooth Randomness.
+- Arrays: One Thing to Many Things.
+- State Machines: Sketches Have Modes.
+
+---
+
+## Phase 4 - Tag-based related-resource fallback
+
+**Status: After Phase 3**
+
+Use tags as a fallback so every page can suggest something useful without hand-authoring every relationship.
+
+Behavior:
+
+- Show hand-authored links first.
+- If no hand-authored links exist, show resources that share tags.
+- Keep recommendations short: 3-5 items is enough.
+- Do not show huge auto-generated lists.
+
+Implementation direction:
+
+- Extend existing JS data objects rather than creating a separate data system.
+- Keep data co-located with rendering logic in `workshop-tool-pages.js` and `starter-seed-pages.js`.
+- Add equivalent bridge metadata only where bridge rendering needs it.
+
+Fields to add where useful:
 
 ```js
-{
-  era: "Fall 2024",
-  title: "Art + Code / Teacher Camp",
-  type: "event flyer",           // flyer | poster | session-work | participant-work
-  imagePath: "assets/artifacts/fall-2024-flyer.jpg",
-  credit: "Saber Khan",
-  permission: "public",          // public | with-permission | placeholder
-  caption: "Art + Code / Teacher Camp · event flyer"
-}
+relatedBridges: []
+relatedTools: []
+relatedSketches: []
+firstChangePrompt: ""
+teachingPrompt: ""
 ```
 
-Store all artifact images under `docs/assets/artifacts/`. No server requirement. GitHub Pages compatible.
-
-### Design
-
-- Caption below each frame: DM Sans 12px, `ink-light`, visitor-facing label + year.
-- On click: lightbox (minimal JS, no library).
-- Hover: `border-style:solid`, `translateY(-2px)` — already in CSS.
-- Add `.artifact-caption` CSS class to the utility sheet (see Phase 5 visual utilities).
-
-**Longer term:** As each camp cohort completes, a new slot fills in. The grid grows. The wall becomes a record.
+A separate JSON file is not necessary unless the current JS object structure becomes painful to maintain.
 
 ---
 
-## Phase 4 — Resource navigation: connect bridges, tools, and starters
+## Phase 5 - Bridge index "Start here" and homepage "Best first"
 
-**Status: Not started — highest-value navigation change**
+**Status: After representative templates**
 
-The three resource types currently exist as separate lists. They should function as a single learning path:
+### Bridge index "Start here" pathway
 
-- **Concept Bridges** → understand the idea
-- **Workshop Tools** → try the idea
-- **Starter Sketches** → remix into a project
+Keep this from the original development plan.
 
-### Cross-links
+Add a recommended first path of 5-6 concept bridges. Display it as a numbered Fraunces list, not another grid.
 
-Add to each resource type:
+Use copy like:
 
-| Resource | Links to add |
-|----------|-------------|
-| Concept bridge | 2–4 related tools, 1–3 related starter sketches |
-| Workshop tool | its concept bridge, 1–2 related starter sketches |
-| Starter sketch | the concept/tool ideas it builds from |
+> If you're new, start here.
 
-**Implementation approach — two-tier linking:**
+Each item should link to:
 
-1. **Tag-based auto-links (default fallback):** Resources sharing tags get auto-linked in a "Related" sidebar. This keeps authoring burden low and scales automatically.
-2. **Hand-authored curated links (priority):** For the 5–6 most-used bridges, explicitly author the `relatedTools` and `relatedSketches` arrays in the JS data objects. Ship these first. Fill in the rest incrementally.
+- The bridge.
+- One matching tool.
+- One matching starter sketch when available.
 
-Add to the JS data objects in `workshop-tool-pages.js` and `starter-seed-pages.js`:
+Store the list as one editable JS array of slugs, not embedded throughout HTML.
 
-```js
-{
-  // existing fields...
-  relatedBridges: ["how-p5-thinks-about-time", "random-unpredictability"],
-  relatedTools: ["noise-lab", "noise-walker"],
-  relatedSketches: ["mini-generative-poster-seed"]
-}
-```
+### Homepage "Best first" row
 
-Do not create a separate JSON file — keep data co-located with rendering logic. GitHub Pages compatible.
+Add a small curated beginner entry point near the resource sections.
 
-### "Best first" curated row
+Rules:
 
-A row of 5–6 hand-picked tools near the top of the homepage for first-time visitors. Editable from one JS array in `site.js`:
+- Store as one editable array of 5-6 slugs.
+- Put the array near the top of `site.js` or in a small `curated.js`.
+- Render one "Best first" row.
+- Do not hard-code the same list in multiple HTML locations.
 
-```js
-const BEST_FIRST = [
-  "draw-loop-visualizer",
-  "shape-and-color-explorer",
-  "noise-lab",
-  "animation-explorer",
-  "map-explorer"
-];
-```
-
-Label it plainly: **"Start here."** Not "Featured" or "Recommended" or "Popular." One label. No persona selection. No onboarding flow.
-
-### Bridge index "start here" pathway
-
-The bridge index currently lists all 21 bridges as a grid. Add a numbered sequence of 5–6 bridges at the top, displayed as a Fraunces italic numbered list (not a grid):
-
-```
-1. How p5.js Thinks About Time
-2. World Coordinates
-3. Random and Unpredictability
-4. Arrays
-5. Noise
-6. Pixels
-```
-
-Label: *"New here? Start with these."* Visitors can jump in anywhere; this just gives a thread.
+This is a small feature with high orientation value.
 
 ---
 
-## Phase 5 — Page template pass (bridges, tools, and seeds)
+## Phase 6 - Teacher move panels
 
-**Status: Not started — run in parallel with Phase 3**
+**Status: Expand after templates prove the pattern**
 
-Don't finish the homepage before touching page templates. Bridge and tool pages are where visitors spend most time.
+Add to bridge pages and featured/standard tool pages, but keep the scope strict.
 
-### Concept bridge pages
+Each panel has exactly three items:
 
-Keep the existing Fuzzy idea / See it / Change it / Code idea / Go next rhythm strip.
+- **Prompt:** one classroom prompt.
+- **Misconception:** one likely confusion.
+- **Ask:** one question to ask students.
 
-**Add "Teacher move" panel** (near bottom of each bridge page):
-- One classroom prompt
-- One likely misconception
-- One question to ask students
+Do not expand this into a full curriculum block. If it gets bigger than three items, it becomes a different product.
 
-Three items, no more. If it grows beyond three it becomes curriculum documentation, which is a different product.
+Good example:
 
-**Add "Try next" panel**:
-- Related workshop tools (2–3)
-- Related starter sketches (1–2)
-- One remix challenge
-
-**"Go next" rhythm card must link somewhere.** Currently it has a label but no destination. Point it to the first tool in the bridge's related-tools list, or to the next bridge in the suggested sequence.
-
-**Every bridge page needs:**
-- A visible p5.js concept label (already exists on most as a `.tool-pill`)
-- A beginner-safe "what to try first" instruction
-- A "what breaks?" edge-case prompt where there's a counterintuitive result
-
-### Workshop tool pages
-
-Already standardized around Open it / Change it / Predict it / Remix it / Teach it.
-
-**Add "Break it on purpose" prompt** — only where there's a surprising or counterintuitive result. Not on every tool. Examples:
-- *Set speed to 0. What stops? What doesn't?*
-- *Make alpha 0. Where does the shape go?*
-- *Push the range past 100. What breaks first?*
-- *Remove randomness entirely. What do you get?*
-
-Keep prompt short: one sentence + one question. Style as `.teaching-note`.
-
-**Add "Workshop Station" section** (reusable card component):
-- **See:** what changes on canvas
-- **Code idea:** the p5.js concept in one sentence
-- **Try:** one concrete slider or value change
-- **Teach:** one classroom adaptation
-
-This is the demo-station card a facilitator would hand to a co-teacher.
-
-### Starter sketch pages
-
-Already standardized around See it / Change it / Remix it / Teach it (done in Phase 1).
-
-**Add "Smallest first change" card:**
-- One value to change
-- One shape/color/text substitution
-- One optional stretch goal
-
-**Add "Make it yours" prompts using CC Fest language:**
-- *Turn it into a poster.*
-- *Make it about your neighborhood.*
-- *Make a tiny game.*
-- *Make it useful for a class.*
-
-Where possible, include a code excerpt with one highlighted editable line. Use `<mark>` inside `<code>` or a CSS `.editable-line` highlight class.
+- **Prompt:** Make the ball stop, then make it start again.
+- **Misconception:** Students may think speed is the object instead of a value controlling position.
+- **Ask:** What number changed, and what did your eye notice first?
 
 ---
 
-## Phase 6 — Visual system utilities
+## Phase 7 - Tool copy pass and selective "Break it on purpose"
 
-**Status: Not started**
+**Status: Ongoing**
 
-Add a small `docs/site-components.css` file with reusable semantic CSS classes. Do not touch `site.css`. Use existing tokens only — no new palette.
+### Tool subtitles
 
-```css
-.poster-proof    /* full-bleed image in the poster tradition */
-.maker-credit    /* small attribution line, DM Mono, bottom-right of a visual */
-.teaching-note   /* gold-soft background card for teacher prompts */
-.try-next        /* linked list of related resources */
-.artifact-caption /* caption below an archive artifact frame */
-.editable-line   /* highlighted line in a code excerpt */
-```
+Rewrite tool subtitles so they make a claim about what the learner can do, not just what the function is.
 
-**Gold as signal:** `--gold` currently appears only in the norms strip. Also use it as a thin left border on tool cards for "new" or "recently updated" items. Controlled by a `data-new` attribute toggled in the JS data. Remove the flag after 30 days.
+- **Before:** Controls how opacity is applied to a shape.
+- **After:** Change how visible anything is - 0 is invisible, 255 is solid, and everything in between is yours.
 
-**Primary section headers:** Some `CONCEPT BRIDGES` / `WORKSHOP TOOLS` labels should use Fraunces 700 italic instead of uppercase DM Sans — matching the poster tradition's use of heavy display type for event names. Not all headers; just the primary section titles on the homepage.
+### Break it on purpose
 
----
+Add these prompts only where an edge case teaches something real.
 
-## Phase 7 — Copy and voice pass
+Good prompts:
 
-**Status: Partially done — 6 bridge cards rewritten; tool subtitles and seed descriptions not yet addressed**
+- "Set speed to 0. What stops? What doesn't?"
+- "Make alpha 0. Is the shape gone, or just invisible?"
+- "Reverse the map range. What flips?"
 
-### Voice rules
+Rules:
 
-**Lead with learner experience or core insight.** Not "A bridge for X." Not "Controls how Y is applied."
-
-**Preferred phrases:**
-- *"Change one thing. See what happens."*
-- *"The code and the canvas are connected."*
-- *"Questions count."*
-- *"Unfinished work counts."*
-- *"Use this in class by asking…"*
-
-**Phrases to remove on sight:**
-- "Robust ecosystem"
-- "Differentiated pathways"
-- "Technical fluency"
-- "Transformational ed-tech"
-- Any phrase that sounds like a grant application
-
-**Tool page subtitles** — rewrite as capability claims:
-- Before: *"Controls how opacity is applied to a shape"*
-- After: *"Change how visible anything is — 0 is invisible, 255 is solid, and everything in between is yours."*
-
-**Make teacher usefulness visible without making the site feel like a curriculum product.** The teaching prompts and "use this in class" language should feel like a workshop facilitator speaking, not like a scope-and-sequence document.
-
-### About page
-
-One page, no tools, no grid. What is CC Fest, who is this for, what happens in a session, how do you join. First person from Saber's perspective. Fraunces headline. One session photo (with permission). Link to signup.
-
-### Footer
-
-Replace generic placeholder with something real: *"CC Fest is a free creative coding community for educators and learners. Sessions happen throughout the year."*
+- Keep prompts short and tied to one edge case.
+- Do not add one to every tool just to satisfy a pattern.
+- Prefer surprising or counterintuitive results.
 
 ---
 
-## Phase 8 — The handmade quality (aesthetic finishing)
+## Phase 8 - Reusable visual components
 
-**Status: Not started**
+**Status: Low-scope, high reuse**
 
-The 1960s teach-in flyer shared the same DNA as CC Fest: activist ephemera, info in three columns, event-as-invitation. The site should feel like it was made by a person, not produced by a system.
+Add a small reusable CSS component layer, preferably `site-components.css`, rather than overloading `site.css`.
 
-1. **Ink texture on cards on hover.** Slightly increase paper texture opacity when a tool card is hovered — makes it feel like you just picked something up.
+Include:
 
-2. **Hand-drawn rhythm connectors (SVG).** Between the five rhythm cards on a bridge page, very thin SVG arrows (not CSS borders) connecting card to card — like handwriting. Echoes the poster tradition of drawing connecting lines between elements.
+- `.maker-credit`
+- `.teaching-note`
+- `.try-next`
+- `.poster-proof`
+- `.artifact-caption`
 
-3. **Error/empty state design.** When a sketch fails to load, the placeholder should not be a broken box — it should be a simple "Hello" p5.js sketch running with a note "the real sketch goes here." Honest and warm rather than broken.
+Rules:
+
+- Use existing tokens from `site.css`.
+- Keep hard ink borders and cream surfaces.
+- Use gold as signal, not decoration.
+- Keep mobile overflow rules explicit.
+- Avoid decorative SVG arrows unless they improve readability.
+- Keep components portable across homepage, bridge pages, tool pages, and starter pages.
 
 ---
 
-## Phase 9 — Generative poster engine (aspirational)
+## Phase 9 - Camp Archive real-image fill
 
-**Status: Not started — aspirational, separate track**
+**Status: Separate content/design phase**
 
-Every CC Fest session gets a generated poster page. The poster is produced by a p5.js sketch that runs in the browser.
+Keep the Camp Archive image fill in the roadmap, but do not let it block cross-linking and template improvements.
 
-- A `/sessions/` directory
-- Each session: `index.html` with date, location, facilitator, topic, and `sketch.js` as the generative poster
-- Session listing: grid of thumbnails, each a still frame from its sketch
-- Sessions link to the tools and bridges used
-- `saveCanvas()` button so facilitators can download and use as an actual event flyer
+The current artifact slots can be filled with real public/event poster images when ready. Use the existing archive-wall pattern:
 
-This closes the loop from the 2017 poster tradition to the 2026 web tool.
+- Real image where public/permission status is clear.
+- Labeled dashed slot where the artifact is missing or permission-dependent.
+- Visible caption and credit for every real image.
+
+This remains important because CC Fest is artifact-rich, but it is not the bottleneck for the next navigation/design push.
+
+---
+
+## Phase 10 - About page and footer polish
+
+**Status: Lower priority than cross-links and representative templates**
+
+The About page is still worth building, but it should not outrank the relationship/template work.
+
+About page direction:
+
+- One page.
+- No tool grid.
+- First-person from Saber's perspective when appropriate.
+- What CC Fest is.
+- Who it is for.
+- What happens in a session.
+- How to join or follow along.
+- One public/permission-safe session image if available.
+
+Footer polish remains a low-scope improvement:
+
+- Plain language.
+- Useful links.
+- No generic brand boilerplate.
+
+---
+
+## Phase 11 - Generative poster engine
+
+**Status: Aspirational and separate**
+
+The long-term aspiration remains strong: every CC Fest session can have a generated poster page, and the poster is produced by a p5.js sketch that runs in the browser.
+
+Possible implementation:
+
+- A `/sessions/` directory.
+- Each session has an `index.html` with date, location, facilitator, topic, and a `sketch.js`.
+- The session listing page shows session tiles as generated poster thumbnails.
+- Sessions link to the tools and bridges used.
+- A Save button calls `saveCanvas()` so facilitators can download an event flyer.
+
+Keep this separate from the near-term site improvement work. It should not delay resource relationships, page templates, or homepage orientation.
 
 ---
 
 ## What not to build
 
 - **User accounts.** Not right for this community or this tool.
-- **CMS or backend.** All static. The handmade quality comes partly from the HTML being legible and editable by the people who made it.
-- **Analytics dashboard.** Simple Plausible or Fathom if any — not Google Analytics.
-- **Dark mode toggle.** The cream-and-ink palette is the aesthetic; dark mode would require a full redesign not yet thought through.
-- **Social sharing buttons.** If the work is worth sharing, people will share it. The buttons cheapen the visual.
-- **Persona onboarding / "I am a..." flows.** Keep filters simple. One "Start here" curated row. No complex entry paths.
-- **Separate data format for resource metadata.** Keep all resource data as JS objects co-located with their render functions. No JSON files, no separate data layer.
+- **CMS or backend.** Keep the site static and GitHub Pages-compatible.
+- **Analytics dashboard.** Keep analytics lightweight if used at all.
+- **Dark mode toggle.** The cream-and-ink palette is the aesthetic.
+- **Social sharing buttons.** They cheapen the visual and are not needed.
+- **Full curriculum system.** Teacher moves should stay compact; full curriculum docs belong elsewhere.
+- **All-at-once metadata migration.** Start with a small authored set and tag fallback.
 
 ---
 
-## Sequenced roadmap
+## Revised roadmap
 
-| Phase | Work | Status |
-|-------|------|--------|
-| 1 | Rhythm strip rollout — all 110 pages | ✅ Done |
-| 2 | Hero live sketch + maker-credit line | ✅ Sketch done · Credit line pending |
-| 2 cont. | Resource count audit across meta/hero/headers | ⬜ Not started |
-| 3 | Camp Archive wall — artifact metadata + real images | ⬜ Not started |
-| 4 | Resource cross-links — tag auto-links + 5 hand-authored bridges | ⬜ Not started |
-| 4 cont. | "Best first" curated row + bridge index start-here sequence | ⬜ Not started |
-| 5 | Page template pass — teacher moves, try-next, break-it prompts | ⬜ Not started |
-| 6 | Visual utilities CSS (`site-components.css`) + gold-as-signal | ⬜ Not started |
-| 7 | Full copy pass — tool subtitles, seed descriptions, about page, footer | ⬜ Not started |
-| 8 | Handmade finishing — hover texture, SVG connectors, empty states | ⬜ Not started |
-| 9 | Generative poster engine — sessions directory | ⬜ Not started |
+| Phase | Work |
+|---|---|
+| 1 ✅ | Rhythm rollout (110 pages), count audit (66/44), maker-credit, dot-grid hero background. |
+| 2A | Homepage: optional "What this site is" strip if needed; footer already done. |
+| 2B | Representative templates: one bridge, one tool, one starter with cross-links and teaching structure. |
+| 3 | Resource relationships v1: 5-6 complete bridge-to-tool-to-sketch paths. |
+| 4 | Tag-based related-resource fallback using existing metadata. |
+| 5 | Bridge index "Start here" pathway and homepage "Best first" curated row. |
+| 6 | Expand relationships and teaching panels across remaining high-value pages. |
+| 7 | Tool copy pass and selective "Break it on purpose" prompts. |
+| 8 | Reusable visual components in a small component CSS layer. |
+| 9 | Camp Archive real-image fill, kept as its own content/design phase. |
+| 10 | About page and footer polish. |
+| 11 | Generative poster engine, aspirational/separate. |
 
----
-
-## Test checklist (run before any major push)
-
-### Static checks
-- Search for stale counts (`31`, `40`, `60`, `66`) and confirm all are intentional
-- Search for visible authoring phrases (`Add`, `TODO`, `coming soon`) that would read as internal notes on public pages
-- Confirm artifact permission status: `public` artifacts have images; `placeholder` slots have visitor-facing labels, not authoring instructions
-
-### Browser QA
-- Homepage at desktop width
-- Homepage at mobile width (check: no horizontal overflow, hero sketch renders, buttons fit)
-- One concept bridge page
-- One JS-rendered workshop tool page
-- One static workshop tool page
-- One starter sketch page
-
-### Interaction QA
-- Hero poster interaction (tilt, drag, remix mode)
-- Hero sketch animation (plays, pauses off-screen, static on reduced-motion)
-- Global search
-- Suit/pathway filters
-- Credits toggle
-- Tool controls (sliders, color pickers, selects)
-
-### Accessibility
-- Buttons have clear labels
-- Images have meaningful alt text
-- Artifact placeholders are understandable without images
-- Color contrast remains strong across cream/ink palette
-
-### Design-language checks
-- Real artifacts are doing visual work (not decorative placeholders)
-- Maker credits are visible on generative visuals
-- Beginner invitation is obvious above the fold
-- Teacher usefulness is visible without feeling like a curriculum product
-- **The site does not drift into startup/product polish**
+The first visible improvements should be: hero maker-credit, one complete bridge/tool/starter relationship path, and one representative page template of each type. That proves the direction before scaling it across the full library.
 
 ---
 
-## Key design references (for agents picking up this work)
+## Test plan
 
-- `ccfest_design_language_agent_guide.md` — full design language spec, CSS tokens, component anatomy, aesthetic principles, archive evidence
-- `docs/site.css` — main stylesheet (synced twin at `cc-fest-coding-camp-pages/site.css`)
-- `docs/tool-page.css` — tool page template stylesheet
-- `docs/concept-bridges/concept-bridge.css` — bridge page stylesheet
-- `docs/hero-sketch.js` — live Perlin-flow background sketch for the hero
-- `docs/starter-seed-pages.js` — JS renderer for all 44 seed pages (contains `seed-rhythm`)
-- `docs/workshop-tool-pages.js` — JS renderer for 11 workshop tool pages (contains `tool-rhythm`)
-- CC Fest poster archive: `/Users/saberkhan/Desktop/CC Fest/` — 2017–2020 NYC, LA, SF, Virtual posters
-- Coding the Canvas: sibling project; Inter/Caveat/JetBrains Mono, terracotta `#ef4b3f`, Caveat for "creative coding for all"
-- `thing.pde` (Processing sketch on Desktop): personal exploratory mode — Perlin noise, iteration, no decoration
-- VCV Rack patches (`perlin.vcv`, `three piece kit.vcv`): Perlin noise as aesthetic value across media
+Before treating this plan as current, verify:
+
+- The plan no longer contains outdated rhythm-strip counts or statuses that conflict with current work.
+- Cross-link work is explicitly incremental, not all-or-nothing.
+- No recommendation requires a backend, CMS, user account system, or non-static infrastructure.
+- The "What this site is" band is optional and strip-like, not a SaaS feature row.
+- `maker-credit`, teacher move, break-it prompts, best-first row, and tag fallback recommendations are all present.
+- Camp Archive image fill and generative poster engine remain in the plan but are scoped separately.
+
+When implementing site changes from this plan, also verify:
+
+- Homepage works at desktop and mobile widths.
+- One bridge, one tool, and one starter page render the new template patterns correctly.
+- Search and filters still work.
+- Related-resource links resolve.
+- No horizontal overflow appears on mobile.
+- Copy remains plainspoken, beginner-safe, and teacher-useful.
+
+---
+
+## Key design references
+
+- `ccfest_design_language_agent_guide.md` - full design language spec, CSS tokens, component anatomy, aesthetic principles, and archive evidence.
+- `docs/site.css` - main homepage/shared stylesheet.
+- `docs/tool-page.css` - tool page template stylesheet.
+- `docs/concept-bridges/concept-bridge.css` - bridge page stylesheet.
+- `docs/workshop-tool-pages.js` - generated workshop tool data/rendering.
+- `docs/starter-seed-pages.js` - generated starter sketch data/rendering.
+- CC Fest poster archive - public/event posters show the core rule: the generative sketch is the visual, and maker credits matter.
