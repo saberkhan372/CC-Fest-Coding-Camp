@@ -281,26 +281,16 @@ This remains important because CC Fest is artifact-rich, but it is not the bottl
 
 ## Phase 10 - About page and footer polish
 
-**Status: Lower priority than cross-links and representative templates**
+**Status: Done - shipped 2026-05-26**
 
-The About page is still worth building, but it should not outrank the relationship/template work.
+The About page now lives in the site itself, with a short CC Fest frame, audience notes, session rhythm, a note from Saber, and direct next-step links back into the tool library.
 
-About page direction:
+Shipped:
 
-- One page.
-- No tool grid.
-- First-person from Saber's perspective when appropriate.
-- What CC Fest is.
-- Who it is for.
-- What happens in a session.
-- How to join or follow along.
-- One public/permission-safe session image if available.
-
-Footer polish remains a low-scope improvement:
-
-- Plain language.
-- Useful links.
-- No generic brand boilerplate.
+- Local `about.html` in source and `docs/`.
+- Homepage topbar, hero, and footer point to the local About page.
+- Footer markup now uses plain text plus direct links, without inline spacing.
+- No session image was added; Phase 9 still owns real-image selection and permission-safe fills.
 
 ---
 

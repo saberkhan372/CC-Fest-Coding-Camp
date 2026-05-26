@@ -92,6 +92,7 @@ a{color:inherit}
   letter-spacing:.12em;
   text-transform:uppercase;
   color:var(--accent);
+  text-decoration:none;
 }
 
 .brand-mark::before{
@@ -1647,6 +1648,72 @@ body.search-active .station-peek-trigger{display:none !important}
   box-shadow:none;
 }
 
+.about-page{
+  display:grid;
+  gap:22px;
+}
+
+.about-hero,
+.about-note{
+  border:2px solid var(--ink);
+  border-radius:var(--radius);
+  background:#fffdf7;
+  box-shadow:var(--shadow);
+}
+
+.about-hero{padding:38px}
+
+.about-hero h1{
+  max-width:880px;
+  margin:0 0 14px;
+  font-size:clamp(38px,7vw,76px);
+  line-height:.95;
+  letter-spacing:-.03em;
+}
+
+.about-hero .lede{max-width:820px}
+
+.about-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+
+.about-card,
+.about-note{padding:24px}
+
+.about-card{
+  border:2px solid var(--ink);
+  border-radius:var(--radius-sm);
+  background:#fff;
+  box-shadow:3px 3px 0 rgba(32,28,26,.1);
+}
+
+.about-card:nth-child(1){background:#fff7d7}
+.about-card:nth-child(2){background:#eaf5ff}
+.about-card:nth-child(3){background:#eef8f2}
+.about-card:nth-child(4){background:#fceaf2}
+
+.about-card h2,
+.about-note h2{
+  margin:0 0 8px;
+  font-size:24px;
+}
+
+.about-card p,
+.about-note p{
+  margin:0;
+  color:var(--ink-light);
+}
+
+.about-note{background:var(--cream-dark)}
+
+.about-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
 .site-footer{
   margin-top:26px;
   padding:20px;
@@ -1657,6 +1724,24 @@ body.search-active .station-peek-trigger{display:none !important}
   font-size:13px;
   text-align:center;
 }
+
+.site-footer p{margin:0}
+
+.footer-links{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px 14px;
+  margin-top:10px;
+}
+
+.footer-links a{
+  color:var(--accent);
+  font-weight:700;
+  text-decoration:none;
+}
+
+.footer-links a:hover{text-decoration:underline}
 
 @media(max-width:980px){
   .hero-grid{grid-template-columns:1fr}
@@ -1687,6 +1772,10 @@ body.search-active .station-peek-trigger{display:none !important}
   .gallery-header,
   .site-topbar{display:block}
   .resource-rhythm{grid-template-columns:1fr}
+  .about-hero{padding:24px}
+  .about-grid{grid-template-columns:1fr}
+  .about-actions{display:grid}
+  .about-actions .button{width:100%}
   .gallery-count{display:inline-flex;margin-top:12px}
   .topbar-link{display:inline-block;margin-top:10px}
   .tool-card{min-height:unset}
