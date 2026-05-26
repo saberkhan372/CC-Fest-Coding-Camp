@@ -640,24 +640,64 @@
     <div class="legend-item"><span class="swatch" style="background:#eee;border-color:#ccc"></span> grid cell (faint)</div>
   </div>
 
-  <section class="pathways" aria-label="Practice and remix links">
-    <div class="pathways-title">What's next</div>
-    <div class="path-links">
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#tools" class="path-link">
-        <span class="path-link-type">Practice →</span>
-        <span class="path-link-name">Look for noise, terrain, or flow field tools in the workshop library</span>
-        <span class="path-link-arrow">›</span>
-      </a>
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/index.html#starter-sketches" class="path-link">
-        <span class="path-link-type">Remix →</span>
-        <span class="path-link-name">Take a starter sketch and drive position, size, or color using noise() instead of random()</span>
-        <span class="path-link-arrow">›</span>
-      </a>
-      <a href="https://saberkhan372.github.io/CC-Fest-Coding-Camp/concept-bridges/map-range-translator/" class="path-link">
-        <span class="path-link-type">Related →</span>
-        <span class="path-link-name">map() Range Translator — use map() to convert 0–1 noise output into useful ranges</span>
-        <span class="path-link-arrow">›</span>
-      </a>
+  <section class="try-next" aria-label="Try these next">
+    <h2>Try these next</h2>
+    <div class="related-grid">
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Workshop Tools</p>
+        <a class="related-link" href="../../tools/noise-lab/">
+          <span>Tool</span>
+          <strong>Noise Lab</strong>
+        </a>
+        <a class="related-link" href="../../tools/noise-walker/">
+          <span>Tool</span>
+          <strong>Noise Walker</strong>
+        </a>
+        <a class="related-link" href="../../tools/noise-vs-random-explorer/">
+          <span>Tool</span>
+          <strong>Noise vs Random Explorer</strong>
+        </a>
+      </div>
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Starter Sketches</p>
+        <a class="related-link" href="../../starter-sketches/wander-agent-seed/">
+          <span>Sketch</span>
+          <strong>Wander Agent Seed</strong>
+        </a>
+        <a class="related-link" href="../../starter-sketches/generative-tile-pattern-seed/">
+          <span>Sketch</span>
+          <strong>Generative Tile Pattern Seed</strong>
+        </a>
+        <a class="related-link" href="../../starter-sketches/mini-generative-poster-seed/">
+          <span>Sketch</span>
+          <strong>Mini Generative Poster Seed</strong>
+        </a>
+      </div>
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--bridge-muted)">Related Bridge</p>
+        <a class="related-link" href="../map-range-translator/">
+          <span>Bridge</span>
+          <strong>map() Range Translator — convert 0–1 noise output into useful ranges</strong>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="teaching-note" aria-label="Teacher move">
+    <h2>Teacher move</h2>
+    <div class="teaching-note-grid">
+      <div class="teaching-note-card">
+        <strong>Prompt</strong>
+        <span>Set the noise scale slider to its maximum value. What does the grid look like? Now drag it to its minimum. What changed, and why?</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Misconception</strong>
+        <span>Students often think noise() returns something random each call. Clarify: the same input coordinates always return the same output. It's a deterministic map, not a dice roll.</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Ask</strong>
+        <span>If you call noise(x, y) and noise(x + 0.001, y), which gives a more similar result — and why does that matter for smooth motion?</span>
+      </div>
     </div>
   </section>
 

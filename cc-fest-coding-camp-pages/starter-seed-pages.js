@@ -48,6 +48,8 @@ function draw() {
       session: "Session 2",
       subtitle: "A tiny clock-driven animation where p5.js keeps moving even when nobody touches the mouse or keyboard.",
       tags: ["frameCount", "time", "animation"],
+      relatedBridges: ["how-p5-thinks-about-time"],
+      relatedTools: ["animation-explorer", "framerate-visualizer"],
       liveSeed: "Watch the circle pulse and the color cycle automatically. Press Run after changing the modulo values.",
       tryText: "Change `% 100` to `% 200`, or change the color range from 360 to 120.",
       noticeText: "frameCount increases by 1 every time draw() runs, so the sketch has its own clock.",
@@ -78,6 +80,8 @@ function draw() {
       session: "Session 2",
       subtitle: "A smooth motion seed where sin() moves a ball back and forth using center, amplitude, and speed.",
       tags: ["sin()", "cos()", "cyclical motion"],
+      relatedBridges: ["triangle-circle-wave-explorer", "how-p5-thinks-about-time"],
+      relatedTools: ["sine-cosine-motion-explorer"],
       liveSeed: "The ball moves by itself. Change amplitude and speed to feel how sine motion works.",
       tryText: "Change amplitude from 120 to 40, then change speed from 0.03 to 0.08.",
       noticeText: "Amplitude controls how far the ball moves. The multiplier controls how fast it cycles.",
@@ -158,6 +162,8 @@ function draw() {
       session: "Session 5",
       subtitle: "A satisfying open-studio seed that combines arrays, objects, motion, randomness, lifespan, and cleanup.",
       tags: ["particles", "classes", "arrays"],
+      relatedBridges: ["arrays-one-thing-to-many-things", "objects-data-plus-behavior"],
+      relatedTools: ["object-lifecycle-visualizer"],
       liveSeed: "Drag on the canvas to emit particles. Each particle moves, fades, and then gets removed.",
       tryText: "Change the velocity range, color, life decrease, or number of particles added each frame.",
       noticeText: "The array stores many Particle objects. The loop updates each one and removes it when it is done.",
@@ -219,6 +225,8 @@ class Particle {
       session: "Session 5",
       subtitle: "A tiny complete game structure with start, play, win, lose, and restart screens controlled by one state variable.",
       tags: ["state", "games", "conditionals"],
+      relatedBridges: ["state-machines-sketches-have-modes", "conditionals-code-makes-choices"],
+      relatedTools: ["game-state-studio"],
       liveSeed: "Press space to start. Move the mouse to touch the target before time runs out. Press r to restart.",
       tryText: "Change the win score, time limit, target size, or player shape. Add enemies when the structure makes sense.",
       noticeText: "The state variable decides which screen runs. That keeps the game from becoming one giant draw().",
@@ -1027,6 +1035,9 @@ function mousePressed() {
       session: "Session 5",
       subtitle: "A small poster generator that combines text, shapes, and randomness so code immediately produces something publishable-looking.",
       tags: ["randomness", "text", "composition"],
+      relatedBridges: ["random-controlled-surprise", "noise-smooth-randomness"],
+      relatedTools: ["noise-lab", "noise-vs-random-explorer"],
+      relatedSketches: ["generative-tile-pattern-seed", "wander-agent-seed"],
       liveSeed: "Click to generate a new abstract poster. Press s to save the current poster as a PNG.",
       tryText: "Change the word bank, add a subtitle, or press s after generating a version you want to keep.",
       noticeText: "A few arrays and random choices are enough to make each poster feel distinct.",
@@ -2373,6 +2384,24 @@ function mousePressed() {
     }
   };
 
+  const RESOURCE_LINKS = {
+    bridges: {
+      "arrays-one-thing-to-many-things": "Arrays: One Thing to Many Things",
+      "conditionals-code-makes-choices": "Conditionals: Code Makes Choices",
+      "how-p5-thinks-about-time": "How p5.js Thinks About Time",
+      "objects-data-plus-behavior": "Objects: Data + Behavior",
+      "state-machines-sketches-have-modes": "State Machines: Sketches Have Modes",
+      "triangle-circle-wave-explorer": "Triangle to Circle to Wave Explorer"
+    },
+    tools: {
+      "animation-explorer": "Animation Explorer",
+      "framerate-visualizer": "frameRate() Visualizer",
+      "game-state-studio": "Game State Studio",
+      "object-lifecycle-visualizer": "Object Lifecycle Visualizer",
+      "sine-cosine-motion-explorer": "Sine + Cosine Motion Explorer"
+    }
+  };
+
   function buildRunnerDoc(code) {
     return `<!DOCTYPE html>
 <html lang="en">
@@ -2428,6 +2457,7 @@ ${code}
     const app = document.getElementById("app");
     if (!seed || !app) return;
 
+    const relatedPanel = renderRelatedResources(seed);
     document.title = `${seed.title} — CC Fest Coding Camp`;
     app.innerHTML = `
       <div class="sketch-shell">
@@ -2526,6 +2556,8 @@ ${code}
           </div>
         </section>
 
+        ${relatedPanel}
+
         <footer class="footer">${seed.footer}</footer>
       </div>
     `;
@@ -2583,6 +2615,38 @@ ${code}
     p5ExportButton.addEventListener("click", exportToP5Editor);
 
     runCurrentCode();
+  }
+
+  function renderRelatedResources(seed) {
+    const groups = [
+      ["Bridge", "relatedBridges", "bridges", "../../concept-bridges/"],
+      ["Tool", "relatedTools", "tools", "../"]
+    ].map(([label, key, type, base]) => {
+      const items = (seed[key] || []).map((slug) => {
+        const title = RESOURCE_LINKS[type][slug] || titleize(slug);
+        return `<a class="related-link" href="${base}${slug}/"><span>${label}</span><strong>${title}</strong></a>`;
+      }).join("");
+      return items ? `<div class="related-group">${items}</div>` : "";
+    }).join("");
+
+    if (!groups.trim()) return "";
+    return `
+      <section class="card try-next" style="margin-top:22px;">
+        <div class="card-inner">
+          <div class="card-header">
+            <div>
+              <h2>Try next</h2>
+              <p>Trace this sketch back to the idea, then forward into a workshop tool.</p>
+            </div>
+          </div>
+          <div class="related-grid">${groups}</div>
+        </div>
+      </section>
+    `;
+  }
+
+  function titleize(slug) {
+    return slug.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
   }
 
   window.renderStarterSeedPage = renderStarterSeedPage;

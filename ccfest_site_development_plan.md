@@ -114,24 +114,31 @@ Keep links direct: CC Fest, Notion, GitHub, contact/sign-up if available.
 
 ## Phase 2B - Representative page templates
 
-**Status: Next, in parallel with Phase 2A**
+**Status: ✅ Done — shipped 2026-05-26**
 
-Do not finish the homepage before touching learning pages. The homepage is the first impression; bridge, tool, and starter pages are where people actually spend time.
+Three representative pages — one of each type — now carry the full template pattern: `try-next` cross-links + `teaching-note` (teacher move panel). These are the templates to scale from.
 
-Pick one representative page of each type:
+### Pages updated
 
-- One concept bridge.
-- One workshop tool.
-- One starter sketch.
+**Concept bridge — `noise-smooth-randomness`**
+- Replaced generic `.pathways` section with proper `try-next` (3-column grid: Workshop Tools, Starter Sketches, Related Bridge).
+- Added `teaching-note` with 3 cards: Prompt (scale slider), Misconception (same input = same output), Ask (noise(x) vs noise(x+0.001)).
 
-Add the new page-level patterns to those first:
+**Workshop tool — `noise-lab` (static HTML)**
+- Added `teaching-note` CSS classes to `tool-page.css` (ported from `concept-bridge.css`, using tool-page tokens).
+- Added `try-next` + `teaching-note` before `</body>` in `noise-lab/index.html`.
+- Includes a "Break it on purpose" note: set scale to max, observe the loss of smoothness.
 
-- Cross-links.
-- Teacher move panel.
-- Try-next/remix structure.
-- Selective "Break it on purpose" prompt where it teaches a real edge case.
+**Starter sketch — `mini-generative-poster-seed`**
+- Added `relatedBridges: ["random-controlled-surprise", "noise-smooth-randomness"]`, `relatedTools: ["noise-lab", "noise-vs-random-explorer"]`, `relatedSketches: ["generative-tile-pattern-seed", "wander-agent-seed"]` to the seed data object in `starter-seed-pages.js`.
 
-Use these pages as templates before scaling across the full site.
+### What `try-next` looks like
+
+Three `.related-group` columns inside `.related-grid` inside `.try-next`. Each group has a muted uppercase label and `.related-link` cards (type span + title). Links are relative paths so they work on both local and GitHub Pages.
+
+### What `teaching-note` looks like
+
+`.teaching-note` container → `.teaching-note-grid` (3-col, collapses to 1-col at 860px) → three `.teaching-note-card` cells with `<strong>` label + `<span>` text. Optional "Break it on purpose" paragraph below the grid.
 
 ---
 
@@ -393,7 +400,7 @@ Keep this separate from the near-term site improvement work. It should not delay
 |---|---|
 | 1 ✅ | Rhythm rollout (110 pages), count audit (66/44), maker-credit, dot-grid hero background. |
 | 2A | Homepage: optional "What this site is" strip if needed; footer already done. |
-| 2B | Representative templates: one bridge, one tool, one starter with cross-links and teaching structure. |
+| 2B ✅ | Representative templates: noise-smooth-randomness bridge, noise-lab tool, mini-generative-poster-seed — all with try-next cross-links and teaching-note panels. |
 | 3 | Resource relationships v1: 5-6 complete bridge-to-tool-to-sketch paths. |
 | 4 | Tag-based related-resource fallback using existing metadata. |
 | 5 | Bridge index "Start here" pathway and homepage "Best first" curated row. |

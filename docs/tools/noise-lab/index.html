@@ -28,4 +28,63 @@ function renderCode(){code.textContent=`function draw() {
   }
 }`;}
 renderCode();draw();
-</script><script src="../../p5-export-helper.js?v=20260505-workshop-export"></script></body></html>
+</script><script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+<div class="wrap" style="margin-top:22px">
+  <section class="try-next" style="padding:20px;border:2px solid #2c2a26;border-radius:14px;background:#fff">
+    <h2 style="margin:0 0 12px;font-family:'Fraunces','DM Sans',sans-serif;font-size:20px">Try these next</h2>
+    <div class="related-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b6760">Concept Bridges</p>
+        <a class="related-link" href="../../concept-bridges/noise-smooth-randomness/">
+          <span>Bridge</span>
+          <strong>Noise: Smooth Randomness</strong>
+        </a>
+        <a class="related-link" href="../../concept-bridges/map-range-translator/">
+          <span>Bridge</span>
+          <strong>map() Range Translator</strong>
+        </a>
+      </div>
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b6760">Related Tools</p>
+        <a class="related-link" href="../noise-walker/">
+          <span>Tool</span>
+          <strong>Noise Walker</strong>
+        </a>
+        <a class="related-link" href="../noise-vs-random-explorer/">
+          <span>Tool</span>
+          <strong>Noise vs Random Explorer</strong>
+        </a>
+      </div>
+      <div class="related-group">
+        <p style="margin:0 0 8px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b6760">Starter Sketches</p>
+        <a class="related-link" href="../../starter-sketches/wander-agent-seed/">
+          <span>Sketch</span>
+          <strong>Wander Agent Seed</strong>
+        </a>
+        <a class="related-link" href="../../starter-sketches/mini-generative-poster-seed/">
+          <span>Sketch</span>
+          <strong>Mini Generative Poster Seed</strong>
+        </a>
+      </div>
+    </div>
+  </section>
+  <section class="teaching-note" style="margin-top:16px;margin-bottom:32px">
+    <h2 style="margin:0 0 10px;font-family:'Fraunces','DM Sans',sans-serif;font-size:18px">Teacher move</h2>
+    <div class="teaching-note-grid">
+      <div class="teaching-note-card">
+        <strong>Prompt</strong>
+        <span>Pause the sketch. Drag the scale slider from one end to the other. What flips in the grid — and what stays the same?</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Misconception</strong>
+        <span>Students assume noise() is random every frame. Clarify: same scale + same time position = same value. Speed moves you through noise-space; it doesn't re-roll the dice.</span>
+      </div>
+      <div class="teaching-note-card">
+        <strong>Ask</strong>
+        <span>Set speed to 0. Click Step. What changed? What does that tell you about how time works in noise()?</span>
+      </div>
+    </div>
+    <p style="margin:12px 0 0;font-size:13px;color:#6b6760"><strong style="color:#2c2a26">Break it on purpose:</strong> Set scale to its maximum. Notice how the grid looks almost random? That's the edge of the smooth zone — inputs are so far apart they lose their relationship.</p>
+  </section>
+</div>
+</body></html>
