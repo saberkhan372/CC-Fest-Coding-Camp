@@ -16,6 +16,26 @@ Short version:
 
 ---
 
+## How the Current Site Expresses Saber + CC Fest
+
+The current CC Fest Coding Camp site is not just using a "fun" visual style. Its design choices are meant to make Saber's teaching practice visible:
+
+- **It starts with invitation, not expertise.** The homepage headline, "A free workshop for creative coding," frames the site as a place people can enter. The first promise is not "master p5.js"; it is "open to anyone curious about creative code."
+- **It treats code as a material.** The hero poster uses draggable-looking code tiles (`mouseX`, `noise()`, `draw()`, `map()`) on a yellow grid. These are not decorative code fragments; they are the actual vocabulary learners meet in p5.js.
+- **It makes learning rhythms visible.** Concept bridges use `Fuzzy idea -> See it -> Change it -> Code idea -> Go next`. Workshop tools use `Open it -> Change it -> Predict it -> Remix it -> Teach it`. Starter sketches use `See it -> Change it -> Remix it -> Teach it`. These strips are the pedagogy in the interface.
+- **It looks like a workshop archive, not a product catalog.** Cream paper, dark ink borders, offset shadows, dashed artifact slots, session cards, and visible placeholder labels make the site feel like a growing collection of camp materials, not a finished SaaS surface.
+- **It honors process and consent.** The Camp Archive slots name real eras and artifact types, including participant work "shared with permission." This makes the site feel accountable to a community rather than extractive of it.
+- **It keeps teachers in view.** The site is not only for a learner clicking tools. It repeatedly asks how an idea can be taught, adapted, remixed, or used in a classroom.
+- **It is bright without becoming generic.** Poster red, flyer yellow, paper cream, and near-black ink carry the CC Fest poster tradition forward while avoiding AI-gradient polish.
+
+The aesthetic is therefore not "handmade" as decoration. It is handmade because the camp itself is a live teaching practice: people try things, break things, save artifacts, write recaps, revise tools, and make space for beginners.
+
+When updating the site, preserve this relationship between form and purpose:
+
+> **The page should look like the way CC Fest teaches: generous, structured, experimental, beginner-safe, and still becoming.**
+
+---
+
 ## The North Star
 
 CC Fest is not a startup, an ed-tech product, or a polished corporate brand.
@@ -707,8 +727,8 @@ This section documents how the CC Fest design language is realized in the curren
 |---|---|
 | `docs/site.css` | Homepage and shared shell |
 | `docs/concept-bridges/concept-bridge.css` | All 21 concept bridge pages |
-| `docs/tool-page.css` | All 60+ workshop tool pages |
-| `docs/starter-sketch.css` | All 40 starter sketch pages |
+| `docs/tool-page.css` | Shared stylesheet for the newer standalone workshop tool pages |
+| `docs/starter-sketch.css` | Shared stylesheet for generated starter sketch pages |
 
 ### Actual CSS custom properties
 
@@ -816,6 +836,13 @@ The lede leads with the invitation ("open to anyone"), not with the feature list
 
 The hero poster (`.hero-poster`) uses floating `.poster-card` tokens (`mouseX`, `noise()`, `circle()`, etc.) in an animated 3D-parallax grid. On desktop, it responds to mouse movement. On mobile, the 3D transform is disabled (`transform: none; transform-style: flat`) so `overflow: hidden` works correctly and nothing clips outside the viewport.
 
+Why this matches Saber/CC Fest:
+
+- It puts "free workshop" before "tool library," matching the community-first nature of the project.
+- It makes the code vocabulary tactile, like cards on a table, instead of presenting code as intimidating syntax.
+- It preserves the poster tradition through one giant headline, a bright generated-looking image field, and plain event-language labels.
+- It leaves the human premise visible: "Creative coding for all" sits beside the tool poster, not hidden in a mission page.
+
 ### The tool norms strip
 
 **HTML class:** `.tool-norms`  
@@ -862,6 +889,12 @@ Current slot labels (correct visitor-facing form):
 
 Replace the frame content with a real `<img>` when the artifact is available.
 
+Why this matches Saber/CC Fest:
+
+- CC Fest has always been a public trail of posters, recaps, sketches, and workshop evidence. The archive wall makes that trail part of the interface.
+- The dashed frames say "this archive is still becoming" without exposing internal TODO language to visitors.
+- Naming cohorts and permission makes community memory and consent visible.
+
 ### Section labels
 
 **HTML class:** `.section-label`
@@ -899,15 +932,28 @@ All 21 concept bridge pages share `concept-bridge.css`. Each bridge page has:
 
 ### Workshop tool pages — shared structure
 
-All 60 workshop tool pages share `tool-page.css`. Each tool page has:
+Workshop tools are implemented through a mix of shared generated shells and standalone pages:
 
-1. **Tool header** (`.tool-header`) — cream panel with ink border, containing the tool name, subtitle, and a 3-step rhythm strip.
-2. **Five-step rhythm** — `Open it / Change it / Predict it / Remix it / Teach it`. This appears either in the tool header or as a sidebar strip.
+- `11` pages render from `docs/workshop-tool-pages.js`.
+- `55` pages include a static `.tool-rhythm` strip in their HTML.
+- `32` pages use `docs/tool-page.css` directly.
+- Some older standalone pages carry local CSS but still include the same five-step rhythm.
+
+When checking coverage, do not count only static HTML. Pages generated by `workshop-tool-pages.js` render their rhythm at runtime. As of this guide, every `docs/tools/*/index.html` page is covered by one of: static `.tool-rhythm`, `workshop-tool-pages.js`, `starter-seed-pages.js`, or starter pathway markup.
+
+Workshop tool pages should have:
+
+1. **Tool header** (`.tool-header`) — cream panel with ink border, containing the tool name, subtitle, and the five-step rhythm strip when the page is standalone.
+2. **Five-step rhythm** — `Open it / Change it / Predict it / Remix it / Teach it`. This appears either in the tool header or in the generated page shell.
 3. **Canvas + controls** — the main interactive area. Controls use `accent-color: var(--accent)` on range inputs.
+
+The rhythm is not ornamental. It encodes Saber's learning move: play first, change one variable, make a prediction, remix the pattern, then ask how someone else could learn from it.
 
 ### Starter sketch pages
 
-All 40 starter sketch pages share `starter-sketch.css`. The rhythm uses: `See it / Change it / Remix it / Teach it` — one step shorter than workshop tools, since the starting point is a working sketch rather than a demo.
+Starter sketch pages are generated by `docs/starter-seed-pages.js`; `44` pages currently use that generated shell. They share `starter-sketch.css`.
+
+The rhythm uses: `See it / Change it / Remix it / Teach it` — one step shorter than workshop tools, since the starting point is a working sketch rather than a demo.
 
 ### Mobile overflow rules
 
@@ -952,13 +998,13 @@ The offset shadow (`6x 6px 0`) reads as a printed card pinned to a board, not a 
 
 ## Saber Khan's Actual Design Practice: Evidence from the Archive
 
-This section comes from a deep read of Saber's iCloud poster folder, Processing sketches, the Coding the Canvas codebase, VCV Rack patches, and desktop files. It grounds the design principles in what he has actually made across eight years.
+This section comes from a privacy-aware read of Saber's public/event design archive: the iCloud CC Fest poster folder, named teaching files on Desktop/iCloud, and Processing/p5.js sketch artifacts. It intentionally avoids turning private photos or personal files into design rules. Future agents should prefer public-facing CC Fest materials, named event artifacts, and participant work shared with permission.
 
 ---
 
 ### The CC Fest poster tradition (2017–2020)
 
-CC Fest posters exist from NYC (2017, 2018 Spring, 2018 Fall, 2019 Spring, 2019 Fall), LA (2017), SF (2018), and Virtual (2020). Read together they reveal a consistent method — not a brand system, but a practice.
+CC Fest posters exist from NYC (2017, 2018 Spring, 2018 Fall, 2019 Spring, 2019 Fall), LA (2017), SF (2018), and Virtual (2020). Read together they reveal a consistent method: not a rigid brand system, but a repeatable community flyer practice.
 
 **The generative sketch IS the visual.** Every poster background is a p5.js (or Processing) sketch made by a participant or collaborator:
 
@@ -967,9 +1013,9 @@ CC Fest posters exist from NYC (2017, 2018 Spring, 2018 Fall, 2019 Spring, 2019 
 - 2018 SF: A concentric circles-and-squares tiling pattern in pink, teal, purple on white. Playful, flat, generated.
 - 2019 NYC Spring: Flat circle/flower forms in purple, green, dark red on black. Bold, West African textile energy.
 - 2019 NYC Fall: Shifts to editorial color-block layout — blue rectangle, red accent squares. More graphic design influence.
-- 2020 Virtual: Bright yellow-green, repeating panda tile (by Raenin Traver-Fallick using p5.js). Caption credits the maker by name.
+- 2020 Virtual: Bright yellow-green, repeating panda tile credited as made with p5.js. The maker credit is part of the poster, not hidden metadata.
 
-**What this tells an agent:** The background image on a CC Fest artifact should feel generative — like code made it, not like stock photography or AI image generation. Tiling, recursion, motion-blur, circles, grids, particle systems: these are the right visual registers. When a real participant sketch is available, use it. When not, describe the empty slot specifically.
+**What this tells an agent:** The background image on a CC Fest artifact should feel generative, like code made it, not like stock photography or AI image generation. Tiling, recursion, motion blur, circles, grids, particle systems, and procedural repetition are the right visual registers. When a real participant sketch is available and permission is clear, use it and credit it. When not, describe the empty slot specifically.
 
 **The three-column info structure is a signature.** The bottom third of every poster is laid out identically:
 - Left column: event name, date, time, venue address, RSVP link
@@ -979,133 +1025,54 @@ This is the workshop flyer tradition — a printed announce, not a brand moment.
 
 **Typography: one big weight, high contrast, left-aligned.** Every poster uses bold sans-serif or display type at 60–70% of the vertical space. No hierarchy games. The headline is everything. The info block is in a small readable weight. There is no middle.
 
-**Credit is built into the format.** The 2018 SF poster credits a sketch. The 2020 panda poster credits "Panda wallpaper design by Raenin Traver-Fallick using p5.js." The Tech Expo 2017 flyer credits "Sharks by Lucas Coffey (coffey.browning.edu/page_four)." Naming the maker is part of the design.
+**Credit is built into the format.** The 2018 SF poster credits a sketch. The 2020 virtual poster credits its panda wallpaper design and p5.js. The Tech Expo flyer credits the student image. Naming the maker is part of the design.
 
 **Color comes from the sketch, not from a brand palette.** 2017 is orange text on dark. 2018 NYC is lime on coral. 2018 SF is black on white with pink/teal. 2019 is light blue on black. 2020 is pink text on yellow-green. No two posters share the same color identity. The palette each year is whatever the generative sketch produced. There is no fixed CC Fest red or CC Fest blue — those emerged in the web tools work but are not native to the poster tradition.
 
 ---
 
-### The ethicalCS visual mode
+### The civic/social visual mode
 
-The `#ethicalCS` Photoshop files (2019–2020 Twitter chat promotional animations) show a different mode:
+The `#ethicalCS Open Data & Civic Tech`, Processing Community Day NYC, CS Ed Week, and Tech Expo posters show a second mode:
 
-- Photo-forward: real images of NYC / civic spaces as the background
-- Text overlay: bold cyan/magenta/yellow on dark photo
-- Short, social-media-formatted copy: `#ethicalCS / Open Data & Civic Tech / Wed, Nov 28, 8 pm ET`
-- Animated (looping GIF/MP4), not static
-- Guest names in the same bold color
+- Photo-forward or student-work-forward: civic buildings, public-school settings, keynote headshots, or student-generated images.
+- Text overlay: bold magenta, cyan, red, green, yellow, and blue, often directly on the image.
+- Public details are visible: handles, dates, cohosts, keynote names, locations, hashtags.
+- The design feels like an announcement meant to move through a real community, not a campaign abstracted from one.
 
-This is Saber's social-media visual mode: high-contrast photo + bold overlay text + topic + date. Warmer and more immediate than the poster tradition, less formal, built for Twitter's layout.
-
----
-
-### The Coding the Canvas design system (a second project)
-
-Coding the Canvas (`~/Documents/coding/Coding The Canvas/`) is a separate project with its own design system, but it shares DNA with CC Fest tools and gives additional signals about Saber's design instincts.
-
-**Font differences:** Caveat (handwritten) replaces Fraunces for display. Inter replaces DM Sans for body. JetBrains Mono replaces DM Mono.
-
-**The key move: "creative coding for all" written in Caveat.** On the Coding the Canvas homepage, the phrase appears as a handwritten eyebrow above the H1. It reads like a margin note or inscription. This is intimate, not loud. The philosophy appears in the informal register.
-
-**Token differences:**
-
-```css
---paper:  #fff6e7    /* slightly warmer than CC Fest's #f6f0e7 */
---ink:    #17130f    /* slightly darker than CC Fest's #201c1a */
---accent: #ef4b3f    /* brighter red-orange than CC Fest's #c8391d */
---gold:   #ffc83d    /* brighter than CC Fest's #f5a800 */
-```
-
-The Coding the Canvas accent is closer to a pure red-orange. The CC Fest tools accent is a darker coral-red. Both are warm, poster-bright, and serve the same role. Neither is corporate.
-
-**Card shadow is harder:** `.band` uses `box-shadow: 4px 5px 0 var(--ink)` — the offset shadow uses ink as the color directly, not a translucent rgba. This reads even more like a printed sticker or woodblock stamp than the tools site.
-
-**The "about" page design promise section** reads:
-- Visible: every abstraction should change something students can see.
-- Doable: each page should offer a clear first move, not just an explanation.
-- Remixable: examples should invite students and teachers to change them.
-- Careful: creative agency, consent, and beginner safety are part of the design.
-
-These four words — Visible, Doable, Remixable, Careful — are the tightest condensation of Saber's pedagogical design values anywhere in his work.
+This is Saber's public-program visual mode: high-contrast image + bold overlay type + topic + date + people. It is warmer and more immediate than a product page, and more accountable than a generic event graphic.
 
 ---
 
-### The Processing sketch (`thing.pde`)
+### The teaching/sketch artifact mode
 
-A small sketch in `~/Documents/thing/`:
+The Processing and p5.js files in the archive show how the design language should treat code.
 
-```java
-PShape thing;
-import peasy.*;
+Examples inspected:
 
-PeasyCam cam;
+- `Recursive_Tree.pde`: sourced from Form+Code, with explanatory comments, probabilities, recursion, and visible parameter names.
+- `ObjectsPractice.pde`: a tiny "snow pile" object/collision sketch with simple `Ball` objects, `display()`, `move()`, `distanceTo()`, and `collide()`.
+- `chatgpt_geneated_3d_cude.pde`: an experimental 3D projection sketch with rotating points, commented-out experiments, noise/offset variables, and imperfect exploratory naming.
+- `p5play.html`: a simple p5.play starter with `player`, `obstacles`, `score`, key controls, wraparound, and collision code left commented out.
 
-int things = 0;
-void setup() {
-  size(500,500,P3D);
-  cam = new PeasyCam(this, 100);
-  thing = loadShape("The Thing.obj");
-}
-void draw() {
-  pointLight(255, 100, 126, 140, 160, 144);
-  rotateZ(600);
-  background(0);
-  scale(50);
-  for(int i = 0; i <= things; i++){
-    pushMatrix();
-    translate(i*2,0);
-    shape(thing);
-    popMatrix();
-  }
-}
-void keyPressed(){
-  things = things + 1;
-}
-```
+These are not polished software artifacts. They are teachable sketches. They leave variables visible, comments plain, mistakes understandable, and experiments close to the surface.
 
-This is exploratory personal work. A 3D object loaded and duplicated across the screen, one keypress at a time. PeasyCam for interactive orbit. Pointlight for mood. The loop as accumulation rather than pattern. It is unfinished, playful, and genuinely curious. This is Saber in the sketchbook.
-
-**What it tells an agent:** the personal sketching register is loose and experimental. Finished tools are structured and scaffolded. The design guide needs to honor both modes.
+**What this tells an agent:** CC Fest tools should not over-sanitize code into museum labels. Keep the learning object visible. Use plain variable names, short comments, small experiments, and "change this one thing" moments. It is okay for the artifact to look like a starter sketch when the goal is to invite remix.
 
 ---
 
-### VCV Rack patches
+### The teach-in flyer reference
 
-Two VCV Rack (modular synthesis) patches exist: `perlin.vcv` and `three piece kit.vcv`.
+In the same poster archive as the CC Fest materials, there is a historic teach-in flyer. Its presence matters because it clarifies the lineage: community education, not brand theater.
 
-The `perlin.vcv` patch connects directly to the p5.js `noise()` concept — Perlin noise as a control signal in a synthesizer instead of as a canvas drawing. The same mathematical idea (smooth organic randomness) that Saber teaches in creative coding sessions also shapes how he builds sound. This is not coincidence. It is the same intellectual sensibility: make the abstract visible (or audible), explore the behavior at the edge cases, connect math to perception.
+The teach-in format is direct:
 
-**What it tells an agent:** Saber's aesthetic interest in noise, randomness, and organic motion is not decorative. It is conceptually central to his practice across media.
+- Big, blunt title.
+- Dense but practical details.
+- Schedule, place, purpose, and invitation.
+- No decorative justification for itself.
 
----
-
-### The game library
-
-Desktop game library includes: Baldur's Gate 3, Crusader Kings III, Cyberpunk 2077, Cult of the Lamb, Frostpunk, HUMANKIND, Inscryption, NORCO, No Man's Sky, Old World, Prison Architect, Suzerain, Vampire Survivors, Total War WARHAMMER.
-
-Several of these have very specific aesthetic identities worth noting:
-
-- **Inscryption**: handmade card game aesthetic, folk horror, dark whimsy, unfinished-feeling world design, meta-narrative
-- **NORCO**: Southern Gothic, industrial Louisiana, surrealist folk art, text-heavy, narrative-forward, working-class setting
-- **Suzerain**: political text RPG, no illustration, pure typographic design, choices and consequences with no visual flourish
-- **Cult of the Lamb**: cute + dark simultaneously, folk ritual imagery, management systems in a handmade world
-- **Vampire Survivors**: lo-fi Italian horror aesthetic, retro, simple, made by one person, pure gameplay legibility over visual polish
-
-The pattern: Saber gravitates toward games with **strong aesthetic identities made by small teams or individuals, with handmade or folk-art energy, that prioritize legibility and feeling over technical polish.** These are not AAA productions. They are indie games where aesthetic choices are intentional and weird.
-
-This directly parallels his design work. CC Fest should not look like a well-funded ed-tech platform (equivalent to AAA). It should look like something made with intention by people who care about the specific texture of the thing.
-
----
-
-### The teach-in flyer
-
-In `~/Library/Mobile Documents/com~apple~CloudDocs/posters/Teach-in-flyer.jpg`: a photocopied 1960s anti-Vietnam War teach-in flyer. Letterpress or typewriter type. Hand-lettered title ("VIET-NAM / AND / U.S. POLICY"). Dense text schedule. Issued by the Faculty Committee to Stop the War in Vietnam.
-
-Saber keeps this. It is in the same folder as CC Fest posters.
-
-**What it tells an agent:** Saber's reference archive includes activist ephemera — photocopied flyers, handmade announcements, community organizing documents. The CC Fest poster tradition draws from this lineage, not from brand design or ed-tech marketing. The information structure (who, what, when, where, RSVP) is the same across the 1960s teach-in and the 2019 CC Fest poster. The aesthetic register (bold, direct, community-made, urgently practical) is the same.
-
-The design is not about beauty. It is about getting people to show up.
+**What this tells an agent:** CC Fest design should keep the flyer instinct. The point is not beauty by itself. The point is to help people show up, understand what is happening, and feel allowed to participate.
 
 ---
 
@@ -1113,23 +1080,25 @@ The design is not about beauty. It is about getting people to show up.
 
 From everything above, here is what distinguishes Saber's actual design sensibility:
 
-**1. The sketch is the proof.** Code that runs, produces something visible, and teaches an idea is more important than any decorative element. The poster background IS the sketch. The tool IS the concept.
+**1. The sketch is the proof.** Code that runs, produces something visible, and teaches an idea is more important than any decorative element. The poster background is the sketch. The tool is the concept.
 
 **2. Workshop flyer structure, not brand design.** Every artifact should be able to answer: Who made this? What is it? When and where? Why come? That structure — name, date, place, why — is as sacred as any visual rule.
 
-**3. Handmade over polished.** Inscryption over Call of Duty. The teach-in flyer over the conference brochure. Generative sketch over stock photo. The texture of effort and intention should show.
+**3. Handmade over polished.** The teach-in flyer over the conference brochure. The generative sketch over the stock image. The commented starter file over the sterile demo. The texture of effort and intention should show.
 
-**4. Credit the maker, always.** Student name. Participant sketch. Guest handle. Collaborator credit. This is not an afterthought — it is part of the information design.
+**4. Credit the maker, always.** Student name, participant sketch, guest handle, collaborator credit, source material, and permission status are not afterthoughts. They are part of the information design.
 
 **5. Color from the work, not from a brand system.** The palette should feel like it emerged from the sketch that drives the visual. Each artifact can have a different dominant color if the work calls for it. The fixed tokens in site.css are a practical constraint, not an aesthetic goal.
 
-**6. The intimate register is handwriting.** When the philosophical core needs to appear — "creative coding for all," "you can learn here," "unfinished work is welcome" — it goes in the informal voice: Caveat font, smaller size, margin-note weight. Not a headline. A whisper.
+**6. The intimate register is plain speech.** When the philosophical core needs to appear - "creative coding for all," "you can learn here," "unfinished work is welcome" - use the informal teaching voice. It should feel like an invitation from a person, not a slogan from an institution.
 
-**7. People at every scale.** Zoom grids. Keynote photos. Student portraits. First-class screenshots. The work is for and with people and they should appear.
+**7. People at every scale.** Keynote photos, student work, cohort screenshots, teacher adaptations, and named collaborators all matter. The work is for and with people, and the design should make that visible with consent.
 
-**8. Noise and randomness are not decoration.** Perlin noise in VCV Rack. `noise()` in p5.js. The smooth organic randomness that Saber reaches for in code is the same quality he reaches for in sound, in games he likes, in the organic irregularity of handmade type. It is a core aesthetic value, not a tool choice.
+**8. Randomness, recursion, and motion are not decoration.** The poster archive repeatedly uses generated patterns, recursive forms, particles, waves, grids, and repeated icons. These are the visual language of creative coding itself.
 
-**9. Small, intentional, weird over large, polished, generic.** The games that resonate. The posters that work. The tools that teach. All of them make a specific choice and commit to it rather than averaging toward acceptability.
+**9. Small, intentional, weird over large, polished, generic.** The posters that work and the tools that teach make a specific choice and commit to it rather than averaging toward acceptability.
+
+**10. Respect the archive boundary.** Do not mine private Photos libraries or personal documents for generic inspiration. Use public event posters, consented participant artifacts, and named teaching materials. If an image was not clearly meant to be public, treat it as private.
 
 ---
 
