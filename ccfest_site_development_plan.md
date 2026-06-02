@@ -779,14 +779,15 @@ The 11 JS-rendered tools have their controls generated from a single data struct
 | 9 | Camp Archive real-image fill, blocked on permission-safe images. |
 | 10 ✅ | About page and footer polish. |
 | 11 ✅ | Generative poster engine — /sessions/ listing + template poster page. |
-| 12 | Filter system: pathway + difficulty — fixes live bug (pathway never worked), adds difficulty (beginner/extension/capstone), builds shared filter state. **Codex.** |
-| 13 | Preview curation polish — audit coverage gaps, harden pause/resume, extend to new tools from 14/15/18. **Codex.** |
-| 14 | "How does it grow?" — static ◎ Motion tool comparing 5 quantity types side-by-side. **Codex.** |
-| 15 | Bezier curve sculptor — static ✦ Marks tool, drag control points + code generation. **Codex.** |
-| 16 | Distribution visualizer — `random()` / `randomGaussian()` / `noise()` in aggregate. **Codex after design decision.** |
-| 17 | Concept map — swimlane SVG graph. Claude spec ✅ done (`concept-map-data.js` written). **Codex: renderer + `concept-map.html`.** |
-| 18 | Unit Circle Wave Sync — orbiting point + live sine/cosine wave, synchronized. **Codex.** |
-| 19 | Tool presentation utilities — embed/projection mode (`?embed=1`), canvas Save Image, Fullscreen, and Copy link buttons. All via `p5-export-helper.js`. **Codex.** |
+| 12 ✅ | Filter system: pathway + difficulty — fixes live bug (pathway never worked), adds difficulty (beginner/extension/capstone), builds shared filter state. |
+| 13 ✅ | Preview curation polish — audit coverage gaps, harden pause/resume, extend to new tools from 14/15/18. |
+| 14 ✅ | "How does it grow?" — static ◎ Motion tool comparing 5 quantity types side-by-side. |
+| 15 ✅ | Bezier curve sculptor — static ✦ Marks tool, drag control points + code generation. |
+| 16 ✅ | Distribution visualizer — falling-dots accumulation for `random()` / `randomGaussian()` / `noise()`. |
+| 17 ✅ | Concept map — swimlane SVG graph, 41 nodes, 44 edges, mobile list fallback. |
+| 18 ✅ | Unit Circle Wave Sync — orbiting point + live sin/cos waves, synchronized. |
+| 19 ✅ | Tool presentation utilities — `?embed=1`, canvas Save Image / Fullscreen / Copy link via `p5-export-helper.js`. |
+| 20 ✅ | Shareable tool state — `tool-state-utils.js`, URL hash sync via `history.replaceState()`, 11 JS-rendered tools. |
 | 20 | Shareable tool state — `tool-state-utils.js`, URL hash encoding via `history.replaceState()`, debounced. 11 JS-rendered tools first. **Codex.** |
 
 ---
