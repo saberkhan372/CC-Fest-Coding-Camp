@@ -325,7 +325,7 @@
   const suitBar = document.querySelector(".suit-filter-bar");
   const pathwayBar = document.querySelector(".pathway-filter-bar");
   const difficultyBar = document.querySelector(".difficulty-filter-bar");
-  const searchInput = document.querySelector(".tool-search");
+  const searchInput = document.querySelector(".global-search");
   if (!suitBar && !pathwayBar && !difficultyBar && !searchInput) return;
 
   const filterState = {
