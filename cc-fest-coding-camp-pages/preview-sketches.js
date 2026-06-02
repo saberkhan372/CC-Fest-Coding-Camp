@@ -92,7 +92,8 @@
     "lerp-follow-seed": { family: "lerpSeed", label: "lerp()" },
     "dist-proximity-seed": { family: "distSeed", label: "dist()" },
     "hsb-color-seed": { family: "hsbSeed", label: "HSB" },
-    "text-as-visual-seed": { family: "textVisual", label: "Text" }
+    "text-as-visual-seed": { family: "textVisual", label: "Text" },
+    "distribution-visualizer": { family: "randomSeed", label: "Distrib." }
   };
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
