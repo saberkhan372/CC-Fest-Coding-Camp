@@ -320,96 +320,149 @@
   });
 })();
 
-// Suit filter bar
+// Tool filters: suit + pathway + difficulty + search
 (function() {
-  const filterBar = document.querySelector(".suit-filter-bar");
-  if (!filterBar) return;
-
-  const stations = document.querySelectorAll("#interactive-tools .station");
-  const sketchCards = document.querySelectorAll("#starter-sketches .tool-card");
-  const toolSection = document.querySelector("#interactive-tools");
-
-  filterBar.addEventListener("click", function(e) {
-    const btn = e.target.closest(".suit-btn");
-    if (!btn) return;
-
-    const filter = btn.dataset.filter;
-    filterBar.querySelectorAll(".suit-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    if (filter === "all") {
-      toolSection?.classList.remove("is-open");
-      stations.forEach(s => s.hidden = false);
-      sketchCards.forEach(c => c.hidden = false);
-    } else {
-      toolSection?.classList.add("is-open");
-      stations.forEach(s => { s.hidden = s.dataset.suit !== filter; });
-      sketchCards.forEach(c => { c.hidden = !c.classList.contains("suit-" + filter); });
-    }
-  });
-})();
-
-// Live search
-(function() {
+  const suitBar = document.querySelector(".suit-filter-bar");
+  const pathwayBar = document.querySelector(".pathway-filter-bar");
+  const difficultyBar = document.querySelector(".difficulty-filter-bar");
   const searchInput = document.querySelector(".tool-search");
-  if (!searchInput) return;
+  if (!suitBar && !pathwayBar && !difficultyBar && !searchInput) return;
 
-  const allCards = document.querySelectorAll(".tool-card");
-  const stations = document.querySelectorAll("#interactive-tools .station, #concept-bridges .station");
+  const filterState = {
+    suit: "all",
+    pathway: "all",
+    difficulty: "all",
+    search: ""
+  };
+
+  const allCards = Array.from(document.querySelectorAll(".tool-card"));
+  const toolStations = Array.from(document.querySelectorAll("#interactive-tools .station"));
+  const bridgeStations = Array.from(document.querySelectorAll("#concept-bridges .station"));
+  const sketchCards = Array.from(document.querySelectorAll("#starter-sketches .tool-card"));
   const bridgeSection = document.querySelector("#concept-bridges");
   const toolSection = document.querySelector("#interactive-tools");
   const sketchSection = document.querySelector("#starter-sketches");
 
-  searchInput.addEventListener("input", function() {
-    const q = this.value.trim().toLowerCase();
+  function cardText(card) {
+    const title = card.querySelector("h3")?.textContent.toLowerCase() || "";
+    const desc = card.querySelector(".tool-description")?.textContent.toLowerCase() || "";
+    const meta = Array.from(card.querySelectorAll(".pill")).map(t => t.textContent.toLowerCase()).join(" ");
+    const tags = Array.from(card.querySelectorAll(".tag")).map(t => t.textContent.toLowerCase()).join(" ");
+    return `${title} ${desc} ${meta} ${tags}`;
+  }
 
-    document.querySelector(".suit-filter-bar")?.querySelectorAll(".suit-btn")
-      .forEach(b => b.classList.toggle("active", b.dataset.filter === "all"));
+  function matchesSearch(card) {
+    return !filterState.search || cardText(card).includes(filterState.search);
+  }
 
-    if (!q) {
-      document.body.classList.remove("search-active");
-      allCards.forEach(c => c.hidden = false);
-      stations.forEach(s => s.hidden = false);
-      bridgeSection?.classList.remove("is-open");
-      toolSection?.classList.remove("is-open");
-      sketchSection?.classList.remove("is-open");
-      if (bridgeSection) bridgeSection.hidden = false;
-      if (toolSection) toolSection.hidden = false;
-      if (sketchSection) sketchSection.hidden = false;
-      return;
-    }
+  function matchesSuit(card) {
+    return filterState.suit === "all" || card.classList.contains(`suit-${filterState.suit}`);
+  }
 
-    document.body.classList.add("search-active");
-    bridgeSection?.classList.add("is-open");
-    toolSection?.classList.add("is-open");
-    allCards.forEach(c => {
-      const title = c.querySelector("h3")?.textContent.toLowerCase() || "";
-      const desc  = c.querySelector(".tool-description")?.textContent.toLowerCase() || "";
-      const meta  = Array.from(c.querySelectorAll(".pill")).map(t => t.textContent.toLowerCase()).join(" ");
-      const tags  = Array.from(c.querySelectorAll(".tag")).map(t => t.textContent.toLowerCase()).join(" ");
-      c.hidden = !(title.includes(q) || desc.includes(q) || tags.includes(q) || meta.includes(q));
+  function matchesPathway(card) {
+    if (filterState.pathway === "all") return true;
+    return (card.dataset.pathway || "").split(/\s+/).includes(filterState.pathway);
+  }
+
+  function matchesDifficulty(card) {
+    return filterState.difficulty === "all" || card.dataset.difficulty === filterState.difficulty;
+  }
+
+  function matchesLearningFilters(card) {
+    return matchesSuit(card) && matchesPathway(card) && matchesDifficulty(card);
+  }
+
+  function setActiveButtons(bar, selector, attr, value) {
+    bar?.querySelectorAll(selector).forEach(btn => {
+      btn.classList.toggle("active", btn.dataset[attr] === value);
+    });
+  }
+
+  function updateFilterButtons() {
+    setActiveButtons(suitBar, ".suit-btn", "filter", filterState.suit);
+    setActiveButtons(pathwayBar, ".pathway-btn", "pathwayFilter", filterState.pathway);
+    setActiveButtons(difficultyBar, ".difficulty-btn", "difficultyFilter", filterState.difficulty);
+  }
+
+  function stationHasVisibleCard(station) {
+    return Array.from(station.querySelectorAll(".tool-card")).some(card => !card.hidden);
+  }
+
+  function applyFilters() {
+    const hasLearningFilter = filterState.suit !== "all" ||
+      filterState.pathway !== "all" ||
+      filterState.difficulty !== "all";
+    const hasSearch = Boolean(filterState.search);
+    const shouldOpen = hasLearningFilter || hasSearch;
+
+    document.body.classList.toggle("search-active", hasSearch);
+    updateFilterButtons();
+
+    allCards.forEach(card => {
+      const insideLearningLibrary = card.closest("#interactive-tools, #starter-sketches");
+      const visible = matchesSearch(card) && (!insideLearningLibrary || matchesLearningFilters(card));
+      card.hidden = !visible;
     });
 
-    stations.forEach(s => {
-      const visible = Array.from(s.querySelectorAll(".tool-card")).some(c => !c.hidden);
-      s.hidden = !visible;
-      if (!s.hidden) s.classList.add("is-open");
+    bridgeStations.forEach(station => {
+      const visible = stationHasVisibleCard(station);
+      station.hidden = hasSearch && !visible;
+      station.classList.toggle("is-open", hasSearch && visible);
     });
+
+    toolStations.forEach(station => {
+      const visible = stationHasVisibleCard(station);
+      station.hidden = !visible;
+      station.classList.toggle("is-open", shouldOpen && visible);
+    });
+
     if (bridgeSection) {
       const visible = Array.from(bridgeSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
-      bridgeSection.hidden = !visible;
-      if (!bridgeSection.hidden) bridgeSection.classList.add("is-open");
+      bridgeSection.hidden = hasSearch && !visible;
+      bridgeSection.classList.toggle("is-open", hasSearch && visible);
     }
+
     if (toolSection) {
-      const visible = Array.from(toolSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
-      toolSection.hidden = !visible;
-      if (!toolSection.hidden) toolSection.classList.add("is-open");
+      const visible = toolStations.some(station => !station.hidden);
+      toolSection.hidden = false;
+      toolSection.classList.toggle("is-open", shouldOpen && visible);
     }
+
     if (sketchSection) {
-      const visible = Array.from(sketchSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
-      sketchSection.hidden = !visible;
-      if (!sketchSection.hidden) sketchSection.classList.add("is-open");
+      const visible = sketchCards.some(card => !card.hidden);
+      sketchSection.hidden = shouldOpen && !visible;
+      sketchSection.classList.toggle("is-open", shouldOpen && visible);
     }
+  }
+
+  suitBar?.addEventListener("click", (event) => {
+    const btn = event.target.closest(".suit-btn");
+    if (!btn) return;
+    filterState.suit = btn.dataset.filter;
+    if (filterState.suit === "all") {
+      filterState.pathway = "all";
+      filterState.difficulty = "all";
+    }
+    applyFilters();
+  });
+
+  pathwayBar?.addEventListener("click", (event) => {
+    const btn = event.target.closest(".pathway-btn");
+    if (!btn) return;
+    filterState.pathway = btn.dataset.pathwayFilter;
+    applyFilters();
+  });
+
+  difficultyBar?.addEventListener("click", (event) => {
+    const btn = event.target.closest(".difficulty-btn");
+    if (!btn) return;
+    filterState.difficulty = btn.dataset.difficultyFilter;
+    applyFilters();
+  });
+
+  searchInput?.addEventListener("input", function() {
+    filterState.search = this.value.trim().toLowerCase();
+    applyFilters();
   });
 })();
 
