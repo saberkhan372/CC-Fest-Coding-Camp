@@ -492,6 +492,14 @@
     const pointer = { x: 430, y: 210, active: false };
     const controls = document.getElementById("controls");
     tool.controls.forEach((control) => controls.appendChild(controlEl(control, state, updateCode)));
+
+    // URL state sync — load saved state then start listening for changes
+    if (window.CCFestToolState) {
+      const controlInputs = controls.querySelectorAll("input, select");
+      CCFestToolState.loadFromURL(controlInputs);
+      CCFestToolState.syncToURL(controlInputs);
+    }
+
     document.getElementById("resetBtn").addEventListener("click", () => resetSim(slug));
     canvas.addEventListener("pointermove", (event) => {
       const rect = canvas.getBoundingClientRect();
