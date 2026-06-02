@@ -93,7 +93,8 @@
     "dist-proximity-seed": { family: "distSeed", label: "dist()" },
     "hsb-color-seed": { family: "hsbSeed", label: "HSB" },
     "text-as-visual-seed": { family: "textVisual", label: "Text" },
-    "distribution-visualizer": { family: "randomSeed", label: "Distrib." }
+    "distribution-visualizer": { family: "randomSeed", label: "Distrib." },
+    "unit-circle-wave-sync": { family: "sineWave", label: "Circle" }
   };
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
