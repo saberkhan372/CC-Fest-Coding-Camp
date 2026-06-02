@@ -1,6 +1,6 @@
 # CC Fest Coding Camp Tools - Site Development Plan
 
-*Last updated: 2026-05-26*
+*Last updated: 2026-06-02*
 
 This document captures the development roadmap for the Creative Coding Tools website, grounded in Saber Khan's design practice, the CC Fest aesthetic tradition, and the current state of the codebase.
 
@@ -362,7 +362,349 @@ What shipped:
 | 10 ✅ | About page and footer polish. |
 | 11 ✅ | Generative poster engine — /sessions/ listing + template poster page. |
 
-The major site-improvement arc is now complete. The only remaining roadmap item is Phase 9, which is content/design work rather than site infrastructure.
+The first major site-improvement arc is now complete. Its only remaining item is Phase 9, which is content/design work rather than site infrastructure.
+
+A second improvement arc — drawing on patterns from the Algebra 2 Playgrounds site and a joint Claude + ChatGPT/Codex analysis — begins at Phase 12. Phases 12–15 are the priority sequence. Phases 16–18 are higher-scope and require design decisions before building.
+
+---
+
+## Definition of done — Phases 12–20
+
+Every phase is complete only when all of the following are true:
+
+- Source edited in `cc-fest-coding-camp-pages/` only. Run `./deploy.sh` only when ready to sync to `docs/`, commit, and push.
+- If a tool was added: tool count updated in meta description, OG description, Twitter description, hero summary card, and gallery header. (Phase 1 documented the exact locations.)
+- If a tool was added: homepage tool card added manually in `index.html` with correct suit CSS class (`suit-marks`, `suit-motion`, etc. on the `<article>`), `data-pathway`, `data-difficulty`, and tag row. Note: suit is expressed as a CSS class, not a `data-suit` attribute — `data-suit` lives on the `.station` wrapper, not on individual cards.
+- If a tool was added: `preview-sketches.js` registration added or intentionally noted as deferred.
+- `try-next` links resolve to real pages.
+- Mobile smoke test: homepage and the new tool page have no horizontal overflow.
+- Suit, pathway, and difficulty filters all compose correctly, and the suit "All" button resets all three filter states.
+- CSS and JS cache keys bumped for any touched files.
+
+---
+
+## Phase 12 — Filter system: pathway + difficulty
+
+**Status: Ready to build · Owner: Codex**
+
+**Context — live bug:** The `.pathway-filter-bar` has been in `index.html` since it was written, but `site.js` has no handler for `.pathway-btn` clicks. Pathway filters have never worked on the live site. This phase fixes that and adds difficulty filtering in the same pass, building one shared filter-state object that suit, pathway, and difficulty all write to.
+
+The three difficulty values in the data are `beginner`, `extension`, and `capstone` (22 cards use capstone, concentrated in ⬡ Systems and ☽ Open suits). Add all three as filter buttons.
+
+**Codex tasks:**
+
+- Audit all `data-difficulty` values in `index.html` to confirm the full set (`beginner`, `extension`, `capstone`).
+- Replace the separate suit-filter IIFE in `site.js` with a single shared `filterState = { suit: "all", pathway: "all", difficulty: "all" }` object. Write one `applyFilters()` function that computes the intersection: a card is shown only if it matches all three active filters (or the filter is set to "all").
+- Wire `.suit-btn` clicks to update `filterState.suit`, `.pathway-btn` clicks to update `filterState.pathway`, and `.difficulty-btn` clicks to update `filterState.difficulty`. Each click calls `applyFilters()`.
+- Add a `.difficulty-filter-bar` to `index.html` with four buttons: All / Beginner / Extension / Capstone.
+- The suit "All" button should reset all three filter states, not just suit — it is the full-reset entry point.
+- Bump `site.js` cache key.
+
+**Do not:**
+
+- Add difficulty labels to the cards themselves; the filter bar is enough.
+- Touch any tool card HTML. The data attributes are already correct.
+
+---
+
+## Phase 13 — Preview curation and performance polish
+
+**Status: Scope correction — partly already built · Owner: Codex**
+
+**Context:** `preview-sketches.js:1289` already calls `createPreview` on every `.tool-card` with a registered slug, using `IntersectionObserver`. Previews already run for tools that have a registered sketch. The work here is not building previews from scratch — it is curation, performance hardening, and extending coverage to the new tools added in Phases 14, 15, and 18.
+
+**Codex tasks:**
+
+- Audit which of the 66 tool cards have a registered slug in `preview-sketches.js` and which do not. Produce a short list of the gaps.
+- For the "Best first" row (4 cards): confirm their slugs are registered and previews are working. Fix any that are missing.
+- Review the `createPreview` pause/resume logic. Confirm that previews stop running when scrolled out of view (IntersectionObserver threshold) and do not run on mobile widths below 640px.
+- After Phases 14, 15, and 18 ship, add preview sketch registrations for each new tool.
+
+**Do not:**
+
+- Rewrite the preview system architecture; it works.
+- Add previews to every card; keep the opt-in pattern.
+
+---
+
+## Phase 14 — "How does it grow?" comparison tool
+
+**Status: Ready to build · Owner: Codex**
+
+A new ◎ Motion tool. A single canvas shows five quantities animating simultaneously: `frameCount` (linear), `frameCount²` (quadratic), `sin(frameCount * 0.05)` (oscillating), `noise(frameCount * 0.01)` (smooth drift), and `lerp(prev, target, 0.05)` (easing). The goal is to make the *personality* of each quantity visible before a learner has to read code.
+
+**Pattern: static HTML page.** Do not register in `workshop-tool-pages.js`. Add a homepage card manually in `index.html`.
+
+**Codex tasks:**
+
+- Create `cc-fest-coding-camp-pages/tools/how-does-it-grow/index.html` using the existing static tool page template (`tool-page.css`, standard rhythm strip). Reference an existing static tool page for the correct shell structure.
+- Canvas: five labeled horizontal tracks. Each track shows a moving marker driven by one quantity, normalized to canvas height. Color each track using existing suit-motion CSS token colors.
+- Controls: play/pause, speed multiplier (×0.5 / ×1 / ×2), toggle to show/hide the code expression driving each track.
+- Break-it note: set speed to ×2 and observe that the `sin()` track wraps while others diverge.
+- `teaching-note` panel (Prompt / Misconception / Ask) and `try-next` cross-links to: `lerp-explorer`, `sine-cosine-motion-explorer`, `animation-explorer`; starter sketch `lerp-follow-seed`; bridge `how-p5-thinks-about-time`.
+- Add homepage card to `index.html`: `<article class="tool-card suit-motion"` with `data-pathway="animation final"` `data-difficulty="extension"` and tags `motion comparison lerp sin noise frameCount`. Place it inside the `#station-motion` station div.
+- Update tool count from 66 to 67 in all count locations (see Phase 1 for the full list of locations).
+- Run `./deploy.sh`.
+
+**Pairs with:** `lerp-explorer`, `sine-cosine-motion-explorer`, `noise-vs-random-explorer`
+
+---
+
+## Phase 15 — Bezier curve sculptor
+
+**Status: Ready to build · Owner: Codex**
+
+A new ✦ Marks tool. Users drag anchor and control points; the Bezier curve updates live; `bezierVertex()` code generates below. No existing tool covers curved drawing paths.
+
+**Pattern: static HTML page.** Do not register in `workshop-tool-pages.js`. Add a homepage card manually.
+
+**Codex tasks:**
+
+- Create `cc-fest-coding-camp-pages/tools/bezier-curve-sculptor/index.html` using the static tool page template.
+- Canvas: one cubic Bezier with draggable anchor points (P0, P3) and control points (P1, P2). Dashed lines connect anchors to their control points.
+- Code panel: auto-generated `beginShape() / bezierVertex(...) / endShape()` that updates on drag.
+- "Add another curve" button: chains a second segment sharing the last anchor.
+- "Copy code" button.
+- Break-it note: drag a control point far off-canvas — the curve follows because handles extend infinitely.
+- `teaching-note` and `try-next` to: `transformations-explorer`, `push-pop-scope-visualizer`; starter sketch `generative-tile-pattern-seed`; bridge `world-vs-local-coordinates`.
+- Add homepage card: `<article class="tool-card suit-marks"` with `data-pathway="final"` `data-difficulty="extension"` and tags `bezier curves shapes vertex code-generation`. Place it inside the `#station-marks` station div.
+- Update tool count from 67 to 68 (after Phase 14 ships) in all count locations.
+- Run `./deploy.sh`.
+
+---
+
+## Phase 16 — Distribution visualizer (randomness in aggregate)
+
+**Status: Needs design decision before building · Owner: Codex after design sign-off**
+
+A new ⬡ Systems tool. Shows what `random()`, `randomGaussian()`, and `noise()` produce over 1000+ calls. Extends the random/noise conceptual territory into aggregate behavior — no current tool covers this.
+
+**Design decision — falling dots.** Each call produces a dot that falls and lands in a pile. Partial transparency (alpha ~60) prevents the Gaussian center from becoming muddy. Histogram bars were considered but are too static — watching the pile build over 1000 calls makes the process visible, not just the result. Fits the "change one thing, watch what happens" CC Fest ethos.
+
+**Pattern: static HTML page.**
+
+**Codex tasks (after design decision):**
+
+- Create `cc-fest-coding-camp-pages/tools/distribution-visualizer/index.html`.
+- Three side-by-side panels: `random(0, width)`, `randomGaussian(width/2, width/6)`, `noise()` sampled across a range.
+- Controls: run/pause, reset, speed.
+- Running mean and range annotations as the distribution fills in.
+- `try-next` to: `noise-vs-random-explorer`, `noise-lab`; bridges `noise-smooth-randomness`, `random-controlled-surprise`.
+- Add homepage card: `<article class="tool-card suit-systems"` with `data-pathway="data final"` `data-difficulty="extension"` and tags `random noise probability distribution statistics`. Place it inside the `#station-systems` station div.
+- Update tool count in all count locations.
+- Run `./deploy.sh`.
+
+---
+
+## Phase 17 — Concept map / relationship graph page
+
+**Status: Needs design decision before building · Owner: Claude (data + spec) + Codex (rendering)**
+
+A spatial navigation page rendering the existing bridge→tool→sketch relationship data as a visual graph. The hand-authored `try-next` cross-links from Phase 3 are the data source — no new authoring required for the initial version.
+
+**Claude tasks — ✅ Done 2026-06-02**
+
+Graph data audited from all 6 priority bridge pages. Full node/edge object written to `cc-fest-coding-camp-pages/concept-map-data.js`. Copy to `docs/` at deploy time.
+
+**Node counts:** 6 priority bridges · 3 referenced bridges · 16 tools · 16 sketches = 41 nodes · 44 edges
+
+**One shared node:** `color-from-position` (sketch) is linked from both `color-numbers-become-feeling` (col 3) and `map-range-translator` (col 4). It carries `col: 3.5` and `shared: true` in the data. Position it centered between those two columns in the layout.
+
+**Node visual vocabulary:**
+- Bridge (priority): bold hexagon, `--accent` red border, Fraunces label
+- Bridge (ref): small hexagon, `--ink-light` border, lighter weight
+- Tool: rounded rectangle card, left border colored by suit token
+- Sketch: circle, filled with suit token color at 30% opacity, suit token border
+
+**Suit token colors** (from `site.css`):
+- marks `✦` → `--gold` (#f5a800)
+- motion `◎` → `--highlight` (#e07a5f)
+- systems `⬡` → `--success` (#7f9d7a)
+- open `☽` → `--purple` (#7a5ea8)
+
+**Edge styles:**
+- `rel: "tool"` or `rel: "sketch"` → solid line, `--line` color, arrow at target
+- `rel: "bridge"` → dashed line, `--accent` color, arrow at target
+
+**Layout recommendation — swimlane grid (hand-positioned):**
+
+Three horizontal bands, 6 columns. Column order matches the data's `col` field (1–6):
+
+```
+Band 1 (top):    BRIDGES   ⬡ ⬡ ⬡ ⬡ ⬡ ⬡
+Band 2 (middle): TOOLS     ▭ ▭ ▭ ▭ ▭ ▭
+Band 3 (bottom): SKETCHES  ◉ ◉ ◉ ◉ ◉ ◉
+```
+
+Referenced bridges (events-sketches-listen, distance-becomes-behavior, arrays-loops-as-system) appear as small hexagons anchored outside the 6-column grid — left of col 1, right of col 6, or below their primary bridge — connected by dashed lines.
+
+`color-from-position` sits at col 3.5 in band 3, straddling cols 3 and 4.
+
+Bridge-to-bridge cross-links (e.g., noise → map, color → map) run horizontally across band 1 as dashed arcs above the hexagons.
+
+Rationale: swimlane makes the pedagogical sequence spatially legible (bridge teaches → tool practices → sketch remixes), fits a poster/poster-grid register, and is straightforward to implement in SVG without a physics library. Force-directed was rejected — it would cluster by edge density (noise and map are heavily connected) and break the left-to-right camp-arc order.
+
+**Codex tasks (after spec — spec is done):**
+
+- Load `concept-map-data.js` (already in source root, synced to `docs/` by `deploy.sh`).
+- Create `cc-fest-coding-camp-pages/concept-map.html`. Static SVG render. No D3.
+- Render swimlane layout: 3 bands × 6 columns. Node positions derived from each node's `col` and `type` fields. `color-from-position` uses `col: 3.5`.
+- Draw edges as SVG `<line>` or `<path>` elements before nodes so nodes paint on top. Solid lines for tool/sketch edges, dashed for bridge edges.
+- Each node is an `<a href="...">` wrapping an SVG shape. Bridge = hexagon (`<polygon>`). Tool = rounded rect (`<rect rx>`). Sketch = circle (`<circle>`). Hovering shows a `<title>` tooltip with the full title.
+- Referenced bridges render outside the 6-column grid at reduced opacity.
+- Mobile (≤720px): hide SVG, show a plain `<ul>` fallback listing each bridge with its linked tools and sketches.
+- Add a topbar link "Concept Map" to `index.html` alongside Sessions and About.
+- Add `concept-map-data.js` to the source and run `./deploy.sh`.
+
+---
+
+## Phase 18 — Unit Circle Wave Sync tool
+
+**Status: Ready to build · Owner: Codex**
+
+A new ◎ Motion tool: a point orbits the unit circle while sine and cosine waves draw to the right in real-time sync. CC Fest has the Triangle-to-Circle-to-Wave bridge (concept) and the Sine + Cosine Motion Explorer (tool), but not the live synchronized animation joining them.
+
+**Pattern: static HTML page.**
+
+**Codex tasks:**
+
+- Create `cc-fest-coding-camp-pages/tools/unit-circle-wave-sync/index.html`.
+- Left panel: unit circle with orbiting point. Right panel: sine and cosine waves drawing live, with a vertical "now" cursor synchronized to the circle angle.
+- Controls: speed, pause/play, toggle for angle value and coordinate readout.
+- `teaching-note` and `try-next` to: `sine-cosine-motion-explorer`, `animation-explorer`; bridge `triangle-circle-wave-explorer`.
+- Add homepage card: `<article class="tool-card suit-motion"` with `data-pathway="animation final"` `data-difficulty="extension"` and tags `sin cos unit-circle waves animation`. Place it inside the `#station-motion` station div.
+- Update tool count in all count locations.
+- Run `./deploy.sh`.
+
+---
+
+---
+
+## Phase 19 — Tool presentation utilities (embed, save image, fullscreen, copy link)
+
+**Status: Ready to build · Owner: Codex**
+
+Four small, independent improvements to how tools behave in classroom settings. All behavior is delivered through `p5-export-helper.js` and a CSS addition to `tool-page.css`. No semantic per-tool HTML edits are required, but cache-busting the helper requires a mechanical script-tag version update across tool pages.
+
+### 19a — Embed / projection mode
+
+`?embed=1` in the URL adds a CSS class to `<body>` that strips everything except the canvas and its controls. Teachers project the embed URL; students use the normal URL.
+
+**Codex tasks:**
+
+- In `p5-export-helper.js` (or a new inline script in the tool page template): on `DOMContentLoaded`, check `new URLSearchParams(location.search).get('embed')`. If truthy, add `embed-mode` to `document.body.classList`.
+- Add to `tool-page.css` (and the `<style>` block in `p5-export-helper.js` for tools that don't load `tool-page.css`):
+
+```css
+.embed-mode .tool-topbar,
+.embed-mode .top,
+.embed-mode .tool-rhythm,
+.embed-mode .teaching-note,
+.embed-mode .try-next,
+.embed-mode .tool-footer { display: none !important; }
+```
+
+Note the two nav variants: `.tool-topbar` (JS-rendered and newer static tools) and `.top` (older static tools, sometimes on a `<nav>`, sometimes on a `<div>`). Both must be covered.
+
+### 19b — Canvas action bar (Save Image + Fullscreen)
+
+The existing `.p5-export-bar` attaches near code blocks. Canvas actions belong near the canvas. Add a separate `.canvas-action-bar` that attaches before or after the first visible `<canvas>` element on the page — independently of whether a code block is found.
+
+**Codex tasks:**
+
+- In `p5-export-helper.js`, after the existing `insertBar()` logic, add `insertCanvasBar()`:
+  - Find the first visible `<canvas>` on the page. Do not use the first canvas blindly if it has zero layout size.
+  - Create a `.canvas-action-bar` div with two buttons: "Save Image" and "⛶ Fullscreen."
+  - Insert it `afterend` relative to the canvas (or its immediate wrapper if the canvas is inside `.card` or `.panel`).
+- **Save Image** button: `canvas.toDataURL('image/png')` → `a.download = 'cc-fest-tool.png'; a.href = dataURL; a.click()`. Label: "Save Image."
+- If `toDataURL()` throws because a canvas is tainted by external images/video/webcam data, show a short failure label ("Cannot save this canvas") and leave the page usable.
+- **Copy link** button: use the existing `copyText()` helper already defined inside `p5-export-helper.js` (line 63). It has a `textarea` fallback for non-secure contexts. Do not call `navigator.clipboard.writeText` directly — reuse the helper.
+- **Fullscreen** button: `canvas.requestFullscreen()`. Handle the case where the canvas is inside a wrapper — prefer `wrapper.requestFullscreen()` if the canvas is the only child of a `.card` or `.panel`. Label: "⛶ Fullscreen." On fullscreen exit (via `fullscreenchange` event), restore the button label.
+- Style `.canvas-action-bar` to match `.p5-export-bar`: same font, border, pill-button shape. Position it flush right, same visual weight.
+- Skip `insertCanvasBar()` if the page already has a `.canvas-action-bar` (idempotency guard).
+
+### 19c — Copy page link
+
+Add a "Copy link" button to the `.canvas-action-bar` (not the code bar). For now this copies the plain page URL with no state encoded — just `location.href`. The button label resets to "Copy link" after 2 seconds.
+
+Once the canvas bar exists, this should call the existing `copyText(location.href)` helper so the same clipboard fallback is used everywhere.
+
+**Do not** implement URL state encoding in this phase. That is Phase 20. The "Copy link" button here copies the bare page URL only.
+
+### Phase 19 deploy
+
+- Edit `p5-export-helper.js` in source (`cc-fest-coding-camp-pages/`).
+- **Cache busting is a non-trivial mechanical task.** All 66 source tool pages currently load `p5-export-helper.js?v=20260505-workshop-export`. Update the version string with a scripted regex pass across `cc-fest-coding-camp-pages/tools/`:
+  ```sh
+  find cc-fest-coding-camp-pages/tools -name "index.html" \
+    -exec sed -i '' 's/p5-export-helper\.js?v=[^""]*/p5-export-helper.js?v=20260619-presentation/g' {} \;
+  ```
+  Verify the count matches (should update 66 files) before running `./deploy.sh`.
+- Smoke-test embed mode on: one JS-rendered tool (`animation-explorer`), one older static tool (`noise-lab`), one tool with a `.top` wrapper (`assets-preload-helper`).
+- Smoke-test Save Image and Fullscreen on a p5 canvas tool and a plain `<canvas>` tool.
+
+---
+
+## Phase 20 — Shareable tool state (URL-encoded slider values)
+
+**Status: Depends on Phase 19 · Owner: Codex**
+
+Encode named control values (sliders, selects, checkboxes) into the URL so a specific tool configuration can be shared as a link. A teacher sets up a demo, clicks "Copy link," and pastes the URL into their session notes. Students open it pre-configured.
+
+**Implementation constraints (from code review):**
+
+- Use `history.replaceState()`, not `location.hash` assignment. Direct hash assignment creates a browser-history entry per slider change — 50 slider moves = 50 back-button presses. `history.replaceState(null, '', '#' + params)` replaces the current history entry silently.
+- Debounce state writes. On `input` events, wait 300ms before writing to the URL. Do not write on every `mousemove`.
+- Preserve the `?embed=1` query param alongside the hash state. When building the URL to write, use `location.search` + `'#' + encodedState` so embed mode survives a shared link.
+- Namespace keys. Use short but non-colliding key names per tool (e.g., `speed`, `hue`, `cells`). Do not use generic names like `v1`, `v2`.
+
+**Scope: JS-rendered workshop tools first.**
+
+The 11 JS-rendered tools have their controls generated from a single data structure in `workshop-tool-pages.js`. Instrumenting one place wires up all 11. Static tools require per-file edits and are out of scope for v1.
+
+**Codex tasks:**
+
+- Create `cc-fest-coding-camp-pages/tool-state-utils.js` as a **plain script (not a module)**. Existing tool scripts are IIFEs; do not use `export`/`import`. Expose a global: `window.CCFestToolState = { syncToURL, loadFromURL }`.
+  - `syncToURL(inputs)` — takes a NodeList or array of named form controls. On `input` event (debounced 300ms), serializes `{ name: value }` pairs into a hash string using `URLSearchParams`. Calls `history.replaceState(null, '', location.search + '#' + params.toString())`.
+  - `loadFromURL(inputs)` — reads `location.hash`, parses it as `URLSearchParams`, sets each matching named control's value. Dispatches an `input` event on each changed control so the tool redraws.
+- `deploy.sh` syncs all root `*.js` files automatically — no deploy script changes needed. Verify the file appears in `docs/` after the first deploy.
+- In `workshop-tool-pages.js`, after controls are rendered, call `CCFestToolState.loadFromURL(...)` then `CCFestToolState.syncToURL(...)`. Add `<script src="../../tool-state-utils.js?v=20260619-state"></script>` to the 11 JS-rendered workshop tool shell pages (or load it dynamically from `workshop-tool-pages.js` before the render function runs).
+- Update the "Copy link" button added in Phase 19c so it now copies `location.href` after state has been synced (no change to the button logic — the URL already contains the state because `syncToURL` runs on every control change).
+- After Phases 14, 15, 16, and 18 ship their static tools, add the `tool-state-utils.js` script tag and wire their named controls individually.
+
+**Do not:**
+
+- Instrument all 66 static tools in one pass. That becomes a maintenance swamp.
+- Use `localStorage` for state. State belongs in the URL, which is shareable. `localStorage` is per-device and invisible.
+- Add state sync to concept bridge pages or starter sketch pages. Tools only.
+
+---
+
+## Revised roadmap (full)
+
+| Phase | Work |
+|---|---|
+| 1 ✅ | Rhythm rollout (110 pages), count audit (66/44), maker-credit, dot-grid hero background. |
+| 2A ✅ | Homepage signal: maker-credit, orientation through path/rows/About, footer language. |
+| 2B ✅ | Representative templates: noise-smooth-randomness bridge, noise-lab tool, mini-generative-poster-seed — all with try-next cross-links and teaching-note panels. |
+| 3 ✅ | Resource relationships v1: 6 complete bridge-to-tool-to-sketch paths. |
+| 4 ✅ | Tag-based related-resource fallback using existing metadata. |
+| 5 ✅ | Bridge index "Start here" pathway and homepage "Best first" curated row. |
+| 6 ✅ | Teacher move panels across foundational bridges and all JS-rendered workshop tools. |
+| 7 ✅ | Tool copy pass and selective "Break it on purpose" prompts. |
+| 8 ✅ | Reusable visual components in a small component CSS layer. |
+| 9 | Camp Archive real-image fill, blocked on permission-safe images. |
+| 10 ✅ | About page and footer polish. |
+| 11 ✅ | Generative poster engine — /sessions/ listing + template poster page. |
+| 12 | Filter system: pathway + difficulty — fixes live bug (pathway never worked), adds difficulty (beginner/extension/capstone), builds shared filter state. **Codex.** |
+| 13 | Preview curation polish — audit coverage gaps, harden pause/resume, extend to new tools from 14/15/18. **Codex.** |
+| 14 | "How does it grow?" — static ◎ Motion tool comparing 5 quantity types side-by-side. **Codex.** |
+| 15 | Bezier curve sculptor — static ✦ Marks tool, drag control points + code generation. **Codex.** |
+| 16 | Distribution visualizer — `random()` / `randomGaussian()` / `noise()` in aggregate. **Codex after design decision.** |
+| 17 | Concept map — swimlane SVG graph. Claude spec ✅ done (`concept-map-data.js` written). **Codex: renderer + `concept-map.html`.** |
+| 18 | Unit Circle Wave Sync — orbiting point + live sine/cosine wave, synchronized. **Codex.** |
+| 19 | Tool presentation utilities — embed/projection mode (`?embed=1`), canvas Save Image, Fullscreen, and Copy link buttons. All via `p5-export-helper.js`. **Codex.** |
+| 20 | Shareable tool state — `tool-state-utils.js`, URL hash encoding via `history.replaceState()`, debounced. 11 JS-rendered tools first. **Codex.** |
 
 ---
 

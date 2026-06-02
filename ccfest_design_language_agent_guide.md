@@ -23,8 +23,8 @@ The current CC Fest Coding Camp site is not just using a "fun" visual style. Its
 - **It starts with invitation, not expertise.** The homepage headline, "A free workshop for creative coding," frames the site as a place people can enter. The first promise is not "master p5.js"; it is "open to anyone curious about creative code."
 - **It treats code as a material.** The hero poster uses draggable-looking code tiles (`mouseX`, `noise()`, `draw()`, `map()`) on a yellow grid. These are not decorative code fragments; they are the actual vocabulary learners meet in p5.js.
 - **It makes learning rhythms visible.** Concept bridges use `Fuzzy idea -> See it -> Change it -> Code idea -> Go next`. Workshop tools use `Open it -> Change it -> Predict it -> Remix it -> Teach it`. Starter sketches use `See it -> Change it -> Remix it -> Teach it`. These strips are the pedagogy in the interface.
-- **It looks like a workshop archive, not a product catalog.** Cream paper, dark ink borders, offset shadows, dashed artifact slots, session cards, and visible placeholder labels make the site feel like a growing collection of camp materials, not a finished SaaS surface.
-- **It honors process and consent.** The Camp Archive slots name real eras and artifact types, including participant work "shared with permission." This makes the site feel accountable to a community rather than extractive of it.
+- **It looks like a workshop archive, not a product catalog.** Cream paper, dark ink borders, offset shadows, session cards, and artifact-aware components make the site feel like a growing collection of camp materials, not a finished SaaS surface.
+- **It honors process and consent.** The roadmap keeps the Camp Archive as a real-image phase, blocked until public or permission-safe artifacts are available. This makes the site accountable to a community rather than extractive of it.
 - **It keeps teachers in view.** The site is not only for a learner clicking tools. It repeatedly asks how an idea can be taught, adapted, remixed, or used in a classroom.
 - **It is bright without becoming generic.** Poster red, flyer yellow, paper cream, and near-black ink carry the CC Fest poster tradition forward while avoiding AI-gradient polish.
 
@@ -719,16 +719,20 @@ Refer to the actual CSS token set in docs/site.css before adding colors or layou
 
 ## The Actual Implementation: How This Project Meets the Aesthetic
 
-This section documents how the CC Fest design language is realized in the current codebase (`docs/` directory, served from GitHub Pages). Use this as the ground truth when editing existing pages or building new ones.
+This section documents how the CC Fest design language is realized in the current codebase. Edit the source files in `cc-fest-coding-camp-pages/`; `docs/` is the synced GitHub Pages output and is useful for checking what is currently published.
 
 ### CSS files
 
 | File | Scope |
 |---|---|
-| `docs/site.css` | Homepage and shared shell |
-| `docs/concept-bridges/concept-bridge.css` | All 21 concept bridge pages |
-| `docs/tool-page.css` | Shared stylesheet for the newer standalone workshop tool pages |
-| `docs/starter-sketch.css` | Shared stylesheet for generated starter sketch pages |
+| Source file | Published copy | Scope |
+|---|---|---|
+| `cc-fest-coding-camp-pages/site.css` | `docs/site.css` | Homepage and shared design tokens |
+| `cc-fest-coding-camp-pages/site-components.css` | `docs/site-components.css` | Reusable component layer: `.teaching-note`, `.try-next`, `.maker-credit`, `.poster-proof`, `.artifact-caption`. Loaded by JS-rendered tool and seed pages. |
+| `cc-fest-coding-camp-pages/concept-bridges/concept-bridge.css` | `docs/concept-bridges/concept-bridge.css` | All 21 concept bridge pages |
+| `cc-fest-coding-camp-pages/tool-page.css` | `docs/tool-page.css` | Shared stylesheet for the newer standalone workshop tool pages |
+| `cc-fest-coding-camp-pages/starter-sketch.css` | `docs/starter-sketch.css` | Shared stylesheet for generated starter sketch pages |
+| `cc-fest-coding-camp-pages/sessions.css` | `docs/sessions.css` | Sessions listing and poster page styles |
 
 ### Actual CSS custom properties
 
@@ -795,13 +799,13 @@ The same `--accent` red (`#c8391d`) and warm cream base appear in all three styl
 
 ### Fonts
 
-All pages use:
+The main site pages and shared templates use:
 
 - **Fraunces** — headlines (`h1`, `h2`, `h3`), weight 700–900. Optical-size range 9–144. Gives the heavy, ink-press quality.
 - **DM Sans** — body text, labels, UI copy. Weight 400–700.
 - **DM Mono** — code only (`<code>`, `<pre>`, `.formula`). Never used decoratively.
 
-Google Fonts import string (same across all pages):
+Google Fonts import string used by the main shared templates:
 
 ```
 family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900
@@ -862,32 +866,21 @@ These are tool-specific. Do not replace them with generic social norms like "cam
 
 On mobile (≤600px) the strip stacks vertically.
 
-### The Camp Archive artifact wall
+### The Camp Archive artifact wall (paused until real images)
 
 **HTML class:** `.camp-archive` containing `.camp-archive-wall`  
-**Location:** inside the Camp Arc section on the homepage
+**Location:** not currently rendered on the homepage. The old placeholder strip was removed; Phase 9 should return only when real public or permission-safe images are available.
 
-A 5-column grid of `.artifact-slot` cards, one per cohort era. Each slot has:
+A future archive wall should be a 5-column grid of `.poster-proof` / `.artifact-caption` cards, one per cohort era or artifact group. Each real artifact should have:
 
 - `.artifact-era` — uppercase era label in `--accent` red
-- `.artifact-what` — italic description of the artifact (visitor-facing, not an authoring note)
+- an image or real artifact preview
 - `.artifact-caption` — small muted caption below the frame
+- visible credit or permission-safe context
 
-Frames use `border: 2px dashed var(--line)` to signal "placeholder" without looking broken. On hover the border becomes solid `--accent` and the frame lifts.
+Do not rebuild dashed placeholder slots as public content. If an artifact is missing or permission-dependent, omit that slot until the artifact is ready. If internal authoring notes are needed, put them in HTML comments, not visible copy.
 
-Slight rotation (±0.8deg) on alternating frames gives the pinned-card feeling. **On mobile, rotation is disabled** — rotated full-width elements cause horizontal overflow.
-
-Current slot labels (correct visitor-facing form):
-
-| Era | Label |
-|---|---|
-| Fall 2024 | `Art + Code / Teacher Camp · event flyer` |
-| Spring 2025 | `Coding Camp Cohort 1 · session work` |
-| Fall 2025 | `Coding Camp Cohort 2 · participant work` |
-| Spring 2026 | `Coding Camp Cohort 3 · invite coming` |
-| Participant work | `Made in camp · shared with permission` |
-
-Replace the frame content with a real `<img>` when the artifact is available.
+Slight rotation (±0.8deg) can give real artifact cards the pinned-card feeling. **On mobile, rotation must be disabled** — rotated full-width elements cause horizontal overflow.
 
 Why this matches Saber/CC Fest:
 
@@ -929,6 +922,34 @@ All 21 concept bridge pages share `concept-bridge.css`. Each bridge page has:
 3. **Tab progress bar** — a 3px `--accent`-filled bar that updates as the learner moves through tabs. Shows where they are in the concept sequence.
 4. **Snapshot button** — captures the canvas + DOM labels as a PNG download. Label: `"📷 Save snapshot"`.
 5. **Break presets** — on supported bridges, a preset that deliberately breaks the visual to show where the concept boundary is.
+
+### Tool page nav wrapper variants
+
+Workshop tool pages were built over time and use two different nav wrapper patterns. Both are in active use. **Any CSS that needs to hide or style the tool nav must target both:**
+
+- `div.tool-topbar` — used by JS-rendered tools and newer static tools (e.g., `animation-explorer`, `arrays-of-objects-visualizer`)
+- `.top` — used by older static tools, sometimes on a `<nav>` and sometimes on a `<div>` (e.g., `noise-lab`, `assets-preload-helper`, `bounce-logic-explainer`, `dist-map-lerp-chain`, `debugging-playground`)
+
+When writing embed-mode or other nav-hiding CSS, always write both selectors. Do not assume one pattern covers all tools.
+
+### Suit classification: CSS class, not data attribute
+
+Workshop tool cards on the homepage use a CSS class to express their suit, not a `data-suit` attribute:
+
+```html
+<article class="tool-card suit-motion" data-pathway="animation final" data-difficulty="extension">
+```
+
+The five suit classes are: `suit-marks`, `suit-motion`, `suit-systems`, `suit-data`, `suit-open`, `suit-support`.
+
+The `data-suit` attribute exists on the `.station` **wrapper** element, not on individual cards:
+
+```html
+<div class="station" id="station-motion" data-suit="motion">
+  <article class="tool-card suit-motion" ...>
+```
+
+When adding a new tool card to the homepage, always use the `suit-*` CSS class on the `<article>`. Do not add `data-suit` to the card.
 
 ### Workshop tool pages — shared structure
 
@@ -972,7 +993,8 @@ On mobile (≤720px) in the site CSS:
   transform-style: flat;   /* re-enables overflow:hidden */
 }
 .sequence-card:nth-child(n) { transform: none }
-.artifact-slot:nth-child(n) .artifact-frame { transform: none }
+.poster-proof:nth-child(n),
+.artifact-frame:nth-child(n) { transform: none }
 ```
 
 `transform-style: preserve-3d` on `.hero-poster` at desktop breaks `overflow: hidden`, allowing absolutely-positioned poster cards to paint outside their container. Setting `transform-style: flat` on mobile restores containment. Rotated full-width cards also extend their painted bounds and clip content — flattening them on mobile prevents this.
