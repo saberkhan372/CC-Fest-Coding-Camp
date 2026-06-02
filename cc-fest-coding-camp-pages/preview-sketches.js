@@ -7,6 +7,7 @@
     "variable-playground": { family: "variable", label: "Variables" },
     "rgb-hsb-color-lab": { family: "colorLab", label: "Color Lab" },
     "arc-visualizer": { family: "shapes", label: "Arc" },
+    "bezier-curve-sculptor": { family: "shapes", label: "Bezier" },
     "animation-explorer": { family: "bounce", label: "Motion" },
     "framerate-visualizer": { family: "frameRate", label: "FPS" },
     "how-does-it-grow": { family: "frameRate", label: "Growth" },
