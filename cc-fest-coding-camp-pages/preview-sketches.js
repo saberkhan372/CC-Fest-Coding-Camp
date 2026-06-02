@@ -94,6 +94,7 @@
   };
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const previewMedia = window.matchMedia("(min-width: 640px)");
   const previews = [];
 
   function slugFromHref(href) {
@@ -139,7 +140,7 @@
   }
 
   function createPreview(card) {
-    const link = card.querySelector(".tool-actions a");
+    const link = card.matches?.("a[href]") ? card : card.querySelector(".tool-actions a");
     if (!link) return null;
     const slug = slugFromHref(link.getAttribute("href"));
     const config = PREVIEW_MAP[slug];
@@ -147,6 +148,7 @@
 
     const stage = document.createElement("div");
     stage.className = "tool-preview";
+    if (card.closest(".best-first-links")) stage.classList.add("best-first-preview");
     stage.dataset.preview = config.family;
     stage.setAttribute("aria-hidden", "true");
 
@@ -1277,16 +1279,20 @@
   }
 
   function animate(now) {
-    previews.forEach((preview) => {
-      if (preview.visible || preview.hover) {
-        draw(preview, reduceMotion ? 0 : now);
-      }
-    });
+    if (previewMedia.matches) {
+      previews.forEach((preview) => {
+        if (preview.visible || preview.hover) {
+          draw(preview, reduceMotion ? 0 : now);
+        }
+      });
+    }
     requestAnimationFrame(animate);
   }
 
   window.addEventListener("DOMContentLoaded", () => {
+    if (!previewMedia.matches) return;
     document.querySelectorAll(".tool-card").forEach(createPreview);
+    document.querySelectorAll(".best-first-links a").forEach(createPreview);
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
