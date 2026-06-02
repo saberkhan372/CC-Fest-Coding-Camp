@@ -27,14 +27,30 @@ https://saberkhan372.github.io/CC-Fest-Coding-Camp/
 
 ## Structure
 
+### Pages
 - `index.html` — homepage gallery and learning pathway
-- `site.css` — shared homepage styling and design tokens
-- `tool-page.css` — shared layout shell for the main interactive tools
-- `starter-sketch.css` — lighter shell for sketch seeds and remix prompts
-- `concept-bridges/` — concept bridge pages and bridge-specific CSS
-- `tools/` — one folder per tool or starter sketch
-- `workshop-tool-pages.js` — data and renderer for JS-rendered workshop tools
-- `starter-seed-pages.js` — data and renderer for JS-rendered starter sketches
+- `about.html` — local About page (linked from topbar, hero, and footer)
+- `sessions/` — sessions listing and generative poster template
+
+### Shared stylesheets
+- `site.css` — homepage and shared design tokens
+- `site-components.css` — reusable component layer (`.teaching-note`, `.try-next`, `.maker-credit`, `.poster-proof`)
+- `tool-page.css` — shared layout shell for standalone workshop tool pages
+- `starter-sketch.css` — lighter shell for starter sketch seed pages
+- `sessions.css` — sessions listing and poster page styles
+- `concept-bridges/concept-bridge.css` — shared stylesheet for all concept bridge pages
+
+### Shared JavaScript
+- `site.js` — homepage: suit filtering, search, collapsible sections, curated paths, "Best first" row. Pathway and difficulty filter composition is planned in Phase 12 of the roadmap.
+- `workshop-tool-pages.js` — data and renderer for the 11 JS-rendered workshop tool pages
+- `starter-seed-pages.js` — data and renderer for the 44 JS-rendered starter sketch pages
+- `preview-sketches.js` — card-level canvas previews using IntersectionObserver
+- `p5-export-helper.js` — current "Copy Code" and "↗ p5 Editor" buttons injected on tool pages. Canvas save/fullscreen/link utilities are planned in Phase 19.
+- `hero-sketch.js` — interactive code-token parallax poster in the homepage hero
+
+### Tool directories
+- `tools/` — one folder per workshop tool or starter sketch; each contains `index.html`
+- `concept-bridges/` — one folder per concept bridge page; each contains `index.html`
 
 ## Library organization
 
