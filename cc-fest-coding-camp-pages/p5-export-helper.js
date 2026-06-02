@@ -39,9 +39,45 @@
       color:#211f1c;
     }
     .p5-export-btn:hover{transform:translateY(-1px)}
+
+    .canvas-action-bar{
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      margin:8px 0 4px;
+    }
+    .canvas-action-btn{
+      border:1px solid rgba(44,42,38,.12);
+      border-radius:999px;
+      background:#fff;
+      color:#2c2a26;
+      padding:7px 11px;
+      font:700 11px "DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+      cursor:pointer;
+      box-shadow:0 1px 2px rgba(0,0,0,.04);
+    }
+    .canvas-action-btn:hover{transform:translateY(-1px)}
+
+    .embed-mode div.tool-topbar,
+    .embed-mode nav.top,
+    .embed-mode .tool-rhythm,
+    .embed-mode .teaching-note,
+    .embed-mode .try-next,
+    .embed-mode .tool-footer { display:none !important; }
   `;
   document.head.appendChild(style);
 
+  // ── Embed mode ────────────────────────────────────────────────────────
+  // Apply as early as possible so layout never flashes before hiding.
+  if (new URLSearchParams(location.search).get("embed")) {
+    document.documentElement.classList.add("embed-mode");
+    // Also add to body once available (DOMContentLoaded runs before first paint)
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.classList.add("embed-mode");
+    }, { once: true });
+  }
+
+  // ── Shared helpers ────────────────────────────────────────────────────
   function visibleCodeElement() {
     return codeElements().find((el) => {
       const text = getCode(el);
@@ -96,6 +132,7 @@
     });
   }
 
+  // ── Code export bar ───────────────────────────────────────────────────
   function insertBar(target) {
     if (!target || target.dataset.p5ExportReady) return;
     target.dataset.p5ExportReady = "true";
@@ -159,9 +196,86 @@
     }, 100);
   }
 
+  // ── Canvas action bar (Save Image · Fullscreen · Copy link) ───────────
+  function insertCanvasBar() {
+    if (document.querySelector(".canvas-action-bar")) return;
+
+    const canvas = Array.from(document.querySelectorAll("canvas")).find((c) => {
+      const b = c.getBoundingClientRect();
+      return b.width > 0 && b.height > 0;
+    });
+    if (!canvas) return;
+
+    // Insert after the nearest meaningful wrapper, or after the canvas itself
+    const insertAfter = canvas.closest(".stage, .canvas-wrap") || canvas;
+
+    const bar = document.createElement("div");
+    bar.className = "canvas-action-bar";
+    bar.setAttribute("aria-label", "Canvas actions");
+
+    // Save Image
+    const saveBtn = document.createElement("button");
+    saveBtn.className = "canvas-action-btn";
+    saveBtn.type = "button";
+    saveBtn.textContent = "Save Image";
+    saveBtn.addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.download = "cc-fest-canvas.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      setButtonText(saveBtn, "Saved ✓");
+    });
+
+    // Fullscreen
+    const fsBtn = document.createElement("button");
+    fsBtn.className = "canvas-action-btn";
+    fsBtn.type = "button";
+    fsBtn.textContent = "⛶ Fullscreen";
+    fsBtn.addEventListener("click", () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        const fsTarget = canvas.closest(".stage, .canvas-wrap") || canvas;
+        (fsTarget.requestFullscreen || canvas.requestFullscreen).call(fsTarget).catch(() => {});
+      }
+    });
+    document.addEventListener("fullscreenchange", () => {
+      fsBtn.textContent = document.fullscreenElement ? "✕ Exit full" : "⛶ Fullscreen";
+    });
+
+    // Copy link
+    const linkBtn = document.createElement("button");
+    linkBtn.className = "canvas-action-btn";
+    linkBtn.type = "button";
+    linkBtn.textContent = "Copy link";
+    linkBtn.addEventListener("click", async () => {
+      await copyText(location.href);
+      setButtonText(linkBtn, "Copied ✓");
+    });
+
+    bar.append(saveBtn, fsBtn, linkBtn);
+    insertAfter.insertAdjacentElement("afterend", bar);
+  }
+
+  function initCanvasBar() {
+    if (document.querySelector(".canvas-action-bar")) return;
+    let tries = 0;
+    const tryInsert = () => {
+      insertCanvasBar();
+      return !!document.querySelector(".canvas-action-bar");
+    };
+    if (tryInsert()) return;
+    const interval = window.setInterval(() => {
+      tries += 1;
+      if (tryInsert() || tries > 40) window.clearInterval(interval);
+    }, 100);
+  }
+
+  // ── Boot ──────────────────────────────────────────────────────────────
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", () => { init(); initCanvasBar(); });
   } else {
     init();
+    initCanvasBar();
   }
 })();
