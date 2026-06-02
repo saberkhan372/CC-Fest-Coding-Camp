@@ -456,19 +456,102 @@ A new ◎ Motion tool. A single canvas shows five quantities animating simultane
 
 A new ✦ Marks tool. Users drag anchor and control points; the Bezier curve updates live; `bezierVertex()` code generates below. No existing tool covers curved drawing paths.
 
-**Pattern: static HTML page.** Do not register in `workshop-tool-pages.js`. Add a homepage card manually.
+**Pattern: static HTML page.** Do not register in `workshop-tool-pages.js`. Add a homepage card manually. Use plain Canvas 2D (not p5.js) for the tool's own rendering — same pattern as `layering-visualizer`. Generate p5.js code in the output panel.
 
-**Codex tasks:**
+### Canvas interaction spec
 
-- Create `cc-fest-coding-camp-pages/tools/bezier-curve-sculptor/index.html` using the static tool page template.
-- Canvas: one cubic Bezier with draggable anchor points (P0, P3) and control points (P1, P2). Dashed lines connect anchors to their control points.
-- Code panel: auto-generated `beginShape() / bezierVertex(...) / endShape()` that updates on drag.
-- "Add another curve" button: chains a second segment sharing the last anchor.
-- "Copy code" button.
-- Break-it note: drag a control point far off-canvas — the curve follows because handles extend infinitely.
-- `teaching-note` and `try-next` to: `transformations-explorer`, `push-pop-scope-visualizer`; starter sketch `generative-tile-pattern-seed`; bridge `world-vs-local-coordinates`.
-- Add homepage card: `<article class="tool-card suit-marks"` with `data-pathway="final"` `data-difficulty="extension"` and tags `bezier curves shapes vertex code-generation`. Place it inside the `#station-marks` station div.
-- Update tool count from 67 to 68 (after Phase 14 ships) in all count locations.
+Four named points: `P0` (start anchor), `P1` (start control), `P2` (end control), `P3` (end anchor). Start positions:
+
+```js
+const pts = [
+  { x: 100, y: 300, label: "P0", kind: "anchor" },
+  { x: 200, y: 100, label: "P1", kind: "control" },
+  { x: 350, y: 100, label: "P2", kind: "control" },
+  { x: 450, y: 300, label: "P3", kind: "anchor" }
+];
+```
+
+**Drag logic (mousedown / mousemove / mouseup + touch equivalents):**
+
+```js
+let dragging = null;
+const HIT = 12; // hit radius px
+
+canvas.addEventListener("mousedown", e => {
+  const { x, y } = canvasXY(e);
+  // test in reverse so top-painted points win
+  for (let i = pts.length - 1; i >= 0; i--) {
+    if (Math.hypot(pts[i].x - x, pts[i].y - y) < HIT) {
+      dragging = i; break;
+    }
+  }
+});
+canvas.addEventListener("mousemove", e => {
+  if (dragging === null) return;
+  const { x, y } = canvasXY(e);
+  pts[dragging].x = x;
+  pts[dragging].y = y;
+  render(); updateCode();
+});
+canvas.addEventListener("mouseup", () => dragging = null);
+```
+
+`canvasXY` maps a MouseEvent to canvas pixel coords accounting for `getBoundingClientRect()` and `devicePixelRatio`.
+
+**Render order per frame:**
+1. Clear canvas
+2. Dashed lines: P0→P1, P2→P3 (`setLineDash([5,4])`, `--ink-light` color)
+3. Bezier curve: `ctx.bezierCurveTo(P1.x, P1.y, P2.x, P2.y, P3.x, P3.y)`, `--accent` stroke, 2.5px
+4. Control points (P1, P2): open circle, `--ink-light` fill, 8px radius
+5. Anchor points (P0, P3): filled circle, `--accent` fill, 10px radius
+6. Labels: DM Mono 11px above each point
+
+**"Add another curve" mechanic:**
+
+Adds a second `bezierVertex()` segment. The new segment's start is the previous P3 (shared, not duplicated in the point array). Append three new points — new P1, P2, P3:
+
+```js
+// after "Add curve" click:
+const last = pts[pts.length - 1]; // current P3 becomes shared anchor
+pts.push(
+  { x: last.x + 80,  y: last.y - 120, label: "P" + pts.length,     kind: "control" },
+  { x: last.x + 200, y: last.y - 120, label: "P" + (pts.length+1), kind: "control" },
+  { x: last.x + 280, y: last.y,       label: "P" + (pts.length+2), kind: "anchor"  }
+);
+```
+
+Limit to 3 total curves (10 points max) before disabling the button.
+
+### Code generation format
+
+Output panel shows valid p5.js using `beginShape()` / `vertex()` / `bezierVertex()`. Coordinates rounded to integers:
+
+```js
+function generateCode(pts) {
+  const r = v => Math.round(v);
+  let out = "beginShape();\n";
+  out += `vertex(${r(pts[0].x)}, ${r(pts[0].y)});\n`;
+  for (let i = 1; i < pts.length; i += 3) {
+    out += `bezierVertex(${r(pts[i].x)}, ${r(pts[i].y)}, `;
+    out +=              `${r(pts[i+1].x)}, ${r(pts[i+1].y)}, `;
+    out +=              `${r(pts[i+2].x)}, ${r(pts[i+2].y)});\n`;
+  }
+  out += "endShape();";
+  return out;
+}
+```
+
+Coordinates use top-left origin (canvas default), matching what `createCanvas()` produces in p5.js.
+
+### Codex tasks
+
+- Create `cc-fest-coding-camp-pages/tools/bezier-curve-sculptor/index.html` using the static tool page template (reference `layering-visualizer` for shell structure).
+- Implement canvas drag interaction and code generation per specs above.
+- Break-it note: drag a control point far off-canvas — the curve follows because bezier handles extend infinitely.
+- `teaching-note` (Prompt / Misconception / Ask) and `try-next` to: `transformations-explorer`, `push-pop-scope-visualizer`; starter sketch `generative-tile-pattern-seed`; bridge `world-vs-local-coordinates`.
+- Add homepage card: `<article class="tool-card suit-marks"` with `data-pathway="final"` `data-difficulty="extension"` and tags `bezier curves shapes vertex code-generation`. Place inside `#station-marks` station div.
+- Update tool count from 67 to 68 in all count locations (see Phase 1 for full list).
+- Add preview registration to `preview-sketches.js` and bump its cache key.
 - Run `./deploy.sh`.
 
 ---
