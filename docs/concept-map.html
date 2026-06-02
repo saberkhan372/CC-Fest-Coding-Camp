@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Concept Map — CC Fest Coding Camp</title>
+  <meta name="description" content="A visual map of how concept bridges, workshop tools, and starter sketches connect across CC Fest Coding Camp.">
+  <script src="concept-map-data.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css?v=20260602-phase12-filters">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+  <style>
+    .map-page-header {
+      padding: 28px 32px 20px;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+    .map-page-header h1 {
+      font-family: Fraunces, serif;
+      font-size: clamp(32px, 5vw, 52px);
+      line-height: 1;
+      margin: 0 0 8px;
+      color: var(--ink);
+    }
+    .map-page-header .lede {
+      color: var(--ink-light);
+      font-size: 15px;
+      max-width: 680px;
+      margin: 0 0 18px;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 22px;
+      align-items: center;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font: 12px "DM Mono", monospace;
+      color: var(--ink-light);
+    }
+    .legend-item svg { flex-shrink: 0; }
+    .suit-pips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+    .suit-pip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font: 11px "DM Mono", monospace;
+      color: var(--ink-light);
+    }
+    .suit-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    /* map container */
+    .map-container {
+      overflow-x: auto;
+      overflow-y: visible;
+      border: 2px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--cream);
+      margin-bottom: 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .map-container svg {
+      display: block;
+      min-width: 1100px;
+      width: 100%;
+      height: auto;
+    }
+
+    /* node hover */
+    .map-container a:hover .node-shape { opacity: 0.85; }
+    .map-container a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+    /* mobile fallback */
+    .map-fallback { display: none; }
+    @media (max-width: 720px) {
+      .map-container { display: none; }
+      .map-fallback { display: block; }
+    }
+    .map-fallback h2 {
+      font-family: Fraunces, serif;
+      font-size: 22px;
+      margin: 0 0 14px;
+      color: var(--ink);
+    }
+    .fallback-bridge {
+      background: var(--panel);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: 4px 4px 0 rgba(32,28,26,.08);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .fallback-bridge h3 {
+      font-family: Fraunces, serif;
+      font-size: 18px;
+      margin: 0 0 10px;
+      color: var(--ink);
+    }
+    .fallback-bridge a { color: var(--accent); text-decoration: none; }
+    .fallback-bridge a:hover { text-decoration: underline; }
+    .fallback-section { font: 700 11px "DM Mono"; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-light); margin: 10px 0 5px; }
+    .fallback-links { display: flex; flex-wrap: wrap; gap: 6px; }
+    .fallback-links a {
+      font: 12px "DM Sans";
+      background: var(--cream-dark);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <div class="site-topbar">
+    <div class="brand-mark">CC Fest · Coding Camp Tools</div>
+    <nav class="topbar-links">
+      <a class="topbar-link" href="https://ccfest.rocks">ccfest.rocks</a>
+      <a class="topbar-link" href="sessions/">Sessions</a>
+      <a class="topbar-link" href="concept-map.html" aria-current="page">Map</a>
+      <a class="topbar-link" href="about.html">About</a>
+      <a class="topbar-link" href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">GitHub</a>
+    </nav>
+  </div>
+
+  <main style="padding: 24px 28px; max-width: 1200px; margin: 0 auto;">
+
+    <div class="map-page-header">
+      <h1>Concept Map</h1>
+      <p class="lede">How the 6 priority concept bridges connect to their workshop tools and starter sketches. Each column is one bridge. Edges show the hand-authored try-next links.</p>
+
+      <div class="legend-row">
+        <div class="legend-item">
+          <svg width="28" height="24" viewBox="0 0 28 24">
+            <polygon points="14,1 26,7 26,17 14,23 2,17 2,7" fill="#fde8e3" stroke="#c8391d" stroke-width="2"/>
+          </svg>
+          Concept Bridge
+        </div>
+        <div class="legend-item">
+          <svg width="36" height="20" viewBox="0 0 36 20">
+            <rect x="1" y="1" width="34" height="18" rx="5" fill="#fff" stroke="#d8cdbf" stroke-width="1.5"/>
+            <rect x="1" y="1" width="4" height="18" rx="2" fill="#e07a5f"/>
+          </svg>
+          Workshop Tool
+        </div>
+        <div class="legend-item">
+          <svg width="20" height="20" viewBox="0 0 20 20">
+            <circle cx="10" cy="10" r="8" fill="rgba(127,157,122,0.25)" stroke="#7f9d7a" stroke-width="1.5"/>
+          </svg>
+          Starter Sketch
+        </div>
+        <div class="legend-item">
+          <svg width="30" height="12" viewBox="0 0 30 12">
+            <line x1="1" y1="6" x2="29" y2="6" stroke="#d8cdbf" stroke-width="1.5" marker-end="url(#arr-legend)"/>
+            <defs><marker id="arr-legend" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#d8cdbf"/></marker></defs>
+          </svg>
+          try-next link
+        </div>
+        <div class="legend-item">
+          <svg width="30" height="12" viewBox="0 0 30 12">
+            <line x1="1" y1="6" x2="29" y2="6" stroke="#c8391d" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.5"/>
+          </svg>
+          bridge cross-link
+        </div>
+        <div class="legend-item" style="color: var(--ink-light); opacity: 0.6;">
+          <svg width="22" height="18" viewBox="0 0 22 18">
+            <polygon points="11,1 20,5.5 20,12.5 11,17 2,12.5 2,5.5" fill="none" stroke="#5c5751" stroke-width="1.5"/>
+          </svg>
+          Referenced bridge
+        </div>
+      </div>
+
+      <div class="suit-pips">
+        <div class="suit-pip"><div class="suit-swatch" style="background:#f5a800"></div>✦ Marks</div>
+        <div class="suit-pip"><div class="suit-swatch" style="background:#e07a5f"></div>◎ Motion</div>
+        <div class="suit-pip"><div class="suit-swatch" style="background:#7f9d7a"></div>⬡ Systems</div>
+        <div class="suit-pip"><div class="suit-swatch" style="background:#7a5ea8"></div>☽ Open</div>
+      </div>
+    </div>
+
+    <!-- SVG map (desktop) -->
+    <div class="map-container" id="mapContainer">
+      <!-- rendered by JS -->
+    </div>
+
+    <!-- List fallback (mobile) -->
+    <nav class="map-fallback" id="mapFallback" aria-label="Concept map navigation">
+      <h2>Browse by bridge</h2>
+      <!-- rendered by JS -->
+    </nav>
+
+  </main>
+</div>
+
+<script>
+(() => {
+  const { nodes, edges } = CONCEPT_MAP_DATA;
+
+  // ── Layout constants ───────────────────────────────────────────────────
+  const W = 1100, H = 630;
+  const COL_W = 156;
+  const L_PAD = 78;
+  function colX(col) { return L_PAD + (col - 1) * COL_W + COL_W / 2; }
+
+  const BY = { bridge: 115, tool: 335, sketch: 535 };
+  const NODE_SPREAD = 48; // px between stacked nodes in same col/band
+
+  const SUIT_COLOR = {
+    marks:   '#f5a800',
+    motion:  '#e07a5f',
+    systems: '#7f9d7a',
+    open:    '#7a5ea8',
+    data:    '#1a6fb0',
+    support: '#5c5751'
+  };
+  const ACCENT    = '#c8391d';
+  const INK       = '#201c1a';
+  const INK_LIGHT = '#5c5751';
+  const LINE_C    = '#d8cdbf';
+  const CREAM     = '#f6f0e7';
+  const PANEL     = '#fffdf7';
+
+  // ── Compute node positions ─────────────────────────────────────────────
+  function computePositions() {
+    const groups = {};
+    nodes.forEach(n => {
+      if (n.ref) return; // handled separately
+      const key = `${n.type}:${n.col}`;
+      (groups[key] = groups[key] || []).push(n);
+    });
+
+    const pos = {};
+
+    // Referenced bridges: right margin column
+    const refs = nodes.filter(n => n.ref);
+    refs.forEach((n, i) => {
+      pos[n.id] = { x: W - 60, y: 80 + i * 85 };
+    });
+
+    // All other nodes
+    nodes.forEach(n => {
+      if (n.ref) return;
+      const key = `${n.type}:${n.col}`;
+      const group = groups[key] || [n];
+      const idx = group.findIndex(x => x.id === n.id);
+      const m = group.length;
+      const oy = (idx - (m - 1) / 2) * NODE_SPREAD;
+      pos[n.id] = { x: colX(n.col), y: BY[n.type] + oy };
+    });
+
+    return pos;
+  }
+
+  const pos = computePositions();
+  const byId = new Map(nodes.map(n => [n.id, n]));
+
+  // ── Helpers ────────────────────────────────────────────────────────────
+  // Hexagon points (flat-top)
+  function hexPts(cx, cy, r) {
+    const pts = [];
+    for (let i = 0; i < 6; i++) {
+      const a = i * 60 * Math.PI / 180;
+      pts.push(`${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`);
+    }
+    return pts.join(' ');
+  }
+
+  // Wrap text to lines of maxChars (returns array of strings)
+  function wrapText(text, maxChars) {
+    const words = text.split(' ');
+    const lines = [];
+    let cur = '';
+    words.forEach(w => {
+      if (cur.length === 0) { cur = w; }
+      else if (cur.length + 1 + w.length <= maxChars) { cur += ' ' + w; }
+      else { lines.push(cur); cur = w; }
+    });
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  function truncate(s, n) {
+    return s.length <= n ? s : s.slice(0, n - 1) + '…';
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Edge endpoint: shorten line by node outset from center
+  function edgePts(fromId, toId) {
+    const fp = pos[fromId], tp = pos[toId];
+    if (!fp || !tp) return null;
+    const dx = tp.x - fp.x, dy = tp.y - fp.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 2) return null;
+    const outset = { bridge: 38, tool: 20, sketch: 22 };
+    const fn = byId.get(fromId), tn = byId.get(toId);
+    const fo = (outset[fn?.type] || 20) / dist;
+    const to_ = (outset[tn?.type] || 20) / dist;
+    return {
+      x1: fp.x + dx * fo, y1: fp.y + dy * fo,
+      x2: tp.x - dx * to_, y2: tp.y - dy * to_
+    };
+  }
+
+  // ── Render edges ───────────────────────────────────────────────────────
+  function renderEdges() {
+    let s = '';
+    // Dedup bidirectional bridge-bridge edges
+    const seen = new Set();
+    edges.forEach(e => {
+      const key = [e.from, e.to].sort().join('|');
+      if (e.rel === 'bridge' && seen.has(key)) return;
+      if (e.rel === 'bridge') seen.add(key);
+
+      const fp = pos[e.from], tp = pos[e.to];
+      if (!fp || !tp) return;
+
+      if (e.rel === 'bridge') {
+        // Curved arc above bridge band
+        const mx = (fp.x + tp.x) / 2;
+        const my = Math.min(fp.y, tp.y) - 55;
+        const fromRef = byId.get(e.from)?.ref;
+        const toRef   = byId.get(e.to)?.ref;
+        const opacity = (fromRef || toRef) ? 0.25 : 0.45;
+        s += `<path d="M${fp.x.toFixed(1)},${(fp.y - 38).toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${tp.x.toFixed(1)},${(tp.y - 38).toFixed(1)}"
+          fill="none" stroke="${ACCENT}" stroke-width="1.5" stroke-dasharray="5,4" opacity="${opacity}"
+          marker-end="url(#arr-bridge)"/>`;
+        return;
+      }
+
+      const ep = edgePts(e.from, e.to);
+      if (!ep) return;
+      const fromRef = byId.get(e.from)?.ref;
+      const toRef   = byId.get(e.to)?.ref;
+      const opacity = (fromRef || toRef) ? 0.2 : 0.45;
+      s += `<line x1="${ep.x1.toFixed(1)}" y1="${ep.y1.toFixed(1)}" x2="${ep.x2.toFixed(1)}" y2="${ep.y2.toFixed(1)}"
+        stroke="${LINE_C}" stroke-width="1.2" opacity="${opacity}"
+        marker-end="url(#arr-solid)"/>`;
+    });
+    return s;
+  }
+
+  // ── Render nodes ───────────────────────────────────────────────────────
+  function renderNode(n) {
+    const p = pos[n.id];
+    if (!p) return '';
+
+    const href = n.type === 'bridge'
+      ? `concept-bridges/${n.id}/`
+      : `tools/${n.id}/`;
+
+    if (n.type === 'bridge') {
+      const r = n.ref ? 24 : 38;
+      const opacity = n.ref ? 0.55 : 1;
+      const strokeW = n.ref ? 1.5 : 2;
+      const stroke  = n.ref ? INK_LIGHT : ACCENT;
+      const fill    = n.ref ? CREAM : '#fde8e3';
+      const lines   = wrapText(n.title, n.ref ? 12 : 14);
+
+      let textSvg = '';
+      const lineH = n.ref ? 11 : 12;
+      const startY = p.y - (lines.length - 1) * lineH / 2;
+      lines.forEach((ln, i) => {
+        textSvg += `<text x="${p.x.toFixed(1)}" y="${(startY + i * lineH).toFixed(1)}"
+          text-anchor="middle" dominant-baseline="middle"
+          font-family="Fraunces,serif" font-weight="700"
+          font-size="${n.ref ? 9 : 10}" fill="${n.ref ? INK_LIGHT : INK}">${esc(ln)}</text>`;
+      });
+
+      return `<a href="${href}" class="node-shape" opacity="${opacity}">
+        <title>${esc(n.title)}</title>
+        <polygon points="${hexPts(p.x, p.y, r)}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}"/>
+        ${textSvg}
+      </a>`;
+    }
+
+    if (n.type === 'tool') {
+      const tw = 112, th = 32, rx = 5;
+      const sc = SUIT_COLOR[n.suit] || LINE_C;
+      const label = truncate(n.title, 15);
+      return `<a href="${href}" class="node-shape">
+        <title>${esc(n.title)}</title>
+        <rect x="${(p.x - tw/2).toFixed(1)}" y="${(p.y - th/2).toFixed(1)}" width="${tw}" height="${th}" rx="${rx}"
+          fill="${PANEL}" stroke="${LINE_C}" stroke-width="1.2"/>
+        <rect x="${(p.x - tw/2).toFixed(1)}" y="${(p.y - th/2).toFixed(1)}" width="4" height="${th}" rx="${rx}"
+          fill="${sc}"/>
+        <text x="${(p.x - tw/2 + 10).toFixed(1)}" y="${p.y.toFixed(1)}"
+          dominant-baseline="middle"
+          font-family="DM Sans,system-ui,sans-serif" font-size="9.5" fill="${INK}">${esc(label)}</text>
+      </a>`;
+    }
+
+    if (n.type === 'sketch') {
+      const r = 18;
+      const sc = SUIT_COLOR[n.suit] || LINE_C;
+      const label = truncate(n.title, 13);
+      return `<a href="${href}" class="node-shape">
+        <title>${esc(n.title)}</title>
+        <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}"
+          fill="${sc}22" stroke="${sc}" stroke-width="1.5"/>
+        <text x="${p.x.toFixed(1)}" y="${(p.y + r + 10).toFixed(1)}"
+          text-anchor="middle" dominant-baseline="middle"
+          font-family="DM Mono,monospace" font-size="8.5" fill="${INK_LIGHT}">${esc(label)}</text>
+      </a>`;
+    }
+
+    return '';
+  }
+
+  // ── Band stripes and labels ─────────────────────────────────────────────
+  function bandStripe(y1, y2, label, symbol) {
+    return `<rect x="4" y="${y1}" width="${W - 8}" height="${y2 - y1}" rx="8"
+        fill="${CREAM}" opacity="0.6"/>
+      <text x="10" y="${(y1 + y2) / 2}" dominant-baseline="middle"
+        font-family="DM Mono,monospace" font-size="9" fill="${INK_LIGHT}" opacity="0.5"
+        transform="rotate(-90 10 ${(y1 + y2) / 2})">${symbol} ${label}</text>`;
+  }
+
+  // ── Column dividers ────────────────────────────────────────────────────
+  function colLines() {
+    let s = '';
+    for (let c = 1; c <= 6; c++) {
+      const x = colX(c);
+      s += `<line x1="${x.toFixed(1)}" y1="30" x2="${x.toFixed(1)}" y2="${H - 20}"
+        stroke="${LINE_C}" stroke-width="0.5" opacity="0.4" stroke-dasharray="3,4"/>`;
+      s += `<text x="${x.toFixed(1)}" y="22" text-anchor="middle"
+        font-family="DM Mono,monospace" font-size="9" fill="${INK_LIGHT}" opacity="0.45">${c}</text>`;
+    }
+    return s;
+  }
+
+  // ── Build SVG ──────────────────────────────────────────────────────────
+  function buildSVG() {
+    const defs = `<defs>
+      <marker id="arr-solid" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+        <polygon points="0 0,7 2.5,0 5" fill="${LINE_C}"/>
+      </marker>
+      <marker id="arr-bridge" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+        <polygon points="0 0,7 2.5,0 5" fill="${ACCENT}" opacity="0.5"/>
+      </marker>
+    </defs>`;
+
+    const bg = `<rect width="${W}" height="${H}" fill="${PANEL}" rx="10"/>`;
+
+    const stripes =
+      bandStripe(60, 175,  'Bridges', '⬡') +
+      bandStripe(285, 405, 'Tools',   '▭') +
+      bandStripe(465, 600, 'Sketches','◉');
+
+    const cols = colLines();
+
+    // Band text labels (right side)
+    const bandLabels = [
+      { label: 'Bridges',  y: 117 },
+      { label: 'Tools',    y: 340 },
+      { label: 'Sketches', y: 535 },
+    ].map(({ label, y }) =>
+      `<text x="${W - 8}" y="${y}" text-anchor="end"
+        font-family="DM Mono,monospace" font-size="9" fill="${INK_LIGHT}" opacity="0.4">${label}</text>`
+    ).join('');
+
+    const edgesSvg  = renderEdges();
+    const nodesSvg  = nodes.map(renderNode).join('');
+
+    return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"
+      role="img" aria-label="Concept map: bridges, tools, and sketches">
+      ${defs}${bg}${stripes}${cols}${bandLabels}${edgesSvg}${nodesSvg}
+    </svg>`;
+  }
+
+  // ── Build mobile fallback ──────────────────────────────────────────────
+  function buildFallback() {
+    const priorityBridges = nodes.filter(n => n.type === 'bridge' && n.priority);
+    let html = '';
+    priorityBridges.forEach(bridge => {
+      const bridgeEdges = edges.filter(e => e.from === bridge.id);
+      const tools   = bridgeEdges.filter(e => e.rel === 'tool').map(e => byId.get(e.to)).filter(Boolean);
+      const sketches = bridgeEdges.filter(e => e.rel === 'sketch').map(e => byId.get(e.to)).filter(Boolean);
+      const bridgeLinks = bridgeEdges.filter(e => e.rel === 'bridge').map(e => byId.get(e.to)).filter(Boolean);
+
+      html += `<div class="fallback-bridge">
+        <h3><a href="concept-bridges/${bridge.id}/">${esc(bridge.title)}</a></h3>`;
+
+      if (tools.length) {
+        html += `<div class="fallback-section">Tools</div><div class="fallback-links">`;
+        tools.forEach(t => { html += `<a href="tools/${t.id}/">${esc(t.title)}</a>`; });
+        html += `</div>`;
+      }
+      if (sketches.length) {
+        html += `<div class="fallback-section">Sketches</div><div class="fallback-links">`;
+        sketches.forEach(s => { html += `<a href="tools/${s.id}/">${esc(s.title)}</a>`; });
+        html += `</div>`;
+      }
+      if (bridgeLinks.length) {
+        html += `<div class="fallback-section">Related Bridges</div><div class="fallback-links">`;
+        bridgeLinks.forEach(b => { html += `<a href="concept-bridges/${b.id}/">${esc(b.title)}</a>`; });
+        html += `</div>`;
+      }
+
+      html += `</div>`;
+    });
+    return html;
+  }
+
+  // ── Mount ──────────────────────────────────────────────────────────────
+  document.getElementById('mapContainer').innerHTML = buildSVG();
+  document.getElementById('mapFallback').insertAdjacentHTML('beforeend', buildFallback());
+
+})();
+</script>
+</body>
+</html>
