@@ -30,6 +30,7 @@ https://saberkhan372.github.io/CC-Fest-Coding-Camp/
 ### Pages
 - `index.html` — homepage gallery and learning pathway
 - `about.html` — local About page (linked from topbar, hero, and footer)
+- `concept-map.html` — swimlane SVG concept map (41 nodes, mobile list fallback)
 - `sessions/` — sessions listing and generative poster template
 
 ### Shared stylesheets
@@ -45,7 +46,9 @@ https://saberkhan372.github.io/CC-Fest-Coding-Camp/
 - `workshop-tool-pages.js` — data and renderer for the 11 JS-rendered workshop tool pages
 - `starter-seed-pages.js` — data and renderer for the 44 JS-rendered starter sketch pages
 - `preview-sketches.js` — card-level canvas previews using IntersectionObserver
-- `p5-export-helper.js` — current "Copy Code" and "↗ p5 Editor" buttons injected on tool pages. Canvas save/fullscreen/link utilities are planned in Phase 19.
+- `p5-export-helper.js` — "Copy Code", "↗ p5 Editor", "Save Image", "⛶ Fullscreen", and "Copy link" buttons injected on every tool page. Also handles `?embed=1` projection mode (hides nav, rhythm strip, and teaching panels).
+- `tool-state-utils.js` — URL hash state sync for workshop tool controls. Exposes `window.CCFestToolState = { syncToURL, loadFromURL }`. Loaded by the 11 JS-rendered workshop tool shell pages.
+- `concept-map-data.js` — node and edge graph data for the concept map page (41 nodes, 44 edges from 6 priority bridge try-next links). Loaded by `concept-map.html`.
 - `hero-sketch.js` — interactive code-token parallax poster in the homepage hero
 
 ### Tool directories

@@ -73,7 +73,9 @@ Corrected all stale counts from the old 60/40 figures to the actual library stat
 | Gallery headers | already correct (66, 44) | unchanged |
 | Footer | already good | unchanged |
 
-Actual library: **21 bridges · 66 workshop tools · 44 starter sketches · 5 sessions**
+Actual library at time of Phase 1: **21 bridges · 66 workshop tools · 44 starter sketches · 5 sessions**
+
+Current library (after Phases 14–18): **21 bridges · 70 workshop tools · 44 starter sketches · 5 sessions**
 
 (66 = 55 static + 11 JS-rendered workshop pages. 44 = all pages using `renderStarterSeedPage`.)
 
@@ -362,9 +364,9 @@ What shipped:
 | 10 ✅ | About page and footer polish. |
 | 11 ✅ | Generative poster engine — /sessions/ listing + template poster page. |
 
-The first major site-improvement arc is now complete. Its only remaining item is Phase 9, which is content/design work rather than site infrastructure.
+Both improvement arcs are now complete. The only remaining open item is Phase 9, which is content/design work blocked on real, permission-safe images.
 
-A second improvement arc — drawing on patterns from the Algebra 2 Playgrounds site and a joint Claude + ChatGPT/Codex analysis — begins at Phase 12. Phases 12–15 are the priority sequence. Phases 16–18 are higher-scope and require design decisions before building.
+The second improvement arc (Phases 12–20), drawn from patterns in A2 Playgrounds and a joint Claude + Codex analysis, shipped 2026-06-02: filter system, preview curation, four new tools (70 total), concept map, tool presentation utilities, and shareable URL state for all 11 JS-rendered tools.
 
 ---
 
@@ -585,7 +587,7 @@ A new ⬡ Systems tool. Shows what `random()`, `randomGaussian()`, and `noise()`
 
 A spatial navigation page rendering the existing bridge→tool→sketch relationship data as a visual graph. The hand-authored `try-next` cross-links from Phase 3 are the data source — no new authoring required for the initial version.
 
-**Claude tasks — ✅ Done 2026-06-02**
+**Status: ✅ Done 2026-06-02 — Claude (data + spec) + Claude (renderer)**
 
 Graph data audited from all 6 priority bridge pages. Full node/edge object written to `cc-fest-coding-camp-pages/concept-map-data.js`. Copy to `docs/` at deploy time.
 
@@ -643,7 +645,7 @@ Rationale: swimlane makes the pedagogical sequence spatially legible (bridge tea
 
 ## Phase 18 — Unit Circle Wave Sync tool
 
-**Status: Ready to build · Owner: Codex**
+**Status: ✅ Done 2026-06-02**
 
 A new ◎ Motion tool: a point orbits the unit circle while sine and cosine waves draw to the right in real-time sync. CC Fest has the Triangle-to-Circle-to-Wave bridge (concept) and the Sine + Cosine Motion Explorer (tool), but not the live synchronized animation joining them.
 
@@ -665,7 +667,7 @@ A new ◎ Motion tool: a point orbits the unit circle while sine and cosine wave
 
 ## Phase 19 — Tool presentation utilities (embed, save image, fullscreen, copy link)
 
-**Status: Ready to build · Owner: Codex**
+**Status: ✅ Done 2026-06-02**
 
 Four small, independent improvements to how tools behave in classroom settings. All behavior is delivered through `p5-export-helper.js` and a CSS addition to `tool-page.css`. No semantic per-tool HTML edits are required, but cache-busting the helper requires a mechanical script-tag version update across tool pages.
 
@@ -730,7 +732,7 @@ Once the canvas bar exists, this should call the existing `copyText(location.hre
 
 ## Phase 20 — Shareable tool state (URL-encoded slider values)
 
-**Status: Depends on Phase 19 · Owner: Codex**
+**Status: ✅ Done 2026-06-02**
 
 Encode named control values (sliders, selects, checkboxes) into the URL so a specific tool configuration can be shared as a link. A teacher sets up a demo, clicks "Copy link," and pastes the URL into their session notes. Students open it pre-configured.
 
@@ -794,36 +796,46 @@ The 11 JS-rendered tools have their controls generated from a single data struct
 
 ## Next work plan
 
-### Repo hygiene
+*Updated 2026-06-02 — both improvement arcs are complete.*
 
-- Keep the repo synced with `origin/main` before starting the next site pass.
-- Leave `.claude/` uncommitted unless it becomes an intentional part of the workflow.
-- After future edits, verify that `cc-fest-coding-camp-pages/` and `docs/` still match everywhere they are meant to match.
+### The only open roadmap phase
 
-### Phase 9 prep: Camp Archive
+Phase 9 is the only item left. It is purely a content/design task:
 
-- Treat Phase 9 as the only open roadmap phase.
 - Do not rebuild the archive strip until real, permission-safe images are available.
 - For each candidate image, collect a title, date or session, credit, permission context, caption, and source file.
-- Use `.poster-proof` and visible `.artifact-caption` styles when the archive returns.
+- Use `.poster-proof` and visible `.artifact-caption` styles from `site-components.css` when the archive returns.
+- No placeholder slots — only add a slot when the real image is in hand.
 
-### Sessions system next step
+### New tools (Phases 21+)
+
+When adding new workshop tools beyond the current 70:
+
+- Use the static HTML page pattern (reference `bezier-curve-sculptor` or `unit-circle-wave-sync` as templates).
+- Add `p5-export-helper.js?v=...` for the canvas action bar and code export.
+- Add `tool-state-utils.js?v=...` if the tool has named range or select controls worth sharing.
+- Add the homepage card inside the correct station div with `suit-*` CSS class, `data-pathway`, `data-difficulty`.
+- Update tool count in all 6 locations (meta, OG, Twitter, hero strong, stat bar, gallery header).
+- Register a preview slug in `preview-sketches.js`.
+- Run `./deploy.sh`.
+
+### Sessions system
 
 - Add future sessions by appending entries to the existing `SESSIONS` array in `/sessions/index.html`.
 - Create each real session page by copying `sessions/template/` into a session-specific directory.
-- Replace template resource links with the relevant tools, concept bridges, and starter sketches for that session.
+- Wire the relevant tools, concept bridges, and starter sketches for that session.
 
-### Public link QA
+### Concept map extensions
 
-- Verify the Notion footer links are public before treating them as finished public navigation.
-- Replace private or brittle Notion links with public share URLs, local site pages, or no link until the resource is ready.
-- Check homepage, About, Sessions, concept bridge, tool, and starter sketch links after each public navigation pass.
+- Phases 14–18 tools are NOT yet in `concept-map-data.js` — they were added after the map data was authored.
+- When the map is next revisited, add the four new tools (how-does-it-grow, bezier-curve-sculptor, distribution-visualizer, unit-circle-wave-sync) as nodes to `concept-map-data.js` and link them from the appropriate bridge nodes.
 
-### Final polish pass
+### Ongoing hygiene
 
-- Bump CSS or JS cache keys whenever public-facing CSS or JavaScript changes.
-- Smoke test the local site before pushing and the GitHub Pages site after pushing.
-- Prioritize visible regressions, broken links, mobile overflow, and confusing public copy over new feature work.
+- Keep `cc-fest-coding-camp-pages/` and `docs/` in sync via `./deploy.sh` — never edit `docs/` directly for normal changes.
+- Bump JS/CSS cache keys whenever a shared file changes.
+- Smoke test on desktop and mobile after any push.
+- Leave `.claude/` uncommitted.
 
 ---
 

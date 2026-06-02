@@ -729,6 +729,9 @@ This section documents how the CC Fest design language is realized in the curren
 |---|---|---|
 | `cc-fest-coding-camp-pages/site.css` | `docs/site.css` | Homepage and shared design tokens |
 | `cc-fest-coding-camp-pages/site-components.css` | `docs/site-components.css` | Reusable component layer: `.teaching-note`, `.try-next`, `.maker-credit`, `.poster-proof`, `.artifact-caption`. Loaded by JS-rendered tool and seed pages. |
+| `docs/p5-export-helper.js` | Injected on every tool page. Provides: "Copy Code" + "↗ p5 Editor" near code blocks; "Save Image" + "⛶ Fullscreen" + "Copy link" near the first visible `<canvas>`. Also activates `?embed=1` projection mode. |
+| `docs/tool-state-utils.js` | Plain script (not a module). Exposes `window.CCFestToolState = { syncToURL, loadFromURL }`. Loaded by the 11 JS-rendered workshop tool shell pages before `workshop-tool-pages.js`. Keys are derived from control `id` by stripping the `ctrl-` prefix. |
+| `docs/concept-map-data.js` | Graph data for `concept-map.html`: 41 nodes (bridges, tools, sketches), 44 edges from the 6 priority bridge try-next cross-links. Audited 2026-06-02. |
 | `cc-fest-coding-camp-pages/concept-bridges/concept-bridge.css` | `docs/concept-bridges/concept-bridge.css` | All 21 concept bridge pages |
 | `cc-fest-coding-camp-pages/tool-page.css` | `docs/tool-page.css` | Shared stylesheet for the newer standalone workshop tool pages |
 | `cc-fest-coding-camp-pages/starter-sketch.css` | `docs/starter-sketch.css` | Shared stylesheet for generated starter sketch pages |
@@ -923,7 +926,32 @@ All 21 concept bridge pages share `concept-bridge.css`. Each bridge page has:
 4. **Snapshot button** — captures the canvas + DOM labels as a PNG download. Label: `"📷 Save snapshot"`.
 5. **Break presets** — on supported bridges, a preset that deliberately breaks the visual to show where the concept boundary is.
 
-### Tool page nav wrapper variants
+### Embed / projection mode
+
+Any tool page loaded with `?embed=1` in the URL gets `embed-mode` added to `<html>` and `<body>` by `p5-export-helper.js`. The CSS hides everything except the canvas and its controls:
+
+```css
+.embed-mode div.tool-topbar,
+.embed-mode nav.top,
+.embed-mode .tool-rhythm,
+.embed-mode .teaching-note,
+.embed-mode .try-next,
+.embed-mode .tool-footer { display: none !important; }
+```
+
+Use `?embed=1` when projecting a tool in class. The URL with `?embed=1` can also be combined with a URL state hash: `?embed=1#gravity=0.9&vx=2`.
+
+### Canvas action bar
+
+`p5-export-helper.js` automatically injects a `.canvas-action-bar` with three buttons after the first visible `<canvas>` on every tool page:
+
+- **Save Image** — downloads the canvas as `cc-fest-canvas.png` via `canvas.toDataURL()`
+- **⛶ Fullscreen** — calls `requestFullscreen()` on the canvas wrapper (`.stage` or `.canvas-wrap`) or the canvas itself
+- **Copy link** — copies `location.href` (which includes any URL state hash) to the clipboard using the `copyText()` fallback helper
+
+The bar is injected once per page (idempotency guard). It uses `.canvas-action-btn` for styling, distinct from `.p5-export-btn` used by the code export bar.
+
+### Tool nav wrapper variants
 
 Workshop tool pages were built over time and use two different nav wrapper patterns. Both are in active use. **Any CSS that needs to hide or style the tool nav must target both:**
 
