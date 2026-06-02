@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How Does It Grow? - CC Fest Coding Camp</title>
+  <meta name="description" content="Compare frameCount, frameCount squared, sin(), noise(), and lerp() as five live motion tracks for p5.js.">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../tool-page.css">
+  <link rel="stylesheet" href="../../site-components.css">
+  <style>
+    :root{--accent:#e07a5f;--motion:#e07a5f;--motion-deep:#c4543d;--motion-soft:#fce4da}
+    .tool-pill.session{color:var(--motion-deep)}
+    .tool-tag{color:var(--motion-deep);border-color:var(--motion-deep);background:#fff8f4}
+    .canvas-frame{background:linear-gradient(180deg,#fff 0%,#fff8f4 100%)}
+    #canvas-container{min-height:520px}
+    .control-cluster{display:grid;gap:14px}
+    .segmented{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .segmented .button{padding:9px 10px}
+    .segmented .button.active{background:var(--motion);border-color:var(--motion);color:#211f1c}
+    .toggle-row{display:flex;flex-wrap:wrap;gap:10px}
+    .track-readouts{display:grid;gap:8px}
+    .track-readout{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:10px 12px;border:1.5px solid var(--cream-deep);border-radius:8px;background:#fff}
+    .track-readout strong{font-size:13px}
+    .track-readout code{font:700 12px "DM Mono",ui-monospace,monospace;color:var(--ink)}
+    .track-dot{display:inline-block;width:10px;height:10px;margin-right:7px;border-radius:999px;background:var(--dot,#e07a5f)}
+    .care-note{background:#fff7d7}
+    .code-panel{margin-top:22px}
+    .try-next,.teaching-note{margin-top:22px}
+    .related-group-label{margin:0 0 2px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-light)}
+    @media(max-width:720px){
+      #canvas-container{min-height:420px}
+      .segmented{grid-template-columns:1fr}
+    }
+  </style>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="How Does It Grow? - CC Fest Coding Camp">
+  <meta property="og:description" content="Five p5.js quantities moving side by side: linear, quadratic, sine, noise, and lerp easing.">
+  <meta property="og:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="How Does It Grow? - CC Fest Coding Camp">
+  <meta name="twitter:description" content="Compare frameCount, frameCount squared, sin(), noise(), and lerp() as live motion tracks.">
+  <meta name="twitter:image" content="https://saberkhan372.github.io/CC-Fest-Coding-Camp/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="tool-shell">
+    <nav class="tool-topbar" aria-label="Tool navigation">
+      <a href="../../index.html">Back to tool library</a>
+      <a href="../../concept-bridges/how-p5-thinks-about-time/">Bridge: How p5.js Thinks About Time</a>
+      <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp" target="_blank" rel="noopener">CC Fest on GitHub</a>
+    </nav>
+
+    <header class="tool-header">
+      <div class="tool-header-meta">
+        <span class="tool-pill session">◎ Motion · Comparison</span>
+        <span class="tool-pill type">Interactive Tool</span>
+      </div>
+      <h1>How Does It Grow?</h1>
+      <p class="tool-subtitle">Five quantities run at the same time: one counts, one accelerates, one oscillates, one drifts, and one eases toward a target.</p>
+      <div class="tool-tags" aria-label="Concept tags">
+        <span class="tool-tag">frameCount</span>
+        <span class="tool-tag">frameCount squared</span>
+        <span class="tool-tag">sin()</span>
+        <span class="tool-tag">noise()</span>
+        <span class="tool-tag">lerp()</span>
+      </div>
+      <section class="tool-rhythm" aria-label="How to use this workshop tool">
+        <span class="tool-rhythm-card"><strong>Open it</strong> Watch the five tracks before touching controls.</span>
+        <span class="tool-rhythm-card"><strong>Change it</strong> Try one speed setting at a time.</span>
+        <span class="tool-rhythm-card"><strong>Predict it</strong> Guess which marker will hit the edge first.</span>
+        <span class="tool-rhythm-card"><strong>Remix it</strong> Pick one personality for your own sketch.</span>
+        <span class="tool-rhythm-card"><strong>Teach it</strong> Name what changed and why.</span>
+      </section>
+    </header>
+
+    <main class="tool-layout">
+      <section class="workspace-panel">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Five Motion Personalities</h2>
+                <p>Raw values keep growing or changing; the track position maps each quantity into a visible lane.</p>
+              </div>
+            </div>
+            <div class="canvas-frame">
+              <div id="canvas-container" aria-label="Five horizontal tracks comparing p5.js quantities"></div>
+            </div>
+          </div>
+        </article>
+
+        <section class="code-panel" aria-label="Code expression preview">
+          <pre id="code"></pre>
+        </section>
+      </section>
+
+      <aside class="stack-panel">
+        <article class="card">
+          <div class="card-inner control-cluster">
+            <div class="card-header">
+              <div>
+                <h2>Controls</h2>
+                <p>Pause the sketch, change speed, or hide the expressions inside the tracks.</p>
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button class="button primary" id="playBtn" type="button">Pause</button>
+            </div>
+
+            <div class="control">
+              <label>Speed multiplier <span id="speedLabel">x1</span></label>
+              <div class="segmented" role="group" aria-label="Speed multiplier">
+                <button class="button" data-speed="0.5" type="button">x0.5</button>
+                <button class="button active" data-speed="1" type="button">x1</button>
+                <button class="button" data-speed="2" type="button">x2</button>
+              </div>
+            </div>
+
+            <div class="toggle-row">
+              <button class="button ghost" id="codeToggle" type="button">Hide expressions</button>
+              <button class="button ghost" id="resetBtn" type="button">Reset run</button>
+            </div>
+
+            <div class="care-note">
+              <h2>Break it on purpose</h2>
+              <p>Set speed to x2. The sin() marker keeps wrapping back through its wave while frameCount and frameCount squared push into the edge much more aggressively.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <h2>Live Values</h2>
+                <p>The same animation frame, five different kinds of numbers.</p>
+              </div>
+            </div>
+            <div class="track-readouts" id="readouts" aria-live="polite"></div>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <section class="teaching-note">
+      <h2>Teacher move</h2>
+      <div class="teaching-note-grid">
+        <div class="teaching-note-card">
+          <strong>Prompt</strong>
+          <span>Before reading code, ask learners to describe each track with a verb: count, rush, wave, drift, or chase.</span>
+        </div>
+        <div class="teaching-note-card">
+          <strong>Misconception</strong>
+          <span>Students may think every changing number behaves like speed. Separate the number's raw value from the way it gets mapped onto the canvas.</span>
+        </div>
+        <div class="teaching-note-card">
+          <strong>Ask</strong>
+          <span>Which expression would you use for a breathing shape? Which one for a score counter? Which one for a character easing toward the mouse?</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="try-next" aria-label="Try these next">
+      <h2>Try these next</h2>
+      <div class="related-grid">
+        <div class="related-group">
+          <p class="related-group-label">Related tools</p>
+          <a class="related-link" href="../lerp-explorer/"><span>Tool</span><strong>lerp() Explorer</strong></a>
+          <a class="related-link" href="../sine-cosine-motion-explorer/"><span>Tool</span><strong>Sine + Cosine Motion Explorer</strong></a>
+          <a class="related-link" href="../animation-explorer/"><span>Tool</span><strong>Animation Explorer</strong></a>
+        </div>
+        <div class="related-group">
+          <p class="related-group-label">Starter sketch</p>
+          <a class="related-link" href="../lerp-follow-seed/"><span>Sketch</span><strong>lerp() Follow Seed</strong></a>
+        </div>
+        <div class="related-group">
+          <p class="related-group-label">Concept bridge</p>
+          <a class="related-link" href="../../concept-bridges/how-p5-thinks-about-time/"><span>Bridge</span><strong>How p5.js Thinks About Time</strong></a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="tool-footer">How Does It Grow? · CC Fest Coding Camp · p5.js motion comparison tool</footer>
+  </div>
+
+  <script>
+    const tracks = [
+      { id: "linear", label: "frameCount", expression: "frameCount", color: "#3d5a80" },
+      { id: "quadratic", label: "frameCount squared", expression: "frameCount * frameCount", color: "#e07a5f" },
+      { id: "sine", label: "sin()", expression: "sin(frameCount * 0.05)", color: "#7a5ea8" },
+      { id: "noise", label: "noise()", expression: "noise(frameCount * 0.01)", color: "#2d6a4f" },
+      { id: "lerp", label: "lerp()", expression: "lerp(prev, target, 0.05)", color: "#f5a800" }
+    ];
+
+    const state = {
+      playing: true,
+      speed: 1,
+      showCode: true,
+      tick: 0,
+      lerpValue: 0,
+      lerpTarget: 1,
+      lastTargetBeat: -1
+    };
+
+    let holder;
+
+    function setup() {
+      holder = document.getElementById("canvas-container");
+      const canvas = createCanvas(holder.clientWidth, holder.clientHeight);
+      canvas.parent("canvas-container");
+      pixelDensity(2);
+      textFont("DM Sans");
+      noiseSeed(19);
+      updateCode();
+      renderReadouts();
+    }
+
+    function windowResized() {
+      if (!holder) return;
+      resizeCanvas(holder.clientWidth, holder.clientHeight);
+    }
+
+    function draw() {
+      if (state.playing) state.tick += state.speed;
+      updateLerpTarget();
+      drawTracks();
+      renderReadouts();
+    }
+
+    function updateLerpTarget() {
+      const beat = Math.floor(state.tick / 160);
+      if (beat !== state.lastTargetBeat) {
+        state.lastTargetBeat = beat;
+        state.lerpTarget = (beat % 2 === 0) ? 1 : 0.12;
+      }
+      state.lerpValue = lerp(state.lerpValue, state.lerpTarget, 0.05);
+    }
+
+    function values() {
+      const frame = state.tick;
+      return {
+        linear: {
+          raw: frame,
+          display: constrain(frame / 360, 0, 1),
+          note: frame >= 360 ? "clamped at the edge" : "steady count"
+        },
+        quadratic: {
+          raw: frame * frame,
+          display: constrain((frame * frame) / 42000, 0, 1),
+          note: frame * frame >= 42000 ? "accelerated into the edge" : "accelerating"
+        },
+        sine: {
+          raw: sin(frame * 0.05),
+          display: map(sin(frame * 0.05), -1, 1, 0, 1),
+          note: "wraps through a wave"
+        },
+        noise: {
+          raw: noise(frame * 0.01),
+          display: noise(frame * 0.01),
+          note: "smooth drift"
+        },
+        lerp: {
+          raw: state.lerpValue,
+          display: state.lerpValue,
+          note: "easing toward target"
+        }
+      };
+    }
+
+    function drawTracks() {
+      background(255, 253, 247);
+      const marginX = min(92, width * 0.13);
+      const rightPad = min(42, width * 0.08);
+      const trackLeft = marginX;
+      const trackRight = width - rightPad;
+      const trackWidth = trackRight - trackLeft;
+      const top = 54;
+      const rowGap = (height - 92) / tracks.length;
+      const vals = values();
+
+      noStroke();
+      fill(44, 42, 38);
+      textFont("DM Sans");
+      textStyle(BOLD);
+      textSize(min(22, width * 0.045));
+      textAlign(LEFT, TOP);
+      text("Five ways a number can move", 22, 16);
+
+      tracks.forEach((track, index) => {
+        const y = top + index * rowGap + rowGap * 0.5;
+        const item = vals[track.id];
+        const x = trackLeft + item.display * trackWidth;
+
+        stroke(44, 42, 38, 45);
+        strokeWeight(2);
+        line(trackLeft, y, trackRight, y);
+
+        stroke(track.color);
+        strokeWeight(6);
+        line(trackLeft, y, x, y);
+
+        noStroke();
+        fill(track.color);
+        circle(x, y, 22);
+        fill(255);
+        circle(x, y, 8);
+
+        fill(44, 42, 38);
+        textFont("DM Sans");
+        textStyle(BOLD);
+        textSize(15);
+        textAlign(LEFT, BOTTOM);
+        text(track.label, trackLeft, y - 15);
+
+        textFont("DM Mono");
+        textStyle(NORMAL);
+        textSize(11);
+        fill(107, 103, 96);
+        textAlign(RIGHT, BOTTOM);
+        text(formatRaw(track.id, item.raw), trackRight, y - 15);
+
+        if (state.showCode) {
+          textAlign(LEFT, TOP);
+          fill(44, 42, 38, 178);
+          text(track.expression, trackLeft, y + 14);
+        }
+
+        if (track.id === "lerp") {
+          const targetX = trackLeft + state.lerpTarget * trackWidth;
+          stroke(track.color);
+          strokeWeight(2);
+          drawingContext.setLineDash([5, 5]);
+          line(targetX, y - 28, targetX, y + 28);
+          drawingContext.setLineDash([]);
+          noStroke();
+          fill(107, 103, 96);
+          textAlign(CENTER, TOP);
+          textSize(10);
+          text("target", targetX, y + 30);
+        }
+      });
+    }
+
+    function formatRaw(id, raw) {
+      if (id === "linear") return nf(raw, 1, 0);
+      if (id === "quadratic") return nf(raw, 1, 0);
+      return nf(raw, 1, 3);
+    }
+
+    function renderReadouts() {
+      const vals = values();
+      const wrap = document.getElementById("readouts");
+      wrap.innerHTML = tracks.map((track) => {
+        const item = vals[track.id];
+        return `<div class="track-readout">
+          <strong><span class="track-dot" style="--dot:${track.color}"></span>${track.label}</strong>
+          <code>${formatRaw(track.id, item.raw)}</code>
+          <span>${item.note}</span>
+          <code>${track.expression}</code>
+        </div>`;
+      }).join("");
+    }
+
+    function updateCode() {
+      const code = `let prev = 0;
+let target = 1;
+
+function draw() {
+  let linear = frameCount;
+  let quadratic = frameCount * frameCount;
+  let wave = sin(frameCount * 0.05);
+  let drift = noise(frameCount * 0.01);
+
+  if (frameCount % 160 === 0) {
+    target = target === 1 ? 0.12 : 1;
+  }
+  prev = lerp(prev, target, 0.05);
+
+  // Map any one of these values into position, size, color, or sound.
+}`;
+      document.getElementById("code").textContent = code;
+    }
+
+    function resetRun() {
+      state.tick = 0;
+      state.lerpValue = 0;
+      state.lerpTarget = 1;
+      state.lastTargetBeat = -1;
+    }
+
+    function wireControls() {
+      document.getElementById("playBtn").addEventListener("click", (event) => {
+        state.playing = !state.playing;
+        event.currentTarget.textContent = state.playing ? "Pause" : "Play";
+        event.currentTarget.classList.toggle("primary", state.playing);
+      });
+
+      document.querySelectorAll("[data-speed]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.speed = Number(button.dataset.speed);
+          document.getElementById("speedLabel").textContent = `x${state.speed}`;
+          document.querySelectorAll("[data-speed]").forEach((item) => item.classList.toggle("active", item === button));
+        });
+      });
+
+      document.getElementById("codeToggle").addEventListener("click", (event) => {
+        state.showCode = !state.showCode;
+        event.currentTarget.textContent = state.showCode ? "Hide expressions" : "Show expressions";
+      });
+
+      document.getElementById("resetBtn").addEventListener("click", resetRun);
+    }
+
+    wireControls();
+  </script>
+  <script src="../../p5-export-helper.js?v=20260505-workshop-export"></script>
+</body>
+</html>

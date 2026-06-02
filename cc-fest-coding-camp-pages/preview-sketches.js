@@ -9,6 +9,7 @@
     "arc-visualizer": { family: "shapes", label: "Arc" },
     "animation-explorer": { family: "bounce", label: "Motion" },
     "framerate-visualizer": { family: "frameRate", label: "FPS" },
+    "how-does-it-grow": { family: "frameRate", label: "Growth" },
     "draw-loop-visualizer": { family: "frameRate", label: "draw()" },
     "bounce-logic-explainer": { family: "bounce", label: "Bounce" },
     "motion-playground": { family: "mapping", label: "Motion Map" },
