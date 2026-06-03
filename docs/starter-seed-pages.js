@@ -2493,6 +2493,62 @@ ${code}
     frame.srcdoc = `<!DOCTYPE html><html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100%;background:#f7f1e7;color:#6b6760;font-family:DM Sans, sans-serif;">Preview stopped</body></html>`;
   }
 
+  function renderStarterCatalogMeta(slug, attempt = 0) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("embed") === "1" || document.documentElement.classList.contains("embed-mode") || document.body.classList.contains("embed-mode")) return;
+    if (document.querySelector(".catalog-meta-strip")) return;
+
+    const catalog = window.CCFestCatalog;
+    if (!catalog?.items?.length) {
+      if (attempt < 40) {
+        window.setTimeout(() => renderStarterCatalogMeta(slug, attempt + 1), 100);
+      }
+      return;
+    }
+
+    const item = catalog.items.find((entry) => entry.id === slug && entry.type === "sketch");
+    if (!item) return;
+
+    const suitMap = {
+      marks: { glyph: "✦", label: "Marks" },
+      motion: { glyph: "◎", label: "Motion" },
+      systems: { glyph: "⬡", label: "Systems" },
+      data: { glyph: "▦", label: "Data" },
+      open: { glyph: "☽", label: "Open" },
+      support: { glyph: "⊕", label: "Support" },
+    };
+    const pathwayLabels = {
+      "first-time": "First time",
+      animation: "Animation",
+      data: "Data",
+      games: "Games",
+      stuck: "Stuck",
+      final: "Final project",
+    };
+
+    const suit = suitMap[item.suit];
+    const level = item.level ? item.level.charAt(0).toUpperCase() + item.level.slice(1) : null;
+    const pathways = (item.pathways || []).map((pathway) => pathwayLabels[pathway] || pathway);
+    const pills = [];
+
+    if (suit) pills.push(`<span class="meta-pill meta-pill--suit">${suit.glyph} ${suit.label}</span>`);
+    if (level) pills.push(`<span class="meta-pill meta-pill--level">${level}</span>`);
+    pathways.forEach((pathway) => {
+      pills.push(`<span class="meta-pill meta-pill--pathway">${pathway}</span>`);
+    });
+    if (!pills.length) return;
+
+    const strip = document.createElement("div");
+    strip.className = "catalog-meta-strip";
+    strip.setAttribute("aria-label", "Resource metadata");
+    strip.innerHTML = pills.join("");
+
+    const anchor = document.querySelector(".seed-rhythm");
+    if (anchor?.parentNode) {
+      anchor.insertAdjacentElement("afterend", strip);
+    }
+  }
+
   function renderStarterSeedPage(slug) {
     const seed = seeds[slug];
     const app = document.getElementById("app");
@@ -2732,6 +2788,7 @@ ${code}
     });
 
     runCurrentCode();
+    renderStarterCatalogMeta(slug);
   }
 
   function renderRelatedResources(seed, slug) {

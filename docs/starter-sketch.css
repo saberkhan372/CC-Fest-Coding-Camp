@@ -180,6 +180,45 @@ a{color:inherit}
   text-transform:uppercase;
 }
 
+.catalog-meta-strip{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:12px 0 0;
+}
+
+.meta-pill{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 9px;
+  border-radius:6px;
+  font:700 10.5px/1 "DM Mono", ui-monospace, monospace;
+  letter-spacing:.04em;
+  border:1.5px solid;
+}
+
+.meta-pill--suit{
+  background:var(--cream-dark, #efe6da);
+  border-color:var(--line, #d8cdbf);
+  color:var(--ink, #2c2a26);
+}
+
+.meta-pill--level{
+  background:var(--gold-soft, #fef3d4);
+  border-color:var(--gold, #f5a800);
+  color:var(--ink, #2c2a26);
+}
+
+.meta-pill--pathway{
+  background:transparent;
+  border-color:var(--line, #d8cdbf);
+  color:var(--ink-light, #5c5751);
+}
+
+.embed-mode .catalog-meta-strip{
+  display:none !important;
+}
+
 .sketch-layout{
   display:block;
 }
