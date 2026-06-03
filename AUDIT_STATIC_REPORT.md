@@ -23,9 +23,13 @@ Generated from `cc-fest-coding-camp-pages`.
 
 ## Missing Titles
 
-- [~] cc-fest-coding-camp-pages/og-image-source.html
+- [x] No issues found.
 
 ## Stale Count Text
+
+- [x] No issues found.
+
+## Stale Catalog Data Cache Keys
 
 - [x] No issues found.
 

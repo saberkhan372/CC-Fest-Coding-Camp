@@ -2,6 +2,10 @@
 
 This file captures findings from the deep audit. The full task checklist is in `AUDIT_TASKS.md`.
 
+## Current Status Note - 2026-06-03
+
+This document is now a historical record of the first deep audit, not the current bug queue. Most P1/P2 items below have since been fixed, deployed, and rechecked during the redesign rollout. For current validation, run `node scripts/audit-static.mjs` and `node scripts/audit-catalog-lens.mjs`, then do a live browser smoke pass on the homepage, sessions, concept map, one bridge, one static tool, one JS-rendered tool, and one starter sketch.
+
 ## Audit Status
 
 - Static source audit: **complete**

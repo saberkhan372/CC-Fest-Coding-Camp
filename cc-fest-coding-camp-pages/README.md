@@ -28,10 +28,10 @@ https://saberkhan372.github.io/CC-Fest-Coding-Camp/
 ## Structure
 
 ### Pages
-- `index.html` — homepage gallery and learning pathway
+- `index.html` — homepage catalog with card cues, search, lens filters, goal shelves, and live resource counts
 - `about.html` — local About page (linked from topbar, hero, and footer)
 - `concept-map.html` — swimlane SVG concept map (41 nodes, mobile list fallback)
-- `sessions/` — sessions listing and generative poster template
+- `sessions/` — five-session arc, side spine, real session pages, and generative poster template
 
 ### Shared stylesheets
 - `site.css` — homepage and shared design tokens
@@ -42,7 +42,12 @@ https://saberkhan372.github.io/CC-Fest-Coding-Camp/
 - `concept-bridges/concept-bridge.css` — shared stylesheet for all concept bridge pages
 
 ### Shared JavaScript
-- `site.js` — homepage: suit filtering, search, collapsible sections, curated paths, "Best first" row. Pathway and difficulty filter composition is planned in Phase 12 of the roadmap.
+- `site.js` — homepage search, lens filters, live counts, catalog card cues, and goal shelves
+- `catalog-data.js` — generated catalog metadata for all 135 bridge/tool/sketch resources
+- `sessions-data.js` — shared five-session arc metadata used by listings, strips, and session pages
+- `spine.js` — session spine wayfinding and sibling station rails
+- `session-strip.js` — compact "Part of Session" strip for tools, bridges, and sketches
+- `catalog-meta-strip.js` — runtime suit/level/pathway strip for static tools and concept bridges
 - `workshop-tool-pages.js` — data and renderer for the 11 JS-rendered workshop tool pages
 - `starter-seed-pages.js` — data and renderer for the 44 JS-rendered starter sketch pages
 - `preview-sketches.js` — card-level canvas previews using IntersectionObserver

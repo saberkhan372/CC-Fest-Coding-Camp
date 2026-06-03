@@ -5,6 +5,7 @@ const repoRoot = process.cwd();
 const sourceRoot = path.join(repoRoot, "cc-fest-coding-camp-pages");
 const reportPath = path.join(repoRoot, "AUDIT_STATIC_REPORT.md");
 const staleCountPattern = /\b(31(?: workshop)? tools|26(?: starter)? sketches|60 tools|40 sketches)\b/i;
+const expectedCatalogDataCacheKey = "20260603-audit-freshness";
 const catalogDataPath = path.join(sourceRoot, "catalog-data.js");
 const sessionsDataPath = path.join(sourceRoot, "sessions-data.js");
 
@@ -105,6 +106,13 @@ const staticWorkshopTools = toolIndexFiles.filter((file) => {
 const missingTitles = htmlFiles.filter((file) => !hasTitle(read(file)));
 const staleCounts = htmlFiles.filter((file) => staleCountPattern.test(read(file)));
 const badStarterPaths = htmlFiles.filter((file) => read(file).includes("../../starter-sketches/"));
+const catalogDataCacheKeyIssues = htmlFiles.flatMap((file) => {
+  const html = read(file);
+  const matches = [...html.matchAll(/catalog-data\.js\?v=([^"']+)/g)];
+  return matches
+    .filter((match) => match[1] !== expectedCatalogDataCacheKey)
+    .map((match) => ({ file, version: match[1] }));
+});
 
 const brokenTargets = [];
 const unresolvedAssets = [];
@@ -221,6 +229,7 @@ function section(title, items, formatter) {
 
 section("Missing Titles", missingTitles, (file) => rel(file));
 section("Stale Count Text", staleCounts, (file) => rel(file));
+section("Stale Catalog Data Cache Keys", catalogDataCacheKeyIssues, (item) => `${rel(item.file)} -> \`${item.version}\``);
 section("Bad Starter-Sketch Path References", badStarterPaths, (file) => rel(file));
 section("Broken Local Hrefs", brokenTargets, (item) => `${rel(item.file)} -> \`${item.url}\``);
 section("Broken Local Src Assets", unresolvedAssets, (item) => `${rel(item.file)} -> \`${item.url}\``);

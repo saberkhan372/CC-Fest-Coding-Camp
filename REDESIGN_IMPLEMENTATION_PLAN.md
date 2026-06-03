@@ -1011,7 +1011,7 @@ Reviewed all three drop-in spec documents in `newdesignideas/` and reconciled ag
 
 - **Direction 2 (Card Anatomy / `Card Anatomy Spec.md`):** Already implemented in Phase 1. The `catalog-card-cue` system in `site.js` is functionally identical to the spec's `cca-*` enhancer — bridge crossing, tool slider strip, sketch code peek. No action needed.
 - **Direction 1 (Filter Refine Bar / `Filter Spec.md`):** Phase 3 delivered the lens bar, search, tokens, and result count. The spec adds live counts on each facet chip and explicit AND/OR facet semantics. Added as **Phase 7**.
-- **Direction 3 (Session Spine / `Session Spine Spec.md`):** Not yet implemented. Adds a metro-style side rail to the sessions index and a compact you-are-here strip + sibling-tool station rail to tool pages, all driven by a single `CCS_SESSIONS` config. Builds on Phase 4's session data. Added as **Phase 8**.
+- **Direction 3 (Session Spine / `Session Spine Spec.md`):** Implemented in Phase 8. Adds a metro-style side rail to the sessions index and compact session wayfinding on tools, bridges, and sketches, driven by shared session/catalog metadata.
 
 All completed task checkboxes updated across Phases 1–6b. Phase 4 session-page decisions and strip copy pattern marked complete per QA log.
 
