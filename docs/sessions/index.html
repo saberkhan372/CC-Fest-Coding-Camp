@@ -6,14 +6,14 @@
   <title>Sessions - CC Fest Coding Camp</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../site.css?v=20260603-phase7-filters">
-  <link rel="stylesheet" href="../sessions.css?v=20260603-phase8-gridfix">
+  <link rel="stylesheet" href="../sessions.css?v=20260603-phase8-mapframe">
   <meta name="description" content="CC Fest Coding Camp session posters, tools, bridges, and starter sketches.">
   <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
 </head>
 <body>
-  <div class="session-shell">
+  <div class="shell">
     <div class="site-topbar">
       <a class="brand-mark" href="../index.html">CC Fest · Coding Camp Tools</a>
       <nav class="topbar-links" aria-label="Sessions page links">
@@ -25,15 +25,17 @@
       </nav>
     </div>
 
-    <header class="sessions-header">
-      <h1>CC Fest Sessions</h1>
-      <p>Five workshop sessions, each with a poster, an anchor bridge, and a small set of tools and sketches for the day.</p>
-    </header>
+    <main class="sessions-main">
+      <header class="sessions-header">
+        <h1>CC Fest Sessions</h1>
+        <p>Five workshop sessions, each with a poster, an anchor bridge, and a small set of tools and sketches for the day.</p>
+      </header>
 
-    <div class="sessions-body">
-      <div id="sessions-spine" aria-label="Session arc navigation"></div>
-      <div class="sessions-grid" id="sessions-grid"></div>
-    </div>
+      <div class="sessions-body">
+        <div id="sessions-spine" aria-label="Session arc navigation"></div>
+        <div class="sessions-grid" id="sessions-grid"></div>
+      </div>
+    </main>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>

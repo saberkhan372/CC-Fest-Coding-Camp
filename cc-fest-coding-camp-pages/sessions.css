@@ -11,6 +11,12 @@
   padding: 28px 24px 56px;
 }
 
+.sessions-main {
+  padding: 24px 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .session-topbar {
   display: flex;
   justify-content: space-between;
@@ -37,7 +43,7 @@
 /* ─── SESSION LISTING ──────────────────────────────────────────────────────── */
 
 .sessions-header {
-  margin-bottom: 32px;
+  margin-bottom: 20px;
   padding: 28px 32px 24px;
   border: 2px solid var(--ink, #2c2a26);
   border-radius: var(--radius, 12px);
@@ -62,7 +68,7 @@
 .sessions-body {
   display: grid;
   grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
-  gap: 32px;
+  gap: 28px;
   align-items: start;
 }
 
@@ -87,6 +93,9 @@
 }
 
 @media (max-width: 800px) {
+  .sessions-main {
+    padding: 18px 0 0;
+  }
   .sessions-body {
     grid-template-columns: 1fr;
   }
@@ -412,6 +421,7 @@
 @media (max-width: 760px) {
   .session-shell,
   .poster-shell { padding: 20px 16px 40px; }
+  .sessions-header { padding: 24px; }
   .poster-layout { grid-template-columns: minmax(0, 1fr); }
   .session-topbar { display: block; }
   .session-topbar a { display: inline-block; margin-top: 8px; }
