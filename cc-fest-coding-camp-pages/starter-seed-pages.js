@@ -2558,6 +2558,10 @@ ${code}
                 <div class="preview-stage">
                   <iframe id="preview-frame" class="preview-frame" title="${seed.title} preview"></iframe>
                 </div>
+                <div class="canvas-action-bar" aria-label="Canvas actions">
+                  <button class="edbtn canvas-action-btn" id="save-canvas-btn" type="button">Save Image</button>
+                  <button class="edbtn canvas-action-btn" id="fullscreen-btn" type="button">⛶ Fullscreen</button>
+                </div>
                 <div class="editor-status">Edit code · press Run to see changes · Reset restores the original</div>
               </div>
             </div>
@@ -2609,6 +2613,9 @@ ${code}
     const stopButton = document.getElementById("stop-button");
     const resetButton = document.getElementById("reset-button");
     const p5ExportButton = document.getElementById("p5-export-button");
+    const canvasSaveButton = document.getElementById("save-canvas-btn");
+    const canvasFullscreenButton = document.getElementById("fullscreen-btn");
+    const previewStage = document.querySelector(".preview-stage");
     const statusEl = document.getElementById("run-status");
     const liveBadge = document.getElementById("live-badge");
     const initialCode = seed.code.trim();
@@ -2643,6 +2650,62 @@ ${code}
       window.open("https://editor.p5js.org/", "_blank", "noopener,noreferrer");
     }
 
+    function frameDocument() {
+      return frame.contentDocument || (frame.contentWindow && frame.contentWindow.document) || null;
+    }
+
+    function currentCanvas() {
+      const doc = frameDocument();
+      return doc && doc.querySelector("canvas");
+    }
+
+    function pulseButton(button, label) {
+      if (!button) return;
+      const original = button.dataset.originalLabel || button.textContent;
+      button.dataset.originalLabel = original;
+      button.textContent = label;
+      window.setTimeout(() => { button.textContent = original; }, 1200);
+    }
+
+    function saveCanvasImage() {
+      const canvas = currentCanvas();
+      if (!canvas) {
+        setStatus("● run first", "var(--gold)");
+        pulseButton(canvasSaveButton, "Run first");
+        return;
+      }
+      try {
+        const link = document.createElement("a");
+        link.download = "ccfest-" + (seed.title || slug || "sketch").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) + ".png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        pulseButton(canvasSaveButton, "Saved ✓");
+      } catch (error) {
+        setStatus("● save blocked", "var(--gold)");
+        pulseButton(canvasSaveButton, "Save blocked");
+      }
+    }
+
+    function toggleCanvasFullscreen() {
+      const canvas = currentCanvas();
+      const doc = frameDocument();
+      if (!canvas) {
+        setStatus("● run first", "var(--gold)");
+        pulseButton(canvasFullscreenButton, "Run first");
+        return;
+      }
+      if (document.fullscreenElement || (doc && doc.fullscreenElement)) {
+        const exit = doc && doc.fullscreenElement
+          ? doc.exitFullscreen()
+          : document.exitFullscreen();
+        if (exit && exit.catch) exit.catch(() => {});
+        return;
+      }
+      const target = previewStage || canvas;
+      const request = target.requestFullscreen || target.webkitRequestFullscreen || canvas.requestFullscreen || canvas.webkitRequestFullscreen;
+      if (request) request.call(target).catch?.(() => setStatus("● fullscreen blocked", "var(--gold)"));
+    }
+
     runButton.addEventListener("click", runCurrentCode);
     stopButton.addEventListener("click", () => {
       setStatus("■ stopped", "rgba(240,235,227,.45)");
@@ -2654,6 +2717,19 @@ ${code}
       runCurrentCode();
     });
     p5ExportButton.addEventListener("click", exportToP5Editor);
+    canvasSaveButton.addEventListener("click", saveCanvasImage);
+    canvasFullscreenButton.addEventListener("click", toggleCanvasFullscreen);
+    const updateFullscreenLabel = () => {
+      const doc = frameDocument();
+      canvasFullscreenButton.textContent = document.fullscreenElement || (doc && doc.fullscreenElement)
+        ? "✕ Exit full"
+        : "⛶ Fullscreen";
+    };
+    document.addEventListener("fullscreenchange", updateFullscreenLabel);
+    frame.addEventListener("load", () => {
+      const doc = frameDocument();
+      if (doc) doc.addEventListener("fullscreenchange", updateFullscreenLabel);
+    });
 
     runCurrentCode();
   }

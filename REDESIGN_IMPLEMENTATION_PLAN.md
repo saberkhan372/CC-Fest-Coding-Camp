@@ -526,7 +526,7 @@ Purpose: extend metadata blocks to static tool pages. Started with a 10-tool rep
 
 ## Phase 6c — Detail Pages: Concept Bridge Pages (21 pages)
 
-**Status: ✅ Complete. Deployed 2026-06-03, commit b479d99.**
+**Status: ✅ Complete. Deployed 2026-06-03, commit b479d99. Teaching-note gap logged as Phase 6e.**
 
 Purpose: add consistent metadata and go-next to all 21 bridge pages.
 
@@ -538,7 +538,9 @@ Purpose: add consistent metadata and go-next to all 21 bridge pages.
 
 ### Claude tasks
 
-- [ ] Review the 9 bare bridges (no teaching panels currently): `arrays-loops-as-system`, `data-as-argument`, `data-in-drawing-out`, `modulo-counting-in-cycles`, `objects-data-plus-behavior`, `pixels-pictures-are-data`, `triangle-circle-wave-explorer`, `vectors-arrows-that-store-motion`, `world-vs-local-coordinates`. Decide whether they need full teaching panels (P2 gap from the audit) or whether catalog-driven go-next blocks are enough for this phase.
+- [x] Review the 9 bare bridges (no teaching panels currently): `arrays-loops-as-system`, `data-as-argument`, `data-in-drawing-out`, `modulo-counting-in-cycles`, `objects-data-plus-behavior`, `pixels-pictures-are-data`, `triangle-circle-wave-explorer`, `vectors-arrows-that-store-motion`, `world-vs-local-coordinates`.
+
+  Decision: catalog-driven go-next blocks are sufficient for this phase. All 9 bridges have an authored `.pathways` "What's next" section with Practice / Remix / Related links. The absent `.teaching-note` sections (Prompt / Misconception / Ask) are a genuine gap but are authoring-heavy (9 x 3 cards). Logged as a future content pass — see Phase 6e below.
 
 ### Acceptance criteria
 
@@ -551,29 +553,53 @@ Purpose: add consistent metadata and go-next to all 21 bridge pages.
 
 ## Phase 6d — Detail Pages: Starter Sketches, About, Sessions
 
-**Status: Not started.**
+**Status: In progress.**
 
 Purpose: complete the detail page system across remaining page types.
 
 ### Codex tasks
 
 - [ ] Add metadata to JS-rendered starter sketch pages via `starter-seed-pages.js` (one change covers all 44).
-- [ ] Decide with Claude whether starter sketches get `p5-export-helper.js` injected from `starter-seed-pages.js` (the B7 open audit item).
+- [x] Decide with Claude whether starter sketches get `p5-export-helper.js` injected from `starter-seed-pages.js` (the B7 open audit item). **Decision: do not inject the global helper. Add a sketch-canvas-only 2-button action bar: Save Image and Fullscreen. Keep the existing single p5 Editor button in the editor chrome; do not add a duplicate p5 Editor button to the canvas bar.**
 - [ ] Update About page: verify topbar has Sessions and Map (already fixed in audit), add a short "What you'll find" summary card that reflects the current library counts from `window.CCFestCatalog`.
 - [ ] Update sessions page to reflect Phase 4 real session data.
 
 ### Claude tasks
 
-- [ ] **Decide B7**: Should starter sketch pages get Save Image / Fullscreen / Copy link? The options are: (a) inject `p5-export-helper.js` from the renderer — learners can save their canvas; (b) add a visible note explaining how to save via the p5 Editor; (c) leave as-is. This decision belongs here, before all 44 pages are shipped in a single change.
+- [x] **Decide B7**: Starter sketch pages get a canvas-only action bar with **Save Image** and **Fullscreen**. No global `p5-export-helper.js` injection, no Copy link, and no duplicate p5 Editor button.
 - [ ] Review About page copy — does it still reflect the current state of the site after the redesign?
 
 ### Acceptance criteria
 
 - All 44 starter sketch pages have a metadata strip.
-- B7 decision is made and documented.
+- B7 decision is made and documented. ✅
 - About page reflects current library state.
 - Sessions page reflects Phase 4 real session data.
 - CC Fest voice check: sketch metadata is minimal — it helps learners know what kind of thing they opened, not categorize it.
+
+---
+
+## Phase 6e — Teaching Notes: Bare Bridge Content Pass (9 pages)
+
+**Status: Not started. Blocked on authoring.**
+
+Purpose: add `.teaching-note` sections (Prompt / Misconception / Ask) to the 9 concept bridges that have interactive tools but no facilitator guidance:
+`arrays-loops-as-system`, `data-as-argument`, `data-in-drawing-out`, `modulo-counting-in-cycles`, `objects-data-plus-behavior`, `pixels-pictures-are-data`, `triangle-circle-wave-explorer`, `vectors-arrows-that-store-motion`, `world-vs-local-coordinates`
+
+### Claude tasks
+
+- [ ] Author 3 teaching-note cards (Prompt / Misconception / Ask) per bridge — 27 cards total. Write them like workshop handout callouts, not lesson plans.
+
+### Codex tasks
+
+- [ ] Once Claude authors the cards: add `.teaching-note` section HTML to each bridge page, matching the pattern in `noise-smooth-randomness/index.html:686–702`.
+- [ ] Optionally upgrade `.pathways` "What's next" links to authored `.try-next` named tool/sketch lists if Claude provides specific resource lists per bridge.
+
+### Acceptance criteria
+
+- All 9 bridges have a `.teaching-note` section visible after the interactive canvas.
+- Cards are warm and workshop-specific — no generic advice.
+- CC Fest voice check: notes read like a facilitator whispering a move, not a teacher's edition footnote.
 
 ---
 
@@ -741,8 +767,8 @@ Now that Phases 0–3 are started:
 17. ✅ Both: Phase 6a complete — metadata strip on all 11 JS-rendered tools, embed-mode hiding confirmed, related resources intact. Commit 2104d04 + fix deploy.
 18. ✅ Both: Phase 6b complete — metadata strip on 10 representative static tools, both nav patterns confirmed, embed mode clean. Commit e62d638.
 19. ✅ Both: Phase 6c complete — metadata strip on all 21 bridges. Phase 6b also expanded to all 59 static tools. Commit b479d99.
-20. **Next — Claude:** Review the 9 bare bridges in Phase 6c (no teaching panels) — decide full panels vs catalog go-next blocks.
-21. **Next — Both:** Phase 6d — starter sketches (44 pages), About page, sessions page detail pass. Claude decides B7 (Save Image on sketches) first.
+20. ✅ **Claude:** Reviewed 9 bare bridges in Phase 6c — pathways sufficient, teaching-note sections logged as Phase 6e authoring pass.
+21. **Current — Both:** Phase 6d — starter sketches (44 pages), About page, sessions page detail pass. B7 decision is made: sketch canvas gets Save Image + Fullscreen only.
 22. After 6d — Phase 7: filter live counts and facet upgrade (`newdesignideas/Filter Spec`).
 23. After 7 — Phase 8: session spine wayfinding rail (`newdesignideas/Session Spine Spec`).
 
@@ -917,7 +943,14 @@ Now that Phases 0–3 are started:
 
 **Validation passed:** `node --check catalog-meta-strip.js`, `node scripts/audit-static.mjs`, `git diff --check`.
 
-**Open Claude task remaining in 6c:** review the 9 bare bridges and decide whether they need full teaching panels or catalog-driven go-next blocks are sufficient.
+**Claude review closed:** the 9 bare bridges can ship with catalog-driven go-next blocks for Phase 6c. Fuller teaching-note sections are a future content pass, not a Phase 6c blocker.
+
+### 2026-06-03 — Phase 6c closed; Phase 6e stubbed (Claude)
+
+- Reviewed all 9 bare bridges (`arrays-loops-as-system`, `data-as-argument`, `data-in-drawing-out`, `modulo-counting-in-cycles`, `objects-data-plus-behavior`, `pixels-pictures-are-data`, `triangle-circle-wave-explorer`, `vectors-arrows-that-store-motion`, `world-vs-local-coordinates`).
+- Decision: catalog-driven go-next is sufficient. All 9 have authored `.pathways` "What's next" sections with Practice / Remix / Related links. No dead ends.
+- `.teaching-note` sections are a genuine P2 gap (27 cards to author) — logged as Phase 6e, blocked on authoring.
+- Phase 6c status updated to ✅ Complete.
 
 ### 2026-06-03 — newdesignideas design spec review (Claude)
 

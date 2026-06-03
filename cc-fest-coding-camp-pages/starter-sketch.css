@@ -396,6 +396,25 @@ a{color:inherit}
   display:block;
 }
 
+.canvas-action-bar{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 10px 4px;
+  background:var(--cream-dark, #efe6da);
+  border-top:1px solid var(--line, #d8cdbf);
+}
+
+.canvas-action-btn{
+  font-size:11px;
+  padding:3px 10px;
+  opacity:.8;
+}
+
+.canvas-action-btn:hover{
+  opacity:1;
+}
+
 .editor-status{
   padding:8px 14px;
   color:var(--ink-light);
