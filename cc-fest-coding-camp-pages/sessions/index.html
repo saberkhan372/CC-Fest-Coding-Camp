@@ -149,57 +149,60 @@
   }
   </script>
   <script>
-  // Session spine side rail — IntersectionObserver: highlights whichever session
-  // card is most visible in the viewport. Works correctly with a grid layout.
+  // Session spine side rail.
+  // Renders an initial state immediately (never blank), then tracks the active
+  // session on scroll. Does NOT depend on IntersectionObserver firing — the rail
+  // paints as soon as CCS + cards exist, and the highlight follows scroll via rAF.
   (function () {
     var spineEl = document.getElementById('sessions-spine');
     if (!spineEl) return;
 
-    var retries = 0;
+    function start() {
+      if (!window.CCS) return false;
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.session-card'));
+      if (!cards.length) return false;
 
-    function initRail() {
-      if (!window.CCS) return;
-      var cards = Array.from(document.querySelectorAll('.session-card'));
-
-      // Cards not yet in DOM (document.fonts.ready hasn't fired yet).
-      // Retry up to 30 times (3 seconds) rather than bailing early.
-      if (!cards.length) {
-        if (++retries < 30) { setTimeout(initRail, 100); }
-        return;
-      }
-
-      var ratios = new Array(cards.length).fill(0);
       var current = -1;
-
-      function update() {
-        var best = -1, bestRatio = 0;
-        ratios.forEach(function (r, i) {
-          if (r > bestRatio) { bestRatio = r; best = i; }
-        });
-        if (best !== current) {
-          current = best;
-          window.CCS.renderSideRail(spineEl, current >= 0 ? current : null);
-        }
+      function paint(i) {
+        if (i === current) return;
+        current = i;
+        window.CCS.renderSideRail(spineEl, i >= 0 ? i : 0);
       }
 
-      var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          var idx = cards.indexOf(entry.target);
-          if (idx >= 0) ratios[idx] = entry.intersectionRatio;
-        });
-        update();
-      }, { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] });
+      // Initial render — the rail is visible the moment the page is ready,
+      // regardless of scroll position or whether IO ever fires.
+      paint(0);
 
-      cards.forEach(function (card) { observer.observe(card); });
+      // Active session = the card whose center is nearest a line ~38% down the
+      // viewport. Deterministic; works on desktop grid and mobile stack alike.
+      function computeActive() {
+        var line = window.innerHeight * 0.38;
+        var best = 0, bestDist = Infinity;
+        for (var i = 0; i < cards.length; i++) {
+          var r = cards[i].getBoundingClientRect();
+          var center = r.top + r.height / 2;
+          var d = Math.abs(center - line);
+          if (d < bestDist) { bestDist = d; best = i; }
+        }
+        paint(best);
+      }
+
+      var ticking = false;
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () { computeActive(); ticking = false; });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
+      computeActive();
+      return true;
     }
 
-    // Wait for CCS (spine.js) to be ready, then start initRail.
-    var pollCount = 0;
+    // Poll until CCS (spine.js) and the JS-rendered cards are both ready.
+    var tries = 0;
     var poll = setInterval(function () {
-      if (window.CCS || ++pollCount > 40) {
-        clearInterval(poll);
-        if (window.CCS) initRail();
-      }
+      if (start() || ++tries > 50) clearInterval(poll);
     }, 100);
   })();
   </script>
