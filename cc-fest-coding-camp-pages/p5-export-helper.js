@@ -208,8 +208,11 @@
     });
     if (!canvas) return;
 
-    // Insert after the nearest meaningful wrapper, or after the canvas itself
-    const insertAfter = canvas.closest(".stage, .canvas-wrap") || canvas;
+    // Insert after the nearest meaningful wrapper, or after the canvas's
+    // parent container, so buttons land outside any flex/centered frame.
+    const insertAfter = canvas.closest(".canvas-frame, .stage, .canvas-wrap")
+      || canvas.parentElement
+      || canvas;
 
     const bar = document.createElement("div");
     bar.className = "canvas-action-bar";

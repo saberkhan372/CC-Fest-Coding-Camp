@@ -197,6 +197,10 @@ a{color:inherit}
   gap:18px;
 }
 
+.workspace-panel{
+  align-self:start;
+}
+
 .card{
   background:var(--panel);
   border:2px solid var(--ink);
