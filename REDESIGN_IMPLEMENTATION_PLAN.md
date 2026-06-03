@@ -645,7 +645,7 @@ Purpose: bring the Phase 3 filter up to the full Direction 1 spec. The current f
 
 ## Phase 8 — Session Spine Wayfinding (Direction 3)
 
-**Status: ✅ Codex complete, commit f3a8b44. Awaiting Claude browser QA.**
+**Status: ✅ Complete. Browser QA passed 2026-06-03 with several post-QA fixes.**
 
 Source spec: `newdesignideas/Session Spine Spec.html` and `Session Spine Spec.md`.
 
@@ -668,11 +668,11 @@ One shared JS config feeds both renderers. Fields per session: `id`, `glyph` (�
 
 ### Claude tasks
 
-- [ ] **Browser QA:** Sessions index — does the side rail add useful wayfinding or compete with the session card grid? Is the two-column layout clean on both desktop and mobile (mobile hides the rail per CSS)?
-- [ ] **Browser QA:** Tool page — does the compact strip crowd the header? Is the you-are-here position clear at a glance? Are prev/next links disabled correctly at Session 01 / Session 05?
-- [ ] **Browser QA:** Station rail — does it correctly highlight the current tool? Does it appear on the right pages?
-- [ ] Decide whether the sibling-tool station rail should appear on all tool pages (current: all 135) or only session-core tools listed in `featuredTools`.
-- [ ] CC Fest voice check: does the spine feel like a workshop map or like a product tour?
+- [x] **Browser QA:** Sessions index — side rail works; several layout iterations needed (see log). Final state: IntersectionObserver scroll-tracking, branded site-topbar, bordered header panel, 3-column card grid.
+- [x] **Browser QA:** Tool page — compact strip confirmed on coordinate-system-explorer; canvas action bar and empty-space layout bugs found and fixed across all standard tool pages.
+- [x] **Browser QA:** Station rail highlights current tool correctly; appears on featured tools only.
+- [x] Decided: station rail on featured tools only (~3 per session) — not all 135 pages.
+- [x] CC Fest voice check: spine reads as workshop wayfinding, not product tour.
 
 ### Acceptance criteria
 
@@ -775,7 +775,8 @@ Now that Phases 0–3 are started:
 22. ✅ Codex: Phase 7 complete — live filter counts, OR-within/AND-across facets, `data-*` card stamping (commit 5c058b8).
 23. ✅ Codex: Phase 8 complete — session spine: side rail on sessions index, compact strip + station rail on all 135 tool/bridge pages (commit f3a8b44).
 24. ✅ Claude: Phase 7 browser QA passed — OR/AND facet logic, live counts, disabled chips, empty state all confirmed.
-25. **Current — Claude:** Phase 8 browser QA — session spine: side rail on sessions index, compact strip + station rail on tool pages.
+25. ✅ Both: Phase 8 QA complete with post-QA fixes — sessions page layout, tool page canvas bar, tool-rhythm HTML, tool-footer styling, session-strip race condition. All deployed.
+26. ✅ **Redesign complete.** All phases 0–8 shipped and QA-signed-off.
 
 ---
 
@@ -935,6 +936,26 @@ Now that Phases 0–3 are started:
 - Added the compact "In this session" strip hook in `site.js` and loaded catalog/session/site runtime scripts on tool and concept bridge detail pages.
 - Updated `sessions.css` for session resource pills, real session cards, and arc navigation.
 - Updated static audit session counting to read from `sessions-data.js` and verify real session pages exist.
+
+### 2026-06-03 — Phase 8 QA + tool page fixes (Claude + Codex)
+
+**Phase 8 browser QA revealed multiple issues fixed across several commits:**
+
+**Sessions page (multiple commits):**
+- `eb72bd3` — canvas overflow fix: `min-width:0` + `width:100%` on session card canvas stopped p5.js 520px intrinsic width from forcing 5-column grid layout
+- `3ad5534` — `sessions.css` cache key bumped to `phase8-spine`
+- `0a74833` — IntersectionObserver replaces broken scroll-tracking (scroll-tracking always returned Session 01 because all cards in the same grid row share identical Y coordinates)
+- `dcec5a8` — sessions page visual language matched to concept map: `site-topbar` replacing stripped `session-topbar`, bordered header panel, shell max-width aligned to 1160px
+- `97ac2b5` — `initRail()` retry loop added: `window.CCS` was becoming available at ~200ms before `document.fonts.ready` created the session cards, so the IntersectionObserver was never attached
+- Several further commits — sessions layout polish: `shell` class, `sessions-main` wrapper, `site-topbar` finalized
+
+**Tool page fixes (commits 483286c, b3f2bf4, 67a93f7):**
+- `session-strip.js` bails early if `spine.js` is present — eliminates double-strip race condition
+- `p5-export-helper.js` — canvas action bar now inserts after `.canvas-frame` instead of after the raw `<canvas>`; buttons were landing as flex siblings inside the centered canvas container
+- `tool-page.css` — `align-self: start` on `.workspace-panel` stops left column from inflating to match the tall right column (was creating large empty space around the canvas)
+- `tool-page.css` — `.tool-footer` converted from heavy bordered card to a simple hairline separator
+- `coordinate-system-explorer` — malformed HTML fixed: `<section class="tool-rhythm">` was nested inside `<div class="tool-tags">` due to a missing `</div>`; aside card heading renamed "Teaching Prompts" to avoid duplication with header rhythm cards
+- 9 other standard tool pages — same `tool-rhythm` nesting bug fixed via Node.js script (animation-explorer, collision-detection-explorer, event-handler-studio, interactive-shape-drawing-app, interactive-shape-explorer, rows-and-columns, shape-and-color-explorer, simple-array-explorer, webgl-3d-workshop)
 
 ### 2026-06-03 — Phases 6d–8 complete (Codex)
 
