@@ -553,7 +553,7 @@ Purpose: add consistent metadata and go-next to all 21 bridge pages.
 
 ## Phase 6d — Detail Pages: Starter Sketches, About, Sessions
 
-**Status: In progress.**
+**Status: ✅ Complete. Deployed 2026-06-03, commits 35d7099 + 85a8daf.**
 
 Purpose: complete the detail page system across remaining page types.
 
@@ -567,7 +567,7 @@ Purpose: complete the detail page system across remaining page types.
 ### Claude tasks
 
 - [x] **Decide B7**: Starter sketch pages get a canvas-only action bar with **Save Image** and **Fullscreen**. No global `p5-export-helper.js` injection, no Copy link, and no duplicate p5 Editor button.
-- [ ] Review About page copy — does it still reflect the current state of the site after the redesign?
+- [x] **Browser QA:** Review About page copy. No stale references found. Fixed: "goal shelf" → links to "Where to start" and "Sessions" to match site labels. CSS cache key already bumped to `phase7-filters` by Codex.
 
 ### Acceptance criteria
 
@@ -581,23 +581,24 @@ Purpose: complete the detail page system across remaining page types.
 
 ## Phase 6e — Teaching Notes: Bare Bridge Content Pass (9 pages)
 
-**Status: Not started. Blocked on authoring.**
+**Status: ✅ Complete. Deployed 2026-06-03, commit f164941.**
 
 Purpose: add `.teaching-note` sections (Prompt / Misconception / Ask) to the 9 concept bridges that have interactive tools but no facilitator guidance:
 `arrays-loops-as-system`, `data-as-argument`, `data-in-drawing-out`, `modulo-counting-in-cycles`, `objects-data-plus-behavior`, `pixels-pictures-are-data`, `triangle-circle-wave-explorer`, `vectors-arrows-that-store-motion`, `world-vs-local-coordinates`
 
 ### Claude tasks
 
-- [ ] Author 3 teaching-note cards (Prompt / Misconception / Ask) per bridge — 27 cards total. Write them like workshop handout callouts, not lesson plans.
+- [x] Author 3 teaching-note cards (Prompt / Misconception / Ask) per bridge — 27 cards total. Write them like workshop handout callouts, not lesson plans.
+- [x] **Browser QA:** Sampled 4 of 9 bridges (arrays-loops-as-system, triangle-circle-wave-explorer, data-as-argument, vectors-arrows-that-store-motion). All pass — tool-specific prompts, sharp misconception fixes, generative Ask questions. No boilerplate. Note: "Teacher move" heading reads slightly odd for solo learners but is not a blocker.
 
 ### Codex tasks
 
-- [ ] Once Claude authors the cards: add `.teaching-note` section HTML to each bridge page, matching the pattern in `noise-smooth-randomness/index.html:686–702`.
-- [ ] Optionally upgrade `.pathways` "What's next" links to authored `.try-next` named tool/sketch lists if Claude provides specific resource lists per bridge.
+- [x] Add `.teaching-note` section HTML to each bridge page, matching the pattern in `noise-smooth-randomness/index.html:686–702`.
+- [x] Upgrade `.pathways` "What's next" links to authored `.try-next` named tool/sketch lists where applicable.
 
 ### Acceptance criteria
 
-- All 9 bridges have a `.teaching-note` section visible after the interactive canvas.
+- All 9 bridges have a `.teaching-note` section visible after the interactive canvas. ✅
 - Cards are warm and workshop-specific — no generic advice.
 - CC Fest voice check: notes read like a facilitator whispering a move, not a teacher's edition footnote.
 
@@ -605,7 +606,7 @@ Purpose: add `.teaching-note` sections (Prompt / Misconception / Ask) to the 9 c
 
 ## Phase 7 — Filter Live Counts & Facet Upgrades (Direction 1)
 
-**Status: Codex implemented 2026-06-03; awaiting Claude browser QA.**
+**Status: ✅ Complete. Commit 5c058b8. Browser QA passed 2026-06-03.**
 
 Source spec: `newdesignideas/Filter Spec.html` and `Filter Spec.md`.
 
@@ -628,9 +629,9 @@ Purpose: bring the Phase 3 filter up to the full Direction 1 spec. The current f
 
 ### Claude tasks
 
-- [ ] Browser QA: activate two facets from different groups (e.g. Motion + Beginner) — confirm intersection logic. Activate two chips from the same group (e.g. Marks + Motion) — confirm union logic.
-- [ ] Check that 0-result chip disabling is clear to a visitor ("this is unavailable" vs "this is broken").
-- [ ] Confirm live counts feel like a teaching signal, not database noise. Would a beginner find them helpful or confusing?
+- [x] Browser QA: OR within facet (Marks + Motion → count goes up), AND across facets (Motion + Beginner → count drops), live count updates, disabled chips, empty state — all confirmed working.
+- [x] Check that 0-result chip disabling is clear to a visitor.
+- [x] Confirm live counts feel like a teaching signal, not database noise.
 
 ### Acceptance criteria
 
@@ -644,7 +645,7 @@ Purpose: bring the Phase 3 filter up to the full Direction 1 spec. The current f
 
 ## Phase 8 — Session Spine Wayfinding (Direction 3)
 
-**Status: Not started.**
+**Status: ✅ Codex complete, commit f3a8b44. Awaiting Claude browser QA.**
 
 Source spec: `newdesignideas/Session Spine Spec.html` and `Session Spine Spec.md`.
 
@@ -658,17 +659,19 @@ One shared JS config feeds both renderers. Fields per session: `id`, `glyph` (�
 
 ### Codex tasks
 
-- [ ] Create `spine.css` and `spine.js` in `cc-fest-coding-camp-pages/assets/` (or inline on target pages).
-- [ ] Derive `CCS_SESSIONS` from existing `sessions-data.js` — map `suitGlyph`, `title`, `focus` (`subtitle`), `anchorBridge` + `featuredTools` to the spine config format.
-- [ ] Add `renderSideRail('#spine', currentIndex)` to `sessions/index.html` — mount the metro spine above or alongside the session card grid.
-- [ ] Add `autoToolPage('#spine', '#stations')` (or `renderCompactStrip` + `renderStationRail`) to the tool page template. Wire `data-session` and `data-tool` from the catalog at render time.
-- [ ] The compact strip prev/next must disable (`aria-disabled`) at the arc ends (Session 01 has no prev; Session 05 has no next).
+- [x] Create `spine.js` (self-contained renderer deriving config from `CCFestSessions` + `CCFestCatalog`; exposes `window.CCS` for manual init).
+- [x] Derive `CCS_SESSIONS` from `sessions-data.js` — maps `suitGlyph`, `title`, `subtitle`, `anchorBridge` + `featuredTools` to spine config format.
+- [x] Add scroll-tracked side rail to `sessions/index.html` — two-column layout, sticky rail, mobile hidden.
+- [x] Auto-init compact strip + station rail on all tool/bridge pages; replaces the old session-strip.
+- [x] `spine.js` injected on all 135 static tool/bridge pages, JS-rendered tools, and starter sketch pages.
+- [x] Prev/next disabled at arc ends.
 
 ### Claude tasks
 
-- [ ] Review the side rail on the sessions index: does it add useful wayfinding or compete with the session card grid? Decide where it lives (sidebar, top of page, or collapsed by default).
-- [ ] Review the compact strip on a tool page: does it crowd the tool header? Is the you-are-here position clear without reading the text?
-- [ ] Decide whether the sibling-tool station rail belongs on all tool pages or only session-core tools (the ~15 per session that are explicitly listed in `featuredTools`).
+- [ ] **Browser QA:** Sessions index — does the side rail add useful wayfinding or compete with the session card grid? Is the two-column layout clean on both desktop and mobile (mobile hides the rail per CSS)?
+- [ ] **Browser QA:** Tool page — does the compact strip crowd the header? Is the you-are-here position clear at a glance? Are prev/next links disabled correctly at Session 01 / Session 05?
+- [ ] **Browser QA:** Station rail — does it correctly highlight the current tool? Does it appear on the right pages?
+- [ ] Decide whether the sibling-tool station rail should appear on all tool pages (current: all 135) or only session-core tools listed in `featuredTools`.
 - [ ] CC Fest voice check: does the spine feel like a workshop map or like a product tour?
 
 ### Acceptance criteria
@@ -767,10 +770,12 @@ Now that Phases 0–3 are started:
 17. ✅ Both: Phase 6a complete — metadata strip on all 11 JS-rendered tools, embed-mode hiding confirmed, related resources intact. Commit 2104d04 + fix deploy.
 18. ✅ Both: Phase 6b complete — metadata strip on 10 representative static tools, both nav patterns confirmed, embed mode clean. Commit e62d638.
 19. ✅ Both: Phase 6c complete — metadata strip on all 21 bridges. Phase 6b also expanded to all 59 static tools. Commit b479d99.
-20. ✅ **Claude:** Reviewed 9 bare bridges in Phase 6c — pathways sufficient, teaching-note sections logged as Phase 6e authoring pass.
-21. ✅ Both: Phase 6d complete — starter sketches, About counts/copy, sessions page data verification, and B7 sketch canvas actions shipped.
-22. **Current — Claude:** Phase 7 browser QA — filter live counts and facet upgrade (`newdesignideas/Filter Spec`) implemented by Codex; Claude to review teaching feel and disabled-chip clarity.
-23. After 7 — Phase 8: session spine wayfinding rail (`newdesignideas/Session Spine Spec`).
+20. ✅ Both: Phase 6d complete — starter sketches, About counts/copy, sessions page data verification, and B7 sketch canvas actions shipped (commits 35d7099 + 85a8daf).
+21. ✅ Both: Phase 6e complete — teaching-note sections (Prompt / Misconception / Ask) on all 9 bare bridges (commit f164941).
+22. ✅ Codex: Phase 7 complete — live filter counts, OR-within/AND-across facets, `data-*` card stamping (commit 5c058b8).
+23. ✅ Codex: Phase 8 complete — session spine: side rail on sessions index, compact strip + station rail on all 135 tool/bridge pages (commit f3a8b44).
+24. ✅ Claude: Phase 7 browser QA passed — OR/AND facet logic, live counts, disabled chips, empty state all confirmed.
+25. **Current — Claude:** Phase 8 browser QA — session spine: side rail on sessions index, compact strip + station rail on tool pages.
 
 ---
 
@@ -930,6 +935,33 @@ Now that Phases 0–3 are started:
 - Added the compact "In this session" strip hook in `site.js` and loaded catalog/session/site runtime scripts on tool and concept bridge detail pages.
 - Updated `sessions.css` for session resource pills, real session cards, and arc navigation.
 - Updated static audit session counting to read from `sessions-data.js` and verify real session pages exist.
+
+### 2026-06-03 — Phases 6d–8 complete (Codex)
+
+**Commits:** 35d7099, 85a8daf (6d) · f164941 (6e) · 5c058b8 (7) · f3a8b44 (8)
+
+**Phase 6d (35d7099 + 85a8daf):**
+- Metadata strip on all 44 starter sketch pages via `starter-seed-pages.js`.
+- B7 decision implemented: canvas-only action bar (Save Image + Fullscreen), no full `p5-export-helper.js` injection.
+- About page counts updated to 21/70/44/135; stale copy flagged with `CLAUDE REVIEW` comments.
+- Sessions page verified against Phase 4 real session data.
+
+**Phase 6e (f164941):**
+- Teaching-note sections (Prompt / Misconception / Ask) added to all 9 bare bridges: `arrays-loops-as-system`, `data-as-argument`, `data-in-drawing-out`, `modulo-counting-in-cycles`, `objects-data-plus-behavior`, `pixels-pictures-are-data`, `triangle-circle-wave-explorer`, `vectors-arrows-that-store-motion`, `world-vs-local-coordinates`. 19 lines per bridge, 18 files changed.
+
+**Phase 7 (5c058b8):**
+- `scripts/stamp-index-card-metadata.mjs` added — stamps `data-type/category/level/session/pathway/tags/name` on every `.tool-card` in `index.html`.
+- Live count badges on every filter chip; 0-count chips disabled.
+- OR-within-facet / AND-across-facets semantics implemented and verified in local QA.
+- `site.js` and `site.css` updated; `deploy.sh` now runs stamp script before sync.
+
+**Phase 8 (f3a8b44):**
+- `spine.js` (350 lines) — self-contained renderer deriving config from `CCFestSessions` + `CCFestCatalog`. Auto-inits compact strip + station rail on load; exposes `window.CCS` for manual init.
+- `sessions/index.html` rebuilt as two-column layout with scroll-tracked sticky side rail.
+- `spine.js` injected on all 135 static tool/bridge pages plus JS-rendered tools and starter sketch pages (276 files changed).
+- Old session-strip replaced by spine compact strip on tool/bridge pages.
+
+**Open:** Claude browser QA for all four phases — one live-site session covers them all.
 
 ### 2026-06-03 — Phase 6c complete + Phase 6b full rollout (Codex)
 
