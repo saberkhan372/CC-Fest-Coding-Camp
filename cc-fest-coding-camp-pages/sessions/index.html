@@ -155,12 +155,18 @@
     var spineEl = document.getElementById('sessions-spine');
     if (!spineEl) return;
 
+    var retries = 0;
+
     function initRail() {
       if (!window.CCS) return;
       var cards = Array.from(document.querySelectorAll('.session-card'));
 
-      // No cards yet (fonts not ready) — render with no current session.
-      if (!cards.length) { window.CCS.renderSideRail(spineEl, null); return; }
+      // Cards not yet in DOM (document.fonts.ready hasn't fired yet).
+      // Retry up to 30 times (3 seconds) rather than bailing early.
+      if (!cards.length) {
+        if (++retries < 30) { setTimeout(initRail, 100); }
+        return;
+      }
 
       var ratios = new Array(cards.length).fill(0);
       var current = -1;
@@ -170,7 +176,6 @@
         ratios.forEach(function (r, i) {
           if (r > bestRatio) { bestRatio = r; best = i; }
         });
-        // Only re-render when the highlighted stop changes.
         if (best !== current) {
           current = best;
           window.CCS.renderSideRail(spineEl, current >= 0 ? current : null);
@@ -188,7 +193,7 @@
       cards.forEach(function (card) { observer.observe(card); });
     }
 
-    // CCS may not be ready yet if spine.js is still booting.
+    // Wait for CCS (spine.js) to be ready, then start initRail.
     var pollCount = 0;
     var poll = setInterval(function () {
       if (window.CCS || ++pollCount > 40) {
