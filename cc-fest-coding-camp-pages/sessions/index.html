@@ -36,7 +36,7 @@
   <script src="../catalog-data.js?v=20260602-redesign-phase3-lens"></script>
   <script src="../sessions-data.js?v=20260603-phase4-sessions"></script>
   <script>
-  const SESSIONS = window.CCFestSessions || [];
+  const SESSIONS = (window.CCFestSessions || []).filter((session) => session.id !== "template");
   const catalogById = new Map((window.CCFestCatalog?.items || []).map((item) => [item.id, item]));
 
   function sessionHref(session) {

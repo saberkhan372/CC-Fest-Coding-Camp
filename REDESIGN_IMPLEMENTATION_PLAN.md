@@ -562,7 +562,7 @@ Purpose: complete the detail page system across remaining page types.
 - [x] Add metadata to JS-rendered starter sketch pages via `starter-seed-pages.js` (one change covers all 44). **6d-1 complete: renderer waits for `window.CCFestCatalog`, finds the sketch by slug, and inserts `.catalog-meta-strip` after `.seed-rhythm`; suppressed for `?embed=1` / `.embed-mode`.**
 - [x] Decide with Claude whether starter sketches get `p5-export-helper.js` injected from `starter-seed-pages.js` (the B7 open audit item). **Decision: do not inject the global helper. Add a sketch-canvas-only 2-button action bar: Save Image and Fullscreen. Keep the existing single p5 Editor button in the editor chrome; do not add a duplicate p5 Editor button to the canvas bar.**
 - [x] Update About page: verify topbar has Sessions and Map (already fixed in audit), add a short "What you'll find" summary card that reflects the current library counts from `window.CCFestCatalog`. **6d-2 complete: counts updated to 21 concept bridges, 70 workshop tools, 44 starter sketches, 135 total; stale "homepage path" language flagged with `CLAUDE REVIEW` comments.**
-- [ ] Update sessions page to reflect Phase 4 real session data.
+- [x] Update sessions page to reflect Phase 4 real session data. **6d-3 complete: sessions index renders the five real Phase 4 sessions and filters out the template placeholder entry.**
 
 ### Claude tasks
 
@@ -574,7 +574,7 @@ Purpose: complete the detail page system across remaining page types.
 - All 44 starter sketch pages have a metadata strip. ✅
 - B7 decision is made and documented. ✅
 - About page reflects current library state. ✅
-- Sessions page reflects Phase 4 real session data.
+- Sessions page reflects Phase 4 real session data. ✅
 - CC Fest voice check: sketch metadata is minimal — it helps learners know what kind of thing they opened, not categorize it.
 
 ---
