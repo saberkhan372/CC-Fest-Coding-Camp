@@ -11,6 +11,9 @@ DST="docs"
 echo "Regenerating catalog data ..."
 node scripts/generate-catalog-data.mjs
 
+echo "Stamping homepage card metadata ..."
+node scripts/stamp-index-card-metadata.mjs
+
 echo "Syncing root assets from $SRC to $DST ..."
 for f in "$SRC"/*.css "$SRC"/*.js "$SRC"/*.html; do
   [ -f "$f" ] || continue

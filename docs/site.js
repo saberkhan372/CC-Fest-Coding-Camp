@@ -412,6 +412,13 @@
     card.classList.add("catalog-card", `catalog-card--${item.type}`);
     card.dataset.catalogId = item.id;
     card.dataset.catalogType = item.type;
+    card.dataset.type = item.type;
+    card.dataset.category = item.suit || "";
+    card.dataset.level = item.level || "";
+    card.dataset.session = item.session || "";
+    card.dataset.pathway = (item.pathways || []).join(" ");
+    card.dataset.name = item.title || "";
+    card.dataset.tags = (item.tags || []).join(" ");
 
     const cue = makeCue(item);
     const tagRow = card.querySelector(".tag-row");
@@ -424,7 +431,7 @@
   });
 })();
 
-// Tool filters: suit + pathway + difficulty + search
+// Catalog filters: OR within a facet, AND across facets, plus search.
 (function() {
   const searchInput = document.querySelector(".global-search");
   if (!searchInput) return;
@@ -443,6 +450,29 @@
     expanded: false
   };
 
+  const filterState = {
+    cats: new Set(),
+    paths: new Set(),
+    levels: new Set(),
+    search: ""
+  };
+
+  const facetConfig = {
+    cats: { lens: "suit", label: "Category", values: catalog?.facets?.suits || [] },
+    levels: { lens: "level", label: "Level", values: catalog?.facets?.levels || [] },
+    paths: { lens: "pathway", label: "Goal", values: catalog?.facets?.pathways || [] }
+  };
+
+  function escapeHtml(value) {
+    return String(value || "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char]));
+  }
+
   const filterStatus = document.createElement("div");
   filterStatus.className = "catalog-filter-status";
   const searchWrap = searchInput.closest(".global-search-wrap");
@@ -450,6 +480,7 @@
 
   let lensBar = null;
   let lensPanel = null;
+  let refineBar = null;
   if (catalog?.items?.length && filterStatus.parentNode) {
     lensBar = document.createElement("div");
     lensBar.className = "catalog-lens-bar";
@@ -461,19 +492,26 @@
       <button type="button" class="lens-btn" data-lens="level">Level</button>
       <button type="button" class="lens-btn" data-lens="pathway">Goal</button>
     `;
+    refineBar = document.createElement("div");
+    refineBar.className = "catalog-refine-bar";
+    refineBar.innerHTML = Object.entries(facetConfig).map(([facet, config]) => `
+      <div class="refine-group" data-refine-group="${facet}">
+        <span>${escapeHtml(config.label)}</span>
+        ${config.values.map((item) => `
+          <button type="button" class="refine-chip" data-filter-facet="${facet}" data-filter-value="${escapeHtml(item.id)}" aria-pressed="false">
+            <b>${escapeHtml(item.label)}</b>
+            <em>0</em>
+          </button>
+        `).join("")}
+      </div>
+    `).join("");
     lensPanel = document.createElement("div");
     lensPanel.className = "catalog-lens-panel";
     lensPanel.hidden = true;
     filterStatus.insertAdjacentElement("afterend", lensPanel);
+    filterStatus.insertAdjacentElement("afterend", refineBar);
     filterStatus.insertAdjacentElement("afterend", lensBar);
   }
-
-  const filterState = {
-    suit: "all",
-    pathway: "all",
-    difficulty: "all",
-    search: ""
-  };
 
   const toolStations = Array.from(document.querySelectorAll("#interactive-tools .station"));
   const bridgeStations = Array.from(document.querySelectorAll("#concept-bridges .station"));
@@ -487,28 +525,38 @@
     const desc = card.querySelector(".tool-description")?.textContent.toLowerCase() || "";
     const meta = Array.from(card.querySelectorAll(".pill")).map(t => t.textContent.toLowerCase()).join(" ");
     const tags = Array.from(card.querySelectorAll(".tag")).map(t => t.textContent.toLowerCase()).join(" ");
-    return `${title} ${desc} ${meta} ${tags}`;
+    const data = `${card.dataset.name || ""} ${card.dataset.tags || ""}`.toLowerCase();
+    return `${title} ${desc} ${meta} ${tags} ${data}`;
   }
 
-  function matchesSearch(card) {
-    return !filterState.search || cardText(card).includes(filterState.search);
+  function valuesForCard(card, facet) {
+    if (facet === "cats") return card.dataset.category ? [card.dataset.category] : [];
+    if (facet === "levels") return card.dataset.level ? [card.dataset.level] : [];
+    if (facet === "paths") return (card.dataset.pathway || "").split(/\s+/).filter(Boolean);
+    return [];
   }
 
-  function matchesSuit(card) {
-    return filterState.suit === "all" || card.classList.contains(`suit-${filterState.suit}`);
+  function valuesForItem(item, facet) {
+    if (facet === "cats") return item.suit ? [item.suit] : [];
+    if (facet === "levels") return item.level ? [item.level] : [];
+    if (facet === "paths") return item.pathways || [];
+    return [];
   }
 
-  function matchesPathway(card) {
-    if (filterState.pathway === "all") return true;
-    return (card.dataset.pathway || "").split(/\s+/).includes(filterState.pathway);
+  function setMatches(values, selected) {
+    return !selected.size || values.some((value) => selected.has(value));
   }
 
-  function matchesDifficulty(card) {
-    return filterState.difficulty === "all" || card.dataset.difficulty === filterState.difficulty;
+  function matchesCard(card, ignore = "") {
+    if (filterState.search && !cardText(card).includes(filterState.search)) return false;
+    if (ignore !== "cats" && !setMatches(valuesForCard(card, "cats"), filterState.cats)) return false;
+    if (ignore !== "levels" && !setMatches(valuesForCard(card, "levels"), filterState.levels)) return false;
+    if (ignore !== "paths" && !setMatches(valuesForCard(card, "paths"), filterState.paths)) return false;
+    return true;
   }
 
-  function matchesLearningFilters(card) {
-    return matchesSuit(card) && matchesPathway(card) && matchesDifficulty(card);
+  function itemMatchesFacetValue(item, facet, value) {
+    return valuesForItem(item, facet).includes(value);
   }
 
   function visibleCatalogCount() {
@@ -524,19 +572,19 @@
     return `${item.title} ${item.summary} ${item.tags.join(" ")} ${item.group}`.toLowerCase();
   }
 
-  function catalogMatchesFilters(item) {
+  function catalogMatchesFilters(item, ignore = "") {
     if (filterState.search && !itemHaystack(item).includes(filterState.search)) return false;
-    if (filterState.suit !== "all" && item.suit !== filterState.suit) return false;
-    if (filterState.difficulty !== "all" && item.level !== filterState.difficulty) return false;
-    if (filterState.pathway !== "all" && !item.pathways.includes(filterState.pathway)) return false;
+    if (ignore !== "cats" && !setMatches(valuesForItem(item, "cats"), filterState.cats)) return false;
+    if (ignore !== "levels" && !setMatches(valuesForItem(item, "levels"), filterState.levels)) return false;
+    if (ignore !== "paths" && !setMatches(valuesForItem(item, "paths"), filterState.paths)) return false;
     return true;
   }
 
   function hasActiveRefinement() {
     return filterState.search ||
-      filterState.suit !== "all" ||
-      filterState.pathway !== "all" ||
-      filterState.difficulty !== "all";
+      filterState.cats.size ||
+      filterState.paths.size ||
+      filterState.levels.size;
   }
 
   function lensValues(item, lens) {
@@ -562,16 +610,6 @@
   function lensSubLabel(lens, value) {
     const item = facetLookup?.[lens]?.get(value);
     return item?.summary || item?.focus || item?.verb || "";
-  }
-
-  function escapeHtml(value) {
-    return String(value || "").replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[char]));
   }
 
   function renderLensPanel() {
@@ -632,18 +670,41 @@
     `;
   }
 
+  function filterLabel(facet, value) {
+    const lens = facetConfig[facet]?.lens;
+    const item = lens ? facetLookup?.[lens]?.get(value) : null;
+    return item?.label || item?.title || value;
+  }
+
+  function countFor(facet, value) {
+    if (!catalog?.items?.length) return 0;
+    return catalog.items.filter((item) => (
+      catalogMatchesFilters(item, facet) && itemMatchesFacetValue(item, facet, value)
+    )).length;
+  }
+
+  function updateRefineCounts() {
+    refineBar?.querySelectorAll(".refine-chip").forEach((chip) => {
+      const facet = chip.dataset.filterFacet;
+      const value = chip.dataset.filterValue;
+      const active = Boolean(facet && filterState[facet]?.has(value));
+      const count = facet && value ? countFor(facet, value) : 0;
+      chip.classList.toggle("active", active);
+      chip.disabled = count === 0 && !active;
+      chip.setAttribute("aria-pressed", active ? "true" : "false");
+      const badge = chip.querySelector("em");
+      if (badge) badge.textContent = String(count);
+    });
+  }
+
   function updateFilterStatus() {
     if (!filterStatus) return;
     const tokens = [];
-    if (filterState.suit !== "all") {
-      tokens.push({ key: "suit", label: facetLookup?.suit?.get(filterState.suit)?.label || filterState.suit });
-    }
-    if (filterState.pathway !== "all") {
-      tokens.push({ key: "pathway", label: facetLookup?.pathway?.get(filterState.pathway)?.label || filterState.pathway });
-    }
-    if (filterState.difficulty !== "all") {
-      tokens.push({ key: "difficulty", label: facetLookup?.level?.get(filterState.difficulty)?.label || filterState.difficulty });
-    }
+    Object.keys(facetConfig).forEach((facet) => {
+      Array.from(filterState[facet]).forEach((value) => {
+        tokens.push({ key: facet, value, label: filterLabel(facet, value) });
+      });
+    });
     if (filterState.search) {
       tokens.push({ key: "search", label: `Search: ${filterState.search}` });
     }
@@ -653,8 +714,8 @@
       <span class="filter-count">${count} resource${count === 1 ? "" : "s"} shown</span>
       <div class="filter-token-list">
         ${tokens.length ? tokens.map(token => `
-          <button class="filter-token" type="button" data-clear-filter="${token.key}">
-            <span>${token.label}</span>
+          <button class="filter-token" type="button" data-clear-filter="${token.key}" ${token.value ? `data-clear-value="${escapeHtml(token.value)}"` : ""}>
+            <span>${escapeHtml(token.label)}</span>
             <b aria-hidden="true">×</b>
           </button>
         `).join("") : `<span class="filter-empty">No refinements active</span>`}
@@ -667,24 +728,21 @@
   }
 
   function applyFilters() {
-    const hasLearningFilter = filterState.suit !== "all" ||
-      filterState.pathway !== "all" ||
-      filterState.difficulty !== "all";
+    const hasLearningFilter = Boolean(filterState.cats.size || filterState.paths.size || filterState.levels.size);
     const hasSearch = Boolean(filterState.search);
     const shouldOpen = hasLearningFilter || hasSearch;
 
     document.body.classList.toggle("search-active", hasSearch);
     document.querySelectorAll(".tool-card").forEach(card => {
-      const insideLearningLibrary = card.closest("#interactive-tools, #starter-sketches");
-      const visible = matchesSearch(card) && (!insideLearningLibrary || matchesLearningFilters(card));
+      const visible = matchesCard(card);
       card.hidden = !visible;
       card.style.display = visible ? "" : "none";
     });
 
     bridgeStations.forEach(station => {
       const visible = stationHasVisibleCard(station);
-      station.hidden = hasSearch && !visible;
-      station.classList.toggle("is-open", hasSearch && visible);
+      station.hidden = shouldOpen && !visible;
+      station.classList.toggle("is-open", shouldOpen && visible);
     });
 
     toolStations.forEach(station => {
@@ -695,8 +753,8 @@
 
     if (bridgeSection) {
       const visible = Array.from(bridgeSection.querySelectorAll(".tool-card")).some(c => !c.hidden);
-      bridgeSection.hidden = hasSearch && !visible;
-      bridgeSection.classList.toggle("is-open", hasSearch && visible);
+      bridgeSection.hidden = shouldOpen && !visible;
+      bridgeSection.classList.toggle("is-open", shouldOpen && visible);
     }
 
     if (toolSection) {
@@ -712,17 +770,34 @@
     }
 
     updateFilterStatus();
+    updateRefineCounts();
     renderLensPanel();
   }
 
   document.addEventListener("click", (event) => {
     const btn = event.target.closest(".shelf-filter-link");
     if (!btn) return;
-    filterState.suit = "all";
-    filterState.pathway = btn.dataset.pathwayFilter || "all";
-    filterState.difficulty = "all";
+    filterState.cats.clear();
+    filterState.paths.clear();
+    filterState.levels.clear();
+    const pathway = btn.dataset.pathwayFilter;
+    if (pathway) filterState.paths.add(pathway);
     applyFilters();
     document.querySelector("#interactive-tools")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  refineBar?.addEventListener("click", (event) => {
+    const btn = event.target.closest(".refine-chip");
+    if (!btn || btn.disabled) return;
+    const facet = btn.dataset.filterFacet;
+    const value = btn.dataset.filterValue;
+    if (!facet || !value || !filterState[facet]) return;
+    if (filterState[facet].has(value)) {
+      filterState[facet].delete(value);
+    } else {
+      filterState[facet].add(value);
+    }
+    applyFilters();
   });
 
   document.addEventListener("click", (event) => {
@@ -732,8 +807,10 @@
     if (key === "search") {
       filterState.search = "";
       if (searchInput) searchInput.value = "";
-    } else if (key && filterState[key] !== undefined) {
-      filterState[key] = "all";
+    } else if (key && filterState[key]) {
+      const value = btn.dataset.clearValue;
+      if (value) filterState[key].delete(value);
+      else filterState[key].clear();
     }
     applyFilters();
   });

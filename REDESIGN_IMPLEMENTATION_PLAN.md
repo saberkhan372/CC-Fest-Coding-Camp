@@ -605,7 +605,7 @@ Purpose: add `.teaching-note` sections (Prompt / Misconception / Ask) to the 9 c
 
 ## Phase 7 — Filter Live Counts & Facet Upgrades (Direction 1)
 
-**Status: Not started.**
+**Status: Codex implemented 2026-06-03; awaiting Claude browser QA.**
 
 Source spec: `newdesignideas/Filter Spec.html` and `Filter Spec.md`.
 
@@ -620,11 +620,11 @@ Purpose: bring the Phase 3 filter up to the full Direction 1 spec. The current f
 
 ### Codex tasks
 
-- [ ] Stamp `data-type`, `data-category`, `data-level`, `data-session`, `data-tags`, `data-name` on every `.tool-card` in `index.html` (can be generated from `catalog-data.js` values by the generator script).
-- [ ] Update `countFor(key, value)` logic in the lens filter: for each chip, count how many cards match if that value is also selected, holding all other active facets fixed.
-- [ ] Disable (not hide) chips whose count would be 0.
-- [ ] Render live count as a badge inside each chip label.
-- [ ] Verify AND-across-facets / OR-within-facet semantics are correct — run `audit-catalog-lens.mjs` after.
+- [x] Stamp `data-type`, `data-category`, `data-level`, `data-session`, `data-pathway`, `data-tags`, `data-name` on every `.tool-card` in `index.html` using `scripts/stamp-index-card-metadata.mjs`.
+- [x] Update `countFor(key, value)` logic in the lens filter: for each chip, count how many cards match if that value is also selected, holding all other active facets fixed.
+- [x] Disable (not hide) chips whose count would be 0.
+- [x] Render live count as a badge inside each chip label.
+- [x] Verify AND-across-facets / OR-within-facet semantics are correct in local browser QA.
 
 ### Claude tasks
 
@@ -768,8 +768,8 @@ Now that Phases 0–3 are started:
 18. ✅ Both: Phase 6b complete — metadata strip on 10 representative static tools, both nav patterns confirmed, embed mode clean. Commit e62d638.
 19. ✅ Both: Phase 6c complete — metadata strip on all 21 bridges. Phase 6b also expanded to all 59 static tools. Commit b479d99.
 20. ✅ **Claude:** Reviewed 9 bare bridges in Phase 6c — pathways sufficient, teaching-note sections logged as Phase 6e authoring pass.
-21. **Current — Both:** Phase 6d — starter sketches (44 pages), About page, sessions page detail pass. B7 decision is made: sketch canvas gets Save Image + Fullscreen only.
-22. After 6d — Phase 7: filter live counts and facet upgrade (`newdesignideas/Filter Spec`).
+21. ✅ Both: Phase 6d complete — starter sketches, About counts/copy, sessions page data verification, and B7 sketch canvas actions shipped.
+22. **Current — Claude:** Phase 7 browser QA — filter live counts and facet upgrade (`newdesignideas/Filter Spec`) implemented by Codex; Claude to review teaching feel and disabled-chip clarity.
 23. After 7 — Phase 8: session spine wayfinding rail (`newdesignideas/Session Spine Spec`).
 
 ---
@@ -961,6 +961,14 @@ Reviewed all three drop-in spec documents in `newdesignideas/` and reconciled ag
 - **Direction 3 (Session Spine / `Session Spine Spec.md`):** Not yet implemented. Adds a metro-style side rail to the sessions index and a compact you-are-here strip + sibling-tool station rail to tool pages, all driven by a single `CCS_SESSIONS` config. Builds on Phase 4's session data. Added as **Phase 8**.
 
 All completed task checkboxes updated across Phases 1–6b. Phase 4 session-page decisions and strip copy pattern marked complete per QA log.
+
+### 2026-06-03 — Phase 7 filter facets implemented (Codex)
+
+- Added static card metadata stamping for all 135 homepage cards: `data-type`, `data-category`, `data-level`, `data-session`, `data-pathway`, `data-name`, and `data-tags`.
+- Added `scripts/stamp-index-card-metadata.mjs` and wired `deploy.sh` to stamp metadata before syncing into `docs/`.
+- Replaced the single-value homepage filter slots with Set-based category/level/goal selections: OR within the same facet, AND across different facets.
+- Added the compact refinement chip bar with live `countFor` badges, same-facet ignore counting, active states, and zero-result disabled chips.
+- Preserved Phase 3 surfaces: global search, result tokens, lens bar, lens panel, and card visuals.
 
 ### 2026-06-03 — Phase 4 Review Fixes (Codex)
 
