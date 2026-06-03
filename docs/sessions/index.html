@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sessions — CC Fest Coding Camp</title>
+  <title>Sessions - CC Fest Coding Camp</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../site.css?v=20260602-phase12-filters">
-  <link rel="stylesheet" href="../sessions.css?v=20260602-audit-fixes">
-  <meta name="description" content="CC Fest Coding Camp session posters — each session as a generative artifact.">
+  <link rel="stylesheet" href="../sessions.css?v=20260603-phase4-sessions">
+  <meta name="description" content="CC Fest Coding Camp session posters, tools, bridges, and starter sketches.">
   <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <body>
   <div class="session-shell">
     <div class="session-topbar">
-      <a href="../index.html">← Back to tool library</a>
+      <a href="../index.html">Back to tool library</a>
       <nav aria-label="Session page links">
         <a href="https://ccfest.rocks">ccfest.rocks</a>
         <a href="../concept-map.html">Map</a>
@@ -26,63 +26,71 @@
 
     <header class="sessions-header">
       <h1>CC Fest Sessions</h1>
-      <p>Each session has a generative poster. Open one to customize it, download a flyer, and find the tools and bridges used that day.</p>
+      <p>Five workshop sessions, each with a poster, an anchor bridge, and a small set of tools and sketches for the day.</p>
     </header>
 
-    <!-- Cards are rendered from SESSIONS array below. To add a session:
-         add one object to SESSIONS and create its directory. No HTML changes needed. -->
     <div class="sessions-grid" id="sessions-grid"></div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script src="../catalog-data.js?v=20260602-redesign-phase3-lens"></script>
+  <script src="../sessions-data.js?v=20260603-phase4-sessions"></script>
   <script>
-  // ── Add a session: append one object here and create its directory. ──────
-  const SESSIONS = [
-    {
-      id:       'template',
-      href:     'template/',
-      label:    'Template',
-      title:    'Session Template',
-      subtitle: 'Start here to build a new session →',
-      topic:    'Your Session\nTopic Here',
-      date:     'Month DD, YYYY',
-      accent:   '#c8391d',
-      seed:     42
-    }
-  ];
+  const SESSIONS = window.CCFestSessions || [];
+  const catalogById = new Map((window.CCFestCatalog?.items || []).map((item) => [item.id, item]));
+
+  function sessionHref(session) {
+    return (session.href || "").replace(/^sessions\//, "");
+  }
+
+  function resourceTitle(slug) {
+    return catalogById.get(slug)?.title || slug.replaceAll("-", " ");
+  }
+
+  function resourcePill(kind, slug) {
+    const base = kind === "bridge" ? "../concept-bridges/" : "../tools/";
+    return `<a class="session-resource-pill session-resource-pill--${kind}" href="${base}${slug}/">${resourceTitle(slug)}</a>`;
+  }
 
   document.fonts.ready.then(() => {
-    const grid = document.getElementById('sessions-grid');
+    const grid = document.getElementById("sessions-grid");
 
-    SESSIONS.forEach(s => {
-      // Build the full card element from data — no matching HTML required
-      const card = document.createElement('a');
-      card.className = 'session-card';
-      card.href = s.href;
+    SESSIONS.forEach((session) => {
+      const card = document.createElement("article");
+      card.className = `session-card session-card--${session.id}`;
+      const details = session.anchorBridge ? `
+        <div class="session-card-resources">
+          ${resourcePill("bridge", session.anchorBridge)}
+          ${(session.featuredTools || []).slice(0, 2).map((slug) => resourcePill("tool", slug)).join("")}
+          ${(session.featuredSketches || []).slice(0, 2).map((slug) => resourcePill("sketch", slug)).join("")}
+        </div>
+      ` : "";
       card.innerHTML = `
-        <div class="session-card-thumb" id="thumb-${s.id}"></div>
-        <div class="session-card-meta">
-          <p class="session-label">${s.label}</p>
-          <h2>${s.title}</h2>
-          <p class="session-date">${s.subtitle}</p>
-        </div>`;
+        <a class="session-card-main" href="${sessionHref(session)}">
+          <div class="session-card-thumb" id="thumb-${session.id}"></div>
+          <div class="session-card-meta">
+            <p class="session-label">${session.label}</p>
+            <h2>${session.title}</h2>
+            <p class="session-focus">${session.subtitle}</p>
+          </div>
+        </a>
+        ${details}
+      `;
       grid.appendChild(card);
 
-      // Draw thumbnail into the newly created container
-      new p5(p => {
+      new p5((p) => {
         p.setup = () => {
-          const cnv = p.createCanvas(520, 200);
-          cnv.parent(document.getElementById('thumb-' + s.id));
+          const canvas = p.createCanvas(520, 200);
+          canvas.parent(document.getElementById("thumb-" + session.id));
           p.noLoop();
-          drawThumb(p, s);
+          drawThumb(p, session);
         };
       });
     });
   });
 
-  function drawThumb(p, s) {
+  function drawThumb(p, session) {
     p.background(250, 246, 240);
-    // dot grid
     p.fill(44, 42, 38, 23);
     p.noStroke();
     for (let x = 2; x < p.width; x += 20) {
@@ -91,41 +99,46 @@
         p.circle(x + 10, y + 10, 3);
       }
     }
-    // accent bar
-    const col = p.color(s.accent);
-    p.fill(col);
+
+    const accent = p.color(session.accent);
+    p.fill(accent);
     p.noStroke();
     p.rect(0, 0, p.width, 36);
-    // label
+
     p.fill(255, 253, 247);
-    p.textFont('DM Mono');
+    p.textFont("DM Mono");
     p.textSize(10);
-    p.text('CC FEST · CODING CAMP', 14, 23);
-    // topic
+    p.text("CC FEST / CODING CAMP", 14, 23);
+
     p.fill(44, 42, 38);
-    p.textFont('Fraunces');
+    p.textFont("Fraunces");
     p.textSize(28);
     p.textLeading(30);
-    p.text(s.topic, 14, 72);
-    // circles
-    p.randomSeed(s.seed);
-    const n = 7, m = 14, sp = (p.width - 2 * m) / (n - 1);
-    for (let i = 0; i < n; i++) {
-      const x = m + i * sp;
+    p.text(session.topic, 14, 72);
+
+    p.randomSeed(session.seed);
+    const count = 7;
+    const margin = 14;
+    const spacing = (p.width - 2 * margin) / (count - 1);
+    for (let i = 0; i < count; i++) {
+      const x = margin + i * spacing;
       const d = 14 + p.random(-4, 4);
       if (p.random() > 0.55) {
-        p.fill(col); p.noStroke();
+        p.fill(accent);
+        p.noStroke();
       } else {
-        p.noFill(); p.stroke(44, 42, 38); p.strokeWeight(1.5);
+        p.noFill();
+        p.stroke(44, 42, 38);
+        p.strokeWeight(1.5);
       }
       p.circle(x, 165, d);
     }
-    // date
+
     p.noStroke();
     p.fill(107, 103, 96);
-    p.textFont('DM Mono');
+    p.textFont("DM Mono");
     p.textSize(9);
-    p.text(s.date, 14, 190);
+    p.text(session.date, 14, 190);
   }
   </script>
 </body>

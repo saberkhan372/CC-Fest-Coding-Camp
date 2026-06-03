@@ -320,6 +320,110 @@
   });
 })();
 
+// Catalog metadata enhancement: Medium content-type card anatomy
+(function() {
+  const catalog = window.CCFestCatalog;
+  if (!catalog?.items?.length) return;
+
+  const byUrl = new Map(catalog.items.map((item) => [item.url.replace(/^\.\//, ""), item]));
+  const actionVerb = {
+    bridge: "Understand the idea",
+    tool: "Play before you read",
+    sketch: "Change one value"
+  };
+
+  function normalizeHref(href) {
+    return (href || "")
+      .replace(/^(\.\/)+/, "")
+      .replace(/^\/CC-Fest-Coding-Camp\//, "")
+      .split("#")[0]
+      .split("?")[0];
+  }
+
+  function findCatalogItem(card) {
+    const localLinks = Array.from(card.querySelectorAll(".tool-actions a[href]"))
+      .map((link) => normalizeHref(link.getAttribute("href")))
+      .filter((href) => href.startsWith("tools/") || href.startsWith("concept-bridges/"));
+    return localLinks.map((href) => byUrl.get(href)).find(Boolean);
+  }
+
+  function cueShell(item) {
+    const cue = document.createElement("div");
+    cue.className = `catalog-card-cue catalog-card-cue--${item.type}`;
+    cue.setAttribute("aria-label", `${item.type} cue`);
+    return cue;
+  }
+
+  function bridgeCue(item) {
+    const cue = cueShell(item);
+    const idea = document.createElement("span");
+    idea.className = "cue-idea";
+    idea.textContent = "idea";
+    const arrow = document.createElement("span");
+    arrow.className = "cue-arrow";
+    arrow.textContent = "->";
+    const concept = document.createElement("span");
+    concept.className = "cue-code";
+    concept.textContent = item.bridgeConcept || item.tags.slice(0, 2).join(" · ") || "p5.js";
+    cue.append(idea, arrow, concept);
+    return cue;
+  }
+
+  function toolCue(item) {
+    const cue = cueShell(item);
+    const label = document.createElement("span");
+    label.className = "cue-label";
+    label.textContent = item.controlCue || "change";
+    const track = document.createElement("span");
+    track.className = "cue-track";
+    const knob = document.createElement("span");
+    knob.className = "cue-knob";
+    track.appendChild(knob);
+    const dots = document.createElement("span");
+    dots.className = "cue-dots";
+    dots.setAttribute("aria-hidden", "true");
+    dots.textContent = "• •";
+    cue.append(label, track, dots);
+    return cue;
+  }
+
+  function sketchCue(item) {
+    const cue = cueShell(item);
+    const code = document.createElement("code");
+    const value = item.codePeek || "let changeMe = 1;";
+    const [head, ...tail] = value.split("=");
+    code.innerHTML = `${head.trim()} = <mark>${tail.join("=").replace(/;$/, "").trim() || "changeMe"}</mark>;`;
+    cue.appendChild(code);
+    return cue;
+  }
+
+  function makeCue(item) {
+    if (item.type === "bridge") return bridgeCue(item);
+    if (item.type === "tool") return toolCue(item);
+    if (item.type === "sketch") return sketchCue(item);
+    return null;
+  }
+
+  document.querySelectorAll(".tool-card").forEach((card) => {
+    if (card.querySelector(".catalog-card-cue")) return;
+    const item = findCatalogItem(card);
+    if (!item) return;
+
+    card.classList.add("catalog-card", `catalog-card--${item.type}`);
+    card.dataset.catalogId = item.id;
+    card.dataset.catalogType = item.type;
+
+    const cue = makeCue(item);
+    const tagRow = card.querySelector(".tag-row");
+    if (cue && tagRow) tagRow.before(cue);
+
+    const primaryAction = card.querySelector(".tool-actions .button.primary");
+    if (primaryAction && actionVerb[item.type]) {
+      primaryAction.textContent = actionVerb[item.type];
+    }
+  });
+})();
+
 // Tool filters: suit + pathway + difficulty + search
 (function() {
   const suitBar = document.querySelector(".suit-filter-bar");
@@ -327,6 +431,45 @@
   const difficultyBar = document.querySelector(".difficulty-filter-bar");
   const searchInput = document.querySelector(".global-search");
   if (!suitBar && !pathwayBar && !difficultyBar && !searchInput) return;
+
+  const catalog = window.CCFestCatalog;
+  const facetLookup = catalog?.facets ? {
+    type: new Map(catalog.facets.types.map((item) => [item.id, item])),
+    suit: new Map(catalog.facets.suits.map((item) => [item.id, item])),
+    level: new Map(catalog.facets.levels.map((item) => [item.id, item])),
+    pathway: new Map(catalog.facets.pathways.map((item) => [item.id, item])),
+    session: new Map(catalog.facets.sessions.map((item) => [item.id, item])),
+  } : null;
+
+  const lensState = {
+    lens: "type",
+    expanded: false
+  };
+
+  const filterStatus = document.createElement("div");
+  filterStatus.className = "catalog-filter-status";
+  const lastFilterBar = difficultyBar || pathwayBar || suitBar || searchInput?.closest(".global-search-wrap");
+  lastFilterBar?.insertAdjacentElement("afterend", filterStatus);
+
+  let lensBar = null;
+  let lensPanel = null;
+  if (catalog?.items?.length && filterStatus.parentNode) {
+    lensBar = document.createElement("div");
+    lensBar.className = "catalog-lens-bar";
+    lensBar.innerHTML = `
+      <span>Organize by</span>
+      <button type="button" class="lens-btn active" data-lens="type">Type</button>
+      <button type="button" class="lens-btn" data-lens="suit">Category</button>
+      <button type="button" class="lens-btn" data-lens="session">Session</button>
+      <button type="button" class="lens-btn" data-lens="level">Level</button>
+      <button type="button" class="lens-btn" data-lens="pathway">Goal</button>
+    `;
+    lensPanel = document.createElement("div");
+    lensPanel.className = "catalog-lens-panel";
+    lensPanel.hidden = true;
+    filterStatus.insertAdjacentElement("afterend", lensPanel);
+    filterStatus.insertAdjacentElement("afterend", lensBar);
+  }
 
   const filterState = {
     suit: "all",
@@ -383,6 +526,161 @@
     setActiveButtons(difficultyBar, ".difficulty-btn", "difficultyFilter", filterState.difficulty);
   }
 
+  function buttonLabel(selector, attr, value) {
+    return document.querySelector(`${selector}[data-${attr}="${value}"]`)?.textContent?.trim() || value;
+  }
+
+  function visibleCatalogCount() {
+    const ids = new Set();
+    document.querySelectorAll(".tool-card[data-catalog-id]").forEach(card => {
+      if (card.hidden || card.style.display === "none") return;
+      ids.add(card.dataset.catalogId);
+    });
+    return ids.size;
+  }
+
+  function itemHaystack(item) {
+    return `${item.title} ${item.summary} ${item.tags.join(" ")} ${item.group}`.toLowerCase();
+  }
+
+  function catalogMatchesFilters(item) {
+    if (filterState.search && !itemHaystack(item).includes(filterState.search)) return false;
+    if (filterState.suit !== "all" && item.suit !== filterState.suit) return false;
+    if (filterState.difficulty !== "all" && item.level !== filterState.difficulty) return false;
+    if (filterState.pathway !== "all" && !item.pathways.includes(filterState.pathway)) return false;
+    return true;
+  }
+
+  function hasActiveRefinement() {
+    return filterState.search ||
+      filterState.suit !== "all" ||
+      filterState.pathway !== "all" ||
+      filterState.difficulty !== "all";
+  }
+
+  function lensValues(item, lens) {
+    if (lens === "type") return [item.type || "unknown"];
+    if (lens === "suit") return [item.suit || "uncategorized"];
+    if (lens === "level") return [item.level || "unleveled"];
+    if (lens === "session") return [item.session || "unscheduled"];
+    if (lens === "pathway") return item.pathways.length ? item.pathways : ["no-goal"];
+    return ["all"];
+  }
+
+  function lensLabel(lens, value) {
+    if (value === "unknown") return "Unknown";
+    if (value === "uncategorized") return "Uncategorized";
+    if (value === "unleveled") return "Unleveled";
+    if (value === "unscheduled") return "Unscheduled";
+    if (value === "no-goal") return "No goal tag";
+    const lookup = facetLookup?.[lens];
+    const item = lookup?.get(value);
+    return item?.plural || item?.label || item?.title || value;
+  }
+
+  function lensSubLabel(lens, value) {
+    const item = facetLookup?.[lens]?.get(value);
+    return item?.summary || item?.focus || item?.verb || "";
+  }
+
+  function escapeHtml(value) {
+    return String(value || "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char]));
+  }
+
+  function renderLensPanel() {
+    if (!lensPanel || !catalog?.items?.length) return;
+    const shouldShow = lensState.expanded || hasActiveRefinement();
+    lensPanel.hidden = !shouldShow;
+    lensBar?.querySelectorAll(".lens-btn").forEach(btn => {
+      btn.classList.toggle("active", shouldShow && btn.dataset.lens === lensState.lens);
+    });
+    if (!shouldShow) {
+      lensPanel.innerHTML = "";
+      return;
+    }
+
+    const items = catalog.items.filter(catalogMatchesFilters);
+    const groups = new Map();
+    items.forEach((item) => {
+      lensValues(item, lensState.lens).forEach((value) => {
+        if (!groups.has(value)) groups.set(value, []);
+        groups.get(value).push(item);
+      });
+    });
+
+    const typeOrder = { bridge: 0, tool: 1, sketch: 2 };
+    const sortedGroups = Array.from(groups.entries()).sort(([a], [b]) => {
+      if (lensState.lens === "type") return (typeOrder[a] ?? 9) - (typeOrder[b] ?? 9);
+      return lensLabel(lensState.lens, a).localeCompare(lensLabel(lensState.lens, b));
+    });
+
+    lensPanel.innerHTML = sortedGroups.length ? `
+      <div class="catalog-lens-groups">
+        ${sortedGroups.map(([value, groupItems]) => `
+          <section class="catalog-lens-group">
+            <header>
+              <div>
+                <h3>${escapeHtml(lensLabel(lensState.lens, value))}</h3>
+                ${lensSubLabel(lensState.lens, value) ? `<p>${escapeHtml(lensSubLabel(lensState.lens, value))}</p>` : ""}
+              </div>
+              <span>${groupItems.length}</span>
+            </header>
+            <div class="catalog-lens-links">
+              ${groupItems.slice(0, 6).map((item) => `
+                <a class="lens-link lens-link--${escapeHtml(item.type)}" href="${escapeHtml(item.url)}">
+                  <span>${escapeHtml(item.type)}</span>
+                  <strong>${escapeHtml(item.title)}</strong>
+                </a>
+              `).join("")}
+            </div>
+            ${groupItems.length > 6 ? `<div class="lens-more">+ ${groupItems.length - 6} more in this group</div>` : ""}
+          </section>
+        `).join("")}
+      </div>
+    ` : `
+      <div class="catalog-lens-empty">
+        <strong>No matching resources yet.</strong>
+        <span>Remove a refinement or try a broader search.</span>
+      </div>
+    `;
+  }
+
+  function updateFilterStatus() {
+    if (!filterStatus) return;
+    const tokens = [];
+    if (filterState.suit !== "all") {
+      tokens.push({ key: "suit", label: buttonLabel(".suit-btn", "filter", filterState.suit) });
+    }
+    if (filterState.pathway !== "all") {
+      tokens.push({ key: "pathway", label: buttonLabel(".pathway-btn", "pathway-filter", filterState.pathway) });
+    }
+    if (filterState.difficulty !== "all") {
+      tokens.push({ key: "difficulty", label: buttonLabel(".difficulty-btn", "difficulty-filter", filterState.difficulty) });
+    }
+    if (filterState.search) {
+      tokens.push({ key: "search", label: `Search: ${filterState.search}` });
+    }
+
+    const count = visibleCatalogCount();
+    filterStatus.innerHTML = `
+      <span class="filter-count">${count} resource${count === 1 ? "" : "s"} shown</span>
+      <div class="filter-token-list">
+        ${tokens.length ? tokens.map(token => `
+          <button class="filter-token" type="button" data-clear-filter="${token.key}">
+            <span>${token.label}</span>
+            <b aria-hidden="true">×</b>
+          </button>
+        `).join("") : `<span class="filter-empty">No refinements active</span>`}
+      </div>
+    `;
+  }
+
   function stationHasVisibleCard(station) {
     return Array.from(station.querySelectorAll(".tool-card")).some(card => !card.hidden && card.style.display !== "none");
   }
@@ -433,6 +731,9 @@
       sketchSection.hidden = shouldOpen && !visible;
       sketchSection.classList.toggle("is-open", shouldOpen && visible);
     }
+
+    updateFilterStatus();
+    renderLensPanel();
   }
 
   suitBar?.addEventListener("click", (event) => {
@@ -460,10 +761,43 @@
     applyFilters();
   });
 
+  document.addEventListener("click", (event) => {
+    const btn = event.target.closest(".shelf-filter-link");
+    if (!btn) return;
+    filterState.suit = "all";
+    filterState.pathway = btn.dataset.pathwayFilter || "all";
+    filterState.difficulty = "all";
+    applyFilters();
+    document.querySelector("#interactive-tools")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.addEventListener("click", (event) => {
+    const btn = event.target.closest(".filter-token");
+    if (!btn) return;
+    const key = btn.dataset.clearFilter;
+    if (key === "search") {
+      filterState.search = "";
+      if (searchInput) searchInput.value = "";
+    } else if (key && filterState[key] !== undefined) {
+      filterState[key] = "all";
+    }
+    applyFilters();
+  });
+
+  lensBar?.addEventListener("click", (event) => {
+    const btn = event.target.closest(".lens-btn");
+    if (!btn) return;
+    lensState.lens = btn.dataset.lens || "type";
+    lensState.expanded = true;
+    renderLensPanel();
+  });
+
   searchInput?.addEventListener("input", function() {
     filterState.search = this.value.trim().toLowerCase();
     applyFilters();
   });
+
+  applyFilters();
 })();
 
 // ─── Curated path data (edit here to update Start here + Best first) ──────────
@@ -506,7 +840,9 @@ const CURATED = {
   const pathEl    = document.querySelector(".beginner-path");
   const linksEl   = document.querySelector(".best-first-links");
   const copyP     = document.querySelector(".best-first-copy p");
-  if (!pathEl && !linksEl) return;
+  const shelvesEl = document.querySelector(".catalog-shelves");
+  const catalog = window.CCFestCatalog;
+  if (!pathEl && !linksEl && !shelvesEl) return;
 
   if (pathEl) {
     pathEl.innerHTML = CURATED.bridges.map((b, i) => `
@@ -527,5 +863,60 @@ const CURATED = {
 
   if (copyP) {
     copyP.textContent = `${CURATED.bestFirst.length} friendly places to click when you just want to begin.`;
+  }
+
+  if (shelvesEl && catalog?.items?.length) {
+    const pathwayOrder = ["first-time", "animation", "data", "games", "stuck", "final"];
+    const pathwayNotes = {
+      "first-time": "Gentle first clicks for people new to p5.js.",
+      animation: "Motion, easing, trails, and sketches that react over time.",
+      data: "Turn tables, rows, and outside information into visual material.",
+      games: "Characters, collisions, state, and interaction loops.",
+      stuck: "Debugging, readability, and confidence when code gets weird.",
+      final: "Project-ready tools and seeds for open studio."
+    };
+    const typeLabel = { bridge: "Bridge", tool: "Tool", sketch: "Sketch" };
+
+    function pickShelfItems(pathwayId) {
+      const matches = catalog.items.filter((item) => item.pathways.includes(pathwayId));
+      const buckets = ["bridge", "tool", "sketch"].map((type) => matches.find((item) => item.type === type)).filter(Boolean);
+      const extras = matches.filter((item) => !buckets.includes(item));
+      return [...buckets, ...extras].slice(0, 4);
+    }
+
+    const shelves = pathwayOrder.map((id) => {
+      const pathway = catalog.facets.pathways.find((item) => item.id === id);
+      return { ...pathway, note: pathwayNotes[id], items: pickShelfItems(id) };
+    }).filter((shelf) => shelf.label && shelf.items.length);
+
+    shelvesEl.innerHTML = `
+      <div class="catalog-shelves-head">
+        <div>
+          <h3>Browse by goal</h3>
+          <p>Pick the kind of momentum you want. Each shelf mixes tools and starter sketches from the full catalog.</p>
+        </div>
+      </div>
+      <div class="catalog-shelf-grid">
+        ${shelves.map((shelf) => `
+          <section class="catalog-shelf" data-shelf="${shelf.id}">
+            <div class="catalog-shelf-top">
+              <div>
+                <h4>${shelf.label}</h4>
+                <p>${shelf.note}</p>
+              </div>
+              <button class="shelf-filter-link" type="button" data-pathway-filter="${shelf.id}">Show all</button>
+            </div>
+            <div class="catalog-shelf-items">
+              ${shelf.items.map((item) => `
+                <a class="shelf-card shelf-card--${item.type}" href="${item.url}">
+                  <span>${typeLabel[item.type] || "Item"}</span>
+                  <strong>${item.title}</strong>
+                </a>
+              `).join("")}
+            </div>
+          </section>
+        `).join("")}
+      </div>
+    `;
   }
 })();

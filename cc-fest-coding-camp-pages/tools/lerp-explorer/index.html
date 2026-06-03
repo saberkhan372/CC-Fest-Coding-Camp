@@ -57,5 +57,8 @@ function code(){let txt=s.mode==="follow"?`let x = 200;\n\nfunction draw() {\n  
 ["start","target","amt"].forEach(id=>$(id).oninput=e=>{s[id]=Number(e.target.value);$(id+"Val").textContent=e.target.value;code()});document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-mode]").forEach(x=>x.classList.remove("active"));b.classList.add("active");s.mode=b.dataset.mode;s.x=s.start;s.trail=[];$("stageTitle").textContent=b.textContent+" Mode";$("stageDesc").textContent=s.mode==="follow"?"Repeated lerp() in draw() creates easing.":"One lerp() call finds one value between two values.";code()});["formula","distance","trail"].forEach(id=>$(id).onclick=e=>{s["show"+id[0].toUpperCase()+id.slice(1)]=!s["show"+id[0].toUpperCase()+id.slice(1)];e.target.classList.toggle("active")});$("reset").onclick=()=>{s.x=s.start;s.trail=[]};c.onpointermove=e=>{let r=c.getBoundingClientRect();s.mouseX=(e.clientX-r.left)*c.width/r.width;s.mouseY=(e.clientY-r.top)*c.height/r.height};code();draw();
 </script>
   <script src="../../p5-export-helper.js?v=20260602-audit-fixes"></script>
+  <script src="../../catalog-data.js?v=20260602-redesign-phase3-lens"></script>
+  <script src="../../sessions-data.js?v=20260603-phase4-sessions"></script>
+  <script src="../../session-strip.js?v=20260603-phase4-sessions"></script>
 </body>
 </html>

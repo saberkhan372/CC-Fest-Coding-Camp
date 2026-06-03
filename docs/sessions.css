@@ -67,12 +67,18 @@
   box-shadow: 6px 6px 0 rgba(44,42,38,.12);
   overflow: hidden;
   text-decoration: none;
-  display: block;
+  display: grid;
   color: inherit;
   transition: transform .1s;
 }
 
 .session-card:hover { transform: translateY(-2px); }
+
+.session-card-main {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
 
 .session-card-thumb {
   height: 200px;
@@ -112,11 +118,49 @@
   letter-spacing: -.02em;
 }
 
-.session-date {
+.session-focus {
   margin: 0;
   font-size: 13px;
   color: var(--ink-light, #6b6760);
-  font-family: 'DM Mono', ui-monospace, monospace;
+  line-height: 1.4;
+}
+
+.session-card-resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 0 16px 16px;
+}
+
+.session-resource-pill {
+  display: inline-flex;
+  max-width: 100%;
+  border: 1.5px solid var(--cream-deep, #e4dccf);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink, #2c2a26);
+  padding: 5px 8px;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.session-resource-pill:hover {
+  border-color: var(--accent, #c8391d);
+  color: var(--accent, #c8391d);
+}
+
+.session-resource-pill--bridge { background: #f7f2ff; }
+.session-resource-pill--tool { background: #fff8f4; }
+.session-resource-pill--sketch { background: #fff7d7; }
+
+.session-kicker {
+  margin: 0 0 5px;
+  color: var(--accent, #c8391d);
+  font: 800 11px/1 "DM Mono", ui-monospace, monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
 /* ─── POSTER PAGE ──────────────────────────────────────────────────────────── */
@@ -283,6 +327,39 @@
   color: var(--accent, #c8391d);
 }
 
+.session-arc-nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.session-arc-nav a {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1.5px solid var(--cream-deep, #e4dccf);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink, #2c2a26);
+  text-decoration: none;
+}
+
+.session-arc-nav a:hover { border-color: var(--accent, #c8391d); }
+
+.session-arc-nav span {
+  color: var(--ink-light, #6b6760);
+  font: 800 10px/1 "DM Mono", ui-monospace, monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.session-arc-nav strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
 /* ─── RESPONSIVE ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 760px) {
@@ -292,4 +369,5 @@
   .session-topbar { display: block; }
   .session-topbar a { display: inline-block; margin-top: 8px; }
   .session-topbar nav { justify-content: flex-start; }
+  .session-arc-nav { grid-template-columns: 1fr; }
 }

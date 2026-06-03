@@ -4,14 +4,16 @@ Generated from `cc-fest-coding-camp-pages`.
 
 ## Counts
 
-- HTML pages: 141
+- HTML pages: 146
 - Concept bridge pages: 21
 - Tool directories/pages total: 114
 - Static workshop tools: 59
 - JS-rendered workshop tools: 11
 - Starter sketches: 44
-- Session pages/directories with index: 2
-- Session entries in SESSIONS array: 1 (template)
+- Session pages/directories with index: 7
+- Session entries in SESSIONS array: 6 (01, 02, 03, 04, 05, template)
+- Catalog metadata items: 135
+- Catalog metadata bridge/tool/sketch: 21/70/44
 
 ## Homepage Count Text
 
@@ -52,6 +54,42 @@ Generated from `cc-fest-coding-camp-pages`.
 - [x] No issues found.
 
 ## Starter Sketches Missing Renderer Script
+
+- [x] No issues found.
+
+## Detail Pages Missing Session Strip Runtime
+
+- [x] No issues found.
+
+## Detail Pages Loading Homepage Runtime
+
+- [x] No issues found.
+
+## Catalog Metadata Count Issues
+
+- [x] No issues found.
+
+## Catalog Duplicate Ids
+
+- [x] No issues found.
+
+## Catalog Items Missing Required Fields
+
+- [x] No issues found.
+
+## Catalog Items Missing Learning Metadata
+
+- [x] No issues found.
+
+## Catalog Sketches With Placeholder Code Peeks
+
+- [x] No issues found.
+
+## Catalog Items With Broken Urls
+
+- [x] No issues found.
+
+## Missing Real Session Pages
 
 - [x] No issues found.
 

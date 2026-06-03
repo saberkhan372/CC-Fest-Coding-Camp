@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Session 03 - Patterns, Systems, and What They Say - CC Fest Coding Camp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../site.css?v=20260602-phase12-filters">
+  <link rel="stylesheet" href="../../sessions.css?v=20260603-phase4-sessions">
+  <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+</head>
+<body>
+  <div class="poster-shell">
+    <div class="session-topbar">
+      <a href="../index.html">All sessions</a>
+      <nav aria-label="Session links">
+        <a href="../../index.html">Tool library</a>
+        <a href="../../concept-map.html">Map</a>
+        <a href="../../about.html">About</a>
+      </nav>
+    </div>
+
+    <header class="poster-page-header">
+      <p class="session-kicker">Session 03</p>
+      <h1>Patterns, Systems, and What They Say</h1>
+      <p>Let the code repeat, branch, and think for itself.</p>
+    </header>
+
+    <div class="poster-layout">
+      <div class="poster-frame"><div id="poster-canvas"></div></div>
+      <aside class="poster-stack">
+        <div class="poster-card">
+          <h3>Poster</h3>
+          <div class="poster-btn-row">
+            <button class="poster-btn" onclick="randomizeSeed()">Shuffle design</button>
+            <button class="poster-btn primary" onclick="savePoster()">Download PNG</button>
+          </div>
+        </div>
+        <div class="poster-card">
+          <h3>Session resources</h3>
+          <ul class="resource-list" id="resource-list"></ul>
+        </div>
+        <nav class="session-arc-nav" id="session-arc-nav" aria-label="Session arc navigation"></nav>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    window.CCFestSession = {
+      id: "03",
+      label: "Session 03",
+      title: "Patterns, Systems, and What They Say",
+      subtitle: "Let the code repeat, branch, and think for itself.",
+      topic: "Patterns, Systems,\nand What They Say",
+      date: "\u2014 2026 \u2014",
+      accent: "#7f9d7a",
+      seed: 1003,
+      suitGlyph: "\u2b21",
+      suitId: "systems",
+      anchorBridge: "noise-smooth-randomness",
+      featuredTools: ["for-loop-stepper", "noise-lab", "rows-and-columns"],
+      featuredSketches: ["generative-tile-pattern-seed", "wander-agent-seed", "noise-walker"]
+    };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script src="../../catalog-data.js?v=20260602-redesign-phase3-lens"></script>
+  <script src="../../sessions-data.js?v=20260603-phase4-sessions"></script>
+  <script src="../session-page.js?v=20260603-phase4-sessions"></script>
+</body>
+</html>

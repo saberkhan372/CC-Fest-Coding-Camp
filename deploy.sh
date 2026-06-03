@@ -8,6 +8,9 @@ set -e
 SRC="cc-fest-coding-camp-pages"
 DST="docs"
 
+echo "Regenerating catalog data ..."
+node scripts/generate-catalog-data.mjs
+
 echo "Syncing root assets from $SRC to $DST ..."
 for f in "$SRC"/*.css "$SRC"/*.js "$SRC"/*.html; do
   [ -f "$f" ] || continue
@@ -19,7 +22,13 @@ for dir in tools concept-bridges sessions; do
   if [ -d "$SRC/$dir" ]; then
     echo "Syncing $dir/ ..."
     mkdir -p "$DST/$dir"
-    rsync -a --delete "$SRC/$dir/" "$DST/$dir/"
+    if command -v rsync >/dev/null 2>&1; then
+      rsync -a --delete "$SRC/$dir/" "$DST/$dir/"
+    else
+      rm -rf "$DST/$dir"
+      mkdir -p "$DST/$dir"
+      cp -R "$SRC/$dir/." "$DST/$dir/"
+    fi
   fi
 done
 

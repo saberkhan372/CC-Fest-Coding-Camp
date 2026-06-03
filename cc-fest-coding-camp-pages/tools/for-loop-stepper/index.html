@@ -14,4 +14,7 @@ function draw(){ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle="#fffdf9";ctx.
 function code(){let lines=[`for (let i = ${cfg.start}; i < ${cfg.stop}; i += ${cfg.inc}) {`,`  circle(i * ${cfg.space} + 60, 170, 32);`,`}`];let active=state.phase===1?0:state.phase===2?1:state.phase===3?0:-1;$("code").innerHTML=lines.map((l,i)=>i===active?`<span class="hl">${l}</span>`:l).join("\n")}
 ["start","stop","inc","space"].forEach(id=>$(id).oninput=e=>{cfg[id==="inc"?"inc":id==="space"?"space":id]=Number(e.target.value);$(id+"Val").textContent=e.target.value;reset()});$("next").onclick=step;$("reset").onclick=reset;$("auto").onclick=e=>{if(state.auto){clearInterval(state.auto);state.auto=null;e.target.textContent="Auto Play"}else{state.auto=setInterval(()=>{step();if(state.done){clearInterval(state.auto);state.auto=null;e.target.textContent="Auto Play"}},650);e.target.textContent="Pause"}};reset();
 </script>  <script src="../../p5-export-helper.js?v=20260602-audit-fixes"></script>
+  <script src="../../catalog-data.js?v=20260602-redesign-phase3-lens"></script>
+  <script src="../../sessions-data.js?v=20260603-phase4-sessions"></script>
+  <script src="../../session-strip.js?v=20260603-phase4-sessions"></script>
 </body></html>

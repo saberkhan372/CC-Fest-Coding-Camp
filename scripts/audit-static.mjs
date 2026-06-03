@@ -5,6 +5,8 @@ const repoRoot = process.cwd();
 const sourceRoot = path.join(repoRoot, "cc-fest-coding-camp-pages");
 const reportPath = path.join(repoRoot, "AUDIT_STATIC_REPORT.md");
 const staleCountPattern = /\b(31(?: workshop)? tools|26(?: starter)? sketches|60 tools|40 sketches)\b/i;
+const catalogDataPath = path.join(sourceRoot, "catalog-data.js");
+const sessionsDataPath = path.join(sourceRoot, "sessions-data.js");
 
 function walk(dir, predicate = () => true) {
   const out = [];
@@ -72,9 +74,26 @@ function countMatches(files, test) {
   return files.filter((file) => test(read(file), file));
 }
 
+function readCatalogItems() {
+  if (!fs.existsSync(catalogDataPath)) return [];
+  const js = read(catalogDataPath);
+  const match = js.match(/const CATALOG_ITEMS = ([\s\S]*?);\n\n  const CATALOG_FACETS/);
+  if (!match) return [];
+  return JSON.parse(match[1]);
+}
+
+function readSessionItems() {
+  if (!fs.existsSync(sessionsDataPath)) return [];
+  const js = read(sessionsDataPath);
+  const match = js.match(/const SESSIONS = ([\s\S]*?);\n\n  window\.CCFestSessions/);
+  if (!match) return [];
+  return Function(`"use strict"; return (${match[1]});`)();
+}
+
 const htmlFiles = walk(sourceRoot, (file) => file.endsWith(".html"));
 const toolIndexFiles = htmlFiles.filter((file) => srcRel(file).startsWith("tools/") && path.basename(file) === "index.html");
 const bridgeIndexFiles = htmlFiles.filter((file) => srcRel(file).startsWith("concept-bridges/") && path.basename(file) === "index.html");
+const detailIndexFiles = [...toolIndexFiles, ...bridgeIndexFiles];
 const sessionIndexFiles = htmlFiles.filter((file) => srcRel(file).startsWith("sessions/") && path.basename(file) === "index.html");
 const jsWorkshopTools = countMatches(toolIndexFiles, (html) => html.includes("renderWorkshopToolPage("));
 const starterSketches = countMatches(toolIndexFiles, (html) => html.includes("renderStarterSeedPage("));
@@ -115,6 +134,8 @@ const staticMissingExportHelper = staticWorkshopTools.filter((file) => !read(fil
 const jsMissingStateUtils = jsWorkshopTools.filter((file) => !read(file).includes("tool-state-utils.js?v="));
 const jsMissingExportHelper = jsWorkshopTools.filter((file) => !read(file).includes("p5-export-helper.js?v="));
 const starterMissingRenderer = starterSketches.filter((file) => !read(file).includes("starter-seed-pages.js"));
+const detailMissingSessionStrip = detailIndexFiles.filter((file) => !read(file).includes("session-strip.js?v=20260603-phase4-sessions"));
+const detailLoadingHomepageRuntime = detailIndexFiles.filter((file) => read(file).includes("site.js?v=20260603-phase4-sessions"));
 
 const homepage = read(path.join(sourceRoot, "index.html"));
 const homepageCountChecks = [
@@ -124,7 +145,45 @@ const homepageCountChecks = [
 ];
 
 const sessionsHtml = read(path.join(sourceRoot, "sessions", "index.html"));
-const sessionIds = [...sessionsHtml.matchAll(/\bid\s*:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
+const sessionItems = readSessionItems();
+const sessionIds = sessionItems.map((session) => session.id);
+const realSessionIds = sessionIds.filter((id) => id !== "template");
+const missingRealSessionPages = realSessionIds.filter((id) => {
+  return !fs.existsSync(path.join(sourceRoot, "sessions", id, "index.html"));
+});
+const catalogItems = readCatalogItems();
+const catalogCounts = catalogItems.reduce((counts, item) => {
+  counts[item.type] = (counts[item.type] || 0) + 1;
+  return counts;
+}, {});
+const catalogIdCounts = catalogItems.reduce((counts, item) => {
+  counts.set(item.id, (counts.get(item.id) || 0) + 1);
+  return counts;
+}, new Map());
+const catalogDuplicateIds = Array.from(catalogIdCounts.entries())
+  .filter(([, count]) => count > 1)
+  .map(([id, count]) => ({ id, count }));
+const catalogMissingRequired = catalogItems.filter((item) => {
+  const required = ["id", "title", "type", "url", "summary", "section", "group"];
+  return required.some((key) => !item[key]);
+});
+const catalogMissingLearningMetadata = catalogItems.filter((item) => {
+  if (item.type === "bridge") return !item.suit || !item.level || !item.pathways?.length || !item.session || !item.bridgeIdea || !item.bridgeConcept;
+  if (item.type === "tool") return !item.suit || !item.level || !item.controlCue;
+  if (item.type === "sketch") return !item.suit || !item.level || !item.codePeek;
+  return true;
+});
+const catalogPlaceholderCodePeeks = catalogItems.filter((item) => item.type === "sketch" && /changeMe|drawSketchStep/.test(item.codePeek || ""));
+const catalogBrokenUrls = catalogItems.flatMap((item) => {
+  const target = normalizeLocalTarget(path.join(sourceRoot, "index.html"), item.url);
+  return target && fs.existsSync(target) ? [] : [{ item, target }];
+});
+const catalogCountIssues = [
+  catalogItems.length === 135 ? null : `Expected 135 catalog items, found ${catalogItems.length}`,
+  catalogCounts.bridge === 21 ? null : `Expected 21 bridge items, found ${catalogCounts.bridge || 0}`,
+  catalogCounts.tool === 70 ? null : `Expected 70 tool items, found ${catalogCounts.tool || 0}`,
+  catalogCounts.sketch === 44 ? null : `Expected 44 sketch items, found ${catalogCounts.sketch || 0}`,
+].filter(Boolean);
 
 const lines = [];
 lines.push("# CC Fest Coding Camp Static Audit Report");
@@ -141,6 +200,8 @@ lines.push(`- JS-rendered workshop tools: ${jsWorkshopTools.length}`);
 lines.push(`- Starter sketches: ${starterSketches.length}`);
 lines.push(`- Session pages/directories with index: ${sessionIndexFiles.length}`);
 lines.push(`- Session entries in SESSIONS array: ${sessionIds.length} (${sessionIds.join(", ") || "none"})`);
+lines.push(`- Catalog metadata items: ${catalogItems.length}`);
+lines.push(`- Catalog metadata bridge/tool/sketch: ${catalogCounts.bridge || 0}/${catalogCounts.tool || 0}/${catalogCounts.sketch || 0}`);
 lines.push("");
 lines.push("## Homepage Count Text");
 lines.push("");
@@ -167,6 +228,15 @@ section("Static Workshop Tools Missing p5 Export Helper", staticMissingExportHel
 section("JS Workshop Tools Missing State Utils", jsMissingStateUtils, (file) => rel(file));
 section("JS Workshop Tools Missing p5 Export Helper", jsMissingExportHelper, (file) => rel(file));
 section("Starter Sketches Missing Renderer Script", starterMissingRenderer, (file) => rel(file));
+section("Detail Pages Missing Session Strip Runtime", detailMissingSessionStrip, (file) => rel(file));
+section("Detail Pages Loading Homepage Runtime", detailLoadingHomepageRuntime, (file) => rel(file));
+section("Catalog Metadata Count Issues", catalogCountIssues, (item) => item);
+section("Catalog Duplicate Ids", catalogDuplicateIds, (item) => `${item.id} appears ${item.count} times`);
+section("Catalog Items Missing Required Fields", catalogMissingRequired, (item) => `${item.id || item.url || "(unknown)"} (${item.type || "unknown"})`);
+section("Catalog Items Missing Learning Metadata", catalogMissingLearningMetadata, (item) => `${item.id || item.url || "(unknown)"} (${item.type || "unknown"})`);
+section("Catalog Sketches With Placeholder Code Peeks", catalogPlaceholderCodePeeks, (item) => `${item.id || item.url || "(unknown)"} -> \`${item.codePeek || ""}\``);
+section("Catalog Items With Broken Urls", catalogBrokenUrls, ({ item }) => `${item.id || "(unknown)"} -> \`${item.url}\``);
+section("Missing Real Session Pages", missingRealSessionPages, (id) => `sessions/${id}/index.html`);
 
 lines.push("## Notes");
 lines.push("");
