@@ -64,6 +64,7 @@
     .embed-mode .teaching-note,
     .embed-mode .try-next,
     .embed-mode .cc-session-strip,
+    .embed-mode .catalog-meta-strip,
     .embed-mode .tool-footer { display:none !important; }
   `;
   document.head.appendChild(style);

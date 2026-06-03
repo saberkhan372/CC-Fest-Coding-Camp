@@ -451,6 +451,7 @@
           <div class="tool-header-meta"><span class="tool-pill session">${tool.session}</span><span class="tool-pill type">${tool.type}</span></div>
           <h1>${tool.title}</h1>
           <p class="tool-subtitle">${tool.subtitle}</p>
+          ${renderCatalogMeta(slug)}
           <div class="tool-tags">${tool.tags.map((tag) => `<span class="tool-tag">${tag}</span>`).join("")}</div>
           <section class="tool-rhythm" aria-label="How to use this workshop tool">
             <span class="tool-rhythm-card"><strong>Open it</strong> Start with the canvas before the code.</span>
@@ -530,6 +531,45 @@
 
     updateCode();
     requestAnimationFrame(frame);
+  }
+
+  function renderCatalogMeta(slug) {
+    const catalog = window.CCFestCatalog;
+    if (!catalog?.items?.length) return "";
+
+    const item = catalog.items.find((entry) => entry.id === slug);
+    if (!item) return "";
+
+    const suitMap = {
+      marks:   { glyph: "✦", label: "Marks" },
+      motion:  { glyph: "◎", label: "Motion" },
+      systems: { glyph: "⬡", label: "Systems" },
+      data:    { glyph: "▦", label: "Data" },
+      open:    { glyph: "☽", label: "Open" },
+      support: { glyph: "⊕", label: "Support" },
+    };
+    const pathwayLabels = {
+      "first-time": "First time",
+      animation:    "Animation",
+      data:         "Data",
+      games:        "Games",
+      stuck:        "Stuck",
+      final:        "Final project",
+    };
+
+    const suit = suitMap[item.suit];
+    const level = item.level
+      ? item.level.charAt(0).toUpperCase() + item.level.slice(1)
+      : null;
+    const pathways = (item.pathways || []).map((p) => pathwayLabels[p] || p);
+
+    const pills = [];
+    if (suit)  pills.push(`<span class="meta-pill meta-pill--suit">${suit.glyph} ${suit.label}</span>`);
+    if (level) pills.push(`<span class="meta-pill meta-pill--level">${level}</span>`);
+    pathways.forEach((p) => pills.push(`<span class="meta-pill meta-pill--pathway">${p}</span>`));
+
+    if (!pills.length) return "";
+    return `<div class="catalog-meta-strip" aria-label="Resource metadata">${pills.join("")}</div>`;
   }
 
   function renderRelatedResources(tool, slug) {
