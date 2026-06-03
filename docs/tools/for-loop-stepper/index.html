@@ -15,6 +15,7 @@ function code(){let lines=[`for (let i = ${cfg.start}; i < ${cfg.stop}; i += ${c
 ["start","stop","inc","space"].forEach(id=>$(id).oninput=e=>{cfg[id==="inc"?"inc":id==="space"?"space":id]=Number(e.target.value);$(id+"Val").textContent=e.target.value;reset()});$("next").onclick=step;$("reset").onclick=reset;$("auto").onclick=e=>{if(state.auto){clearInterval(state.auto);state.auto=null;e.target.textContent="Auto Play"}else{state.auto=setInterval(()=>{step();if(state.done){clearInterval(state.auto);state.auto=null;e.target.textContent="Auto Play"}},650);e.target.textContent="Pause"}};reset();
 </script>  <script src="../../p5-export-helper.js?v=20260603-phase6a-catalog-meta"></script>
   <script src="../../catalog-data.js?v=20260602-redesign-phase3-lens"></script>
+  <script src="../../spine.js?v=20260603-phase8"></script>
   <script src="../../catalog-meta-strip.js?v=20260603-phase6c"></script>
   <script src="../../sessions-data.js?v=20260603-phase4-sessions"></script>
   <script src="../../session-strip.js?v=20260603-phase4-sessions"></script>

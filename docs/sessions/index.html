@@ -29,12 +29,16 @@
       <p>Five workshop sessions, each with a poster, an anchor bridge, and a small set of tools and sketches for the day.</p>
     </header>
 
-    <div class="sessions-grid" id="sessions-grid"></div>
+    <div class="sessions-body">
+      <div id="sessions-spine" aria-label="Session arc navigation"></div>
+      <div class="sessions-grid" id="sessions-grid"></div>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="../catalog-data.js?v=20260602-redesign-phase3-lens"></script>
   <script src="../sessions-data.js?v=20260603-phase4-sessions"></script>
+  <script src="../spine.js?v=20260603-phase8"></script>
   <script>
   const SESSIONS = (window.CCFestSessions || []).filter((session) => session.id !== "template");
   const catalogById = new Map((window.CCFestCatalog?.items || []).map((item) => [item.id, item]));
@@ -140,6 +144,52 @@
     p.textSize(9);
     p.text(session.date, 14, 190);
   }
+  </script>
+  <script>
+  // Session spine side rail — scroll-tracked: highlights whichever session card is in view.
+  (function () {
+    var spineEl = document.getElementById('sessions-spine');
+    if (!spineEl) return;
+
+    function initRail() {
+      if (!window.CCS) return;
+      var cards = Array.from(document.querySelectorAll('.session-card'));
+      if (!cards.length) { window.CCS.renderSideRail(spineEl, null); return; }
+
+      function currentIdx() {
+        var mid = window.innerHeight / 2;
+        var best = -1, bestDist = Infinity;
+        cards.forEach(function (card, i) {
+          var rect = card.getBoundingClientRect();
+          var dist = Math.abs((rect.top + rect.bottom) / 2 - mid);
+          if (dist < bestDist) { bestDist = dist; best = i; }
+        });
+        return best;
+      }
+
+      window.CCS.renderSideRail(spineEl, currentIdx());
+
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          requestAnimationFrame(function () {
+            window.CCS.renderSideRail(spineEl, currentIdx());
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+    }
+
+    // CCS may not be ready yet if spine.js is still booting
+    var pollCount = 0;
+    var poll = setInterval(function () {
+      if (window.CCS || ++pollCount > 40) {
+        clearInterval(poll);
+        if (window.CCS) initRail();
+      }
+    }, 100);
+  })();
   </script>
 </body>
 </html>

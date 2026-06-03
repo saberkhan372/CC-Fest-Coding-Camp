@@ -26,6 +26,7 @@ function paint(now){ctx.fillStyle="#fffdf9";ctx.fillRect(0,0,c.width,c.height);c
 ["fps","speed"].forEach(id=>$(id).oninput=e=>{s[id]=Number(e.target.value);$(id+"Val").textContent=e.target.value});$("pause").onclick=e=>{s.paused=!s.paused;e.target.textContent=s.paused?"Play":"Pause"};$("step").onclick=()=>{tick(1/s.fps);paint(performance.now())};$("trail").onclick=e=>{s.trail=!s.trail;e.target.classList.toggle("active");e.target.textContent=s.trail?"Trail On":"Trail Off"};$("perFrame").onclick=e=>{s.perSecond=false;$("perFrame").classList.add("active");$("perSecond").classList.remove("active")};$("perSecond").onclick=e=>{s.perSecond=true;$("perSecond").classList.add("active");$("perFrame").classList.remove("active")};requestAnimationFrame(draw);
 </script>  <script src="../../p5-export-helper.js?v=20260603-phase6a-catalog-meta"></script>
   <script src="../../catalog-data.js?v=20260602-redesign-phase3-lens"></script>
+  <script src="../../spine.js?v=20260603-phase8"></script>
   <script src="../../catalog-meta-strip.js?v=20260603-phase6c"></script>
   <script src="../../sessions-data.js?v=20260603-phase4-sessions"></script>
   <script src="../../session-strip.js?v=20260603-phase4-sessions"></script>
