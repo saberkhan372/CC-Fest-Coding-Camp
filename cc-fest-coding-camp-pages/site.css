@@ -665,6 +665,8 @@ a{color:inherit}
 .library-stat-bar span{color:var(--ink-light);font-weight:400}
 .catalog-shelves{
   margin-top:0;
+  padding-top:28px;
+  border-top:1px solid var(--line);
 }
 .catalog-shelves-head{
   display:flex;
@@ -674,10 +676,11 @@ a{color:inherit}
   margin-bottom:14px;
 }
 .catalog-shelves-head h3{
-  margin:0;
-  font-size:18px;
-  font-weight:900;
-  letter-spacing:-.02em;
+  margin:0 0 4px;
+  font-family:"Fraunces",Georgia,serif;
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:0;
   color:var(--ink);
 }
 .catalog-shelves-head p{
@@ -928,9 +931,9 @@ a{color:inherit}
   background:#fffdf7;
 }
 .filter-count{
-  font:800 11px/1 "DM Mono",ui-monospace,monospace;
-  letter-spacing:.08em;
-  text-transform:uppercase;
+  font:700 13px/1 "DM Mono",ui-monospace,monospace;
+  letter-spacing:0;
+  text-transform:none;
   color:var(--ink);
 }
 .filter-token-list{
@@ -979,13 +982,15 @@ a{color:inherit}
   display:flex;
   align-items:center;
   flex-wrap:wrap;
-  gap:8px;
-  margin:10px 0;
+  gap:6px 8px;
+  margin:12px 0 10px;
+  padding:12px 0 0;
+  border-top:1px solid var(--line);
 }
 
 .catalog-lens-bar span{
   margin-right:2px;
-  font:800 10.5px/1 "DM Mono",ui-monospace,monospace;
+  font:800 11px/1 "DM Mono",ui-monospace,monospace;
   letter-spacing:.08em;
   text-transform:uppercase;
   color:var(--ink-light);
@@ -997,8 +1002,8 @@ a{color:inherit}
   border-radius:999px;
   background:transparent;
   color:var(--ink-light);
-  padding:6px 12px;
-  font:800 11px/1 "DM Sans",system-ui,sans-serif;
+  padding:6px 14px;
+  font:800 12px/1 "DM Sans",system-ui,sans-serif;
   cursor:pointer;
 }
 
@@ -1462,7 +1467,7 @@ body.search-active .station-peek-trigger{display:none !important}
   background:#fffdf7;
   border:2px solid var(--ink);
   border-radius:var(--radius-sm);
-  padding:22px 22px 60px;
+  padding:22px;
   min-height:390px;
   display:flex;
   flex-direction:column;

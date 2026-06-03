@@ -156,9 +156,9 @@
 .session-resource-pill--sketch { background: #fff7d7; }
 
 .session-kicker {
-  margin: 0 0 5px;
-  color: var(--accent, #c8391d);
-  font: 800 11px/1 "DM Mono", ui-monospace, monospace;
+  margin: 0 0 6px;
+  color: var(--ink-light, #6b6760);
+  font: 700 12px/1 "DM Mono", ui-monospace, monospace;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
@@ -176,9 +176,13 @@
 }
 
 .poster-page-header h1 {
-  margin: 0 0 4px;
-  font-size: 28px;
-  letter-spacing: -.03em;
+  margin: 6px 0 10px;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--ink, #2c2a26);
 }
 
 .poster-page-header p {

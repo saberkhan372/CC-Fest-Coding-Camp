@@ -786,6 +786,7 @@
     shelvesEl.innerHTML = `
       <div class="catalog-shelves-head">
         <div>
+          <div class="section-label">Where to start</div>
           <h3>Browse by goal</h3>
           <p>Pick the kind of momentum you want. Each shelf mixes tools and starter sketches from the full catalog.</p>
         </div>
