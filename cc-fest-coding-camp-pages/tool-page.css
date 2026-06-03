@@ -435,13 +435,11 @@ pre[contenteditable="true"]{
 /* try-next, related-*, teaching-note* → now in site-components.css */
 
 .tool-footer{
-  margin-top:22px;
-  padding:16px;
-  border:2px solid var(--ink);
-  border-radius:var(--radius);
-  background:#fffdf7;
+  margin-top:24px;
+  padding:14px 0 0;
+  border-top:1px solid var(--cream-deep);
   text-align:center;
-  font-size:13px;
+  font-size:12px;
   color:var(--ink-light);
 }
 

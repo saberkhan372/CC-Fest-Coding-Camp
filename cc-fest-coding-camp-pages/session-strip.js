@@ -1,5 +1,10 @@
 // Compact session strip for tool and concept bridge detail pages.
+// Skipped if spine.js is loaded — spine.js renders the full compact
+// arc strip which supersedes this simpler strip.
 (function() {
+  // Defer to spine.js if it is present or will be present.
+  if (document.querySelector('script[src*="spine.js"]')) return;
+
   const STYLE_ID = "cc-session-strip-style";
   const catalog = window.CCFestCatalog;
   const sessions = window.CCFestSessions || [];
