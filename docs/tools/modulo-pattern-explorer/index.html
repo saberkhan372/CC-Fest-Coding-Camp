@@ -11,5 +11,5 @@ function mark(x,y,r,size){ctx.fillStyle=pal[r%pal.length];ctx.beginPath();ctx.ar
 function legend(){let html="";for(let i=0;i<s.mod;i++)html+=`<span style="border-color:${pal[i]};color:${pal[i]}">remainder ${i}</span>`;$("legend").innerHTML=html}
 function code(){let text=s.mode==="grid"?`let r = (row + col) % ${s.mod};\nfill(colors[r]);\ncircle(col * 50, row * 50, 20);`:`let r = i % ${s.mod};\nfill(colors[r]);\ncircle(i * 40, 200, 20);`;$("code").textContent=text}
 $("mod").oninput=e=>{s.mod=Number(e.target.value);$("modVal").textContent=s.mod;draw()};$("labels").onclick=e=>{s.labels=!s.labels;e.target.classList.toggle("active");e.target.textContent=s.labels?"Labels On":"Labels Off";draw()};document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-mode]").forEach(x=>x.classList.remove("active"));b.classList.add("active");s.mode=b.dataset.mode;draw()});draw();
-</script>  <script src="../../p5-export-helper.js?v=20260602-presentation"></script>
+</script>  <script src="../../p5-export-helper.js?v=20260602-audit-fixes"></script>
 </body></html>

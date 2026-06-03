@@ -25,6 +25,13 @@
   color: var(--ink-light, #6b6760);
 }
 
+.session-topbar nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px 16px;
+}
+
 .session-topbar a:hover { color: var(--accent, #c8391d); }
 
 /* ─── SESSION LISTING ──────────────────────────────────────────────────────── */
@@ -75,12 +82,15 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  padding: 10px;
 }
 
 .session-card-thumb canvas {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
 }
 
 .session-card-meta {
@@ -112,7 +122,7 @@
 /* ─── POSTER PAGE ──────────────────────────────────────────────────────────── */
 
 .poster-shell {
-  max-width: 960px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 28px 24px 56px;
 }
@@ -135,9 +145,10 @@
 
 .poster-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 270px;
+  grid-template-columns: minmax(420px, 600px) minmax(280px, 1fr);
   gap: 22px;
   align-items: start;
+  justify-content: center;
 }
 
 .poster-frame {
@@ -190,7 +201,9 @@
 }
 
 .poster-field input[type="text"] {
+  display: block;
   width: 100%;
+  min-width: 0;
   border: 1.5px solid var(--cream-deep, #e4dccf);
   border-radius: 8px;
   padding: 8px 10px;
@@ -201,7 +214,9 @@
 }
 
 .poster-field input[type="color"] {
+  display: block;
   width: 100%;
+  min-width: 0;
   min-height: 36px;
   border: 1.5px solid var(--cream-deep, #e4dccf);
   border-radius: 8px;
@@ -273,7 +288,8 @@
 @media (max-width: 760px) {
   .session-shell,
   .poster-shell { padding: 20px 16px 40px; }
-  .poster-layout { grid-template-columns: 1fr; }
+  .poster-layout { grid-template-columns: minmax(0, 1fr); }
   .session-topbar { display: block; }
   .session-topbar a { display: inline-block; margin-top: 8px; }
+  .session-topbar nav { justify-content: flex-start; }
 }

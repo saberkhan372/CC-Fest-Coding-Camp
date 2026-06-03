@@ -422,6 +422,12 @@ pre[contenteditable="true"]{
   .tool-header,.card-inner{padding:20px}
   .card-header,.tool-topbar{display:block}
   .tool-topbar a{display:inline-block;margin-top:10px}
+  .top{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 14px;
+  }
+  .top a{display:inline-block}
   #canvas-container{min-height:unset;height:auto}
   .tool-rhythm{grid-template-columns:1fr}
   .tool-rhythm-card,

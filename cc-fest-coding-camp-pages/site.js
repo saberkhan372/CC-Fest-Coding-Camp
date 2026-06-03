@@ -335,7 +335,6 @@
     search: ""
   };
 
-  const allCards = Array.from(document.querySelectorAll(".tool-card"));
   const toolStations = Array.from(document.querySelectorAll("#interactive-tools .station"));
   const bridgeStations = Array.from(document.querySelectorAll("#concept-bridges .station"));
   const sketchCards = Array.from(document.querySelectorAll("#starter-sketches .tool-card"));
@@ -385,7 +384,7 @@
   }
 
   function stationHasVisibleCard(station) {
-    return Array.from(station.querySelectorAll(".tool-card")).some(card => !card.hidden);
+    return Array.from(station.querySelectorAll(".tool-card")).some(card => !card.hidden && card.style.display !== "none");
   }
 
   function applyFilters() {
@@ -398,10 +397,11 @@
     document.body.classList.toggle("search-active", hasSearch);
     updateFilterButtons();
 
-    allCards.forEach(card => {
+    document.querySelectorAll(".tool-card").forEach(card => {
       const insideLearningLibrary = card.closest("#interactive-tools, #starter-sketches");
       const visible = matchesSearch(card) && (!insideLearningLibrary || matchesLearningFilters(card));
       card.hidden = !visible;
+      card.style.display = visible ? "" : "none";
     });
 
     bridgeStations.forEach(station => {

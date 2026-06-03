@@ -58,7 +58,7 @@
     }
     .canvas-action-btn:hover{transform:translateY(-1px)}
 
-    .embed-mode div.tool-topbar,
+    .embed-mode .tool-topbar,
     .embed-mode nav.top,
     .embed-mode .tool-rhythm,
     .embed-mode .teaching-note,
