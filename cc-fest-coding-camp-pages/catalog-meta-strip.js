@@ -1,24 +1,24 @@
-// Compact catalog metadata strip for static workshop tool pages.
+// Compact catalog metadata strip for static workshop tool and bridge pages.
 (function() {
   const STYLE_ID = "cc-catalog-meta-strip-style";
   const catalog = window.CCFestCatalog;
   if (!catalog?.items?.length) return;
 
   const path = window.location.pathname.replace(/\\/g, "/");
-  const match = path.match(/\/tools\/([^/]+)\/(?:index\.html)?$/);
+  const match = path.match(/\/(tools|concept-bridges)\/([^/]+)\/(?:index\.html)?$/);
   if (!match) return;
 
-  const slug = match[1];
+  const slug = match[2];
   const item = catalog.items.find((entry) => entry.id === slug);
   if (!item) return;
 
   const suitMap = {
-    marks: { glyph: "✦", label: "Marks" },
-    motion: { glyph: "◎", label: "Motion" },
-    systems: { glyph: "⬡", label: "Systems" },
-    data: { glyph: "▦", label: "Data" },
-    open: { glyph: "☽", label: "Open" },
-    support: { glyph: "⊕", label: "Support" },
+    marks: { glyph: "\u2726", label: "Marks" },
+    motion: { glyph: "\u25ce", label: "Motion" },
+    systems: { glyph: "\u2b21", label: "Systems" },
+    data: { glyph: "\u25a6", label: "Data" },
+    open: { glyph: "\u263d", label: "Open" },
+    support: { glyph: "\u2295", label: "Support" },
   };
   const pathwayLabels = {
     "first-time": "First time",
@@ -91,20 +91,18 @@
   strip.setAttribute("aria-label", "Resource metadata");
   strip.innerHTML = pills.join("");
 
-  const subtitle = document.querySelector(".tool-subtitle");
-  if (subtitle) {
-    subtitle.insertAdjacentElement("afterend", strip);
+  const insertAfter = document.querySelector(".tool-subtitle, .subtitle");
+  const insertBefore = !insertAfter && document.querySelector("h1, h2");
+
+  if (insertAfter?.parentNode) {
+    insertAfter.insertAdjacentElement("afterend", strip);
     return;
   }
 
-  const tagRow = document.querySelector(".tag-row, .tool-tags");
-  if (tagRow?.parentNode) {
-    tagRow.insertAdjacentElement("beforebegin", strip);
+  if (insertBefore?.parentNode) {
+    insertBefore.insertAdjacentElement("beforebegin", strip);
     return;
   }
 
-  const heading = document.querySelector("h1");
-  if (heading?.parentNode) {
-    heading.insertAdjacentElement("beforebegin", strip);
-  }
+  document.body.appendChild(strip);
 })();

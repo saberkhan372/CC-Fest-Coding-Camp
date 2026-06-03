@@ -11,6 +11,7 @@ function draw(){ctx.fillStyle="#fffdf9";ctx.fillRect(0,0,c.width,c.height);let c
 $("cell").oninput=e=>{$("cellVal").textContent=e.target.value;draw()};$("mode").onchange=draw;$("sample").onclick=makeSample;$("upload").onchange=e=>{let f=e.target.files[0];if(!f)return;let im=new Image();im.onload=()=>{img.width=320;img.height=210;ictx.drawImage(im,0,0,320,210);source="image";draw()};im.src=URL.createObjectURL(f)};$("webcam").onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({video:true});video.srcObject=stream;source="webcam";draw()}catch(e){alert("Webcam permission was not available. The sample image still works.")}};$("save").onclick=()=>{let a=document.createElement("a");a.download="pixel-remix.png";a.href=c.toDataURL("image/png");a.click()};makeSample();
 </script>  <script src="../../p5-export-helper.js?v=20260603-phase6a-catalog-meta"></script>
   <script src="../../catalog-data.js?v=20260602-redesign-phase3-lens"></script>
+  <script src="../../catalog-meta-strip.js?v=20260603-phase6c"></script>
   <script src="../../sessions-data.js?v=20260603-phase4-sessions"></script>
   <script src="../../session-strip.js?v=20260603-phase4-sessions"></script>
 </body></html>
