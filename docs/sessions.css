@@ -6,7 +6,7 @@
 /* ─── SHARED SHELL ─────────────────────────────────────────────────────────── */
 
 .session-shell {
-  max-width: 1180px;
+  max-width: 1160px;
   margin: 0 auto;
   padding: 28px 24px 56px;
 }
@@ -38,6 +38,11 @@
 
 .sessions-header {
   margin-bottom: 32px;
+  padding: 28px 32px 24px;
+  border: 2px solid var(--ink, #2c2a26);
+  border-radius: var(--radius, 12px);
+  background: var(--panel, #fffdf7);
+  box-shadow: var(--shadow, 4px 4px 0 rgba(44,42,38,.10));
 }
 
 .sessions-header h1 {
