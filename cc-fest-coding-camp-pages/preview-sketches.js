@@ -152,7 +152,6 @@
 
     const stage = document.createElement("div");
     stage.className = "tool-preview";
-    if (card.closest(".best-first-links")) stage.classList.add("best-first-preview");
     stage.dataset.preview = config.family;
     stage.setAttribute("aria-hidden", "true");
 
@@ -1296,7 +1295,6 @@
   window.addEventListener("DOMContentLoaded", () => {
     if (!previewMedia.matches) return;
     document.querySelectorAll(".tool-card").forEach(createPreview);
-    document.querySelectorAll(".best-first-links a").forEach(createPreview);
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {

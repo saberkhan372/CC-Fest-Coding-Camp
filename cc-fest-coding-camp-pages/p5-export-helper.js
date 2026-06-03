@@ -63,6 +63,7 @@
     .embed-mode .tool-rhythm,
     .embed-mode .teaching-note,
     .embed-mode .try-next,
+    .embed-mode .cc-session-strip,
     .embed-mode .tool-footer { display:none !important; }
   `;
   document.head.appendChild(style);

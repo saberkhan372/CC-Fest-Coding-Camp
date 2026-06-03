@@ -426,11 +426,8 @@
 
 // Tool filters: suit + pathway + difficulty + search
 (function() {
-  const suitBar = document.querySelector(".suit-filter-bar");
-  const pathwayBar = document.querySelector(".pathway-filter-bar");
-  const difficultyBar = document.querySelector(".difficulty-filter-bar");
   const searchInput = document.querySelector(".global-search");
-  if (!suitBar && !pathwayBar && !difficultyBar && !searchInput) return;
+  if (!searchInput) return;
 
   const catalog = window.CCFestCatalog;
   const facetLookup = catalog?.facets ? {
@@ -448,8 +445,8 @@
 
   const filterStatus = document.createElement("div");
   filterStatus.className = "catalog-filter-status";
-  const lastFilterBar = difficultyBar || pathwayBar || suitBar || searchInput?.closest(".global-search-wrap");
-  lastFilterBar?.insertAdjacentElement("afterend", filterStatus);
+  const searchWrap = searchInput.closest(".global-search-wrap");
+  searchWrap?.insertAdjacentElement("afterend", filterStatus);
 
   let lensBar = null;
   let lensPanel = null;
@@ -512,22 +509,6 @@
 
   function matchesLearningFilters(card) {
     return matchesSuit(card) && matchesPathway(card) && matchesDifficulty(card);
-  }
-
-  function setActiveButtons(bar, selector, attr, value) {
-    bar?.querySelectorAll(selector).forEach(btn => {
-      btn.classList.toggle("active", btn.dataset[attr] === value);
-    });
-  }
-
-  function updateFilterButtons() {
-    setActiveButtons(suitBar, ".suit-btn", "filter", filterState.suit);
-    setActiveButtons(pathwayBar, ".pathway-btn", "pathwayFilter", filterState.pathway);
-    setActiveButtons(difficultyBar, ".difficulty-btn", "difficultyFilter", filterState.difficulty);
-  }
-
-  function buttonLabel(selector, attr, value) {
-    return document.querySelector(`${selector}[data-${attr}="${value}"]`)?.textContent?.trim() || value;
   }
 
   function visibleCatalogCount() {
@@ -655,13 +636,13 @@
     if (!filterStatus) return;
     const tokens = [];
     if (filterState.suit !== "all") {
-      tokens.push({ key: "suit", label: buttonLabel(".suit-btn", "filter", filterState.suit) });
+      tokens.push({ key: "suit", label: facetLookup?.suit?.get(filterState.suit)?.label || filterState.suit });
     }
     if (filterState.pathway !== "all") {
-      tokens.push({ key: "pathway", label: buttonLabel(".pathway-btn", "pathway-filter", filterState.pathway) });
+      tokens.push({ key: "pathway", label: facetLookup?.pathway?.get(filterState.pathway)?.label || filterState.pathway });
     }
     if (filterState.difficulty !== "all") {
-      tokens.push({ key: "difficulty", label: buttonLabel(".difficulty-btn", "difficulty-filter", filterState.difficulty) });
+      tokens.push({ key: "difficulty", label: facetLookup?.level?.get(filterState.difficulty)?.label || filterState.difficulty });
     }
     if (filterState.search) {
       tokens.push({ key: "search", label: `Search: ${filterState.search}` });
@@ -693,8 +674,6 @@
     const shouldOpen = hasLearningFilter || hasSearch;
 
     document.body.classList.toggle("search-active", hasSearch);
-    updateFilterButtons();
-
     document.querySelectorAll(".tool-card").forEach(card => {
       const insideLearningLibrary = card.closest("#interactive-tools, #starter-sketches");
       const visible = matchesSearch(card) && (!insideLearningLibrary || matchesLearningFilters(card));
@@ -736,31 +715,6 @@
     renderLensPanel();
   }
 
-  suitBar?.addEventListener("click", (event) => {
-    const btn = event.target.closest(".suit-btn");
-    if (!btn) return;
-    filterState.suit = btn.dataset.filter;
-    if (filterState.suit === "all") {
-      filterState.pathway = "all";
-      filterState.difficulty = "all";
-    }
-    applyFilters();
-  });
-
-  pathwayBar?.addEventListener("click", (event) => {
-    const btn = event.target.closest(".pathway-btn");
-    if (!btn) return;
-    filterState.pathway = btn.dataset.pathwayFilter;
-    applyFilters();
-  });
-
-  difficultyBar?.addEventListener("click", (event) => {
-    const btn = event.target.closest(".difficulty-btn");
-    if (!btn) return;
-    filterState.difficulty = btn.dataset.difficultyFilter;
-    applyFilters();
-  });
-
   document.addEventListener("click", (event) => {
     const btn = event.target.closest(".shelf-filter-link");
     if (!btn) return;
@@ -800,72 +754,12 @@
   applyFilters();
 })();
 
-// ─── Curated path data (edit here to update Start here + Best first) ──────────
-const CURATED = {
-  bridges: [
-    { slug: "color-numbers-become-feeling",       title: "Color: Numbers Become Feeling",
-      tool:   { slug: "rgb-hsb-color-lab",         title: "RGB / HSB Color Lab" },
-      sketch: { slug: "hsb-color-seed",            title: "HSB Color Seed" },
-      teaser: "Start with color — instant feedback." },
-    { slug: "how-p5-thinks-about-time",           title: "How p5.js Thinks About Time",
-      tool:   { slug: "animation-explorer",        title: "Animation Explorer" },
-      sketch: { slug: "framecount-animation-seed", title: "frameCount Animation Seed" },
-      teaser: "See how setup(), draw(), and frameCount create motion." },
-    { slug: "map-range-translator",               title: "map() Range Translator",
-      tool:   { slug: "map-explorer",             title: "Map Explorer" },
-      sketch: { slug: "color-from-position",      title: "Color From Position" },
-      teaser: "Translate mouse, distance, and data into size, color, and motion." },
-    { slug: "noise-smooth-randomness",            title: "Noise: Smooth Randomness",
-      tool:   { slug: "noise-lab",               title: "Noise Lab" },
-      sketch: { slug: "noise-walker",            title: "Noise Walker" },
-      teaser: "See why noise() flows while random() jumps." },
-    { slug: "arrays-one-thing-to-many-things",    title: "Arrays: One Thing to Many Things",
-      tool:   { slug: "simple-array-explorer",   title: "Simple Array Explorer" },
-      sketch: { slug: "click-to-create-shapes",  title: "Click to Create Shapes" },
-      teaser: "Move from one shape to a collection." },
-    { slug: "state-machines-sketches-have-modes", title: "State Machines: Sketches Have Modes",
-      tool:   { slug: "game-state-studio",       title: "Game State Studio" },
-      sketch: { slug: "game-state-starter",      title: "Game State Starter" },
-      teaser: "Learn how sketches switch between screens and rules." }
-  ],
-  bestFirst: [
-    { slug: "coordinate-system-explorer",  title: "Coordinate System Explorer", type: "Tool" },
-    { slug: "shape-and-color-explorer",    title: "Shape + Color Explorer",      type: "Tool" },
-    { slug: "animation-explorer",          title: "Animation Explorer",          type: "Tool" },
-    { slug: "framecount-animation-seed",   title: "frameCount Animation Seed",   type: "Sketch" }
-  ]
-};
-
 (() => {
-  const pathEl    = document.querySelector(".beginner-path");
-  const linksEl   = document.querySelector(".best-first-links");
-  const copyP     = document.querySelector(".best-first-copy p");
   const shelvesEl = document.querySelector(".catalog-shelves");
   const catalog = window.CCFestCatalog;
-  if (!pathEl && !linksEl && !shelvesEl) return;
+  if (!shelvesEl) return;
 
-  if (pathEl) {
-    pathEl.innerHTML = CURATED.bridges.map((b, i) => `
-      <li>
-        <span class="path-number">${i + 1}</span>
-        <div>
-          <h3><a href="concept-bridges/${b.slug}/">${b.title}</a></h3>
-          <p>${b.teaser} Then try <a href="tools/${b.tool.slug}/">${b.tool.title}</a> and remix <a href="tools/${b.sketch.slug}/">${b.sketch.title}</a>.</p>
-        </div>
-      </li>`).join("");
-  }
-
-  if (linksEl) {
-    linksEl.innerHTML = CURATED.bestFirst.map(t =>
-      `<a href="tools/${t.slug}/"><span>${t.type}</span><strong>${t.title}</strong></a>`
-    ).join("");
-  }
-
-  if (copyP) {
-    copyP.textContent = `${CURATED.bestFirst.length} friendly places to click when you just want to begin.`;
-  }
-
-  if (shelvesEl && catalog?.items?.length) {
+  if (catalog?.items?.length) {
     const pathwayOrder = ["first-time", "animation", "data", "games", "stuck", "final"];
     const pathwayNotes = {
       "first-time": "Gentle first clicks for people new to p5.js.",
