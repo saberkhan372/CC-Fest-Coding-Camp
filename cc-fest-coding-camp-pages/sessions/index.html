@@ -146,7 +146,8 @@
   }
   </script>
   <script>
-  // Session spine side rail — scroll-tracked: highlights whichever session card is in view.
+  // Session spine side rail — IntersectionObserver: highlights whichever session
+  // card is most visible in the viewport. Works correctly with a grid layout.
   (function () {
     var spineEl = document.getElementById('sessions-spine');
     if (!spineEl) return;
@@ -154,34 +155,37 @@
     function initRail() {
       if (!window.CCS) return;
       var cards = Array.from(document.querySelectorAll('.session-card'));
+
+      // No cards yet (fonts not ready) — render with no current session.
       if (!cards.length) { window.CCS.renderSideRail(spineEl, null); return; }
 
-      function currentIdx() {
-        var mid = window.innerHeight / 2;
-        var best = -1, bestDist = Infinity;
-        cards.forEach(function (card, i) {
-          var rect = card.getBoundingClientRect();
-          var dist = Math.abs((rect.top + rect.bottom) / 2 - mid);
-          if (dist < bestDist) { bestDist = dist; best = i; }
+      var ratios = new Array(cards.length).fill(0);
+      var current = -1;
+
+      function update() {
+        var best = -1, bestRatio = 0;
+        ratios.forEach(function (r, i) {
+          if (r > bestRatio) { bestRatio = r; best = i; }
         });
-        return best;
+        // Only re-render when the highlighted stop changes.
+        if (best !== current) {
+          current = best;
+          window.CCS.renderSideRail(spineEl, current >= 0 ? current : null);
+        }
       }
 
-      window.CCS.renderSideRail(spineEl, currentIdx());
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          var idx = cards.indexOf(entry.target);
+          if (idx >= 0) ratios[idx] = entry.intersectionRatio;
+        });
+        update();
+      }, { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] });
 
-      var ticking = false;
-      window.addEventListener('scroll', function () {
-        if (!ticking) {
-          requestAnimationFrame(function () {
-            window.CCS.renderSideRail(spineEl, currentIdx());
-            ticking = false;
-          });
-          ticking = true;
-        }
-      }, { passive: true });
+      cards.forEach(function (card) { observer.observe(card); });
     }
 
-    // CCS may not be ready yet if spine.js is still booting
+    // CCS may not be ready yet if spine.js is still booting.
     var pollCount = 0;
     var poll = setInterval(function () {
       if (window.CCS || ++pollCount > 40) {

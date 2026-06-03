@@ -64,6 +64,7 @@
 #sessions-spine {
   position: sticky;
   top: 24px;
+  padding-left: 8px;
 }
 
 .sessions-grid {
