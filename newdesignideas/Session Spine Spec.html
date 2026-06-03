@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CC Fest — Session Spine (drop-in reference)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     CC FEST · SESSION SPINE — DROP-IN REFERENCE  (Direction 3, wayfinding)
+     ────────────────────────────────────────────────────────────────────────
+     The 5-session arc as a persistent wayfinding device, in two contexts:
+
+       • /sessions/ index  → the SIDE RAIL (metro spine). Current session
+                              expands to show its focus, anchor bridge, tools.
+       • each tool page     → the COMPACT STRIP (you-are-here) + a station
+                              rail of the other tools in the same session,
+                              with prev/next.
+
+     One shared config (CCS_SESSIONS) feeds both renderers. Vanilla, no build.
+     Works across separate static pages — each page just calls one function.
+     See "Session Spine Spec.md" for the guide.
+
+     COPY BLOCKS, fenced ░░ COPY ░░:
+       1. <style id="ccs-css">       — spine styling
+       2. <script id="ccs-config">   — the arc data (edit this to your tools)
+       3. <script id="ccs-js">       — the two renderers
+     ════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ░░ COPY BLOCK 1: CSS ░░ -->
+<style id="ccs-css">
+  :root{
+    --ccs-paper:#f7f5f0; --ccs-paper-alt:#efece4; --ccs-ink:#1b1a17;
+    --ccs-muted:#6e6b64; --ccs-rule:rgba(27,26,23,.14); --ccs-accent:#bc7a2c;
+  }
+  .ccs,.ccs *{box-sizing:border-box}
+  .ccs{font-family:"Inter Tight",system-ui,sans-serif;color:var(--ccs-ink)}
+  .ccs-mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+  .ccs-node{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-weight:600;font-size:13px;flex-shrink:0;border:1.5px solid var(--ccs-rule);
+    background:var(--ccs-paper);color:var(--ccs-muted)}
+  .ccs-node.past{background:var(--ccs-ink);color:var(--ccs-paper);border-color:var(--ccs-ink)}
+  .ccs-node.current{background:var(--ccs-accent);color:var(--ccs-paper);border-color:var(--ccs-accent);
+    box-shadow:0 0 0 3px var(--ccs-paper),0 0 0 4.5px var(--ccs-accent)}
+
+  /* ── SIDE RAIL (sessions index) ── */
+  .ccs-rail{max-width:300px}
+  .ccs-rail .kicker{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ccs-accent);margin-bottom:16px}
+  .ccs-stop{display:grid;grid-template-columns:34px 1fr;column-gap:14px;text-decoration:none;color:inherit;cursor:pointer}
+  .ccs-gutter{position:relative;display:flex;justify-content:center}
+  .ccs-gutter .line{position:absolute;width:1.5px;background:var(--ccs-rule)}
+  .ccs-gutter .line.top{top:0;height:14px}
+  .ccs-gutter .line.bot{top:14px;bottom:0}
+  .ccs-gutter .line.done{background:var(--ccs-accent)}
+  .ccs-stop .node-wrap{position:relative;z-index:1;padding-top:1px}
+  .ccs-body{padding-bottom:20px}
+  .ccs-num{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--ccs-muted)}
+  .ccs-num.cur{color:var(--ccs-accent)}
+  .ccs-yah{font-family:"JetBrains Mono",monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ccs-paper);background:var(--ccs-accent);padding:2px 6px;margin-left:8px}
+  .ccs-title{font-weight:500;font-size:16px;letter-spacing:-.015em;margin-top:3px}
+  .ccs-title.cur{font-weight:600}
+  .ccs-stop.future .ccs-title{color:var(--ccs-muted)}
+  .ccs-expand{margin-top:12px;display:flex;flex-direction:column;gap:9px}
+  .ccs-focus{font-size:12.5px;color:var(--ccs-muted);line-height:1.45}
+  .ccs-bridge{display:flex;align-items:center;gap:8px;font-family:"JetBrains Mono",monospace;font-size:11px}
+  .ccs-bridge .sym{color:var(--ccs-accent)}
+  .ccs-bridge a{color:var(--ccs-ink);text-decoration:none}
+  .ccs-bridge a:hover{text-decoration:underline}
+  .ccs-tools{display:flex;flex-direction:column;gap:5px;margin-top:2px}
+  .ccs-tool{display:flex;align-items:center;gap:9px;font-size:12.5px;text-decoration:none;color:inherit}
+  .ccs-tool:hover{color:var(--ccs-accent)}
+  .ccs-tool .dot{width:5px;height:5px;border-radius:50%;background:var(--ccs-rule);flex-shrink:0}
+  .ccs-tool .sym{color:var(--ccs-accent);font-size:11px}
+
+  /* ── COMPACT STRIP (tool page) ── */
+  .ccs-strip{display:flex;align-items:center;gap:16px;border:1px solid var(--ccs-ink);padding:10px 14px;flex-wrap:wrap}
+  .ccs-strip .kicker{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ccs-muted)}
+  .ccs-dots{display:flex;align-items:center}
+  .ccs-dots .seg{width:18px;height:1.5px;background:var(--ccs-rule)}
+  .ccs-dots .seg.done{background:var(--ccs-accent)}
+  .ccs-dots a{width:13px;height:13px;border-radius:50%;flex-shrink:0;display:block;
+    box-shadow:inset 0 0 0 1.5px var(--ccs-rule);background:var(--ccs-paper);text-decoration:none}
+  .ccs-dots a.past{background:var(--ccs-ink);box-shadow:none}
+  .ccs-dots a.current{background:var(--ccs-accent);box-shadow:0 0 0 3px var(--ccs-paper),0 0 0 4px var(--ccs-accent)}
+  .ccs-strip .label{display:flex;align-items:baseline;gap:8px;min-width:0}
+  .ccs-strip .label .n{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ccs-accent)}
+  .ccs-strip .label .t{font-weight:600;font-size:14.5px;letter-spacing:-.01em;white-space:nowrap}
+  .ccs-strip .nav{margin-left:auto;display:flex;gap:6px}
+  .ccs-strip .nav a{border:1px solid var(--ccs-rule);width:28px;height:28px;display:flex;align-items:center;
+    justify-content:center;text-decoration:none;color:var(--ccs-ink);font-size:13px;opacity:.85}
+  .ccs-strip .nav a:hover{opacity:1;border-color:var(--ccs-ink)}
+  .ccs-strip .nav a[aria-disabled="true"]{opacity:.35;pointer-events:none}
+
+  /* ── STATION RAIL (tool page sidebar) ── */
+  .ccs-stations{border:1px solid var(--ccs-ink);padding:14px 14px 16px;max-width:260px}
+  .ccs-stations .kicker{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ccs-muted);margin-bottom:12px}
+  .ccs-station{display:grid;grid-template-columns:20px 1fr;gap:8px;align-items:center;padding:7px 0;
+    text-decoration:none;color:var(--ccs-muted);border-top:1px solid var(--ccs-rule)}
+  .ccs-station:first-of-type{border-top:none}
+  .ccs-station:hover{color:var(--ccs-ink)}
+  .ccs-station.cur{color:var(--ccs-ink)}
+  .ccs-station .mk{justify-self:center;width:9px;height:9px;border-radius:50%;background:var(--ccs-paper);
+    box-shadow:inset 0 0 0 1.5px var(--ccs-rule)}
+  .ccs-station.cur .mk{background:var(--ccs-accent);box-shadow:0 0 0 3px var(--ccs-paper),0 0 0 4px var(--ccs-accent)}
+  .ccs-station .nm{font-size:13px;line-height:1.25;letter-spacing:-.01em}
+  .ccs-station.cur .nm{font-weight:600}
+</style>
+<!-- ░░ END BLOCK 1 ░░ -->
+
+<style>
+  body{margin:0;background:#f7f5f0;font-family:"Inter Tight",system-ui,sans-serif;color:#1b1a17}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 28px 100px}
+  .ctx{margin-top:46px;padding-top:26px;border-top:1px solid #1b1a17}
+  .ctx .tag{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#bc7a2c}
+  .ctx h2{margin:8px 0 4px;font-weight:600;font-size:22px;letter-spacing:-.02em}
+  .ctx .note{color:#6e6b64;font-size:14px;max-width:60ch;line-height:1.5;margin:0 0 24px}
+  .demo-tool{display:grid;grid-template-columns:1fr 260px;gap:24px;align-items:start;margin-top:16px}
+  .sketch-ph{border:1px solid rgba(27,26,23,.14);background:#efece4;height:170px;display:flex;align-items:center;justify-content:center;
+    background-image:repeating-linear-gradient(135deg,rgba(27,26,23,.14) 0 1px,transparent 1px 11px)}
+  .sketch-ph span{font-family:"JetBrains Mono",monospace;font-size:11px;color:#6e6b64;background:#f7f5f0;padding:4px 10px;border:1px solid rgba(27,26,23,.14)}
+</style>
+</head>
+
+<body class="ccs">
+<div class="wrap">
+  <header style="padding-bottom:22px;border-bottom:1px solid rgba(27,26,23,.14)">
+    <div class="ccs-mono" style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6e6b64;margin-bottom:12px">Drop-in reference · Direction 3 · wayfinding</div>
+    <h1 style="margin:0;font-weight:500;font-size:clamp(30px,4vw,46px);letter-spacing:-.04em;line-height:1.02">The arc, <span style="color:#bc7a2c">on every page.</span></h1>
+    <p style="margin:16px 0 0;max-width:62ch;color:#6e6b64;font-size:15.5px;line-height:1.55">One shared config drives two renderers. Below are the two contexts as they'd appear on the real site — the sessions index (side rail) and a tool page (compact strip + station rail). Click around; links point at the live tool URLs.</p>
+  </header>
+
+  <!-- CONTEXT A: sessions index -->
+  <section class="ctx" style="border-top:none;padding-top:30px">
+    <div class="tag">Context A · /sessions/ index</div>
+    <h2>Side rail — the spine you trace</h2>
+    <p class="note">Persistent down the page. The current session expands to its focus line, anchor bridge, and tools. Past sessions fill in; future ones stay outline. Mount: <code>ccs.renderSideRail(el, currentIndex)</code>.</p>
+    <div id="mount-rail"></div>
+  </section>
+
+  <!-- CONTEXT B: a tool page -->
+  <section class="ctx">
+    <div class="tag">Context B · a tool page (e.g. /tools/map-explorer/)</div>
+    <h2>Compact strip + station rail</h2>
+    <p class="note">The arc shrinks to a you-are-here strip with prev/next across sessions; a finer rail lists the sibling tools in this session. Mount from a single <code>data-session</code> + <code>data-tool</code> on the page.</p>
+
+    <div id="mount-strip" style="margin-bottom:18px"></div>
+    <div class="demo-tool">
+      <div>
+        <div class="ccs-mono" style="font-size:11px;color:#6e6b64;margin-bottom:10px">Camp / 02 Things That Move &amp; Listen / map() Explorer</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:20px;color:#bc7a2c">◎</span>
+          <h2 style="margin:0;font-weight:500;font-size:30px;letter-spacing:-.03em">map() Explorer</h2>
+        </div>
+        <div class="sketch-ph"><span>live p5.js sketch</span></div>
+      </div>
+      <div id="mount-stations"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ░░ COPY BLOCK 2: the arc config ░░ -->
+<script id="ccs-config">
+  // The arc. One entry per session, in order. Edit titles / tools to match your
+  // site. Each tool: [label, href]. `bridge` is the anchor concept bridge.
+  // `glyph` is the session's dominant category mark.
+  const CCS_BASE = "https://saberkhan372.github.io/CC-Fest-Coding-Camp";
+  const CCS_SESSIONS = [
+    { id:'01', glyph:'✦', title:'Your Canvas, Your Voice',
+      focus:'Make your first marks and find your canvas voice.',
+      bridge:{ label:'Color as Feeling', href:CCS_BASE+'/concept-bridges/color-numbers-become-feeling/' },
+      tools:[
+        ['Coordinate System Explorer', CCS_BASE+'/tools/coordinate-system-explorer/'],
+        ['Shape + Color Explorer',     CCS_BASE+'/tools/shape-and-color-explorer/'],
+        ['Text Basics Studio',         CCS_BASE+'/tools/text-basics-studio/'],
+        ['RGB / HSB Color Lab',        CCS_BASE+'/tools/rgb-hsb-color-lab/'],
+      ] },
+    { id:'02', glyph:'◎', title:'Things That Move & Listen',
+      focus:'Build things that move, react, and respond.',
+      bridge:{ label:'Distance Becomes Behavior', href:CCS_BASE+'/concept-bridges/distance-becomes-behavior/' },
+      tools:[
+        ['Animation Explorer',     CCS_BASE+'/tools/animation-explorer/'],
+        ['frameRate() Visualizer', CCS_BASE+'/tools/framerate-visualizer/'],
+        ['map() Explorer',         CCS_BASE+'/tools/map-explorer/'],
+        ['lerp() Explorer',        CCS_BASE+'/tools/lerp-explorer/'],
+        ['If / Else Decision Studio', CCS_BASE+'/tools/if-else-decision-studio/'],
+      ] },
+    { id:'03', glyph:'⬡', title:'Patterns & Systems',
+      focus:'Let the code repeat, branch, and think for itself.',
+      bridge:{ label:'Noise vs Random', href:CCS_BASE+'/concept-bridges/noise-smooth-randomness/' },
+      tools:[
+        ['For Loop Stepper',        CCS_BASE+'/tools/for-loop-stepper/'],
+        ['Rows + Columns',          CCS_BASE+'/tools/rows-and-columns/'],
+        ['Function Builder',        CCS_BASE+'/tools/function-builder/'],
+        ['Noise vs Random Explorer',CCS_BASE+'/tools/noise-vs-random-explorer/'],
+      ] },
+    { id:'04', glyph:'▦', title:'Data as Material',
+      focus:'Turn numbers into pictures that mean something personal.',
+      bridge:{ label:'Data In, Drawing Out', href:CCS_BASE+'/concept-bridges/data-in-drawing-out/' },
+      tools:[
+        ['Data Story Planner',         CCS_BASE+'/tools/data-story-planner/'],
+        ['Data Mapper',                CCS_BASE+'/tools/data-mapper/'],
+        ['CSV / loadTable Explorer',   CCS_BASE+'/tools/csv-loadtable-data-explorer/'],
+      ] },
+    { id:'05', glyph:'☽', title:'Open Studio',
+      focus:'Remix, share, reflect, teach.',
+      bridge:{ label:'State Machines', href:CCS_BASE+'/concept-bridges/state-machines-sketches-have-modes/' },
+      tools:[
+        ['Image Remix Studio',     CCS_BASE+'/tools/image-remix-studio/'],
+        ['Sound + Shape Visualizer',CCS_BASE+'/tools/sound-shape-visualizer/'],
+        ['Postcard Studio',        CCS_BASE+'/tools/postcard-studio/'],
+        ['Game State Starter',     CCS_BASE+'/tools/game-state-starter/'],
+        ['Particle System Seed',   CCS_BASE+'/tools/particle-system-seed/'],
+      ] },
+  ];
+</script>
+<!-- ░░ END BLOCK 2 ░░ -->
+
+<!-- ░░ COPY BLOCK 3: the two renderers ░░ -->
+<script id="ccs-js">
+const ccs = (function(){
+  const S = CCS_SESSIONS, N = S.length;
+  const stateOf = (i, cur) => i < cur ? 'past' : i === cur ? 'current' : 'future';
+
+  // ── Side rail (sessions index). currentIndex optional (-1 = none current). ──
+  function renderSideRail(mount, currentIndex){
+    const cur = currentIndex == null ? -1 : currentIndex;
+    const el = typeof mount === 'string' ? document.querySelector(mount) : mount;
+    const rail = document.createElement('div'); rail.className = 'ccs-rail';
+    rail.innerHTML = `<div class="kicker">The arc</div>`;
+    S.forEach((s, i) => {
+      const st = stateOf(i, cur), isCur = st === 'current';
+      const stop = document.createElement('a');
+      stop.className = 'ccs-stop ' + st;
+      stop.href = `#session-${s.id}`;
+      stop.innerHTML =
+        `<div class="ccs-gutter">`+
+          `${i>0 ? `<span class="line top ${cur>=0&&i<=cur?'done':''}"></span>`:''}`+
+          `${i<N-1 ? `<span class="line bot ${cur>=0&&i<cur?'done':''}"></span>`:''}`+
+          `<span class="node-wrap"><span class="ccs-node ${st}">${s.glyph}</span></span>`+
+        `</div>`+
+        `<div class="ccs-body">`+
+          `<div><span class="ccs-num ${isCur?'cur':''}">${s.id}</span>${isCur?`<span class="ccs-yah">You are here</span>`:''}</div>`+
+          `<div class="ccs-title ${isCur?'cur':''}">${s.title}</div>`+
+          (isCur ? expand(s) : '')+
+        `</div>`;
+      rail.appendChild(stop);
+    });
+    el.innerHTML = ''; el.appendChild(rail);
+  }
+  function expand(s){
+    const tools = s.tools.map(([label,href])=>
+      `<a class="ccs-tool" href="${href}"><span class="dot"></span><span class="sym">${s.glyph}</span>${label}</a>`).join('');
+    return `<div class="ccs-expand">`+
+      `<div class="ccs-focus">${s.focus}</div>`+
+      `<div class="ccs-bridge"><span class="sym">⬡</span><a href="${s.bridge.href}">${s.bridge.label}</a></div>`+
+      `<div class="ccs-tools">${tools}</div>`+
+    `</div>`;
+  }
+
+  // ── Compact strip (tool page). currentIndex = which session this tool is in. ──
+  function renderCompactStrip(mount, currentIndex){
+    const cur = currentIndex, s = S[cur];
+    const el = typeof mount === 'string' ? document.querySelector(mount) : mount;
+    const dots = S.map((ss,i)=>{
+      const st = stateOf(i,cur);
+      const seg = i>0 ? `<span class="seg ${i<=cur?'done':''}"></span>` : '';
+      return seg + `<a class="${st}" href="#session-${ss.id}" title="${ss.title}"></a>`;
+    }).join('');
+    const prev = cur>0   ? `href="#session-${S[cur-1].id}"` : 'aria-disabled="true"';
+    const next = cur<N-1 ? `href="#session-${S[cur+1].id}"` : 'aria-disabled="true"';
+    const strip = document.createElement('div'); strip.className = 'ccs-strip';
+    strip.innerHTML =
+      `<span class="kicker">The arc</span>`+
+      `<span class="ccs-dots">${dots}</span>`+
+      `<span class="label"><span class="n">${s.id}</span><span class="t">${s.title}</span></span>`+
+      `<span class="nav"><a ${prev}>‹</a><a ${next}>›</a></span>`;
+    el.innerHTML=''; el.appendChild(strip);
+  }
+
+  // ── Station rail (tool page sidebar). activeToolHref highlights the current one. ──
+  function renderStationRail(mount, currentIndex, activeToolHref){
+    const s = S[currentIndex];
+    const el = typeof mount === 'string' ? document.querySelector(mount) : mount;
+    const box = document.createElement('aside'); box.className='ccs-stations';
+    const items = s.tools.map(([label,href])=>{
+      const cur = activeToolHref && href.replace(/\/$/,'') === activeToolHref.replace(/\/$/,'');
+      return `<a class="ccs-station ${cur?'cur':''}" href="${href}"><span class="mk"></span><span class="nm">${label}</span></a>`;
+    }).join('');
+    box.innerHTML = `<div class="kicker">In this session · ${s.id}</div>${items}`;
+    el.innerHTML=''; el.appendChild(box);
+  }
+
+  // ── Convenience: auto-init a tool page from data-attrs on a single element ──
+  //   <div id="spine" data-session="02" data-tool=".../map-explorer/"></div>
+  function autoToolPage(stripEl, stationEl){
+    const host = typeof stripEl==='string'?document.querySelector(stripEl):stripEl;
+    const idx = parseInt(host.dataset.session,10) - 1;
+    const tool = host.dataset.tool || location.pathname;
+    renderCompactStrip(host, idx);
+    if(stationEl) renderStationRail(stationEl, idx, tool);
+  }
+
+  return { renderSideRail, renderCompactStrip, renderStationRail, autoToolPage, SESSIONS:S };
+})();
+</script>
+<!-- ░░ END BLOCK 3 ░░ -->
+
+<!-- demo init (this part is per-page; see README §2) -->
+<script>
+  // Context A — sessions index. Pretend we've scrolled to session 02.
+  ccs.renderSideRail('#mount-rail', 1);
+  // Context B — a tool page in session 02, current tool = map() Explorer.
+  ccs.renderCompactStrip('#mount-strip', 1);
+  ccs.renderStationRail('#mount-stations', 1, CCS_SESSIONS[1].tools[2][1]);
+</script>
+</body>
+</html>

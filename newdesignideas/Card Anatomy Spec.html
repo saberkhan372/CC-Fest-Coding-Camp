@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CC Fest — Card Anatomy (drop-in reference)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     CC FEST · CARD ANATOMY — DROP-IN REFERENCE  (Direction 2, "Medium" level)
+     ────────────────────────────────────────────────────────────────────────
+     Today the three content types differ only by a text label. This adds ONE
+     quiet, type-specific "anatomy" zone to each card so Bridge / Tool / Sketch
+     are distinguishable at a glance — without making the grid louder:
+
+       • Bridge → a crossing:  idea ⟶ fill() · HSB        (the bridge metaphor)
+       • Tool   → a control strip: a slider + dots         ("you can move this")
+       • Sketch → a code peek:  // change speed = 4         ("you can edit this")
+
+     Vanilla, no build. The enhancer reads the data-* attributes you already add
+     for the filter (data-type, data-fn, data-snippet) and injects the right
+     zone. Pure-CSS; no layout library. See "Card Anatomy Spec.md" for the guide.
+
+     THREE COPY BLOCKS, fenced ░░ COPY ░░ below:
+       1. <style id="cca-css">     — the anatomy + card styling
+       2. <script id="cca-js">     — the enhancer (or hand-author the zone; §3 of README)
+     ════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ░░ COPY BLOCK 1: CSS ░░ -->
+<style id="cca-css">
+  :root{
+    --cca-paper:#f7f5f0; --cca-paper-alt:#efece4; --cca-ink:#1b1a17;
+    --cca-muted:#6e6b64; --cca-rule:rgba(27,26,23,.14); --cca-accent:#bc7a2c;
+  }
+  .cca-card{border:1px solid var(--cca-rule);background:var(--cca-paper);padding:18px;
+    display:flex;flex-direction:column;min-height:182px;font-family:"Inter Tight",system-ui,sans-serif;
+    color:var(--cca-ink);transition:border-color .14s,transform .14s,box-shadow .14s}
+  .cca-card:hover{border-color:var(--cca-ink);transform:translateY(-2px);box-shadow:0 8px 26px -14px rgba(0,0,0,.4)}
+  .cca-card *{box-sizing:border-box}
+  .cca-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+  .cca-id{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--cca-muted);letter-spacing:.06em}
+  .cca-sym{font-size:16px;color:var(--cca-accent)}
+  .cca-card h4{margin:0 0 7px;font-weight:600;font-size:16.5px;letter-spacing:-.015em;line-height:1.16;text-wrap:pretty}
+  .cca-card p{margin:0;font-size:13px;color:var(--cca-muted);line-height:1.5;flex:1;text-wrap:pretty}
+  .cca-foot{margin-top:13px;padding-top:11px;border-top:1px solid var(--cca-rule);display:flex;align-items:center;gap:8px}
+  .cca-kind{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    padding:2px 6px;border:1px solid var(--cca-rule);color:var(--cca-muted)}
+  .cca-meta{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--cca-muted)}
+  .cca-verb{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--cca-accent);
+    opacity:0;transition:opacity .14s}
+  .cca-card:hover .cca-verb{opacity:1}
+
+  /* ── THE ANATOMY ZONE — one per type ───────────────────────────────────── */
+  .cca-anat{margin:12px 0 2px}
+
+  /* Bridge: idea ⟶ concept */
+  .cca-bridge{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--cca-muted);
+    font-family:"JetBrains Mono",monospace}
+  .cca-bridge .idea{font-style:italic;font-family:"Inter Tight",sans-serif}
+  .cca-bridge .arrow{color:var(--cca-accent)}
+  .cca-bridge .fn{color:var(--cca-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* Tool: control strip */
+  .cca-tool{display:flex;align-items:center;gap:10px}
+  .cca-track{position:relative;height:3px;background:var(--cca-rule);border-radius:2px;flex:1}
+  .cca-track::before{content:"";position:absolute;left:0;top:0;bottom:0;width:46%;background:var(--cca-accent);border-radius:2px}
+  .cca-knob{position:absolute;left:calc(46% - 6px);top:-4.5px;width:12px;height:12px;border-radius:50%;
+    background:var(--cca-paper);border:1px solid var(--cca-ink);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .cca-dots{display:flex;gap:4px}
+  .cca-dots i{width:6px;height:6px;border-radius:50%;background:var(--cca-rule)}
+  .cca-dots i:first-child{background:var(--cca-accent)}
+
+  /* Sketch: code peek */
+  .cca-sketch{background:var(--cca-paper-alt);border:1px solid var(--cca-rule);padding:7px 10px;
+    font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--cca-ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cca-sketch .c{color:var(--cca-muted)}
+  .cca-sketch .v{color:var(--cca-accent);font-weight:600}
+</style>
+<!-- ░░ END BLOCK 1 ░░ -->
+
+<style>
+  body{margin:0;background:#f7f5f0;font-family:"Inter Tight",system-ui,sans-serif;color:#1b1a17}
+  .wrap{max-width:1120px;margin:0 auto;padding:40px 28px 100px}
+  .mono{font-family:"JetBrains Mono",monospace}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:14px;margin-top:24px}
+  .toggle{display:inline-flex;border:1px solid #1b1a17}
+  .toggle button{border:none;border-left:1px solid rgba(27,26,23,.14);padding:9px 16px;
+    font:500 13px "Inter Tight",sans-serif;background:transparent;color:#1b1a17;cursor:pointer}
+  .toggle button:first-child{border-left:none}
+  .toggle button[aria-pressed="true"]{background:#1b1a17;color:#f7f5f0}
+  /* "before" = label-only (Whisper): the anatomy zone is hidden */
+  body[data-mode="before"] .cca-anat{display:none}
+</style>
+</head>
+
+<body data-mode="after">
+<div class="wrap">
+  <header style="margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid rgba(27,26,23,.14)">
+    <div class="mono" style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6e6b64;margin-bottom:12px">Drop-in reference · Direction 2 · “Medium” distinction</div>
+    <h1 style="margin:0;font-weight:500;font-size:clamp(30px,4vw,46px);letter-spacing:-.04em;line-height:1.02">One quiet tell <span style="color:#bc7a2c">per content type.</span></h1>
+    <p style="margin:16px 0 22px;max-width:62ch;color:#6e6b64;font-size:15.5px;line-height:1.55">Same frame, same calm. Each card gains a single type-specific zone: a <strong>crossing</strong> for bridges, a <strong>control strip</strong> for tools, a <strong>code peek</strong> for sketches. Toggle to compare against today's label-only cards.</p>
+    <div class="toggle" role="group" aria-label="Compare">
+      <button data-mode="before" aria-pressed="false">Before · label only</button>
+      <button data-mode="after"  aria-pressed="true">After · Medium anatomy</button>
+    </div>
+  </header>
+
+  <!-- Demo cards. In your site these are your server-rendered cards; the enhancer
+       runs on whatever carries class="cca-card" + the data-* attributes. -->
+  <div class="grid" id="cca-demo"></div>
+</div>
+
+<!-- Demo seed only (your real cards replace this) -->
+<script id="cca-seed">
+  const CCA_SEED = [
+    // id, name, type, category, fn(bridge)/snippet(sketch), verb
+    ['B01','Color: Numbers Become Feeling','bridge','marks','fill() · HSB · lerpColor()'],
+    ['B06','Distance Becomes Behavior','bridge','motion','dist() · map()'],
+    ['B14','Data In, Drawing Out','bridge','data','loadTable() · loadJSON()'],
+    ['T01','Coordinate System Explorer','tool','marks',''],
+    ['T09','map() Explorer','tool','motion',''],
+    ['T20','Data Mapper','tool','data',''],
+    ['S01','Bouncing Ball Starter','sketch','motion','let speed = 4'],
+    ['S04','Generative Tile Pattern','sketch','systems','let cols = 8'],
+    ['S11','Data Self-Portrait Seed','sketch','data','let facts = [...]'],
+  ];
+  const CCA_SYM = {marks:'✦',motion:'◎',systems:'⬡',data:'▦',open:'☽',support:'⊕'};
+  const CCA_SUIT= {marks:'Marks',motion:'Motion',systems:'Systems',data:'Data',open:'Open',support:'Support'};
+  const CCA_BLURB = {
+    bridge:'A concept bridge — meet the idea before the syntax.',
+    tool:'A live station — change one control and watch it respond.',
+    sketch:'A starter sketch — a working seed, ready to remix.',
+  };
+  (function(){
+    const host=document.getElementById('cca-demo');
+    CCA_SEED.forEach(([id,name,type,cat,extra])=>{
+      const el=document.createElement('article');
+      el.className='cca-card';
+      el.dataset.type=type; el.dataset.category=cat; el.dataset.name=name;
+      if(type==='bridge') el.dataset.fn=extra;
+      if(type==='sketch') el.dataset.snippet=extra;
+      el.innerHTML=`
+        <div class="cca-top"><span class="cca-id">${id}</span><span class="cca-sym">${CCA_SYM[cat]}</span></div>
+        <h4>${name}</h4>
+        <p>${CCA_BLURB[type]}</p>
+        <div class="cca-foot">
+          <span class="cca-kind">${type}</span>
+          <span class="cca-meta">${CCA_SUIT[cat]}</span>
+        </div>`;
+      host.appendChild(el);
+    });
+  })();
+</script>
+
+<!-- ░░ COPY BLOCK 2: the enhancer ░░ -->
+<script id="cca-js">
+(function(){
+  // Verb printed on hover, per type. Edit to taste.
+  const VERB = { bridge:'Understand it ↗', tool:'Play first ↗', sketch:'Remix it ↗' };
+
+  // Build the type-specific anatomy zone for one card.
+  function anatomy(card){
+    const type = card.dataset.type;
+    const zone = document.createElement('div');
+    zone.className = 'cca-anat';
+
+    if(type === 'bridge'){
+      // idea ⟶ the p5 functions this bridge connects to.
+      // Prefers data-fn; falls back to data-tags; then a generic label.
+      const fn = card.dataset.fn || (card.dataset.tags||'').split(/\s+/).filter(Boolean).join(' · ') || 'a p5.js concept';
+      zone.className += ' cca-bridge';
+      zone.innerHTML = `<span class="idea">idea</span><span class="arrow">⟶</span><span class="fn">${fn}</span>`;
+
+    } else if(type === 'tool'){
+      // Decorative control strip — signals "this is manipulable". No data needed.
+      zone.className += ' cca-tool';
+      zone.innerHTML = `<span class="cca-track"><span class="cca-knob"></span></span>`+
+                       `<span class="cca-dots"><i></i><i></i></span>`;
+
+    } else if(type === 'sketch'){
+      // A one-line code peek with the editable value accented.
+      // Prefers data-snippet ("let speed = 4"); falls back to "// change <first tag>".
+      const raw = card.dataset.snippet;
+      zone.className += ' cca-sketch';
+      if(raw){
+        // accent the part after "=" (the value you'd change)
+        const m = raw.match(/^(.*?=\s*)(.+)$/);
+        zone.innerHTML = m ? `${escapeHtml(m[1])}<span class="v">${escapeHtml(m[2])}</span>`
+                           : `<span class="v">${escapeHtml(raw)}</span>`;
+      } else {
+        const tag = (card.dataset.tags||'this value').split(/\s+/)[0];
+        zone.innerHTML = `<span class="c">// change </span><span class="v">${escapeHtml(tag)}</span>`;
+      }
+    } else {
+      return null; // unknown type → no zone
+    }
+    return zone;
+  }
+
+  function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+  // Enhance every card: insert the zone before the footer, add the hover verb.
+  document.querySelectorAll('.cca-card').forEach(card=>{
+    if(card.querySelector('.cca-anat')) return;          // already enhanced
+    const zone = anatomy(card);
+    const foot = card.querySelector('.cca-foot');
+    if(zone && foot) card.insertBefore(zone, foot);
+    // hover verb in the footer
+    if(foot && !foot.querySelector('.cca-verb')){
+      const v=document.createElement('span'); v.className='cca-verb';
+      v.textContent = VERB[card.dataset.type] || '';
+      foot.appendChild(v);
+    }
+  });
+})();
+</script>
+<!-- ░░ END BLOCK 2 ░░ -->
+
+<!-- demo: wire the before/after toggle (NOT part of the drop-in) -->
+<script>
+  document.querySelectorAll('.toggle button').forEach(b=>b.addEventListener('click',()=>{
+    document.body.dataset.mode=b.dataset.mode;
+    document.querySelectorAll('.toggle button').forEach(x=>x.setAttribute('aria-pressed', x===b?'true':'false'));
+  }));
+</script>
+</body>
+</html>

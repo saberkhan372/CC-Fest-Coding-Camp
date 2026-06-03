@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CC Fest — Filter Module (drop-in reference)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     CC FEST · CATALOG FILTER — DROP-IN REFERENCE
+     ────────────────────────────────────────────────────────────────────────
+     Vanilla JS. No build step, no framework. Progressive enhancement: it
+     reads the cards you already render and adds (1) one refine bar, (2) an
+     "Organize by" lens that regroups results, (3) live counts, (4) removable
+     active-filter tokens, (5) a result total + empty state.
+
+     HOW TO ADOPT (see "Filter Spec.md" for the full guide):
+       1. Copy the <style id="ccf-css"> block.
+       2. Copy the .ccf-bar markup (the toolbar) into your tools section,
+          just above your existing grid.
+       3. Give your grid container  id="ccf-grid"  and give EACH card:
+            class="ccf-card"
+            data-type="tool|bridge|sketch"
+            data-category="marks|motion|systems|data|open|support"
+            data-pathway="first animation data games stuck final"  (space list, optional)
+            data-level="beginner|extension|capstone"
+            data-session="01|02|03|04|05|—"
+            data-name="Coordinate System Explorer"
+            data-tags="coordinates canvas shapes"
+          (Your generator already knows all of these — you print them as text
+           today. Stamp them as attributes instead/also.)
+       4. Copy the <script id="ccf-js"> block. It self-initialises on load.
+     The cards below are real CC Fest items, marked up exactly as step 3 asks.
+     ════════════════════════════════════════════════════════════════════════ -->
+
+<style id="ccf-css">
+  :root{
+    --ccf-paper:#f7f5f0; --ccf-paper-alt:#efece4; --ccf-ink:#1b1a17;
+    --ccf-muted:#6e6b64; --ccf-rule:rgba(27,26,23,.14); --ccf-accent:#bc7a2c;
+  }
+  .ccf-scope{font-family:"Inter Tight",system-ui,sans-serif;color:var(--ccf-ink)}
+  .ccf-scope *{box-sizing:border-box}
+  .ccf-mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+
+  /* ── Toolbar ── */
+  .ccf-bar{border:1px solid var(--ccf-ink);background:var(--ccf-paper-alt)}
+  .ccf-bar-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:12px 14px}
+  .ccf-bar-row + .ccf-bar-row{border-top:1px solid var(--ccf-rule)}
+  .ccf-label{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ccf-muted)}
+
+  .ccf-search{position:relative;flex:1;min-width:200px}
+  .ccf-search input{width:100%;padding:9px 12px 9px 30px;font:14px "Inter Tight",sans-serif;
+    color:var(--ccf-ink);background:var(--ccf-paper);border:1px solid var(--ccf-ink);outline:none}
+  .ccf-search input::placeholder{color:var(--ccf-muted)}
+  .ccf-search::before{content:"⌕";position:absolute;left:11px;top:50%;transform:translateY(-50%);
+    color:var(--ccf-muted);font-family:"JetBrains Mono",monospace;font-size:13px;pointer-events:none}
+
+  .ccf-seg{display:inline-flex;border:1px solid var(--ccf-ink)}
+  .ccf-seg button{border:none;border-left:1px solid var(--ccf-rule);padding:8px 13px;
+    font:500 12.5px "Inter Tight",sans-serif;background:transparent;color:var(--ccf-ink);cursor:pointer}
+  .ccf-seg button:first-child{border-left:none}
+  .ccf-seg button[aria-pressed="true"]{background:var(--ccf-ink);color:var(--ccf-paper)}
+
+  .ccf-chip{border:1px solid var(--ccf-rule);background:transparent;color:var(--ccf-ink);
+    padding:7px 12px;font:12px "Inter Tight",sans-serif;cursor:pointer;display:inline-flex;
+    align-items:center;gap:7px;white-space:nowrap}
+  .ccf-chip:hover{border-color:var(--ccf-ink)}
+  .ccf-chip[aria-pressed="true"]{background:var(--ccf-ink);color:var(--ccf-paper);border-color:var(--ccf-ink)}
+  .ccf-chip .ccf-n{font-family:"JetBrains Mono",monospace;font-size:10.5px;opacity:.7;font-variant-numeric:tabular-nums}
+  .ccf-chip:disabled{opacity:.4;cursor:not-allowed}
+
+  .ccf-select{font:13px "Inter Tight",sans-serif;padding:8px 10px;border:1px solid var(--ccf-ink);
+    background:var(--ccf-paper);color:var(--ccf-ink);cursor:pointer}
+
+  .ccf-count{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--ccf-muted)}
+  .ccf-count b{color:var(--ccf-ink);font-weight:600}
+
+  /* ── Active-filter tokens ── */
+  .ccf-tokens{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .ccf-tokens:empty{display:none}
+  .ccf-token{display:inline-flex;align-items:center;gap:7px;padding:4px 8px 4px 11px;
+    background:var(--ccf-ink);color:var(--ccf-paper);font:11.5px "Inter Tight",sans-serif;border:none;cursor:pointer}
+  .ccf-token .x{opacity:.7;font-size:13px;line-height:1}
+  .ccf-clear{background:none;border:none;color:var(--ccf-accent);font:11.5px "Inter Tight",sans-serif;
+    cursor:pointer;padding:4px}
+
+  /* ── Group headers (rendered when "Organize by" is active) ── */
+  .ccf-group-head{display:flex;align-items:baseline;gap:12px;margin:34px 0 16px;
+    border-bottom:1px solid var(--ccf-ink);padding-bottom:10px}
+  .ccf-group-head:first-child{margin-top:24px}
+  .ccf-group-head .sym{font-size:19px;color:var(--ccf-accent)}
+  .ccf-group-head h3{margin:0;font-weight:600;font-size:21px;letter-spacing:-.02em}
+  .ccf-group-head .sub{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ccf-muted)}
+  .ccf-group-head .gn{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:21px;
+    font-weight:600;color:var(--ccf-accent);letter-spacing:-.03em}
+
+  /* ── Grid + cards (demo styling; your real cards keep their own look) ── */
+  #ccf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:14px;margin-top:22px}
+  .ccf-group{display:contents}                     /* groups don't break the grid flow */
+  .ccf-card{border:1px solid var(--ccf-rule);background:var(--ccf-paper);padding:18px;
+    display:flex;flex-direction:column;min-height:176px;transition:border-color .14s,transform .14s}
+  .ccf-card:hover{border-color:var(--ccf-ink);transform:translateY(-2px)}
+  .ccf-card[hidden]{display:none}
+  .ccf-card .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+  .ccf-card .id{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--ccf-muted);letter-spacing:.06em}
+  .ccf-card .sym{font-size:16px;color:var(--ccf-accent)}
+  .ccf-card h4{margin:0 0 7px;font-weight:600;font-size:16.5px;letter-spacing:-.015em;line-height:1.16;text-wrap:pretty}
+  .ccf-card p{margin:0;font-size:13px;color:var(--ccf-muted);line-height:1.5;flex:1;text-wrap:pretty}
+  .ccf-card .foot{margin-top:13px;padding-top:11px;border-top:1px solid var(--ccf-rule);
+    display:flex;align-items:center;gap:8px}
+  .ccf-kind{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    padding:2px 6px;border:1px solid var(--ccf-rule);color:var(--ccf-muted)}
+  .ccf-meta{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ccf-muted)}
+
+  .ccf-empty{border:1px solid var(--ccf-rule);padding:52px 24px;text-align:center;color:var(--ccf-muted);grid-column:1/-1}
+  .ccf-empty[hidden]{display:none}
+  .ccf-empty b{display:block;color:var(--ccf-ink);font-size:15px;margin-bottom:6px}
+</style>
+</head>
+
+<body style="margin:0;background:#f7f5f0">
+<div class="ccf-scope" style="max-width:1180px;margin:0 auto;padding:40px 28px 100px">
+
+  <header style="margin-bottom:30px;padding-bottom:24px;border-bottom:1px solid var(--ccf-rule)">
+    <div class="ccf-mono" style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ccf-muted);margin-bottom:12px">Drop-in reference · vanilla JS</div>
+    <h1 style="margin:0;font-weight:500;font-size:clamp(30px,4vw,46px);letter-spacing:-.04em;line-height:1.02">One refine bar. <span style="color:var(--ccf-accent)">Counts, tokens, and a lens.</span></h1>
+    <p style="margin:16px 0 0;max-width:60ch;color:var(--ccf-muted);font-size:15.5px;line-height:1.55">Replaces the three stacked filter rows. Search + type + level live on one bar; <em>Organize by</em> regroups the surviving cards into labeled sections; every facet shows a live count and removable token. View source — it's all in the three labeled blocks (<code>#ccf-css</code>, <code>.ccf-bar</code>, <code>#ccf-js</code>).</p>
+  </header>
+
+  <!-- ░░ COPY FROM HERE: the refine bar ░░ -->
+  <div class="ccf-bar" role="search" aria-label="Filter the catalog">
+    <div class="ccf-bar-row">
+      <div class="ccf-search">
+        <input id="ccf-q" type="search" placeholder="Search names, tags, descriptions…" autocomplete="off">
+      </div>
+      <span class="ccf-label">Type</span>
+      <div class="ccf-seg" id="ccf-type" role="group" aria-label="Content type">
+        <button data-v="all" aria-pressed="true">All</button>
+        <button data-v="bridge" aria-pressed="false">Bridges</button>
+        <button data-v="tool" aria-pressed="false">Tools</button>
+        <button data-v="sketch" aria-pressed="false">Sketches</button>
+      </div>
+      <span class="ccf-count" id="ccf-count"><b>0</b> shown</span>
+    </div>
+
+    <div class="ccf-bar-row">
+      <span class="ccf-label">Organize by</span>
+      <select class="ccf-select" id="ccf-lens" aria-label="Organize results by">
+        <option value="none">No grouping</option>
+        <option value="category" selected>Category</option>
+        <option value="session">Session</option>
+        <option value="pathway">Goal / pathway</option>
+        <option value="level">Level</option>
+      </select>
+
+      <span class="ccf-label" style="margin-left:6px">Category</span>
+      <div id="ccf-cat" class="ccf-tokens" role="group" aria-label="Category"></div>
+    </div>
+
+    <div class="ccf-bar-row">
+      <span class="ccf-label">Level</span>
+      <div id="ccf-level" class="ccf-tokens" role="group" aria-label="Level"></div>
+      <span class="ccf-label" style="margin-left:6px">Goal</span>
+      <div id="ccf-path" class="ccf-tokens" role="group" aria-label="Pathway"></div>
+    </div>
+
+    <div class="ccf-bar-row" id="ccf-active-row" hidden>
+      <span class="ccf-label">Active</span>
+      <div id="ccf-active" class="ccf-tokens" aria-live="polite"></div>
+      <button class="ccf-clear" id="ccf-clear">Clear all ✕</button>
+    </div>
+  </div>
+  <!-- ░░ COPY TO HERE ░░ -->
+
+  <!-- Your existing grid. Give it id="ccf-grid"; each card gets the data-* attrs. -->
+  <div id="ccf-grid">
+    <div class="ccf-empty" id="ccf-empty" hidden><b>Nothing matches.</b>Loosen a filter or clear all.</div>
+    <!-- Cards injected by the demo seed below so this file stays short; in your
+         site these are your server-rendered cards with the same data-* attrs. -->
+  </div>
+</div>
+
+<!-- Demo data only — your real cards replace this. Kept separate so the
+     filter logic below is the only thing you copy. -->
+<script id="ccf-seed">
+  const CCF_SEED = [
+    ['B01','Color: Numbers Become Feeling','bridge','marks','01','beginner','first','fill() HSB lerpColor()'],
+    ['B05','map() Range Translator','bridge','motion','02','beginner','animation data','map() ranges translation'],
+    ['B06','Distance Becomes Behavior','bridge','motion','02','extension','games','dist() proximity behavior'],
+    ['B07','Noise: Smooth Randomness','bridge','systems','03','extension','animation','noise() random() motion'],
+    ['B12','Conditionals: Code Makes Choices','bridge','systems','03','beginner','stuck games','if/else booleans logic'],
+    ['B14','Data In, Drawing Out','bridge','data','04','extension','data','preload() loadTable() loadJSON()'],
+    ['T01','Coordinate System Explorer','tool','marks','01','beginner','first','coordinates canvas shapes'],
+    ['T03','Shape + Color Explorer','tool','marks','01','beginner','first','color shapes starter'],
+    ['T09','map() Explorer','tool','motion','02','beginner','animation data','map() ranges motion'],
+    ['T13','For Loop Stepper','tool','systems','03','beginner','first stuck','for loops i step'],
+    ['T16','Noise vs Random Explorer','tool','systems','03','extension','animation','noise random motion'],
+    ['T20','Data Mapper','tool','data','04','beginner','data','data mapping visualization'],
+    ['T23','Image Remix Studio','tool','open','05','extension','','images media remix'],
+    ['T27','Debugging Playground','tool','support','—','beginner','stuck','debugging errors confidence'],
+    ['S01','Bouncing Ball Starter','sketch','motion','02','beginner','animation first','motion variables if'],
+    ['S06','lerp() Follow Seed','sketch','motion','02','beginner','animation','lerp() easing motion'],
+    ['S04','Generative Tile Pattern','sketch','systems','03','extension','','loops modulo noise'],
+    ['S11','Data Self-Portrait Seed','sketch','data','04','beginner','data final','data arrays storytelling'],
+    ['S03','Particle System Seed','sketch','open','05','capstone','final','particles classes arrays'],
+    ['S12','State Machine Game Seed','sketch','open','05','capstone','games final','gameState switch restart'],
+  ];
+  const CCF_SYM = {marks:'✦',motion:'◎',systems:'⬡',data:'▦',open:'☽',support:'⊕'};
+  const CCF_SUITNAME = {marks:'Marks',motion:'Motion',systems:'Systems',data:'Data',open:'Open',support:'Support'};
+  const CCF_KIND = {bridge:'Bridge',tool:'Tool',sketch:'Sketch'};
+  (function seed(){
+    const grid = document.getElementById('ccf-grid');
+    const blurbs = {bridge:'A concept bridge — understand the idea before the syntax.',
+      tool:'A live workshop tool — play before you read.',
+      sketch:'A starter sketch — change one value and make it yours.'};
+    CCF_SEED.forEach(([id,name,type,cat,session,level,path,tags])=>{
+      const el = document.createElement('article');
+      el.className = 'ccf-card';
+      el.dataset.type = type; el.dataset.category = cat; el.dataset.pathway = path;
+      el.dataset.level = level; el.dataset.session = session;
+      el.dataset.name = name; el.dataset.tags = tags;
+      el.innerHTML = `
+        <div class="top"><span class="id">${id}</span><span class="sym">${CCF_SYM[cat]}</span></div>
+        <h4>${name}</h4>
+        <p>${blurbs[type]}</p>
+        <div class="foot">
+          <span class="ccf-kind">${CCF_KIND[type]}</span>
+          <span class="ccf-meta">${CCF_SUITNAME[cat]}${session!=='—'?' · S'+session:''} · ${level}</span>
+        </div>`;
+      grid.appendChild(el);
+    });
+  })();
+</script>
+
+<!-- ░░ COPY THIS WHOLE BLOCK — the filter controller ░░ -->
+<script id="ccf-js">
+(function(){
+  // ── Facet definitions. Edit labels here; ids must match your data-* values. ──
+  const CATEGORIES = [
+    {id:'marks',label:'✦ Marks'},{id:'motion',label:'◎ Motion'},{id:'systems',label:'⬡ Systems'},
+    {id:'data',label:'▦ Data'},{id:'open',label:'☽ Open'},{id:'support',label:'⊕ Support'},
+  ];
+  const LEVELS   = [{id:'beginner',label:'Beginner'},{id:'extension',label:'Extension'},{id:'capstone',label:'Capstone'}];
+  const PATHWAYS = [
+    {id:'first',label:'First time'},{id:'animation',label:'Animation'},{id:'data',label:'Data'},
+    {id:'games',label:'Games'},{id:'stuck',label:"I'm stuck"},{id:'final',label:'Final project'},
+  ];
+  const GROUP_META = {
+    category:{order:CATEGORIES.map(c=>c.id),label:id=>({marks:'Marks',motion:'Motion',systems:'Systems',data:'Data',open:'Open',support:'Support'}[id]),
+              sym:id=>({marks:'✦',motion:'◎',systems:'⬡',data:'▦',open:'☽',support:'⊕'}[id]),
+              sub:id=>({marks:'drawing & color',motion:'animation & interaction',systems:'loops & generative',data:'visualization & data',open:'images, sound, 3D',support:'debugging & confidence'}[id])},
+    session:{order:['01','02','03','04','05','—'],label:id=>id==='—'?'Cross-session support':'Session '+id,sym:()=>'',sub:()=>''},
+    level:{order:['beginner','extension','capstone'],label:id=>({beginner:'Beginner',extension:'Extension',capstone:'Capstone'}[id]),sym:()=>'',sub:()=>''},
+    pathway:{order:PATHWAYS.map(p=>p.id),label:id=>({first:'First time with p5',animation:'I want animation',data:'I want data',games:'I want games',stuck:"I'm stuck",final:'Final project'}[id]),sym:()=>'',sub:()=>'an intent, not a category'},
+  };
+
+  // ── State ──
+  const state = { q:'', type:'all', cats:new Set(), levels:new Set(), paths:new Set(), lens:'category' };
+
+  // ── Index the cards once (read data-* into fast objects) ──
+  const grid  = document.getElementById('ccf-grid');
+  const empty = document.getElementById('ccf-empty');
+  const cards = [...grid.querySelectorAll('.ccf-card')].map(el=>({
+    el, type:el.dataset.type, cat:el.dataset.category, level:el.dataset.level,
+    session:el.dataset.session||'—',
+    paths:(el.dataset.pathway||'').trim().split(/\s+/).filter(Boolean),
+    hay:((el.dataset.name||'')+' '+(el.dataset.tags||'')+' '+el.textContent).toLowerCase(),
+  }));
+
+  // ── Matching. AND across facets, OR within a multi-select facet. ──
+  // ignore = a facet key to skip (used for computing that facet's own counts).
+  function matches(c, ignore){
+    if(state.q && !c.hay.includes(state.q)) return false;
+    if(ignore!=='type'  && state.type!=='all' && c.type!==state.type) return false;
+    if(ignore!=='cats'  && state.cats.size  && !state.cats.has(c.cat))   return false;
+    if(ignore!=='levels'&& state.levels.size&& !state.levels.has(c.level))return false;
+    if(ignore!=='paths' && state.paths.size && !c.paths.some(p=>state.paths.has(p))) return false;
+    return true;
+  }
+  // Count cards that would match if `value` were added to facet `key`. Holds
+  // all OTHER facets fixed → the number you see is what you'll get.
+  function countFor(key, value){
+    return cards.reduce((n,c)=>{
+      if(!matches(c, key)) return n;
+      if(key==='paths')  return n + (c.paths.includes(value)?1:0);
+      const field = {cats:'cat',levels:'level'}[key];
+      return n + (c[field]===value?1:0);
+    },0);
+  }
+
+  // ── Build the count-bearing chip rows ──
+  function chipRow(host, key, defs){
+    host.innerHTML='';
+    defs.forEach(d=>{
+      const set = state[key];
+      const on  = set.has(d.id);
+      const n   = countFor(key, d.id);
+      const b = document.createElement('button');
+      b.className='ccf-chip'; b.type='button';
+      b.setAttribute('aria-pressed', on?'true':'false');
+      if(n===0 && !on) b.disabled=true;
+      b.innerHTML = `${d.label} <span class="ccf-n">${n}</span>`;
+      b.onclick = ()=>{ on?set.delete(d.id):set.add(d.id); render(); };
+      host.appendChild(b);
+    });
+  }
+
+  // ── Active-filter tokens ──
+  function renderTokens(){
+    const host=document.getElementById('ccf-active');
+    const row =document.getElementById('ccf-active-row');
+    const toks=[];
+    if(state.type!=='all') toks.push(['type',state.type,{bridge:'Bridges',tool:'Tools',sketch:'Sketches'}[state.type]]);
+    state.cats.forEach(v=>toks.push(['cats',v,CATEGORIES.find(c=>c.id===v).label]));
+    state.levels.forEach(v=>toks.push(['levels',v,LEVELS.find(l=>l.id===v).label]));
+    state.paths.forEach(v=>toks.push(['paths',v,PATHWAYS.find(p=>p.id===v).label]));
+    if(state.q) toks.push(['q',null,'“'+state.q+'”']);
+    host.innerHTML='';
+    toks.forEach(([key,val,label])=>{
+      const t=document.createElement('button'); t.className='ccf-token'; t.type='button';
+      t.innerHTML = label+' <span class="x">✕</span>';
+      t.onclick=()=>{ if(key==='q'){state.q='';document.getElementById('ccf-q').value='';}
+        else if(key==='type'){state.type='all';} else {state[key].delete(val);} render(); };
+      host.appendChild(t);
+    });
+    row.hidden = toks.length===0;
+  }
+
+  // ── Group + show/hide the cards ──
+  function applyGrouping(visible){
+    // remove any prior group headers
+    grid.querySelectorAll('.ccf-group-head').forEach(h=>h.remove());
+    if(state.lens==='none'){
+      // restore source order, just toggle visibility
+      cards.forEach(c=>c.el.hidden = !visible.has(c));
+      return;
+    }
+    const meta=GROUP_META[state.lens];
+    const keyOf = c => state.lens==='category'?c.cat : state.lens==='session'?c.session :
+                       state.lens==='level'?c.level : null; // pathway handled below
+    const frag=document.createDocumentFragment();
+    meta.order.forEach(gid=>{
+      let members;
+      if(state.lens==='pathway') members=[...visible].filter(c=>c.paths.includes(gid));
+      else members=[...visible].filter(c=>keyOf(c)===gid);
+      if(!members.length) return;
+      const h=document.createElement('div'); h.className='ccf-group-head';
+      const sym=meta.sym(gid);
+      h.innerHTML=`${sym?`<span class="sym">${sym}</span>`:''}<h3>${meta.label(gid)}</h3>`+
+        `${meta.sub(gid)?`<span class="sub">${meta.sub(gid)}</span>`:''}`+
+        `<span class="gn">${String(members.length).padStart(2,'0')}</span>`;
+      frag.appendChild(h);
+      members.forEach(c=>{ c.el.hidden=false; frag.appendChild(c.el); });
+    });
+    // hide non-visible
+    cards.forEach(c=>{ if(!visible.has(c)) c.el.hidden=true; });
+    grid.appendChild(frag); // re-append in grouped order (headers + members)
+  }
+
+  // ── Master render ──
+  function render(){
+    // type segmented
+    document.querySelectorAll('#ccf-type button').forEach(b=>
+      b.setAttribute('aria-pressed', b.dataset.v===state.type ? 'true':'false'));
+    // chip rows (rebuilt so counts refresh)
+    chipRow(document.getElementById('ccf-cat'),  'cats',  CATEGORIES);
+    chipRow(document.getElementById('ccf-level'),'levels',LEVELS);
+    chipRow(document.getElementById('ccf-path'), 'paths', PATHWAYS);
+    // results
+    const visible=new Set(cards.filter(c=>matches(c)));
+    applyGrouping(visible);
+    document.getElementById('ccf-count').innerHTML='<b>'+visible.size+'</b> of '+cards.length+' shown';
+    empty.hidden = visible.size>0;
+    if(visible.size===0) grid.appendChild(empty); // keep empty state last
+    renderTokens();
+  }
+
+  // ── Wire inputs ──
+  document.getElementById('ccf-q').addEventListener('input',e=>{state.q=e.target.value.trim().toLowerCase();render();});
+  document.querySelectorAll('#ccf-type button').forEach(b=>
+    b.addEventListener('click',()=>{state.type=b.dataset.v;render();}));
+  document.getElementById('ccf-lens').addEventListener('change',e=>{state.lens=e.target.value;render();});
+  document.getElementById('ccf-clear').addEventListener('click',()=>{
+    state.q='';state.type='all';state.cats.clear();state.levels.clear();state.paths.clear();
+    document.getElementById('ccf-q').value=''; render();
+  });
+
+  render(); // initial paint
+})();
+</script>
+<!-- ░░ END copy block ░░ -->
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CC Fest Coding Camp — Homepage Redesign</title>
+
+  <!-- Type system: serif, sans, mono pairings for each direction -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter+Tight:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+
+  <style>
+    html, body { margin: 0; padding: 0; background: #efece6; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+    #root { min-height: 100vh; }
+    a { color: inherit; }
+
+    /* Make the design-canvas grid background a touch warmer than default */
+    :root { --dc-bg: #efece6; }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Shared content + framework -->
+  <script src="content.jsx"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+
+  <!-- Direction components -->
+  <script type="text/babel" src="direction-a.jsx"></script>
+  <script type="text/babel" src="direction-b.jsx"></script>
+  <script type="text/babel" src="direction-c.jsx"></script>
+  <script type="text/babel" src="direction-d.jsx"></script>
+  <script type="text/babel" src="direction-b-pages.jsx"></script>
+
+  <!-- App -->
+  <script type="text/babel">
+    const { useMemo } = React;
+
+    // ── Palette resolver ────────────────────────────────────────────────
+    // Returns a per-direction palette given a theme name.
+    const PALETTES = {
+      A: {
+        warm: {
+          paper:    '#f4ede0',
+          paperAlt: '#ece2cf',
+          ink:      '#1f1a14',
+          muted:    '#6b5d4a',
+          accent:   '#b3401d',
+          rule:     'rgba(31,26,20,0.18)',
+        },
+        cool: {
+          paper:    '#eef0ee',
+          paperAlt: '#e2e6e2',
+          ink:      '#161a18',
+          muted:    '#5c6661',
+          accent:   '#1f5c3f',
+          rule:     'rgba(22,26,24,0.18)',
+        },
+        light: {
+          paper:    '#fbf9f5',
+          paperAlt: '#f1ede4',
+          ink:      '#1a1a1a',
+          muted:    '#6e6a64',
+          accent:   '#a83018',
+          rule:     'rgba(26,26,26,0.16)',
+        },
+        dark: {
+          paper:    '#1c1a17',
+          paperAlt: '#252220',
+          ink:      '#f4ece0',
+          muted:    '#9a8f7e',
+          accent:   '#e0a050',
+          rule:     'rgba(244,236,224,0.16)',
+        },
+      },
+      B: {
+        warm: {
+          paper:    '#f7f5f0',
+          paperAlt: '#efece4',
+          ink:      '#1b1a17',
+          muted:    '#6e6b64',
+          accent:   '#a86528',
+          rule:     'rgba(27,26,23,0.14)',
+        },
+        cool: {
+          paper:    '#fafbfb',
+          paperAlt: '#eef1f1',
+          ink:      '#101316',
+          muted:    '#5a636a',
+          accent:   '#1d5b8e',
+          rule:     'rgba(16,19,22,0.14)',
+        },
+        light: {
+          paper:    '#ffffff',
+          paperAlt: '#f4f4f1',
+          ink:      '#0c0c0a',
+          muted:    '#6b6b65',
+          accent:   '#b46a12',
+          rule:     'rgba(12,12,10,0.16)',
+        },
+        dark: {
+          paper:    '#0f1011',
+          paperAlt: '#181a1b',
+          ink:      '#f1efea',
+          muted:    '#8a8d8c',
+          accent:   '#e0a64a',
+          rule:     'rgba(241,239,234,0.16)',
+        },
+      },
+      C: {
+        warm: {
+          paper:    '#f5eed9',
+          paperAlt: '#ede4c8',
+          ink:      '#241d10',
+          muted:    '#6e5d3f',
+          accent:   '#8a3a18',
+          rule:     'rgba(36,29,16,0.2)',
+        },
+        cool: {
+          paper:    '#eef0e8',
+          paperAlt: '#e3e7dd',
+          ink:      '#1a1f18',
+          muted:    '#5c6457',
+          accent:   '#2e5d36',
+          rule:     'rgba(26,31,24,0.2)',
+        },
+        light: {
+          paper:    '#faf5e6',
+          paperAlt: '#f1ead5',
+          ink:      '#1d180c',
+          muted:    '#766848',
+          accent:   '#8c3a18',
+          rule:     'rgba(29,24,12,0.18)',
+        },
+        dark: {
+          paper:    '#1d1a14',
+          paperAlt: '#26221a',
+          ink:      '#f3ead0',
+          muted:    '#a6967a',
+          accent:   '#d68a4a',
+          rule:     'rgba(243,234,208,0.16)',
+        },
+      },
+      // Direction D — mirrors the original CC Fest site palette,
+      // with cool/light/dark recoloring that keeps the original DNA.
+      D: {
+        warm: {
+          paper:      '#f6f0e7',
+          panel:      '#fffdf7',
+          ink:        '#201c1a',
+          muted:      '#5c5751',
+          accent:     '#c8391d',
+          accent_soft:'#fde8e3',
+          gold:       '#f5a800',
+          gold_soft:  '#fef3d4',
+          highlight:  '#e07a5f',
+          line:       '#d8cdbf',
+        },
+        cool: {
+          paper:      '#eef0ed',
+          panel:      '#f8fafa',
+          ink:        '#191c1e',
+          muted:      '#586168',
+          accent:     '#1f5c8a',
+          accent_soft:'#e2ecf3',
+          gold:       '#d6a32e',
+          gold_soft:  '#f4ecd1',
+          highlight:  '#6a8aa8',
+          line:       '#c8d2d6',
+        },
+        light: {
+          paper:      '#fbf8f1',
+          panel:      '#ffffff',
+          ink:        '#1a1814',
+          muted:      '#65605a',
+          accent:     '#b73118',
+          accent_soft:'#fde2dd',
+          gold:       '#e8a000',
+          gold_soft:  '#fbeed0',
+          highlight:  '#d97a5f',
+          line:       '#e2d9c9',
+        },
+        dark: {
+          paper:      '#1a1715',
+          panel:      '#231f1c',
+          ink:        '#f3ead8',
+          muted:      '#a39888',
+          accent:     '#e87248',
+          accent_soft:'rgba(232,114,72,0.16)',
+          gold:       '#e8b347',
+          gold_soft:  'rgba(232,179,71,0.14)',
+          highlight:  '#e89678',
+          line:       'rgba(243,234,216,0.18)',
+        },
+      },
+    };
+
+    // ── Tweak defaults ──────────────────────────────────────────────────
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "theme": "cool",
+      "density": "spacious",
+      "bgPattern": "hairlines",
+      "layout": "grid",
+      "filterUI": "tabs",
+      "typeMood": "default"
+    }/*EDITMODE-END*/;
+
+    function App() {
+      const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+      const C_A = useMemo(() => PALETTES.A[t.theme] || PALETTES.A.warm, [t.theme]);
+      const C_B = useMemo(() => PALETTES.B[t.theme] || PALETTES.B.warm, [t.theme]);
+      const C_C = useMemo(() => PALETTES.C[t.theme] || PALETTES.C.warm, [t.theme]);
+      const C_D = useMemo(() => PALETTES.D[t.theme] || PALETTES.D.warm, [t.theme]);
+
+      // Artboard dimensions chosen to fit each direction's natural height
+      const W = 1280;
+
+      return (
+        <>
+          <DesignCanvas>
+            <DCSection
+              id="homepages"
+              title="CC Fest Coding Camp — Homepage Redesign"
+              subtitle="Four directions, from subtle (D) to a bigger departure (A, B, C). D keeps the existing site's cream + red + gold palette, Fraunces / DM Sans / DM Mono pairing, and 2px-ink borders with offset shadows — just calmer and tighter. Click any artboard to focus it; tweak the palette and layout from the panel."
+            >
+              <DCArtboard id="d" label="D · Workshop Refined (subtle)" width={W} height={3450}>
+                <DirectionD t={t} C={C_D} />
+              </DCArtboard>
+              <DCArtboard id="a" label="A · Reading List" width={W} height={3650}>
+                <DirectionA t={t} C={C_A} />
+              </DCArtboard>
+              <DCArtboard id="b" label="B · Catalog" width={W} height={3850}>
+                <DirectionB t={t} C={C_B} />
+              </DCArtboard>
+              <DCArtboard id="c" label="C · Almanac" width={W} height={4150}>
+                <DirectionC t={t} C={C_C} />
+              </DCArtboard>
+            </DCSection>
+
+            <DCSection
+              id="catalog-pages"
+              title="B · Catalog — Page system"
+              subtitle="Carrying the Catalog idiom across the whole site: a representative tool page, a concept-bridge page, the sessions page, and the about page. Same topbar, footer, type system, and ochre accent throughout."
+            >
+              <DCArtboard id="b-tool" label="B · Tool page (Coordinate System Explorer)" width={W} height={2950}>
+                <BToolPage t={t} C={C_B} />
+              </DCArtboard>
+              <DCArtboard id="b-bridge" label="B · Concept Bridge (Color: Numbers Become Feeling)" width={W} height={3250}>
+                <BBridgePage t={t} C={C_B} />
+              </DCArtboard>
+              <DCArtboard id="b-sessions" label="B · Sessions" width={W} height={3850}>
+                <BSessionsPage t={t} C={C_B} />
+              </DCArtboard>
+              <DCArtboard id="b-about" label="B · About" width={W} height={3350}>
+                <BAboutPage t={t} C={C_B} />
+              </DCArtboard>
+            </DCSection>
+          </DesignCanvas>
+
+          <TweaksPanel title="Tweaks">
+            <TweakSection label="Palette" />
+            <TweakRadio
+              label="Theme"
+              value={t.theme}
+              options={['warm', 'light', 'cool', 'dark']}
+              onChange={(v) => setTweak('theme', v)}
+            />
+
+            <TweakSection label="Layout" />
+            <TweakRadio
+              label="Density"
+              value={t.density}
+              options={['compact', 'regular', 'spacious']}
+              onChange={(v) => setTweak('density', v)}
+            />
+            <TweakRadio
+              label="Tools layout"
+              value={t.layout}
+              options={['list', 'grid', 'masonry']}
+              onChange={(v) => setTweak('layout', v)}
+            />
+            <TweakSelect
+              label="Filter UI"
+              value={t.filterUI}
+              options={['chips', 'sidebar', 'tabs']}
+              onChange={(v) => setTweak('filterUI', v)}
+            />
+
+            <TweakSection label="Paper" />
+            <TweakSelect
+              label="Background pattern"
+              value={t.bgPattern}
+              options={['none', 'dots', 'grid', 'hairlines']}
+              onChange={(v) => setTweak('bgPattern', v)}
+            />
+          </TweaksPanel>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

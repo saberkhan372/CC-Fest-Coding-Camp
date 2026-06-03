@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CC Fest — Content Types: Distinct but Related</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+  <style>
+    html, body { margin: 0; padding: 0; background: #efece6; }
+    body { font-family: "Inter Tight", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    #root { min-height: 100vh; }
+    :root { --dc-bg: #efece6; }
+    a { color: inherit; }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="content-cards.jsx"></script>
+
+  <script type="text/babel">
+    const { TypeTrio, BridgeCard, ToolCard, SketchCard } = window.ContentCards;
+
+    const THEMES = {
+      warm:  { paper: '#f7f5f0', paperAlt: '#efece4', ink: '#1b1a17', muted: '#6e6b64', rule: 'rgba(27,26,23,0.14)' },
+      light: { paper: '#ffffff', paperAlt: '#f4f4f1', ink: '#121211', muted: '#6b6b65', rule: 'rgba(12,12,10,0.12)' },
+      dark:  { paper: '#141413', paperAlt: '#1e1d1b', ink: '#f1efea', muted: '#9a958c', rule: 'rgba(241,239,234,0.16)' },
+    };
+
+    const DEFAULTS = /*EDITMODE-BEGIN*/{
+      "theme": "warm",
+      "accent": "#bc7a2c"
+    }/*EDITMODE-END*/;
+
+    // A labelled column wrapper used inside each artboard.
+    function VariantColumn({ C, tag, name, note, variant, recommended }) {
+      return (
+        <div style={{ width: '100%' }}>
+          <div style={{ marginBottom: 16, paddingBottom: 12, borderBottom: `1px solid ${C.ink}` }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span style={{ fontFamily: '"JetBrains Mono",monospace', fontSize: 10.5, letterSpacing: '.14em', textTransform: 'uppercase', color: C.accent }}>{tag}</span>
+              {recommended && <span style={{ fontFamily: '"JetBrains Mono",monospace', fontSize: 9, letterSpacing: '.1em', textTransform: 'uppercase', color: C.paper, background: C.accent, padding: '2px 6px' }}>Recommended</span>}
+            </div>
+            <div style={{ fontFamily: '"Inter Tight",sans-serif', fontWeight: 600, fontSize: 21, letterSpacing: '-0.02em', marginTop: 8 }}>{name}</div>
+            <div style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.45, marginTop: 6, textWrap: 'pretty' }}>{note}</div>
+          </div>
+          <TypeTrio C={C} variant={variant} />
+        </div>
+      );
+    }
+
+    function App() {
+      const [t, setTweak] = useTweaks(DEFAULTS);
+      const base = THEMES[t.theme] || THEMES.warm;
+      const C = { ...base, accent: t.accent };
+      const W = 408;
+
+      return (
+        <React.Fragment>
+          <DesignCanvas>
+            <DCSection
+              id="spectrum"
+              title="Content types — distinct, but one family"
+              subtitle="Bridge / Tool / Sketch share the same DNA in every column: Inter Tight titles, mono meta, hairline frame, one accent, the same header→footer grammar. What changes is the ANATOMY each card foregrounds — a crossing (idea→function) for a bridge, a control strip for a tool, an editable code-peek for a sketch. Three columns = three intensities of distinction. Pick how hard to push it."
+            >
+              <DCArtboard id="whisper" label="Whisper · type-led only" width={W} height={788}>
+                <div style={{ background: C.paper, color: C.ink, padding: 24, minHeight: '100%' }}>
+                  <VariantColumn C={C} tag="Level 01" name="Whisper" variant="whisper"
+                    note="Identical cards; only the kind label + glyph + verb differ. Calmest, but the three types are nearly impossible to tell apart at a glance — the failure mode of the current site." />
+                </div>
+              </DCArtboard>
+
+              <DCArtboard id="medium" label="Medium · anatomy cue (recommended)" width={W} height={882}>
+                <div style={{ background: C.paper, color: C.ink, padding: 24, minHeight: '100%' }}>
+                  <VariantColumn C={C} tag="Level 02" name="Medium" variant="medium" recommended
+                    note="One compact distinctive zone per type — a tiny idea→function line, a slider strip, a one-line code peek. Reads instantly, stays quiet enough for a dense grid." />
+                </div>
+              </DCArtboard>
+
+              <DCArtboard id="loud" label="Loud · material + silhouette" width={W} height={1110}>
+                <div style={{ background: C.paper, color: C.ink, padding: 24, minHeight: '100%' }}>
+                  <VariantColumn C={C} tag="Level 03" name="Loud" variant="loud"
+                    note="Each type gets its own material: a tinted accent-edged panel (bridge), an ink-bordered control station with a Launch button (tool), a dark mini-editor (sketch). Unmistakable — but busier, and harder to keep tidy at scale." />
+                </div>
+              </DCArtboard>
+            </DCSection>
+
+            <DCSection
+              id="side-by-side"
+              title="The recommended trio, read across"
+              subtitle="The Medium treatment lined up so the family resemblance and the per-type tell are both visible at once. This is the set I'd take into the catalog."
+            >
+              <DCArtboard id="b-only" label="Concept Bridge" width={W} height={312}>
+                <div style={{ background: C.paper, color: C.ink, padding: 24, minHeight: '100%' }}>
+                  <BridgeCard C={C} variant="medium" />
+                </div>
+              </DCArtboard>
+              <DCArtboard id="t-only" label="Workshop Tool" width={W} height={312}>
+                <div style={{ background: C.paper, color: C.ink, padding: 24, minHeight: '100%' }}>
+                  <ToolCard C={C} variant="medium" />
+                </div>
+              </DCArtboard>
+              <DCArtboard id="s-only" label="Starter Sketch" width={W} height={312}>
+                <div style={{ background: C.paper, color: C.ink, padding: 24, minHeight: '100%' }}>
+                  <SketchCard C={C} variant="medium" />
+                </div>
+              </DCArtboard>
+            </DCSection>
+          </DesignCanvas>
+
+          <TweaksPanel title="Tweaks">
+            <TweakSection label="Palette" />
+            <TweakRadio label="Theme" value={t.theme} options={['warm', 'light', 'dark']}
+              onChange={(v) => setTweak('theme', v)} />
+            <TweakColor label="Accent" value={t.accent}
+              options={['#bc7a2c', '#c64a26', '#3a8a5c', '#3f82c4', '#8a5bd0']}
+              onChange={(v) => setTweak('accent', v)} />
+          </TweaksPanel>
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

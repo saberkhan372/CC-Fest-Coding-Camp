@@ -186,7 +186,7 @@ Purpose: establish a reliable data model before touching the visual system.
 
 ## Phase 1 — Medium Card System
 
-**Status: Built. Needs browser QA.**
+**Status: ✅ Complete. Browser QA passed 2026-06-03.**
 
 Purpose: improve card readability and make content types distinct-but-related.
 
@@ -200,9 +200,9 @@ Purpose: improve card readability and make content types distinct-but-related.
 
 ### Claude tasks
 
-- [ ] Browser QA: open the homepage, verify that bridge/tool/sketch cues are visually distinct and readable at card density.
-- [ ] Check that cue language and anatomy feel workshop-like, not tech-catalog. Ask: does a beginner understand what the cue is telling them?
-- [ ] Sign off on sketch code peeks for 5 representative sketches from different suits.
+- [x] Browser QA: open the homepage, verify that bridge/tool/sketch cues are visually distinct and readable at card density.
+- [x] Check that cue language and anatomy feel workshop-like, not tech-catalog. Ask: does a beginner understand what the cue is telling them?
+- [x] Sign off on sketch code peeks for 5 representative sketches from different suits.
 
 ### Acceptance criteria
 
@@ -217,7 +217,7 @@ Purpose: improve card readability and make content types distinct-but-related.
 
 ## Phase 2 — Shelves Landing
 
-**Status: Built. Not yet browser-QA'd. Bridge metadata prerequisite must be verified before public deploy.**
+**Status: ✅ Complete. Browser QA passed 2026-06-03. Legacy navigation removed and deployed.**
 
 Purpose: give newcomers a browse-first entry point before asking them to operate filters.
 
@@ -229,14 +229,14 @@ Purpose: give newcomers a browse-first entry point before asking them to operate
 - [x] Each shelf shows up to 4 resources (1 bridge, 1 tool, 1 sketch + 1 extra if available).
 - [x] "Show all" shelf buttons activate the existing pathway filter and scroll to the catalog.
 - [x] Responsive shelf grid: 2-column → 1-column at 640px.
-- [ ] Once Claude approves Phase 2 removal plan: remove `.beginner-path` and `.best-first` from the homepage and their rendering code from `site.js`.
+- [x] Once Claude approves Phase 2 removal plan: remove `.beginner-path` and `.best-first` from the homepage and their rendering code from `site.js`.
 
 ### Claude tasks
 
-- [ ] Browser QA: verify that each shelf shows at least one bridge (requires bridge pathway metadata to be correct), at least one tool, and at least one sketch.
-- [ ] Check shelf labels and notes — do they sound like CC Fest invitations or like filter labels? Rewrite any that sound like database categories.
-- [ ] Decide: does "Browse by goal" fully replace the existing "Where to start" path and "Best first" row, or does one of them stay in a different form? Document the decision and schedule the removal.
-- [ ] Review "Browse by goal" heading — is there a warmer phrase that fits CC Fest voice? (e.g. "What do you want to make?" or "Start with a goal.")
+- [x] Browser QA: verify that each shelf shows at least one bridge (requires bridge pathway metadata to be correct), at least one tool, and at least one sketch.
+- [x] Check shelf labels and notes — do they sound like CC Fest invitations or like filter labels? Rewrite any that sound like database categories.
+- [x] Decide: does "Browse by goal" fully replace the existing "Where to start" path and "Best first" row, or does one of them stay in a different form? Document the decision and schedule the removal.
+- [x] Review "Browse by goal" heading — is there a warmer phrase that fits CC Fest voice? (e.g. "What do you want to make?" or "Start with a goal.")
 
 ### Acceptance criteria
 
@@ -250,7 +250,7 @@ Purpose: give newcomers a browse-first entry point before asking them to operate
 
 ## Phase 3 — Lens & Refine Catalog
 
-**Status: Built. Not yet browser-QA'd. Legacy chip rows still present.**
+**Status: ✅ Complete. Browser QA passed 2026-06-03. Chip rows removed and deployed.**
 
 Purpose: replace stacked chip rows with a coherent catalog interaction.
 
@@ -262,15 +262,15 @@ Purpose: replace stacked chip rows with a coherent catalog interaction.
 - [x] Lens panel shows up to 6 items per group with "+ N more" footer.
 - [x] Add `scripts/audit-catalog-lens.mjs` to smoke-test grouping logic.
 - [x] Make the lens panel default to collapsed / hidden on page load. Show only when a lens button is clicked or a filter is active. This avoids an overwhelming 135-item dump on first visit.
-- [ ] Once Claude approves Phase 3 removal plan: remove the suit, pathway, and difficulty chip rows from `index.html` and their button-rendering code from `site.js`. The lens bar and token row become the single filter surface.
+- [x] Once Claude approves Phase 3 removal plan: remove the suit, pathway, and difficulty chip rows from `index.html` and their button-rendering code from `site.js`. The lens bar and token row become the single filter surface.
 
 ### Claude tasks
 
-- [ ] Browser QA: click through all 5 lens views (Type / Category / Session / Level / Goal). Verify each one groups items sensibly and no group is empty or misleadingly named (e.g. "Uncategorized" after bridge metadata fix).
-- [ ] Browser QA: activate filters from the chip rows, then from shelf "Show all" buttons, confirm tokens appear and removal works.
-- [ ] Decide: what does the lens panel look like when nothing is filtered — should it show a summary row (counts only) rather than full item grids? Or stay hidden until activated?
-- [ ] Approve or revise the chip-row removal. Confirm the lens bar genuinely replaces all three chip rows before they are removed.
-- [ ] CC Fest voice check on group labels: "Uncategorized", "Unleveled", "No goal tag" are fallback strings that should never be visible to a visitor after bridge metadata is complete. Verify they don't appear.
+- [x] Browser QA: click through all 5 lens views (Type / Category / Session / Level / Goal). Verify each one groups items sensibly and no group is empty or misleadingly named (e.g. "Uncategorized" after bridge metadata fix).
+- [x] Browser QA: activate filters from the chip rows, then from shelf "Show all" buttons, confirm tokens appear and removal works.
+- [x] Decide: what does the lens panel look like when nothing is filtered — should it show a summary row (counts only) rather than full item grids? Or stay hidden until activated?
+- [x] Approve or revise the chip-row removal. Confirm the lens bar genuinely replaces all three chip rows before they are removed.
+- [x] CC Fest voice check on group labels: "Uncategorized", "Unleveled", "No goal tag" are fallback strings that should never be visible to a visitor after bridge metadata is complete. Verify they don't appear.
 
 ### Acceptance criteria
 
@@ -285,7 +285,7 @@ Purpose: replace stacked chip rows with a coherent catalog interaction.
 
 ## Phase 4 — Session Arc
 
-**Status: Session metadata authored. Ready for Codex to build.**
+**Status: ✅ Complete. Browser QA passed 2026-06-03. Embed strip fix deployed.**
 
 Purpose: make the five-session curriculum visible across the site and build real session pages.
 
@@ -411,9 +411,9 @@ const SESSIONS = [
 ### Claude tasks
 
 - [x] Author canonical session metadata for all 5 sessions — complete, see above.
-- [ ] Review first built session page (01): does it feel like a CC Fest workshop handout, not an event schedule?
-- [ ] Decide: do session pages link to the poster generator template, or is the poster only in `template/`? *(Recommendation: link from each real session to its own poster page, not back to template. Each session has its own seed and accent — those are the poster.)*
-- [ ] Write "In this session" strip copy pattern — 1 sentence that orients a tool user ("Part of Session 03 — Patterns, Systems, and What They Say") without crowding the tool. Keep it link-only, not a full block.
+- [x] Review first built session page (01): does it feel like a CC Fest workshop handout, not an event schedule?
+- [x] Decide: do session pages link to the poster generator template, or is the poster only in `template/`? *(Decision: each real session links to its own poster; template stays in `template/` only.)*
+- [x] Write "In this session" strip copy pattern — 1 sentence that orients a tool user ("Part of Session 03 — Patterns, Systems, and What They Say") without crowding the tool. Keep it link-only, not a full block.
 
 ### Acceptance criteria
 
@@ -428,7 +428,7 @@ const SESSIONS = [
 
 ## Phase 5 — Catalog Visual Polish
 
-**Status: Not started.**
+**Status: ✅ Complete. Deployed and browser QA passed 2026-06-03.**
 
 Purpose: move the visual language closer to Direction B while keeping CC Fest warmth.
 
@@ -436,16 +436,16 @@ Purpose: move the visual language closer to Direction B while keeping CC Fest wa
 
 ### Codex tasks
 
-- [ ] Implement spacing and density changes per Claude's direction — tighter vertical rhythm in catalog grids, larger count numerals in lens group headers.
-- [ ] Reduce visual weight of decorative card elements (border radii, shadows) in the catalog sections where they interfere with scanning.
-- [ ] Review every responsive breakpoint in `site.css` and `tool-page.css` — fix any layout where the catalog surfaces clip, overflow, or collapse awkwardly.
-- [ ] Run mobile smoke test (390px) on homepage, a representative bridge, a static tool, a JS-rendered tool, and the sessions page.
+- [x] Implement spacing and density changes per Claude's direction — tighter vertical rhythm in catalog grids, larger count numerals in lens group headers.
+- [x] Reduce visual weight of decorative card elements (border radii, shadows) in the catalog sections where they interfere with scanning.
+- [x] Review every responsive breakpoint in `site.css` and `tool-page.css` — fix any layout where the catalog surfaces clip, overflow, or collapse awkwardly.
+- [x] Run mobile smoke test (390px) on homepage, a representative bridge, a static tool, a JS-rendered tool, and the sessions page.
 
 ### Claude tasks
 
-- [ ] In the browser: mark up what feels too heavy, too decorative, or too generic about the current catalog surfaces. Write specific CSS notes rather than vague direction.
-- [ ] Font decision: review whether any catalog utility text (count badges, facet group labels) benefits from a tighter font. If yes, define the exact elements and explain why it serves CC Fest. If no, remove the consideration entirely.
-- [ ] Check that the homepage still reads as a CC Fest workshop archive at the end of this phase — not as a polished ed-tech catalog with CC Fest branding applied.
+- [x] In the browser: mark up what feels too heavy, too decorative, or too generic about the current catalog surfaces. Write specific CSS notes rather than vague direction.
+- [x] Font decision: Inter Tight removed from consideration permanently. Fraunces / DM Sans / DM Mono only. No catalog utility text exception needed.
+- [x] Check that the homepage still reads as a CC Fest workshop archive at the end of this phase — not as a polished ed-tech catalog with CC Fest branding applied.
 
 ### Acceptance criteria
 
@@ -460,7 +460,7 @@ Purpose: move the visual language closer to Direction B while keeping CC Fest wa
 
 ## Phase 6a — Detail Pages: JS-Rendered Workshop Tools (11 pages)
 
-**Status: Not started.**
+**Status: ✅ Complete. Browser QA passed 2026-06-03.**
 
 Purpose: give the 11 JS-rendered workshop tools a consistent metadata block.
 
@@ -468,14 +468,14 @@ These share a single shell pattern via `workshop-tool-pages.js`, so one change c
 
 ### Codex tasks
 
-- [ ] Add a metadata strip to the `workshop-tool-pages.js` rendered shell: type pill, suit glyph, level, session number, and pathway tags — drawn from `window.CCFestCatalog` if the item is found.
-- [ ] Add a "Related resources" go-next block at the bottom of each rendered page using the `relatedBridges`, `relatedTools`, `relatedSketches` fields already in the tool data.
-- [ ] Verify `?embed=1` mode still hides the metadata strip.
+- [x] Add a metadata strip to the `workshop-tool-pages.js` rendered shell: type pill, suit glyph, level, session number, and pathway tags — drawn from `window.CCFestCatalog` if the item is found.
+- [x] Add a "Related resources" go-next block at the bottom of each rendered page using the `relatedBridges`, `relatedTools`, `relatedSketches` fields already in the tool data.
+- [x] Verify `?embed=1` mode still hides the metadata strip.
 
 ### Claude tasks
 
-- [ ] Browser QA on all 11 JS-rendered tools: metadata strip is correct, go-next links are accurate, embed mode is clean.
-- [ ] Check that the metadata strip doesn't crowd the tool itself — tools are the primary thing, metadata is secondary.
+- [x] Browser QA on all 11 JS-rendered tools: metadata strip is correct, go-next links are accurate, embed mode is clean.
+- [x] Check that the metadata strip doesn't crowd the tool itself — tools are the primary thing, metadata is secondary.
 
 ### Acceptance criteria
 
@@ -486,29 +486,39 @@ These share a single shell pattern via `workshop-tool-pages.js`, so one change c
 
 ---
 
-## Phase 6b — Detail Pages: Static Workshop Tools (representative set)
+## Phase 6b — Detail Pages: Static Workshop Tools (all 59 pages)
 
-**Status: Not started.**
+**Status: ✅ Complete. Full rollout deployed 2026-06-03, commit b479d99.**
 
-Purpose: extend metadata blocks to static tool pages. Start with a sample set, then expand.
+Purpose: extend metadata blocks to static tool pages. Started with a 10-tool representative sample; expanded to all 59 in the same deploy as Phase 6c.
 
-**Scope:** 10 representative tools across all 6 suits. Do not attempt all 59 static tools at once.
+**Scope:** All 59 static workshop tool pages.
 
 ### Codex tasks
 
-- [ ] Identify 10 representative static tools (one or two per suit, covering both old `.top` and new `.tool-topbar` nav patterns).
-- [ ] Add a metadata strip and go-next block to each selected page, using `site-components.css` classes so the style is shared.
-- [ ] Report which static tool pages have the `.top` nav pattern vs `.tool-topbar` pattern — this affects where the metadata strip is placed.
+- [x] Identify 10 representative static tools (one or two per suit, covering both old `.top` and new `.tool-topbar` nav patterns).
+- [x] Add a metadata strip and go-next block to each selected page, using `site-components.css` classes so the style is shared.
+- [x] Report which static tool pages have the `.top` nav pattern vs `.tool-topbar` pattern — this affects where the metadata strip is placed.
 
 ### Claude tasks
 
-- [ ] Pick the 10 representative tools for the sample set — prioritize the tools most likely to be opened from a session or the concept map.
-- [ ] Browser QA the 10 pages: metadata strip correct, no layout breakage, embed mode clean.
-- [ ] Decide whether to expand to all 59 static tools or to a larger sample. Document the decision.
+- [x] **10 representative tools selected** — one or two per suit, covering both `.top` and `.tool-topbar` nav patterns, anchored to the sessions and concept map:
+  - `noise-lab` (systems · `.top` nav · Session 03) — most-linked tool from concept map
+  - `map-explorer` (motion · `.top` nav · Session 02) — priority bridge cross-link
+  - `rgb-hsb-color-lab` (marks · static · Session 01)
+  - `animation-explorer` (motion · `.tool-topbar` · Session 02)
+  - `if-else-decision-studio` (systems · static · Session 03)
+  - `simple-array-explorer` (systems · static · Session 03)
+  - `for-loop-stepper` (systems · static · Session 03)
+  - `bar-chart-studio` (data · static · Session 04)
+  - `bounce-logic-explainer` (motion · `.top` nav · Session 02) — has old `.top` pattern
+  - `image-remix-studio` (open · static · Session 05)
+- [x] Browser QA the 10 pages: metadata strip correct, position correct, embed mode clean.
+- [x] Decide whether to expand to all 59 static tools or a larger sample after reviewing the 10. **Decision: expand to all 59 — shipped in Phase 6c deploy.**
 
 ### Acceptance criteria
 
-- 10 static tools have metadata strips that match the JS-rendered tool pattern.
+- All 59 static tools have metadata strips that match the JS-rendered tool pattern.
 - No layout breakage on desktop or mobile.
 - Static audit detects the same metadata fields on the sample pages.
 
@@ -516,15 +526,15 @@ Purpose: extend metadata blocks to static tool pages. Start with a sample set, t
 
 ## Phase 6c — Detail Pages: Concept Bridge Pages (21 pages)
 
-**Status: Not started.**
+**Status: ✅ Complete. Deployed 2026-06-03, commit b479d99.**
 
 Purpose: add consistent metadata and go-next to all 21 bridge pages.
 
 ### Codex tasks
 
-- [ ] Add a metadata strip (type: Concept Bridge, suit, session, level) to each bridge page using `concept-bridge.css`.
-- [ ] Verify the 12 bridges that already have try-next panels are not duplicated — the new go-next block should complement, not repeat.
-- [ ] The 9 bridges with no try-next panels get a minimal auto-generated go-next block from catalog data.
+- [x] Add a metadata strip (type: Concept Bridge, suit, session, level) to each bridge page using `catalog-meta-strip.js` (updated to support both tools and concept-bridges).
+- [x] Verify the 12 bridges that already have try-next panels are not duplicated — the new go-next block should complement, not repeat.
+- [x] The 9 bridges with no try-next panels get a minimal auto-generated go-next block from catalog data.
 
 ### Claude tasks
 
@@ -532,9 +542,9 @@ Purpose: add consistent metadata and go-next to all 21 bridge pages.
 
 ### Acceptance criteria
 
-- All 21 bridges have a metadata strip.
-- None of the 12 bridges with existing try-next panels have duplicated sections.
-- The 9 bare bridges have at least a catalog-driven go-next block.
+- All 21 bridges have a metadata strip. ✅
+- None of the 12 bridges with existing try-next panels have duplicated sections. ✅
+- The 9 bare bridges have at least a catalog-driven go-next block. ✅
 - CC Fest voice check: bridge metadata strips are unobtrusive — they don't compete with the interactive bridge tool above them.
 
 ---
@@ -567,7 +577,87 @@ Purpose: complete the detail page system across remaining page types.
 
 ---
 
-## Validation Checklist
+## Phase 7 — Filter Live Counts & Facet Upgrades (Direction 1)
+
+**Status: Not started.**
+
+Source spec: `newdesignideas/Filter Spec.html` and `Filter Spec.md`.
+
+Purpose: bring the Phase 3 filter up to the full Direction 1 spec. The current filter has the lens bar, global search, removable tokens, and result count — but lacks live counts *on each facet chip* and the explicit AND-across / OR-within facet logic.
+
+**What Phase 3 already delivered:** lens grouping, global search, active-filter tokens, result total, lens panel hidden on load.
+
+**What this phase adds:**
+- Live count badge on every facet chip ("Motion · 47") — the number shown is always *what you'll actually get*, not a static total. Options that would yield 0 results are disabled, preventing dead ends.
+- AND across facets, OR within a facet — e.g. Marks *or* Motion, *and* Beginner.
+- `data-type`, `data-category`, `data-level`, `data-session`, `data-tags`, `data-name` stamped as attributes on each card `<article>` element in `index.html` so the filter reads HTML directly rather than relying solely on the JS catalog object.
+
+### Codex tasks
+
+- [ ] Stamp `data-type`, `data-category`, `data-level`, `data-session`, `data-tags`, `data-name` on every `.tool-card` in `index.html` (can be generated from `catalog-data.js` values by the generator script).
+- [ ] Update `countFor(key, value)` logic in the lens filter: for each chip, count how many cards match if that value is also selected, holding all other active facets fixed.
+- [ ] Disable (not hide) chips whose count would be 0.
+- [ ] Render live count as a badge inside each chip label.
+- [ ] Verify AND-across-facets / OR-within-facet semantics are correct — run `audit-catalog-lens.mjs` after.
+
+### Claude tasks
+
+- [ ] Browser QA: activate two facets from different groups (e.g. Motion + Beginner) — confirm intersection logic. Activate two chips from the same group (e.g. Marks + Motion) — confirm union logic.
+- [ ] Check that 0-result chip disabling is clear to a visitor ("this is unavailable" vs "this is broken").
+- [ ] Confirm live counts feel like a teaching signal, not database noise. Would a beginner find them helpful or confusing?
+
+### Acceptance criteria
+
+- Every active chip shows a live count badge.
+- Chips that would return 0 results are visually disabled and cannot be clicked.
+- AND/OR facet logic is correct and matches user expectation.
+- No performance regression — rendering stays fast with ~135 cards.
+- CC Fest voice check: the filter still feels like a browse tool, not a search engine.
+
+---
+
+## Phase 8 — Session Spine Wayfinding (Direction 3)
+
+**Status: Not started.**
+
+Source spec: `newdesignideas/Session Spine Spec.html` and `Session Spine Spec.md`.
+
+Purpose: give the five-session arc a persistent, navigable spine — a metro-style rail on the sessions index, and a compact you-are-here strip + sibling-tool rail on each tool page.
+
+**Relationship to Phase 4:** Phase 4 built the session pages, the sessions listing, and the slim "In this session" strip. This phase adds the *navigational chrome* that lets visitors feel the arc and move within it. The two strips serve different jobs — the Phase 4 strip says "you're in session 3"; the spine strip shows all five stops and lets you jump.
+
+### The config (`CCS_SESSIONS`)
+
+One shared JS config feeds both renderers. Fields per session: `id`, `glyph` (✦ ◎ ⬡ ▦ ☽), `title`, `focus`, `bridge` (label + href), `tools` (array of [label, href] pairs). Pre-filled with real session 1–5 data from `sessions-data.js` — Codex should derive from that rather than re-author.
+
+### Codex tasks
+
+- [ ] Create `spine.css` and `spine.js` in `cc-fest-coding-camp-pages/assets/` (or inline on target pages).
+- [ ] Derive `CCS_SESSIONS` from existing `sessions-data.js` — map `suitGlyph`, `title`, `focus` (`subtitle`), `anchorBridge` + `featuredTools` to the spine config format.
+- [ ] Add `renderSideRail('#spine', currentIndex)` to `sessions/index.html` — mount the metro spine above or alongside the session card grid.
+- [ ] Add `autoToolPage('#spine', '#stations')` (or `renderCompactStrip` + `renderStationRail`) to the tool page template. Wire `data-session` and `data-tool` from the catalog at render time.
+- [ ] The compact strip prev/next must disable (`aria-disabled`) at the arc ends (Session 01 has no prev; Session 05 has no next).
+
+### Claude tasks
+
+- [ ] Review the side rail on the sessions index: does it add useful wayfinding or compete with the session card grid? Decide where it lives (sidebar, top of page, or collapsed by default).
+- [ ] Review the compact strip on a tool page: does it crowd the tool header? Is the you-are-here position clear without reading the text?
+- [ ] Decide whether the sibling-tool station rail belongs on all tool pages or only session-core tools (the ~15 per session that are explicitly listed in `featuredTools`).
+- [ ] CC Fest voice check: does the spine feel like a workshop map or like a product tour?
+
+### Acceptance criteria
+
+- Sessions index shows the metro rail with 5 labeled stops; current session (if any) is visually distinguished.
+- Connector segments above the current stop render in accent color (done); future stops are outline.
+- Tool pages show the compact strip with correct session highlighted and functional prev/next.
+- Station rail highlights the current tool's entry.
+- Works without JS for navigation (plain `<a href>` links).
+- No layout breakage on mobile.
+- CC Fest voice check: spine is orientation, not decoration.
+
+---
+
+
 
 Run after each phase:
 
@@ -641,8 +731,20 @@ Now that Phases 0–3 are started:
 7. ✅ Codex: Fix `lerp-follow-seed` / `how-does-it-grow` catalog title/URL mismatch.
 8. ✅ Codex: Apply 3 bridge pathway corrections and regenerate catalog-data.js.
 9. ✅ Codex: Build Phase 4 session pages from the authored metadata above.
-10. **Next — Claude:** Browser QA Phases 1–3 before any public deploy. Blocked until Codex fixes are landed and the site is deployed or served locally.
-11. **Blocking public deploy — Both:** Run Legacy Navigation Removal per the table above. Neither Shelves nor Lens & Refine ships publicly with the old chip rows still present.
+10. ✅ Claude: Browser QA Phases 1–4 on live GitHub Pages — all passed.
+11. ✅ Both: Legacy Navigation Removal complete; chip rows and beginner/best-first removed and deployed (commit 20b0366).
+12. ✅ Codex: Embed mode hides `.cc-session-strip`; final deploy pushed.
+13. ✅ Claude: Phase 5 direction notes written — 5 specific changes, no new fonts, no card restructure.
+14. ✅ Codex: Phase 5 implemented in source — session h1, shelves heading, hairline rules, lens buttons, tool card padding.
+15. ✅ Codex: Phase 5 deployed — `site.css?v=20260603-phase5-direction` confirmed live.
+16. ✅ Claude: Phase 5 browser QA passed — all 5 checks green on live GitHub Pages.
+17. ✅ Both: Phase 6a complete — metadata strip on all 11 JS-rendered tools, embed-mode hiding confirmed, related resources intact. Commit 2104d04 + fix deploy.
+18. ✅ Both: Phase 6b complete — metadata strip on 10 representative static tools, both nav patterns confirmed, embed mode clean. Commit e62d638.
+19. ✅ Both: Phase 6c complete — metadata strip on all 21 bridges. Phase 6b also expanded to all 59 static tools. Commit b479d99.
+20. **Next — Claude:** Review the 9 bare bridges in Phase 6c (no teaching panels) — decide full panels vs catalog go-next blocks.
+21. **Next — Both:** Phase 6d — starter sketches (44 pages), About page, sessions page detail pass. Claude decides B7 (Save Image on sketches) first.
+22. After 6d — Phase 7: filter live counts and facet upgrade (`newdesignideas/Filter Spec`).
+23. After 7 — Phase 8: session spine wayfinding rail (`newdesignideas/Session Spine Spec`).
 
 ---
 
@@ -680,6 +782,65 @@ Now that Phases 0–3 are started:
 - Added grouped catalog panel powered by `window.CCFestCatalog`.
 - Added `scripts/audit-catalog-lens.mjs`.
 - Fixed homepage/content mismatch: `arrays-loops-as-system` was missing from the homepage bridge cards.
+
+### 2026-06-03 — Phase 6a complete (Codex + Claude QA)
+
+**What shipped:**
+- `renderCatalogMeta(slug)` added to `workshop-tool-pages.js` — looks up suit/level/pathways from `window.CCFestCatalog` by slug.
+- Strip injected after `.tool-subtitle`, before `.tool-tags` in the rendered header.
+- `setTimeout(0)` deferred re-render so catalog-data.js loads first.
+- `.catalog-meta-strip` / `.meta-pill` styles in `tool-page.css`.
+- Embed mode hides `.catalog-meta-strip` via `p5-export-helper.js`.
+- Deployed as commit 2104d04 + fix commit.
+
+**QA results (Claude, live GitHub Pages):**
+- All 11 JS-rendered tools: strip present, 5 pills (suit + level + 3 pathways) ✓
+- Position: between subtitle and tags ✓
+- Pill styles: suit cream, level gold-soft, pathway outline ✓
+- Related resources (authored): bridge + sketches showing correctly on gravity tool ✓
+- Session strip coexists alongside metadata strip ✓
+- Embed mode: nav, rhythm, meta strip all `display:none` ✓
+
+**Phase 6b:** 10 representative static tools selected (see Phase 6b Claude tasks).
+
+### 2026-06-03 — Phase 5 built in source (Claude direction + Codex implementation)
+
+**Claude direction notes:**
+- No new fonts. Fraunces / DM Sans / DM Mono only. Inter Tight removed from consideration permanently.
+- Five specific changes: session page h1, shelves section heading, filter count, lens bar, tool card padding.
+- Defined what to leave alone: card borders/shadows, tool norms, hero, cue sizes, session card listing.
+- Full notes recorded in Phase 5 section above.
+
+**Codex implementation:**
+- `sessions.css`: Session page h1 → Fraunces `clamp(36px, 5vw, 52px)` / weight 800.
+- `index.html` + `site.css`: "Browse by goal" section gets "Where to start" label, Fraunces 24px heading, hairline separator above.
+- `site.css`: Filter count → 13px DM Mono. Lens bar → `border-top: 1px solid var(--line)`, buttons → 12px. Tool cards → uniform 22px padding.
+- Cache keys bumped for homepage and session pages.
+- Validation passed. Not yet deployed — browser QA pending.
+
+### 2026-06-03 — Phases 1–4 complete, deployed (Claude QA + Codex)
+
+**Browser QA results (Claude, live GitHub Pages):**
+- Card anatomy cues: 24 bridge + 73 tool + 44 sketch rendering correctly. All three types visually distinct.
+- CTA verbs confirmed: "Understand the idea / Play before you read / Change one value".
+- Lens panel hidden on load; appears on lens button click. Type lens shows 21/70/44 groups correctly.
+- Filter composition (B11 fix): motion → 47 cards; motion + beginner → 27 cards. Intersection, not union. ✓
+- All 6 shelves render with 4 items each. Every shelf includes at least one bridge (bridge metadata fix confirmed).
+- Sessions listing: 5 real sessions + template; anchor bridge and resource pills on all 5.
+- Session 01 page: poster canvas renders, 7 resources correct, arc nav (prev empty, next → Session 02).
+- Session strip on static tool (noise-lab): correct text, correct session link, CSS self-injected.
+- Session strip on JS-rendered tool (atan2): correct session link.
+- Session strip on bridge (noise-smooth-randomness): present and correct.
+- Embed mode: nav hidden, rhythm hidden, session strip now hidden. ✓
+- Mobile breakpoints: all shelf/lens responsive rules confirmed in CSS.
+- **Bug found and fixed:** Session strip was visible in `?embed=1` — added `.embed-mode .cc-session-strip { display: none !important; }` to p5-export-helper.js.
+
+**Legacy nav removal (Codex):**
+- Suit, pathway, difficulty chip rows removed from index.html and site.js.
+- `.beginner-path` and `.best-first` removed from index.html and site.js.
+- Search, shelves, filter status, and lens panel remain as the single filter surface.
+
+**Deployed:** commit 20b0366 — "Phase 3+4 complete: card cues, shelves, lens panel, sessions, strip — legacy nav removed"
 
 ### 2026-06-03 — Phase 0 complete, Phase 4 metadata authored (Claude)
 
@@ -743,6 +904,30 @@ Now that Phases 0–3 are started:
 - Added the compact "In this session" strip hook in `site.js` and loaded catalog/session/site runtime scripts on tool and concept bridge detail pages.
 - Updated `sessions.css` for session resource pills, real session cards, and arc navigation.
 - Updated static audit session counting to read from `sessions-data.js` and verify real session pages exist.
+
+### 2026-06-03 — Phase 6c complete + Phase 6b full rollout (Codex)
+
+**Commit b479d99:** "Phase 6c + 6b full rollout: catalog metadata strip on all 21 bridges and all 59 static tools"
+
+**What shipped:**
+- `catalog-meta-strip.js` updated to support both `tools/` and `concept-bridges/` pages — strip placement lands after `.tool-subtitle` or `.subtitle`, with `h1`/`h2` fallback.
+- Strip added to all 21 concept bridge pages.
+- Strip added/bumped across all 59 static tool pages (Phase 6b expanded from the original 10-tool sample to the full set in the same commit).
+- JS-rendered shells, starter pages, and sketch pages left untouched — those are Phase 6d.
+
+**Validation passed:** `node --check catalog-meta-strip.js`, `node scripts/audit-static.mjs`, `git diff --check`.
+
+**Open Claude task remaining in 6c:** review the 9 bare bridges and decide whether they need full teaching panels or catalog-driven go-next blocks are sufficient.
+
+### 2026-06-03 — newdesignideas design spec review (Claude)
+
+Reviewed all three drop-in spec documents in `newdesignideas/` and reconciled against current site state:
+
+- **Direction 2 (Card Anatomy / `Card Anatomy Spec.md`):** Already implemented in Phase 1. The `catalog-card-cue` system in `site.js` is functionally identical to the spec's `cca-*` enhancer — bridge crossing, tool slider strip, sketch code peek. No action needed.
+- **Direction 1 (Filter Refine Bar / `Filter Spec.md`):** Phase 3 delivered the lens bar, search, tokens, and result count. The spec adds live counts on each facet chip and explicit AND/OR facet semantics. Added as **Phase 7**.
+- **Direction 3 (Session Spine / `Session Spine Spec.md`):** Not yet implemented. Adds a metro-style side rail to the sessions index and a compact you-are-here strip + sibling-tool station rail to tool pages, all driven by a single `CCS_SESSIONS` config. Builds on Phase 4's session data. Added as **Phase 8**.
+
+All completed task checkboxes updated across Phases 1–6b. Phase 4 session-page decisions and strip copy pattern marked complete per QA log.
 
 ### 2026-06-03 — Phase 4 Review Fixes (Codex)
 

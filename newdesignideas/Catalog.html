@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CC Fest Coding Camp — Catalog</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+  <style>
+    html, body { margin: 0; padding: 0; }
+    body { font-family: "Inter Tight", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    #root { min-height: 100vh; }
+    a { color: inherit; }
+    .cat-input{appearance:none;outline:none;font:inherit}
+    .cat-fbtn{cursor:default;font:inherit}
+    .cat-stop{cursor:default}
+    .cat-stop:hover .cat-stop-title{text-decoration:underline;text-underline-offset:2px}
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="filter-data.jsx"></script>
+  <script type="text/babel" src="session-data.jsx"></script>
+  <script type="text/babel" src="catalog-card.jsx"></script>
+
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+    const FD = window.FilterData;
+    const { SESSIONS, SUIT_GLYPH, SUIT_NAME } = window.SessionData;
+    const { MediumCard, CatalogCardStyle } = window.CatalogCard;
+    const { FS_SUITS, FS_DATA, FS_LEVELS, FS_TYPES } = FD;
+
+    const THEMES = {
+      warm:  { paper: '#f7f5f0', paperAlt: '#efece4', ink: '#1b1a17', muted: '#6e6b64', rule: 'rgba(27,26,23,0.14)' },
+      light: { paper: '#ffffff', paperAlt: '#f4f4f1', ink: '#121211', muted: '#6b6b65', rule: 'rgba(12,12,10,0.12)' },
+      dark:  { paper: '#141413', paperAlt: '#1e1d1b', ink: '#f1efea', muted: '#9a958c', rule: 'rgba(241,239,234,0.16)' },
+    };
+    const DEFAULTS = /*EDITMODE-BEGIN*/{
+      "theme": "warm",
+      "accent": "#bc7a2c",
+      "density": "regular"
+    }/*EDITMODE-END*/;
+
+    const mono = (C, extra) => ({ fontFamily: '"JetBrains Mono",monospace', ...extra });
+
+    // ── Session nav-rail (the wayfinding spine) ──────────────────────────────
+    function Node({ C, state, glyph }) {
+      const past = state === 'past', cur = state === 'current';
+      return (
+        <div style={{
+          width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: '"Inter Tight",sans-serif', fontWeight: 600, fontSize: 12, flexShrink: 0,
+          background: cur ? C.accent : past ? C.ink : C.paper,
+          color: cur || past ? C.paper : C.muted,
+          border: `1.5px solid ${cur ? C.accent : past ? C.ink : C.rule}`,
+          boxShadow: cur ? `0 0 0 3px ${C.paper}, 0 0 0 4.5px ${C.accent}` : 'none',
+        }}>{glyph}</div>
+      );
+    }
+
+    function NavRail({ C, sel, onSelect }) {
+      const n = SESSIONS.length;
+      return (
+        <div>
+          <div style={mono(C, { fontSize: 10.5, letterSpacing: '.16em', textTransform: 'uppercase', color: C.accent, marginBottom: 16 })}>The arc</div>
+
+          {/* Everything */}
+          <button className="cat-fbtn" onClick={() => onSelect(null)} style={{
+            appearance: 'none', width: '100%', textAlign: 'left', border: `1px solid ${sel === null ? C.ink : C.rule}`,
+            background: sel === null ? C.ink : 'transparent', color: sel === null ? C.paper : C.ink,
+            padding: '10px 12px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <span style={{ fontWeight: 600, fontSize: 14 }}>Everything</span>
+            <span style={mono(C, { fontSize: 11, color: sel === null ? C.paper : C.muted })}>{FS_DATA.length}</span>
+          </button>
+
+          {SESSIONS.map((s, i) => {
+            const state = sel === null ? 'future' : i < sel ? 'past' : i === sel ? 'current' : 'future';
+            const cur = state === 'current';
+            return (
+              <div key={s.n} className="cat-stop" onClick={() => onSelect(i)} style={{ display: 'grid', gridTemplateColumns: '30px 1fr', columnGap: 12 }}>
+                <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+                  {i > 0 && <div style={{ position: 'absolute', top: 0, height: 13, width: 1.5, background: sel !== null && i <= sel ? C.accent : C.rule }} />}
+                  {i < n - 1 && <div style={{ position: 'absolute', top: 13, bottom: 0, width: 1.5, background: sel !== null && i < sel ? C.accent : C.rule }} />}
+                  <div style={{ position: 'relative', zIndex: 1 }}><Node C={C} state={state} glyph={s.glyph} /></div>
+                </div>
+                <div style={{ paddingBottom: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                    <span style={mono(C, { fontSize: 10.5, color: cur ? C.accent : C.muted })}>{s.n}</span>
+                    {cur && <span style={mono(C, { fontSize: 8.5, letterSpacing: '.1em', textTransform: 'uppercase', color: C.paper, background: C.accent, padding: '2px 6px' })}>You are here</span>}
+                  </div>
+                  <div className="cat-stop-title" style={{ fontWeight: cur ? 600 : 500, fontSize: 14.5, letterSpacing: '-0.01em', marginTop: 3, color: state === 'future' && sel !== null ? C.muted : C.ink }}>{s.title}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // ── Refine bar ───────────────────────────────────────────────────────────
+    function Seg({ C, value, options, onChange }) {
+      return (
+        <div style={{ display: 'inline-flex', border: `1px solid ${C.ink}` }}>
+          {options.map((o, i) => {
+            const on = o.id === value;
+            return (
+              <button key={o.id} className="cat-fbtn" onClick={() => onChange(o.id)} style={{
+                border: 'none', borderLeft: i ? `1px solid ${C.rule}` : 'none', padding: '7px 13px', fontSize: 12.5, fontWeight: 500,
+                background: on ? C.ink : 'transparent', color: on ? C.paper : C.ink, whiteSpace: 'nowrap',
+              }}>{o.label}</button>
+            );
+          })}
+        </div>
+      );
+    }
+
+    function RefineBar({ C, q, setQ, type, setType, levels, toggleLevel, count }) {
+      return (
+        <div style={{ border: `1px solid ${C.ink}`, background: C.paperAlt, display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'center', padding: '12px 14px' }}>
+          <div style={{ position: 'relative', flex: 1, minWidth: 180 }}>
+            <span style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: C.muted, ...mono(C, { fontSize: 13 }), pointerEvents: 'none' }}>⌕</span>
+            <input className="cat-input" value={q} onChange={e => setQ(e.target.value)} placeholder="Search the catalog…" style={{
+              width: '100%', padding: '9px 12px 9px 30px', border: `1px solid ${C.ink}`, background: C.paper, color: C.ink, fontSize: 14,
+            }} />
+          </div>
+          <Seg C={C} value={type} onChange={setType} options={[
+            { id: 'all', label: 'All' }, { id: 'bridge', label: 'Bridges' }, { id: 'tool', label: 'Tools' }, { id: 'sketch', label: 'Sketches' },
+          ]} />
+          <div style={{ display: 'flex', gap: 6 }}>
+            {FS_LEVELS.map(l => (
+              <button key={l.id} className="cat-fbtn" onClick={() => toggleLevel(l.id)} style={{
+                padding: '7px 11px', fontSize: 12, border: `1px solid ${levels.has(l.id) ? C.ink : C.rule}`,
+                background: levels.has(l.id) ? C.ink : 'transparent', color: levels.has(l.id) ? C.paper : C.ink,
+              }}>{l.label}</button>
+            ))}
+          </div>
+          <span style={mono(C, { fontSize: 11.5, color: C.muted, marginLeft: 'auto' })}>
+            <span style={{ color: C.ink, fontWeight: 600 }}>{count}</span> shown
+          </span>
+        </div>
+      );
+    }
+
+    function CardGrid({ C, items, dense }) {
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fill, minmax(${dense ? 224 : 248}px, 1fr))`, gap: dense ? 10 : 14 }}>
+          {items.map(it => <MediumCard key={it.id} C={C} item={it} dense={dense} />)}
+        </div>
+      );
+    }
+
+    function GroupHead({ C, sym, label, sub, count }) {
+      return (
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16, borderBottom: `1px solid ${C.ink}`, paddingBottom: 10 }}>
+          {sym && <span style={{ fontSize: 19, color: C.accent }}>{sym}</span>}
+          <h3 style={{ margin: 0, fontFamily: '"Inter Tight",sans-serif', fontWeight: 600, fontSize: 21, letterSpacing: '-0.02em' }}>{label}</h3>
+          {sub && <span style={mono(C, { fontSize: 12, color: C.muted })}>{sub}</span>}
+          <span style={mono(C, { marginLeft: 'auto', fontSize: 21, color: C.accent, fontWeight: 600, letterSpacing: '-0.03em' })}>{String(count).padStart(2, '0')}</span>
+        </div>
+      );
+    }
+
+    function App() {
+      const [t, setTweak] = useTweaks(DEFAULTS);
+      const base = THEMES[t.theme] || THEMES.warm;
+      const C = { ...base, accent: t.accent };
+      const dense = t.density === 'compact';
+
+      const [sel, setSel] = useState(null);     // null = Everything, else session index
+      const [q, setQ] = useState('');
+      const [type, setType] = useState('all');
+      const [levels, setLevels] = useState(new Set());
+      const toggleLevel = (id) => setLevels(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+      const matched = useMemo(() => {
+        const qq = q.trim().toLowerCase();
+        return FS_DATA.filter(it => {
+          if (sel !== null && it.session !== SESSIONS[sel].n) return false;
+          if (type !== 'all' && it.type !== type) return false;
+          if (levels.size && !levels.has(it.level)) return false;
+          if (qq) {
+            const hay = (it.name + ' ' + it.blurb + ' ' + it.tags.join(' ')).toLowerCase();
+            if (!hay.includes(qq)) return false;
+          }
+          return true;
+        });
+      }, [sel, q, type, levels]);
+
+      const groups = useMemo(() => {
+        if (sel !== null) return null;
+        return FS_SUITS.map(s => ({ ...s, items: matched.filter(it => it.suit === s.id) })).filter(g => g.items.length);
+      }, [sel, matched]);
+
+      const session = sel !== null ? SESSIONS[sel] : null;
+
+      return (
+        <div style={{ background: C.paper, color: C.ink, minHeight: '100vh' }}>
+          <CatalogCardStyle />
+
+          {/* Masthead */}
+          <div style={{ borderBottom: `1px solid ${C.ink}` }}>
+            <div style={{ maxWidth: 1240, margin: '0 auto', padding: '20px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', ...mono(C, { fontSize: 10.5, letterSpacing: '.12em', textTransform: 'uppercase', color: C.muted }) }}>
+              <span><span style={{ color: C.accent }}>◆</span> CC Fest · Coding Camp</span>
+              <span>Free · open to everyone · p5.js</span>
+            </div>
+          </div>
+          <header style={{ maxWidth: 1240, margin: '0 auto', padding: '44px 32px 32px' }}>
+            <h1 style={{ margin: 0, fontFamily: '"Inter Tight",sans-serif', fontWeight: 500, fontSize: 'clamp(38px,5vw,64px)', lineHeight: 1.0, letterSpacing: '-0.04em', maxWidth: '18ch' }}>
+              Creative coding, <span style={{ color: C.accent }}>cataloged.</span>
+            </h1>
+            <div style={{ marginTop: 26, display: 'flex', gap: 0, flexWrap: 'wrap', borderTop: `1px solid ${C.rule}` }}>
+              {[['21', 'Concept bridges'], ['70', 'Workshop tools'], ['44', 'Starter sketches'], ['05', 'Sessions']].map((s, i) => (
+                <div key={i} style={{ flex: '1 1 160px', padding: '16px 0', borderRight: i < 3 ? `1px solid ${C.rule}` : 'none' }}>
+                  <div style={{ fontFamily: '"Inter Tight",sans-serif', fontWeight: 500, fontSize: 40, letterSpacing: '-0.04em', color: C.accent, lineHeight: 0.9 }}>{s[0]}</div>
+                  <div style={mono(C, { fontSize: 11, color: C.muted, marginTop: 8, letterSpacing: '.04em', textTransform: 'uppercase' })}>{s[1]}</div>
+                </div>
+              ))}
+            </div>
+          </header>
+
+          {/* Body */}
+          <div style={{ maxWidth: 1240, margin: '0 auto', padding: '8px 32px 120px', display: 'grid', gridTemplateColumns: '236px 1fr', gap: 40, alignItems: 'start' }}>
+            <aside style={{ position: 'sticky', top: 16 }}>
+              <NavRail C={C} sel={sel} onSelect={setSel} />
+            </aside>
+
+            <main>
+              {/* Session header (only in session mode) */}
+              {session && (
+                <div style={{ marginBottom: 26 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: 20, alignItems: 'start', borderBottom: `1px solid ${C.ink}`, paddingBottom: 20 }}>
+                    <div style={{ fontFamily: '"Inter Tight",sans-serif', fontWeight: 500, fontSize: 64, lineHeight: 0.82, letterSpacing: '-0.05em', color: C.accent }}>{session.n}</div>
+                    <div>
+                      <div style={mono(C, { fontSize: 10.5, letterSpacing: '.14em', textTransform: 'uppercase', color: C.muted, marginBottom: 7, display: 'flex', alignItems: 'center', gap: 8 })}>
+                        <span style={{ color: C.accent, fontSize: 13 }}>{session.glyph}</span> {SUIT_NAME[session.suit]} · Session {sel + 1} of 5
+                      </div>
+                      <h2 style={{ margin: 0, fontFamily: '"Inter Tight",sans-serif', fontWeight: 500, fontSize: 'clamp(26px,3vw,38px)', letterSpacing: '-0.03em', lineHeight: 1.04 }}>{session.title}</h2>
+                      <p style={{ margin: '10px 0 0', fontSize: 15.5, color: C.ink, maxWidth: '44ch', lineHeight: 1.5 }}>{session.focus}</p>
+                    </div>
+                  </div>
+                  <div style={{ marginTop: 18, border: `1px solid ${C.accent}`, borderLeft: `3px solid ${C.accent}`, background: C.paperAlt, padding: '13px 16px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 18, color: C.accent }}>⬡</span>
+                    <div style={{ flex: 1, minWidth: 180 }}>
+                      <div style={mono(C, { fontSize: 9.5, letterSpacing: '.12em', textTransform: 'uppercase', color: C.muted, marginBottom: 3 })}>Start with the bridge</div>
+                      <div style={{ fontFamily: '"Inter Tight",sans-serif', fontWeight: 600, fontSize: 16.5, letterSpacing: '-0.015em' }}>{session.bridge.name}</div>
+                    </div>
+                    <span style={mono(C, { fontSize: 12, color: C.ink })}>{session.bridge.fns}</span>
+                  </div>
+                </div>
+              )}
+
+              <div style={{ position: 'sticky', top: 16, zIndex: 5, marginBottom: 26 }}>
+                <RefineBar C={C} q={q} setQ={setQ} type={type} setType={setType} levels={levels} toggleLevel={toggleLevel} count={matched.length} />
+              </div>
+
+              {matched.length === 0 && (
+                <div style={{ border: `1px solid ${C.rule}`, padding: '52px 24px', textAlign: 'center', color: C.muted }}>
+                  <div style={{ fontSize: 15, color: C.ink, fontWeight: 600, marginBottom: 6 }}>Nothing matches.</div>
+                  <div style={{ fontSize: 13.5 }}>Loosen a filter — or pick <strong>Everything</strong> in the rail.</div>
+                </div>
+              )}
+
+              {/* Session mode: flat grid. Everything mode: grouped by category. */}
+              {session
+                ? <CardGrid C={C} items={matched} dense={dense} />
+                : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 38 }}>
+                    {groups.map(g => (
+                      <section key={g.id}>
+                        <GroupHead C={C} sym={g.sym} label={g.name} sub={g.sub} count={g.items.length} />
+                        <CardGrid C={C} items={g.items} dense={dense} />
+                      </section>
+                    ))}
+                  </div>
+                )}
+            </main>
+          </div>
+
+          <TweaksPanel title="Tweaks">
+            <TweakSection label="Density" />
+            <TweakRadio label="Cards" value={t.density} options={['compact', 'regular']} onChange={(v) => setTweak('density', v)} />
+            <TweakSection label="Palette" />
+            <TweakRadio label="Theme" value={t.theme} options={['warm', 'light', 'dark']} onChange={(v) => setTweak('theme', v)} />
+            <TweakColor label="Accent" value={t.accent} options={['#bc7a2c', '#c64a26', '#3a8a5c', '#3f82c4', '#8a5bd0']} onChange={(v) => setTweak('accent', v)} />
+          </TweaksPanel>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
