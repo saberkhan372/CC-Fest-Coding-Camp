@@ -2628,7 +2628,7 @@ ${code}
           <div class="card-inner">
             <div class="card-header">
               <div>
-                <h2>See it · Change it · Remix it · Teach it</h2>
+                <h2>Teaching Prompts</h2>
                 <p>Four moves that turn any starter sketch into a full session.</p>
               </div>
             </div>
