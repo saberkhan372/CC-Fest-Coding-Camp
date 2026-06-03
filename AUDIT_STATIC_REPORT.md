@@ -25,6 +25,10 @@ Generated from `cc-fest-coding-camp-pages`.
 
 - [x] No issues found.
 
+## Missing Descriptions
+
+- [x] No issues found.
+
 ## Stale Count Text
 
 - [x] No issues found.

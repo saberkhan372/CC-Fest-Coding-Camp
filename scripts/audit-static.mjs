@@ -104,6 +104,7 @@ const staticWorkshopTools = toolIndexFiles.filter((file) => {
 });
 
 const missingTitles = htmlFiles.filter((file) => !hasTitle(read(file)));
+const missingDescriptions = htmlFiles.filter((file) => !/<meta\s+name=["']description["']/i.test(read(file)));
 const staleCounts = htmlFiles.filter((file) => staleCountPattern.test(read(file)));
 const badStarterPaths = htmlFiles.filter((file) => read(file).includes("../../starter-sketches/"));
 const catalogDataCacheKeyIssues = htmlFiles.flatMap((file) => {
@@ -228,6 +229,7 @@ function section(title, items, formatter) {
 }
 
 section("Missing Titles", missingTitles, (file) => rel(file));
+section("Missing Descriptions", missingDescriptions, (file) => rel(file));
 section("Stale Count Text", staleCounts, (file) => rel(file));
 section("Stale Catalog Data Cache Keys", catalogDataCacheKeyIssues, (item) => `${rel(item.file)} -> \`${item.version}\``);
 section("Bad Starter-Sketch Path References", badStarterPaths, (file) => rel(file));

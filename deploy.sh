@@ -14,6 +14,9 @@ node scripts/generate-catalog-data.mjs
 echo "Stamping homepage card metadata ..."
 node scripts/stamp-index-card-metadata.mjs
 
+echo "Stamping page descriptions ..."
+node scripts/stamp-page-descriptions.mjs
+
 echo "Syncing root assets from $SRC to $DST ..."
 for f in "$SRC"/*.css "$SRC"/*.js "$SRC"/*.html; do
   [ -f "$f" ] || continue
