@@ -488,6 +488,11 @@
       </main>
     `;
 
+    setTimeout(() => {
+      const existing = document.querySelector(".catalog-meta-strip");
+      if (existing) existing.outerHTML = renderCatalogMeta(slug);
+    }, 0);
+
     const canvas = document.getElementById("toolCanvas");
     const ctx = canvas.getContext("2d");
     const pointer = { x: 430, y: 210, active: false };
@@ -535,10 +540,10 @@
 
   function renderCatalogMeta(slug) {
     const catalog = window.CCFestCatalog;
-    if (!catalog?.items?.length) return "";
+    if (!catalog?.items?.length) return '<div class="catalog-meta-strip"></div>';
 
     const item = catalog.items.find((entry) => entry.id === slug);
-    if (!item) return "";
+    if (!item) return '<div class="catalog-meta-strip"></div>';
 
     const suitMap = {
       marks:   { glyph: "✦", label: "Marks" },
