@@ -101,6 +101,16 @@ a{color:inherit}
 
 .tool-topbar a:hover{color:var(--accent)}
 
+.tool-topbar .brand-mark,
+.top .brand-mark{
+  color:var(--accent);
+  font-family:"DM Mono",ui-monospace,monospace;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
 .tool-header{
   background:var(--panel);
   border:2px solid var(--ink);

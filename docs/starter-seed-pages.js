@@ -2559,7 +2559,7 @@ ${code}
     app.innerHTML = `
       <div class="sketch-shell">
         <div class="sketch-topbar">
-          <a href="../../index.html">← Back to tool library</a>
+          <a class="brand-mark" href="../../index.html">CC Fest · Coding Camp Tools</a>
           <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">CC Fest on GitHub</a>
         </div>
 

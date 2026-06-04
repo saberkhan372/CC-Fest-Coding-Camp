@@ -5,7 +5,7 @@ const roots = [
   path.join(process.cwd(), "cc-fest-coding-camp-pages", "tools"),
   path.join(process.cwd(), "docs", "tools"),
 ];
-const rendererSrc = "starter-seed-pages.js?v=20260603-phase6d-starter-actions";
+const rendererSrc = "starter-seed-pages.js?v=20260603-brand-topbar";
 
 function walk(dir) {
   const out = [];

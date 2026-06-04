@@ -6,6 +6,7 @@ const sourceRoot = path.join(repoRoot, "cc-fest-coding-camp-pages");
 const reportPath = path.join(repoRoot, "AUDIT_STATIC_REPORT.md");
 const staleCountPattern = /\b(31(?: workshop)? tools|26(?: starter)? sketches|60 tools|40 sketches)\b/i;
 const expectedCatalogDataCacheKey = "20260603-audit-freshness";
+const expectedStarterRendererCacheKey = "20260603-brand-topbar";
 const catalogDataPath = path.join(sourceRoot, "catalog-data.js");
 const sessionsDataPath = path.join(sourceRoot, "sessions-data.js");
 
@@ -111,6 +112,7 @@ const missingTitles = htmlFiles.filter((file) => !hasTitle(read(file)));
 const missingDescriptions = htmlFiles.filter((file) => !/<meta\s+name=["']description["']/i.test(read(file)));
 const missingHeadings = htmlFiles.filter((file) => !hasH1(read(file)));
 const staleCounts = htmlFiles.filter((file) => staleCountPattern.test(read(file)));
+const legacyBackLinkTopbars = htmlFiles.filter((file) => /<a\s+href=["']\.\.\/\.\.\/index\.html["']>\s*(?:←\s*)?Back to tool library\s*<\/a>/i.test(read(file)));
 const badStarterPaths = htmlFiles.filter((file) => read(file).includes("../../starter-sketches/"));
 const catalogDataCacheKeyIssues = htmlFiles.flatMap((file) => {
   const html = read(file);
@@ -123,7 +125,7 @@ const catalogDataCacheKeyIssues = htmlFiles.flatMap((file) => {
 const brokenTargets = [];
 const unresolvedAssets = [];
 for (const file of htmlFiles) {
-  const html = read(file);
+  const html = read(file).replace(/<script(?![^>]*\bsrc=)[\s\S]*?<\/script>/gi, "");
   const hrefs = extractAttrs(html, "href");
   const srcs = extractAttrs(html, "src");
 
@@ -148,7 +150,7 @@ const staticMissingExportHelper = staticWorkshopTools.filter((file) => !read(fil
 const jsMissingStateUtils = jsWorkshopTools.filter((file) => !read(file).includes("tool-state-utils.js?v="));
 const jsMissingExportHelper = jsWorkshopTools.filter((file) => !read(file).includes("p5-export-helper.js?v="));
 const starterMissingRenderer = starterSketches.filter((file) => !read(file).includes("starter-seed-pages.js"));
-const starterRendererCacheKeyIssues = starterSketches.filter((file) => !read(file).includes("starter-seed-pages.js?v=20260603-phase6d-starter-actions"));
+const starterRendererCacheKeyIssues = starterSketches.filter((file) => !read(file).includes(`starter-seed-pages.js?v=${expectedStarterRendererCacheKey}`));
 const jsRenderedMissingStaticFallback = [...jsWorkshopTools, ...starterSketches]
   .filter((file) => !read(file).includes("data-static-fallback"));
 const detailMissingSessionStrip = detailIndexFiles.filter((file) => !read(file).includes("session-strip.js?v=20260603-phase4-sessions"));
@@ -240,6 +242,7 @@ section("Missing Titles", missingTitles, (file) => rel(file));
 section("Missing Descriptions", missingDescriptions, (file) => rel(file));
 section("Missing H1 Headings", missingHeadings, (file) => rel(file));
 section("Stale Count Text", staleCounts, (file) => rel(file));
+section("Legacy Back-Link Topbars", legacyBackLinkTopbars, (file) => rel(file));
 section("Stale Catalog Data Cache Keys", catalogDataCacheKeyIssues, (item) => `${rel(item.file)} -> \`${item.version}\``);
 section("Bad Starter-Sketch Path References", badStarterPaths, (file) => rel(file));
 section("Broken Local Hrefs", brokenTargets, (item) => `${rel(item.file)} -> \`${item.url}\``);

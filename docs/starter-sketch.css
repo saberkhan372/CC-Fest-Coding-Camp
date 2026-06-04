@@ -93,6 +93,15 @@ a{color:inherit}
 
 .sketch-topbar a:hover{color:var(--accent)}
 
+.sketch-topbar .brand-mark{
+  color:var(--accent);
+  font-family:"DM Mono",ui-monospace,monospace;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
 .sketch-header{
   background:rgba(255,255,255,.82);
   border:1px solid rgba(44,42,38,.06);

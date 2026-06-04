@@ -23,6 +23,12 @@ node scripts/stamp-static-fallbacks.mjs
 echo "Stamping starter renderer cache keys ..."
 node scripts/stamp-starter-renderer-cache.mjs
 
+echo "Stamping branded topbars ..."
+node scripts/stamp-brand-topbars.mjs
+
+echo "Stamping branded topbar cache keys ..."
+node scripts/stamp-brand-cache-keys.mjs
+
 echo "Syncing root assets from $SRC to $DST ..."
 for f in "$SRC"/*.css "$SRC"/*.js "$SRC"/*.html; do
   [ -f "$f" ] || continue
@@ -44,13 +50,13 @@ for dir in tools concept-bridges sessions; do
   fi
 done
 
-if [ -z "$(git status --porcelain -- "$SRC" "$DST")" ]; then
-  echo "Nothing changed in $SRC or $DST - already up to date."
+if [ -z "$(git status --porcelain -- "$SRC" "$DST" scripts deploy.sh)" ]; then
+  echo "Nothing changed in $SRC, $DST, scripts, or deploy.sh - already up to date."
   exit 0
 fi
 
 MSG="${1:-Sync docs with source}"
-git add "$SRC" "$DST"
+git add "$SRC" "$DST" scripts deploy.sh
 git commit -m "$MSG"
 git push origin main
 echo "Done. Pushed to origin/main."

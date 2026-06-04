@@ -444,7 +444,7 @@
     document.getElementById("app").innerHTML = `
       <main class="tool-shell">
         <nav class="tool-topbar">
-          <a href="../../index.html">← Back to tool library</a>
+          <a class="brand-mark" href="../../index.html">CC Fest · Coding Camp Tools</a>
           <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp" target="_blank" rel="noopener">CC Fest on GitHub</a>
         </nav>
         <header class="tool-header">
