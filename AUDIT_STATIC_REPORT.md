@@ -29,6 +29,10 @@ Generated from `cc-fest-coding-camp-pages`.
 
 - [x] No issues found.
 
+## Missing H1 Headings
+
+- [x] No issues found.
+
 ## Stale Count Text
 
 - [x] No issues found.
@@ -62,6 +66,10 @@ Generated from `cc-fest-coding-camp-pages`.
 - [x] No issues found.
 
 ## Starter Sketches Missing Renderer Script
+
+- [x] No issues found.
+
+## JS-Rendered Pages Missing Static Fallback
 
 - [x] No issues found.
 

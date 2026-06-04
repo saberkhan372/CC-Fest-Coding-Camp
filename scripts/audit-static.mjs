@@ -71,6 +71,10 @@ function hasTitle(html) {
   return /<title>[^<]+<\/title>/i.test(html);
 }
 
+function hasH1(html) {
+  return /<h1[\s>]/i.test(html);
+}
+
 function countMatches(files, test) {
   return files.filter((file) => test(read(file), file));
 }
@@ -105,6 +109,7 @@ const staticWorkshopTools = toolIndexFiles.filter((file) => {
 
 const missingTitles = htmlFiles.filter((file) => !hasTitle(read(file)));
 const missingDescriptions = htmlFiles.filter((file) => !/<meta\s+name=["']description["']/i.test(read(file)));
+const missingHeadings = htmlFiles.filter((file) => !hasH1(read(file)));
 const staleCounts = htmlFiles.filter((file) => staleCountPattern.test(read(file)));
 const badStarterPaths = htmlFiles.filter((file) => read(file).includes("../../starter-sketches/"));
 const catalogDataCacheKeyIssues = htmlFiles.flatMap((file) => {
@@ -143,6 +148,8 @@ const staticMissingExportHelper = staticWorkshopTools.filter((file) => !read(fil
 const jsMissingStateUtils = jsWorkshopTools.filter((file) => !read(file).includes("tool-state-utils.js?v="));
 const jsMissingExportHelper = jsWorkshopTools.filter((file) => !read(file).includes("p5-export-helper.js?v="));
 const starterMissingRenderer = starterSketches.filter((file) => !read(file).includes("starter-seed-pages.js"));
+const jsRenderedMissingStaticFallback = [...jsWorkshopTools, ...starterSketches]
+  .filter((file) => !read(file).includes("data-static-fallback"));
 const detailMissingSessionStrip = detailIndexFiles.filter((file) => !read(file).includes("session-strip.js?v=20260603-phase4-sessions"));
 const detailLoadingHomepageRuntime = detailIndexFiles.filter((file) => read(file).includes("site.js?v=20260603-phase4-sessions"));
 
@@ -230,6 +237,7 @@ function section(title, items, formatter) {
 
 section("Missing Titles", missingTitles, (file) => rel(file));
 section("Missing Descriptions", missingDescriptions, (file) => rel(file));
+section("Missing H1 Headings", missingHeadings, (file) => rel(file));
 section("Stale Count Text", staleCounts, (file) => rel(file));
 section("Stale Catalog Data Cache Keys", catalogDataCacheKeyIssues, (item) => `${rel(item.file)} -> \`${item.version}\``);
 section("Bad Starter-Sketch Path References", badStarterPaths, (file) => rel(file));
@@ -239,6 +247,7 @@ section("Static Workshop Tools Missing p5 Export Helper", staticMissingExportHel
 section("JS Workshop Tools Missing State Utils", jsMissingStateUtils, (file) => rel(file));
 section("JS Workshop Tools Missing p5 Export Helper", jsMissingExportHelper, (file) => rel(file));
 section("Starter Sketches Missing Renderer Script", starterMissingRenderer, (file) => rel(file));
+section("JS-Rendered Pages Missing Static Fallback", jsRenderedMissingStaticFallback, (file) => rel(file));
 section("Detail Pages Missing Session Strip Runtime", detailMissingSessionStrip, (file) => rel(file));
 section("Detail Pages Loading Homepage Runtime", detailLoadingHomepageRuntime, (file) => rel(file));
 section("Catalog Metadata Count Issues", catalogCountIssues, (item) => item);

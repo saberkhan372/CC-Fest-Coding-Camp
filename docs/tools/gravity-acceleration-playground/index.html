@@ -7,13 +7,21 @@
 <title>Gravity + Acceleration Playground - CC Fest Coding Camp</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../site-components.css">
-  <link rel="stylesheet" href="../../tool-page.css?v=20260603-phase6a-catalog-meta">
+  <link rel="stylesheet" href="../../tool-page.css?v=20260603-static-fallbacks">
   <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
+  <main class="static-fallback" data-static-fallback>
+    <p class="tool-eyebrow">Workshop tool</p>
+    <h1>Gravity + Acceleration Playground</h1>
+    <p>Adjust gravity, velocity, and damping while a bouncing ball exposes the position ← velocity ← acceleration chain. Vector overlays show the motion model live.</p>
+    <p>This interactive page is rendered with JavaScript. Enable JavaScript to use the canvas, controls, code panel, and session wayfinding.</p>
+    <p><a href="../../index.html">Back to the CC Fest tool library</a></p>
+  </main>
+  </div>
   <script src="../../tool-state-utils.js?v=20260602-state"></script>
   <script src="../../spine.js?v=20260603-phase8"></script>
   <script src="../../workshop-tool-pages.js?v=20260603-phase6a-catalog-meta-delay"></script>

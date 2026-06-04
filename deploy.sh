@@ -17,6 +17,9 @@ node scripts/stamp-index-card-metadata.mjs
 echo "Stamping page descriptions ..."
 node scripts/stamp-page-descriptions.mjs
 
+echo "Stamping static fallbacks ..."
+node scripts/stamp-static-fallbacks.mjs
+
 echo "Syncing root assets from $SRC to $DST ..."
 for f in "$SRC"/*.css "$SRC"/*.js "$SRC"/*.html; do
   [ -f "$f" ] || continue
