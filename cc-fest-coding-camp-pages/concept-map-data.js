@@ -122,6 +122,11 @@ const CONCEPT_MAP_DATA = {
     { id: "for-loop-stepper",        type: "tool", suit: "systems", title: "For Loop Stepper",                  col: 5 },
     { id: "polished-array-explorer", type: "tool", suit: "systems", title: "Array Explorer: Values Become Visuals", col: 5 },
 
+    { id: "bezier-curve-sculptor",    type: "tool", suit: "marks",   title: "Bezier Curve Sculptor",             col: 3 },
+    { id: "how-does-it-grow",        type: "tool", suit: "motion",  title: "How Does It Grow?",                 col: 4 },
+    { id: "distribution-visualizer", type: "tool", suit: "systems", title: "Distribution Visualizer",           col: 1 },
+    { id: "unit-circle-wave-sync",   type: "tool", suit: "motion",  title: "Unit Circle Wave Sync",             col: 2 },
+
     { id: "game-state-studio",       type: "tool", suit: "open",    title: "Game State Studio",                 col: 6 },
     { id: "if-else-decision-studio", type: "tool", suit: "motion",  title: "If / Else Decision Studio",         col: 6 },
 

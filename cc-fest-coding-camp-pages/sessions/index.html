@@ -3,207 +3,329 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sessions - CC Fest Coding Camp</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../site.css?v=20260603-phase7-filters">
-  <link rel="stylesheet" href="../sessions.css?v=20260603-phase8-mapframe">
-  <meta name="description" content="Browse the five CC Fest workshop sessions, each with a poster, anchor bridge, workshop tools, and starter sketches.">
+  <title>Sessions — CC Fest Coding Camp</title>
+  <meta name="description" content="Five workshop sessions, each with a poster, an anchor bridge, and a small set of tools and starter sketches for the day.">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+<style>
+  /* ══════════════════════════════════════════════════════════════════════
+     CC FEST · SESSIONS — "Camp Press"
+     Cream paper, poster-red accents, Fraunces headlines, DM Mono labels,
+     bordered panels with offset shadow, p5 generative poster per card,
+     and a sticky suit-accent metro spine.
+     ══════════════════════════════════════════════════════════════════════ */
+  :root{
+    --paper:#f6f0e7; --panel:#fffdf7; --ink:#201c1a; --ink2:#5c5751;
+    --line:#d8cdbf; --red:#c8391d; --gold:#f5a800; --maxw:1120px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"DM Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  a{color:inherit}
+  .mono{font-family:"DM Mono",ui-monospace,monospace}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+
+  /* ── topbar ── */
+  .topbar{border-bottom:2px solid var(--ink);background:var(--paper);position:sticky;top:0;z-index:50}
+  .topbar-in{max-width:var(--maxw);margin:0 auto;padding:14px 40px;display:flex;align-items:center;gap:22px}
+  .brand{font:700 15px/1 "DM Sans",sans-serif;letter-spacing:-.01em;color:var(--red);text-decoration:none;margin-right:auto}
+  .tlinks{display:flex;align-items:center;gap:20px}
+  .tlinks a{font:500 12px/1 "DM Mono",monospace;letter-spacing:.02em;color:var(--ink2);text-decoration:none}
+  .tlinks a:hover{color:var(--red)}
+  @media(max-width:720px){.tlinks a:not(.gh){display:none}}
+
+  /* ── hero ── */
+  .hero{padding:54px 0 34px}
+  .hero .eye{font:600 11px/1 "DM Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--red)}
+  .hero h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(44px,6.4vw,72px);line-height:.94;
+    letter-spacing:-.022em;margin:16px 0 0;max-width:13ch;text-wrap:balance}
+  .hero h1 .y{color:var(--red)}
+  .hero .lede{margin:20px 0 0;max-width:56ch;font-size:clamp(15px,1.7vw,17.5px);line-height:1.55;color:var(--ink2);text-wrap:pretty}
+
+  /* ── layout ── */
+  .layout{display:grid;grid-template-columns:236px 1fr;gap:50px;padding:34px 0 60px;align-items:start}
+  @media(max-width:900px){.layout{grid-template-columns:1fr;gap:0}}
+
+  /* ── spine ── */
+  .rail{position:sticky;top:88px;align-self:start}
+  @media(max-width:900px){.rail{display:none}}
+  .rail .kick{font:600 10px/1 "DM Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:18px}
+  .stop{display:grid;grid-template-columns:30px 1fr;gap:11px;color:inherit}
+  .gut{position:relative;display:flex;justify-content:center;text-decoration:none}
+  .st-jump{display:block;text-decoration:none;color:inherit;cursor:pointer}
+  .gut .ln{position:absolute;width:2px;background:var(--line);left:50%;transform:translateX(-50%)}
+  .gut .ln.t{top:0;height:13px}.gut .ln.b{top:13px;bottom:0}
+  .gut .ln.on{background:var(--gold)}
+  .nd{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink2);z-index:1;margin-top:1px;
+    transition:background .2s,color .2s,box-shadow .2s,border-color .2s}
+  .stop.past .nd{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .stop.cur .nd{background:var(--sa,var(--gold));color:#fff;border-color:var(--sa,var(--gold));
+    box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--sa,var(--gold))}
+  .sb{padding-bottom:18px}
+  .snum{font:600 10px/1 "DM Mono",monospace;color:var(--ink2)}
+  .stop.cur .snum{color:var(--sa,var(--gold))}
+  .yah{font:700 8px/1 "DM Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#fff;
+    background:var(--sa,var(--gold));padding:2px 5px;margin-left:6px}
+  .st{font:700 15px/1.2 "DM Sans",sans-serif;letter-spacing:-.01em;margin-top:4px;color:var(--ink2);transition:color .2s}
+  .stop.past .st,.stop.cur .st{color:var(--ink)}
+  .exp{margin-top:9px;display:flex;flex-direction:column;gap:7px}
+  .efoc{font-size:12px;line-height:1.45;color:var(--ink2)}
+  .ebr{font:600 11.5px/1.3 "DM Sans",sans-serif;text-decoration:none;display:flex;gap:6px}
+  .ebr:hover{color:var(--red)}
+  .ebr b{color:var(--red);font-weight:700}
+  .etl{display:flex;flex-direction:column;gap:3px}
+  .etl a{font-size:11.5px;color:var(--ink2);display:flex;gap:7px;align-items:center;text-decoration:none}
+  .etl a:hover{color:var(--ink)}
+  .etl a::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--line);flex-shrink:0}
+
+  /* ── cards ── */
+  .cards{display:flex;flex-direction:column;gap:26px;min-width:0}
+  .card{border:2px solid var(--ink);background:var(--panel);box-shadow:7px 7px 0 rgba(32,28,26,.13);
+    overflow:hidden;scroll-margin-top:90px}
+  .poster{display:block;line-height:0}
+  .poster canvas{display:block;width:100%;height:auto}
+  .cbody{padding:22px 24px 24px}
+  .cmeta{display:flex;align-items:center;gap:10px;font:600 10.5px/1 "DM Mono",monospace;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+  .cmeta .g{font-size:14px}
+  .card h2{font-family:"Fraunces",serif;font-weight:800;font-size:clamp(26px,3vw,33px);line-height:1.02;
+    letter-spacing:-.02em;margin:10px 0 0}
+  .card h2 a{text-decoration:none}
+  .card h2 a:hover{color:var(--red)}
+  .cfoc{margin:10px 0 0;font-size:15px;line-height:1.45;color:var(--ink2);max-width:50ch}
+  .br{margin-top:18px;border:1.5px solid var(--ink);border-left:5px solid var(--sa,var(--red));background:var(--paper);
+    padding:13px 16px;display:flex;align-items:center;gap:13px;flex-wrap:wrap;text-decoration:none;color:inherit;transition:background .15s}
+  .br:hover{background:#efe7d8}
+  .br .hx{font-size:18px;color:var(--sa,var(--red))}
+  .br .bk{display:block;font:600 8.5px/1 "DM Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+  .br .bn{display:block;font:700 16px/1.15 "Fraunces",serif;margin-top:4px}
+  .br .bf{font:500 11px/1.4 "DM Mono",monospace;color:var(--ink2);margin-left:auto;text-align:right;max-width:30ch}
+  .grp{margin-top:18px}
+  .grp .gl{font:600 9.5px/1 "DM Mono",monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--ink2);margin-bottom:9px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font:600 12.5px/1 "DM Sans",sans-serif;border:1.5px solid var(--line);background:var(--paper);
+    padding:8px 12px;display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;transition:border-color .15s}
+  .chip:hover{border-color:var(--ink)}
+  .chip .d{width:6px;height:6px;border-radius:50%;background:var(--sa,var(--red));flex-shrink:0}
+  .chip.sketch .d{background:transparent;border:1.5px solid var(--sa,var(--red))}
+  .chip .go{color:var(--ink2);font:500 10px/1 "DM Mono",monospace}
+
+  /* ── footer ── */
+  .foot{border-top:2px solid var(--ink);padding:26px 0 64px}
+  .foot-in{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;
+    font:500 11px/1.5 "DM Mono",monospace;color:var(--ink2)}
+  .foot-in a{color:var(--ink2);text-decoration:none}.foot-in a:hover{color:var(--red)}
+
+  @media(max-width:600px){.wrap{padding:0 20px}.topbar-in{padding:14px 20px}.hero{padding:36px 0 24px}}
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
 </head>
 <body>
-  <div class="shell">
-    <div class="site-topbar">
-      <a class="brand-mark" href="../index.html">CC Fest · Coding Camp Tools</a>
-      <nav class="topbar-links" aria-label="Sessions page links">
-        <a class="topbar-link" href="https://ccfest.rocks">ccfest.rocks</a>
-        <a class="topbar-link" href="../concept-map.html">Map</a>
-        <a class="topbar-link" href="../about.html">About</a>
-        <a class="topbar-link" href="../index.html">Tools</a>
-        <a class="topbar-link" href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">GitHub</a>
+  <header class="topbar">
+    <div class="topbar-in">
+      <a class="brand" href="../index.html">CC Fest · Coding Camp Tools</a>
+      <nav class="tlinks" aria-label="Sessions page links">
+        <a href="https://ccfest.rocks">ccfest.rocks</a>
+        <a href="../concept-map.html">Map</a>
+        <a href="../about.html">About</a>
+        <a href="../index.html">Tools</a>
+        <a class="gh" href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">GitHub</a>
       </nav>
     </div>
+  </header>
 
-    <main class="sessions-main">
-      <header class="sessions-header">
-        <h1>CC Fest Sessions</h1>
-        <p>Five workshop sessions, each with a poster, an anchor bridge, and a small set of tools and sketches for the day.</p>
-      </header>
+  <main class="wrap">
+    <section class="hero">
+      <div class="eye">CC Fest Coding Camp · five sessions, one arc</div>
+      <h1>Five sessions. <span class="y">One arc.</span></h1>
+      <p class="lede">Each session is a poster — a focus, an anchoring concept bridge, and a small set of tools and starter sketches for the day. The arc runs from your first marks to open studio, but every tool stands alone, so you can drop in anywhere.</p>
+    </section>
 
-      <div class="sessions-body">
-        <div id="sessions-spine" aria-label="Session arc navigation"></div>
-        <div class="sessions-grid" id="sessions-grid"></div>
-      </div>
-    </main>
-  </div>
+    <div class="layout">
+      <aside class="rail" aria-label="Session navigation">
+        <div class="kick">The arc</div>
+        <nav id="rail"></nav>
+      </aside>
+      <div class="cards" id="cards"></div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <span>CC Fest Coding Camp · creative coding tools for p5.js</span>
+      <span><a href="https://ccfest.rocks">ccfest.rocks</a> · <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">GitHub ↗</a></span>
+    </div>
+  </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-  <script src="../catalog-data.js?v=20260603-audit-freshness"></script>
+  <script src="../catalog-data.js?v=20260602-redesign-phase3-lens"></script>
   <script src="../sessions-data.js?v=20260603-phase4-sessions"></script>
-  <script src="../spine.js?v=20260603-phase8"></script>
   <script>
-  const SESSIONS = (window.CCFestSessions || []).filter((session) => session.id !== "template");
-  const catalogById = new Map((window.CCFestCatalog?.items || []).map((item) => [item.id, item]));
-
-  function sessionHref(session) {
-    return (session.href || "").replace(/^sessions\//, "");
-  }
-
-  function resourceTitle(slug) {
-    return catalogById.get(slug)?.title || slug.replaceAll("-", " ");
-  }
-
-  function resourcePill(kind, slug) {
-    const base = kind === "bridge" ? "../concept-bridges/" : "../tools/";
-    return `<a class="session-resource-pill session-resource-pill--${kind}" href="${base}${slug}/">${resourceTitle(slug)}</a>`;
-  }
-
-  document.fonts.ready.then(() => {
-    const grid = document.getElementById("sessions-grid");
-
-    SESSIONS.forEach((session) => {
-      const card = document.createElement("article");
-      card.className = `session-card session-card--${session.id}`;
-      const details = session.anchorBridge ? `
-        <div class="session-card-resources">
-          ${resourcePill("bridge", session.anchorBridge)}
-          ${(session.featuredTools || []).slice(0, 2).map((slug) => resourcePill("tool", slug)).join("")}
-          ${(session.featuredSketches || []).slice(0, 2).map((slug) => resourcePill("sketch", slug)).join("")}
-        </div>
-      ` : "";
-      card.innerHTML = `
-        <a class="session-card-main" href="${sessionHref(session)}">
-          <div class="session-card-thumb" id="thumb-${session.id}"></div>
-          <div class="session-card-meta">
-            <p class="session-label">${session.label}</p>
-            <h2>${session.title}</h2>
-            <p class="session-focus">${session.subtitle}</p>
-          </div>
-        </a>
-        ${details}
-      `;
-      grid.appendChild(card);
-
-      new p5((p) => {
-        p.setup = () => {
-          const canvas = p.createCanvas(520, 200);
-          canvas.parent(document.getElementById("thumb-" + session.id));
-          p.noLoop();
-          drawThumb(p, session);
-        };
-      });
-    });
-  });
-
-  function drawThumb(p, session) {
-    p.background(250, 246, 240);
-    p.fill(44, 42, 38, 23);
-    p.noStroke();
-    for (let x = 2; x < p.width; x += 20) {
-      for (let y = 2; y < p.height; y += 20) {
-        p.circle(x, y, 3);
-        p.circle(x + 10, y + 10, 3);
-      }
-    }
-
-    const accent = p.color(session.accent);
-    p.fill(accent);
-    p.noStroke();
-    p.rect(0, 0, p.width, 36);
-
-    p.fill(255, 253, 247);
-    p.textFont("DM Mono");
-    p.textSize(10);
-    p.text("CC FEST / CODING CAMP", 14, 23);
-
-    p.fill(44, 42, 38);
-    p.textFont("Fraunces");
-    p.textSize(28);
-    p.textLeading(30);
-    p.text(session.topic, 14, 72);
-
-    p.randomSeed(session.seed);
-    const count = 7;
-    const margin = 14;
-    const spacing = (p.width - 2 * margin) / (count - 1);
-    for (let i = 0; i < count; i++) {
-      const x = margin + i * spacing;
-      const d = 14 + p.random(-4, 4);
-      if (p.random() > 0.55) {
-        p.fill(accent);
-        p.noStroke();
-      } else {
-        p.noFill();
-        p.stroke(44, 42, 38);
-        p.strokeWeight(1.5);
-      }
-      p.circle(x, 165, d);
-    }
-
-    p.noStroke();
-    p.fill(107, 103, 96);
-    p.textFont("DM Mono");
-    p.textSize(9);
-    p.text(session.date, 14, 190);
-  }
-  </script>
-  <script>
-  // Session spine side rail.
-  // Renders an initial state immediately (never blank), then tracks the active
-  // session on scroll. Does NOT depend on IntersectionObserver firing — the rail
-  // paints as soon as CCS + cards exist, and the highlight follows scroll via rAF.
   (function () {
-    var spineEl = document.getElementById('sessions-spine');
-    if (!spineEl) return;
+    var SESSIONS = (window.CCFestSessions || []).filter(function (s) { return s.id !== 'template'; });
+    var catalog = new Map((window.CCFestCatalog && window.CCFestCatalog.items || []).map(function (it) { return [it.id, it]; }));
+    var N = SESSIONS.length;
+
+    function titleOf(slug) { var it = catalog.get(slug); return it ? it.title : slug.replace(/-/g, ' '); }
+    function bridgeFns(slug) {
+      var it = catalog.get(slug);
+      if (it && it.tags && it.tags.length) return it.tags.slice(0, 3).join(' · ');
+      return '';
+    }
+    function suitName(s) {
+      var map = { marks:'Marks', motion:'Motion', systems:'Systems', data:'Data', open:'Open' };
+      return map[s.suitId] || (s.suitId ? s.suitId.charAt(0).toUpperCase() + s.suitId.slice(1) : 'Session');
+    }
+    function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // ── p5 generative poster ──────────────────────────────────────────────────
+    function drawThumb(p, session, W, H) {
+      p.background(250, 246, 240);
+      p.noStroke(); p.fill(44, 42, 38, 23);
+      for (var x = 2; x < W; x += 20) for (var y = 2; y < H; y += 20) { p.circle(x, y, 3); p.circle(x + 10, y + 10, 3); }
+      var accent = p.color(session.accent);
+      p.fill(accent); p.rect(0, 0, W, 38);
+      p.fill(255, 253, 247); p.textFont('DM Mono'); p.textSize(11); p.text('CC FEST / CODING CAMP', 18, 25);
+      p.fill(44, 42, 38); p.textFont('Fraunces'); p.textStyle(p.BOLD); p.textSize(34); p.textLeading(34);
+      p.text(session.topic, 18, 84);
+      p.randomSeed(session.seed || 1);
+      var count = 9, margin = 18, spacing = (W - 2 * margin) / (count - 1), cy = H - 40;
+      for (var i = 0; i < count; i++) {
+        var cx = margin + i * spacing, d = 17 + p.random(-5, 5);
+        if (p.random() > 0.5) { p.fill(accent); p.noStroke(); }
+        else { p.noFill(); p.stroke(44, 42, 38); p.strokeWeight(1.8); }
+        p.circle(cx, cy, d);
+      }
+      p.noStroke(); p.fill(107, 103, 96); p.textFont('DM Mono'); p.textStyle(p.NORMAL); p.textSize(10);
+      p.text(session.date || '— 2026 —', 18, H - 14);
+    }
+
+    // ── build session cards ───────────────────────────────────────────────────
+    var cardsEl = document.getElementById('cards');
+    function build() {
+      cardsEl.innerHTML = SESSIONS.map(function (s, i) {
+        var tools = (s.featuredTools || []).map(function (slug) {
+          return '<a class="chip" href="../tools/' + slug + '/"><span class="d"></span>' + esc(titleOf(slug)) + '<span class="go">↗</span></a>';
+        }).join('');
+        var sketches = (s.featuredSketches || []).map(function (slug) {
+          return '<a class="chip sketch" href="../tools/' + slug + '/"><span class="d"></span>' + esc(titleOf(slug)) + '<span class="go">↗</span></a>';
+        }).join('');
+        var fns = bridgeFns(s.anchorBridge);
+        var bridge = s.anchorBridge ? (
+          '<a class="br" href="../concept-bridges/' + s.anchorBridge + '/">' +
+            '<span class="hx">⬡</span>' +
+            '<span><span class="bk">Anchoring concept bridge</span><span class="bn">' + esc(titleOf(s.anchorBridge)) + '</span></span>' +
+            (fns ? '<span class="bf">' + esc(fns) + '</span>' : '') +
+          '</a>') : '';
+        return (
+          '<section class="card" id="session-' + s.id + '" style="--sa:' + s.accent + '">' +
+            '<a class="poster" href="' + s.id + '/" id="thumb-' + s.id + '" aria-label="Open Session ' + s.id + ': ' + esc(s.title) + '"></a>' +
+            '<div class="cbody">' +
+              '<div class="cmeta"><span class="g" style="color:' + s.accent + '">' + (s.suitGlyph || '●') + '</span> ' + suitName(s) + ' · Session ' + (i + 1) + ' of ' + N + '</div>' +
+              '<h2><a href="' + s.id + '/">' + esc(s.title) + '</a></h2>' +
+              '<p class="cfoc">' + esc(s.subtitle || '') + '</p>' +
+              bridge +
+              (tools ? '<div class="grp"><div class="gl">Workshop tools</div><div class="chips">' + tools + '</div></div>' : '') +
+              (sketches ? '<div class="grp"><div class="gl">Starter sketches</div><div class="chips">' + sketches + '</div></div>' : '') +
+            '</div>' +
+          '</section>'
+        );
+      }).join('');
+
+      SESSIONS.forEach(function (s) {
+        var host = document.getElementById('thumb-' + s.id);
+        if (!host) return;
+        new p5(function (p) {
+          p.setup = function () {
+            var W = Math.max(360, host.clientWidth || 760), H = 196;
+            var c = p.createCanvas(W, H); c.parent(host); p.pixelDensity(2); p.noLoop();
+            drawThumb(p, s, W, H);
+          };
+          p.windowResized = function () {
+            var W = Math.max(360, host.clientWidth || 760), H = 196;
+            p.resizeCanvas(W, H); drawThumb(p, s, W, H);
+          };
+        });
+      });
+    }
+
+    // ── spine rail ────────────────────────────────────────────────────────────
+    var railEl = document.getElementById('rail');
+    function paintRail(cur) {
+      railEl.innerHTML = SESSIONS.map(function (s, i) {
+        var st = i < cur ? 'past' : i === cur ? 'cur' : 'future';
+        var exp = '';
+        if (st === 'cur') {
+          var tools = (s.featuredTools || []).slice(0, 3).map(function (slug) {
+            return '<a href="../tools/' + slug + '/">' + esc(titleOf(slug)) + '</a>';
+          }).join('');
+          exp = '<div class="exp">' +
+            '<div class="efoc">' + esc(s.subtitle || '') + '</div>' +
+            (s.anchorBridge ? '<a class="ebr" href="../concept-bridges/' + s.anchorBridge + '/">⬡ <b>' + esc(titleOf(s.anchorBridge)) + '</b></a>' : '') +
+            '<div class="etl">' + tools + '</div>' +
+          '</div>';
+        }
+        return (
+          '<div class="stop ' + st + '" style="--sa:' + s.accent + '">' +
+            '<a class="gut" href="#session-' + s.id + '" aria-label="' + esc(s.title) + '">' +
+              (i > 0 ? '<span class="ln t ' + (i <= cur ? 'on' : '') + '"></span>' : '') +
+              (i < N - 1 ? '<span class="ln b ' + (i < cur ? 'on' : '') + '"></span>' : '') +
+              '<span class="nd">' + (s.suitGlyph || '●') + '</span>' +
+            '</a>' +
+            '<div class="sb">' +
+              '<a class="st-jump" href="#session-' + s.id + '">' +
+                '<span class="snum">' + s.id + (st === 'cur' ? '<span class="yah">You are here</span>' : '') + '</span>' +
+                '<span class="st">' + esc(s.title) + '</span>' +
+              '</a>' +
+              exp +
+            '</div>' +
+          '</div>'
+        );
+      }).join('');
+    }
+
+    // ── scroll-spy: initial render up front; updates via rAF — no IO dependency ─
+    var current = -1;
+    function setCurrent(i) { if (i === current) return; current = i; paintRail(i); }
 
     function start() {
-      if (!window.CCS) return false;
-      var cards = Array.prototype.slice.call(document.querySelectorAll('.session-card'));
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
       if (!cards.length) return false;
-
-      var current = -1;
-      function paint(i) {
-        if (i === current) return;
-        current = i;
-        window.CCS.renderSideRail(spineEl, i >= 0 ? i : 0);
-      }
-
-      // Initial render — the rail is visible the moment the page is ready,
-      // regardless of scroll position or whether IO ever fires.
-      paint(0);
-
-      // Active session = the card whose center is nearest a line ~38% down the
-      // viewport. Deterministic; works on desktop grid and mobile stack alike.
+      setCurrent(0); // rail is never blank
       function computeActive() {
-        var line = window.innerHeight * 0.38;
-        var best = 0, bestDist = Infinity;
+        var line = window.innerHeight * 0.34, best = 0, bestDist = Infinity;
         for (var i = 0; i < cards.length; i++) {
-          var r = cards[i].getBoundingClientRect();
-          var center = r.top + r.height / 2;
-          var d = Math.abs(center - line);
+          var r = cards[i].getBoundingClientRect(), center = r.top + r.height / 2, d = Math.abs(center - line);
           if (d < bestDist) { bestDist = d; best = i; }
         }
-        paint(best);
+        // snap to last session when scrolled to the very bottom
+        if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) best = cards.length - 1;
+        setCurrent(best);
       }
-
       var ticking = false;
-      function onScroll() {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(function () { computeActive(); ticking = false; });
-      }
+      function onScroll() { if (ticking) return; ticking = true; requestAnimationFrame(function () { computeActive(); ticking = false; }); }
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onScroll, { passive: true });
+      if (location.hash) {
+        var idx = SESSIONS.findIndex(function (s) { return '#session-' + s.id === location.hash; });
+        if (idx >= 0) current = idx;
+      }
+      paintRail(current < 0 ? 0 : current);
       computeActive();
       return true;
     }
 
-    // Poll until CCS (spine.js) and the JS-rendered cards are both ready.
-    var tries = 0;
-    var poll = setInterval(function () {
-      if (start() || ++tries > 50) clearInterval(poll);
-    }, 100);
+    function init() {
+      if (!SESSIONS.length || !(window.CCFestCatalog && window.CCFestCatalog.items)) { setTimeout(init, 80); return; }
+      build();
+      var tries = 0;
+      (function go() { if (start() || ++tries > 50) return; setTimeout(go, 80); })();
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
   })();
   </script>
 </body>
