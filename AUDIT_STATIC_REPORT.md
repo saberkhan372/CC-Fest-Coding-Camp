@@ -69,6 +69,10 @@ Generated from `cc-fest-coding-camp-pages`.
 
 - [x] No issues found.
 
+## Starter Sketches With Stale Renderer Cache Keys
+
+- [x] No issues found.
+
 ## JS-Rendered Pages Missing Static Fallback
 
 - [x] No issues found.

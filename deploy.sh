@@ -20,6 +20,9 @@ node scripts/stamp-page-descriptions.mjs
 echo "Stamping static fallbacks ..."
 node scripts/stamp-static-fallbacks.mjs
 
+echo "Stamping starter renderer cache keys ..."
+node scripts/stamp-starter-renderer-cache.mjs
+
 echo "Syncing root assets from $SRC to $DST ..."
 for f in "$SRC"/*.css "$SRC"/*.js "$SRC"/*.html; do
   [ -f "$f" ] || continue

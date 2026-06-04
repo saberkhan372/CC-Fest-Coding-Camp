@@ -148,6 +148,7 @@ const staticMissingExportHelper = staticWorkshopTools.filter((file) => !read(fil
 const jsMissingStateUtils = jsWorkshopTools.filter((file) => !read(file).includes("tool-state-utils.js?v="));
 const jsMissingExportHelper = jsWorkshopTools.filter((file) => !read(file).includes("p5-export-helper.js?v="));
 const starterMissingRenderer = starterSketches.filter((file) => !read(file).includes("starter-seed-pages.js"));
+const starterRendererCacheKeyIssues = starterSketches.filter((file) => !read(file).includes("starter-seed-pages.js?v=20260603-phase6d-starter-actions"));
 const jsRenderedMissingStaticFallback = [...jsWorkshopTools, ...starterSketches]
   .filter((file) => !read(file).includes("data-static-fallback"));
 const detailMissingSessionStrip = detailIndexFiles.filter((file) => !read(file).includes("session-strip.js?v=20260603-phase4-sessions"));
@@ -247,6 +248,7 @@ section("Static Workshop Tools Missing p5 Export Helper", staticMissingExportHel
 section("JS Workshop Tools Missing State Utils", jsMissingStateUtils, (file) => rel(file));
 section("JS Workshop Tools Missing p5 Export Helper", jsMissingExportHelper, (file) => rel(file));
 section("Starter Sketches Missing Renderer Script", starterMissingRenderer, (file) => rel(file));
+section("Starter Sketches With Stale Renderer Cache Keys", starterRendererCacheKeyIssues, (file) => rel(file));
 section("JS-Rendered Pages Missing Static Fallback", jsRenderedMissingStaticFallback, (file) => rel(file));
 section("Detail Pages Missing Session Strip Runtime", detailMissingSessionStrip, (file) => rel(file));
 section("Detail Pages Loading Homepage Runtime", detailLoadingHomepageRuntime, (file) => rel(file));
