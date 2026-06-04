@@ -77,9 +77,22 @@ a{color:inherit}
   justify-content:space-between;
   align-items:center;
   gap:16px;
-  margin-bottom:20px;
+  margin-bottom:16px;
+  padding-bottom:16px;
+  border-bottom:2px solid var(--ink);
   font-size:14px;
 }
+
+/* Camp Press breadcrumb (injected by spine.js) */
+.ccs-crumb{
+  font:500 11.5px/1 "DM Mono",ui-monospace,monospace;
+  color:var(--ink-light);
+  margin:0 0 16px;
+}
+.ccs-crumb i{color:var(--cream-deep);font-style:normal;margin:0 5px}
+.ccs-crumb a{color:inherit;text-decoration:none}
+.ccs-crumb a:hover{color:var(--accent)}
+.ccs-crumb b{color:var(--ink);font-weight:500}
 
 .tool-topbar a{
   text-decoration:none;

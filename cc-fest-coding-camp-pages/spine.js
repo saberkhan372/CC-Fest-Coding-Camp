@@ -70,10 +70,10 @@
     '  background:var(--line,#d8cdbf)}',
 
     /* ── Compact strip (tool/bridge pages) ── */
+    /* Camp Press spec: ink border, no border-radius, matches dp-arc */
     '.ccs-strip{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;',
-    '  padding:10px 14px;margin:20px 0 0;',
-    '  border:1.5px solid var(--line,#d8cdbf);',
-    '  border-radius:var(--radius-sm,8px);',
+    '  padding:9px 14px;margin:20px 0 0;',
+    '  border:1.5px solid var(--ink,#201c1a);',
     '  background:var(--panel,#fffdf7)}',
     '.ccs-dots{display:flex;align-items:center;gap:0}',
     '.ccs-seg{width:16px;height:1.5px;background:var(--line,#d8cdbf);flex-shrink:0}',
@@ -82,8 +82,9 @@
     '  border:1.5px solid var(--line,#d8cdbf);background:var(--panel,#fffdf7);',
     '  text-indent:-9999px;overflow:hidden}',
     '.ccs-dot--past{background:var(--ink,#201c1a);border-color:var(--ink,#201c1a)}',
-    '.ccs-dot--current{background:var(--gold,#f5a800);border-color:var(--gold,#f5a800);',
-    '  box-shadow:0 0 0 2.5px var(--panel,#fffdf7),0 0 0 4px var(--gold,#f5a800)}',
+    /* Current dot uses session accent (--sa) set inline; falls back to gold */
+    '.ccs-dot--current{background:var(--sa,var(--gold,#f5a800));border-color:var(--sa,var(--gold,#f5a800));',
+    '  box-shadow:0 0 0 2.5px var(--panel,#fffdf7),0 0 0 4px var(--sa,var(--gold,#f5a800))}',
     '.ccs-dot:focus-visible{outline:2px solid var(--accent,#c8391d);outline-offset:2px}',
     '.ccs-strip-label{display:flex;align-items:baseline;gap:7px;min-width:0}',
     '.ccs-strip-num{font:700 11px/1 "DM Mono",ui-monospace,monospace}',
@@ -91,19 +92,25 @@
     '  letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;',
     '  color:var(--ink,#201c1a)}',
     '.ccs-strip-nav{margin-left:auto;display:flex;gap:5px}',
+    /* Camp Press: nav buttons match dp-nav — no border-radius */
     '.ccs-nav-btn{display:flex;align-items:center;justify-content:center;',
     '  width:26px;height:26px;border:1.5px solid var(--line,#d8cdbf);',
-    '  border-radius:var(--radius-sm,8px);',
     '  font:400 15px/1 "DM Sans",system-ui,sans-serif;',
     '  color:var(--ink,#201c1a);text-decoration:none;background:transparent}',
     'a.ccs-nav-btn:hover{border-color:var(--ink,#201c1a)}',
     'span.ccs-nav-btn[aria-disabled="true"]{opacity:.3;pointer-events:none}',
 
-    /* ── Station rail (tool pages) ── */
+    /* ── Breadcrumb (Camp Press dp-crumb) ── */
+    '.ccs-crumb{font:500 11.5px/1 "DM Mono",ui-monospace,monospace;',
+    '  color:var(--ink-light,#5c5751);margin:0 0 16px}',
+    '.ccs-crumb i{color:var(--line,#d8cdbf);font-style:normal;margin:0 5px}',
+    '.ccs-crumb a{color:inherit;text-decoration:none}.ccs-crumb a:hover{color:var(--accent,#c8391d)}',
+    '.ccs-crumb b{color:var(--ink,#201c1a);font-weight:500}',
+
+    /* ── Station rail (tool pages) — Camp Press: ink border, no border-radius ── */
     '.ccs-tool-nav{margin:20px 0 0}',
     '.ccs-stations{margin-top:10px;padding:12px 14px 14px;',
-    '  border:1.5px solid var(--line,#d8cdbf);',
-    '  border-radius:var(--radius-sm,8px);',
+    '  border:1.5px solid var(--ink,#201c1a);',
     '  background:var(--panel,#fffdf7)}',
     '.ccs-station{display:flex;align-items:center;gap:9px;padding:6px 0;',
     '  text-decoration:none;color:var(--ink-light,#5c5751);',
@@ -114,9 +121,10 @@
     '.ccs-station--cur{color:var(--ink,#201c1a)}',
     '.ccs-station-mk{width:8px;height:8px;border-radius:50%;flex-shrink:0;',
     '  border:1.5px solid var(--line,#d8cdbf);background:var(--panel,#fffdf7)}',
-    '.ccs-station--cur .ccs-station-mk{background:var(--gold,#f5a800);',
-    '  border-color:var(--gold,#f5a800);',
-    '  box-shadow:0 0 0 2.5px var(--panel,#fffdf7),0 0 0 4px var(--gold,#f5a800)}',
+    /* Current station mark uses session accent */
+    '.ccs-station--cur .ccs-station-mk{background:var(--sa,var(--gold,#f5a800));',
+    '  border-color:var(--sa,var(--gold,#f5a800));',
+    '  box-shadow:0 0 0 2.5px var(--panel,#fffdf7),0 0 0 4px var(--sa,var(--gold,#f5a800))}',
     '.ccs-station-nm{letter-spacing:-.01em}',
     '.ccs-station--cur .ccs-station-nm{font-weight:700}',
 
@@ -313,13 +321,35 @@
       if (item && item.session) {
         var sessionIdx = CCS.findIndex(function (s) { return s.id === item.session; });
         if (sessionIdx >= 0) {
+          var sess = CCS[sessionIdx];
+
           // Remove existing session strip (compact strip replaces it)
           document.querySelectorAll('.cc-session-strip').forEach(function (el) { el.remove(); });
 
+          // ── Set session accent on the page shell for --sa ──────────────────
+          var shell = document.querySelector('.tool-shell, .bridge-shell, body');
+          if (shell) shell.style.setProperty('--sa', sess.accent);
+
+          // ── Inject Camp Press breadcrumb above the tool/bridge header ───────
+          var headerEl = document.querySelector('.tool-header, header.tool-header, .bridge-header');
+          if (headerEl && !document.querySelector('.ccs-crumb')) {
+            var crumb = document.createElement('div');
+            crumb.className = 'ccs-crumb';
+            crumb.innerHTML =
+              '<a href="' + BASE + '/index.html">Camp</a>' +
+              '<i>/</i>' +
+              '<a href="' + BASE + '/sessions/' + sess.id + '/">' + sess.id + ' ' + sess.title + '</a>' +
+              '<i>/</i>' +
+              '<b>' + (item.title || slug.replace(/-/g, ' ')) + '</b>';
+            headerEl.insertAdjacentElement('beforebegin', crumb);
+          }
+
+          // ── Compact strip + station rail before footer ──────────────────────
           var anchor = document.querySelector('.bottom-nav, .tool-footer, .bridge-footer, footer');
           if (anchor && anchor.parentNode) {
             var wrapper = document.createElement('div');
             wrapper.className = 'ccs-tool-nav';
+            wrapper.style.setProperty('--sa', sess.accent);
 
             var stripMount = document.createElement('div');
             wrapper.appendChild(stripMount);
