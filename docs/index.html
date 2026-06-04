@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CC Fest Coding Camp: Creative Coding Tools for p5.js</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css?v=20260603-phase7-filters">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css?v=20260604-camppress-catalog">
   <script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   <meta name="description" content="A free workshop for creative coding. Open to anyone curious — you don't need to be a programmer. 21 concept bridges, 70 workshop tools, and 44 starter sketches for learning p5.js together.">
   <meta property="og:type" content="website">
@@ -27,186 +27,105 @@
 </head>
 <body>
   <div class="shell">
-    <div class="site-topbar">
-      <div class="brand-mark">CC Fest · Coding Camp Tools</div>
+    <div class="site-topbar hp-topbar">
+      <a class="brand-mark" href="index.html">CC Fest · Coding Camp Tools</a>
       <nav class="topbar-links">
-        <a class="topbar-link" href="https://ccfest.rocks">ccfest.rocks</a>
         <a class="topbar-link" href="sessions/">Sessions</a>
         <a class="topbar-link" href="concept-map.html">Map</a>
         <a class="topbar-link" href="about.html">About</a>
-        <a class="topbar-link" href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">GitHub</a>
+        <a class="topbar-link" href="https://ccfest.rocks">ccfest.rocks</a>
+        <a class="topbar-link hp-gh" href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">GitHub</a>
       </nav>
     </div>
 
-    <header class="hero">
-      <div class="hero-grid">
-        <div class="hero-text">
-          <p class="eyebrow">CC Fest Coding Camp · Free · Open to everyone</p>
-          <h1>A free workshop for creative coding.</h1>
-          <p class="lede">Open to anyone curious about creative code — you don't need to be a programmer to start. Use a concept bridge when an idea feels fuzzy, open a tool when you want guided practice, then remix a starter sketch into something of your own.</p>
-          <div class="hero-actions">
-            <a class="button primary" href="#interactive-tools">Browse Tools</a>
-            <a class="button secondary" href="#concept-bridges">Concept Bridges</a>
-            <a class="button secondary" href="#starter-sketches">Starter Sketches</a>
-            <a class="button" href="about.html">About the Camp →</a>
-          </div>
-          <div class="library-summary" aria-label="Library summary">
-            <div class="summary-card">
-              <strong>21</strong>
-              <span>Concept bridges</span>
-              <small>For intuition before syntax.</small>
-            </div>
-            <div class="summary-card">
-              <strong>70</strong>
-              <span>Workshop tools</span>
-              <small>For guided demos and stations.</small>
-            </div>
-            <div class="summary-card">
-              <strong>44</strong>
-              <span>Starter sketches</span>
-              <small>For editing, remixing, and projects.</small>
-            </div>
-            <div class="summary-card">
-              <strong>5</strong>
-              <span>Sessions</span>
-              <small>One arc from first marks to open studio.</small>
-            </div>
+    <!-- ── HERO FLYER ── -->
+    <section class="hp-flyer">
+      <div class="hp-flyer-bar"><span>CC Fest · Coding Camp</span><span>Creative coding for all · 2026</span></div>
+      <div class="hp-flyer-body">
+        <div class="hp-flyer-text">
+          <div class="hp-eye">A free p5.js workshop library</div>
+          <h1>Make something <em>you didn't know you could.</em></h1>
+          <p class="hp-lede">The code and the canvas are connected. Move one value, watch it change, and keep the version that surprises you. No experience required.</p>
+          <div class="hp-cta">
+            <a class="hp-btn" href="#hp-start">Find where to start</a>
+            <a class="hp-tlink" href="#full-library">Browse all 135 →</a>
           </div>
         </div>
-        <div class="hero-visual">
-          <div class="hero-poster" role="button" tabindex="0" aria-label="Interactive creative coding panel. Move your pointer to tilt and animate the code tiles." data-hero-poster>
-            <div class="poster-grid"></div>
-            <div class="poster-dot dot-a"></div>
-            <div class="poster-dot dot-b"></div>
-            <div class="poster-dot dot-c"></div>
-            <div class="poster-card card-a" data-token data-draggable>mouseX</div>
-            <div class="poster-card card-b" data-token data-draggable>noise()</div>
-            <div class="poster-card card-c" data-token data-draggable>circle()</div>
-            <div class="poster-card card-d" data-token data-draggable>map()</div>
-            <div class="poster-card card-e" data-token data-draggable>draw()</div>
-            <div class="poster-card card-f" data-token data-draggable>fill()</div>
-            <div class="poster-card card-g" data-token data-draggable>random()</div>
-            <div class="poster-card card-h" data-token data-draggable>lerp()</div>
-            <div class="poster-card card-i" data-token data-draggable>frameCount</div>
-          </div>
-          <aside class="hero-aside">
-            <h2>Creative coding for all.</h2>
-            <p class="aside-byline">— Saber Khan, CC Fest</p>
-            <ul>
-              <li>You don't need to be a programmer.</li>
-              <li>The code and the canvas are connected.</li>
-              <li>Change one thing. See what happens.</li>
-              <li>Everything here is yours to remix.</li>
-            </ul>
-          </aside>
-          <aside class="hero-credit" aria-label="How these tools were made">
-            <h2>How these tools were made. <button class="credits-toggle" aria-expanded="false" aria-controls="credits-body">See credits ↓</button></h2>
-            <p id="credits-body" hidden>These tools and sketches were made thanks to the help of LLMs, including Claude and ChatGPT, testing with my students and classes, and learning from members of the community, including Dan Shiffman, Lauren Lee McCarthy, Casey Reas, Kevin Workman, Patt Vira, Allison Parrish, Jeff Thompson, Tim Rodenbröker, p5.js and Processing Foundation materials, and the many people that have shared their teaching materials.</p>
-          </aside>
+        <div class="hp-flyer-sketch">
+          <div class="hp-sketch-host" id="hp-hero-host"></div>
+          <div class="hp-sketch-tag">Living grid · move your mouse</div>
         </div>
       </div>
-      <div class="hero-steps">
-        <div><strong>1. Open a tool</strong><span>Play before reading.</span></div>
-        <div><strong>2. Change one thing</strong><span>Move a slider or edit a value.</span></div>
-        <div><strong>3. Read the code</strong><span>Connect the visual to the syntax.</span></div>
-        <div><strong>4. Remix it</strong><span>Make it yours.</span></div>
+      <div class="hp-ribbon">
+        <div><strong id="c-bridge">21</strong><span>Concept bridges</span><small>intuition first</small></div>
+        <div><strong id="c-tool">70</strong><span>Workshop tools</span><small>play &amp; predict</small></div>
+        <div><strong id="c-sketch">44</strong><span>Starter sketches</span><small>edit &amp; remix</small></div>
+        <div><strong id="c-session">5</strong><span>Sessions</span><small>marks → studio</small></div>
       </div>
-      <p class="maker-credit">CC Fest · 2026</p>
-    </header>
+    </section>
 
     <main>
 
-<section class="overview panel" aria-label="Suggested learning sequence">
-        <div class="section-label">The Camp Arc</div>
-        <h2>Five sessions. One arc.</h2>
-        <p>CC Fest Coding Camp runs five sessions over five weeks. The sequence moves from first marks to open studio. Each session builds on the last, but every tool and sketch also stands alone. Jump in anywhere.</p>
-        <div class="sequence">
-          <div class="sequence-card">
-            <strong>1 · Your Canvas, Your Voice</strong>
-            <span>Make your first marks and find your canvas voice</span>
-            <div class="sequence-tools">
-              <a href="tools/coordinate-system-explorer/">Coordinates</a>
-              <a href="tools/shape-and-color-explorer/">Shape + Color</a>
-              <a href="tools/text-basics-studio/">Text</a>
-              <a href="tools/rgb-hsb-color-lab/">RGB / HSB</a>
-            </div>
-            <a class="sequence-bridge" href="concept-bridges/color-numbers-become-feeling/">⬡ Bridge: Color as Feeling</a>
-          </div>
-          <div class="sequence-card">
-            <strong>2 · Things That Move, Things That Listen</strong>
-            <span>Build things that move, react, and respond</span>
-            <div class="sequence-tools">
-              <a href="tools/animation-explorer/">Animation</a>
-              <a href="tools/framerate-visualizer/">frameRate()</a>
-              <a href="tools/map-explorer/">map()</a>
-              <a href="tools/lerp-explorer/">lerp()</a>
-              <a href="tools/if-else-decision-studio/">If / Else</a>
-            </div>
-            <a class="sequence-bridge" href="concept-bridges/distance-becomes-behavior/">⬡ Bridge: Distance Becomes Behavior</a>
-          </div>
-          <div class="sequence-card">
-            <strong>3 · Patterns, Systems, and What They Say</strong>
-            <span>Let the code repeat, branch, and think for itself</span>
-            <div class="sequence-tools">
-              <a href="tools/for-loop-stepper/">For Loop</a>
-              <a href="tools/rows-and-columns/">Rows + Cols</a>
-              <a href="tools/function-builder/">Functions</a>
-              <a href="tools/noise-vs-random-explorer/">Noise</a>
-            </div>
-            <a class="sequence-bridge" href="concept-bridges/noise-smooth-randomness/">⬡ Bridge: Noise vs Random</a>
-          </div>
-          <div class="sequence-card">
-            <strong>4 · Data as Material</strong>
-            <span>Turn numbers into pictures that mean something personal</span>
-            <div class="sequence-tools">
-              <a href="tools/data-story-planner/">Story Planner</a>
-              <a href="tools/data-mapper/">Data Mapper</a>
-              <a href="tools/csv-loadtable-data-explorer/">CSV / loadTable</a>
-            </div>
-            <a class="sequence-bridge" href="concept-bridges/data-in-drawing-out/">⬡ Bridge: Data In, Drawing Out</a>
-          </div>
-          <div class="sequence-card">
-            <strong>5 · Open Studio</strong>
-            <span>Remix, share, reflect, teach</span>
-            <div class="sequence-tools">
-              <a href="tools/image-remix-studio/">Image Remix</a>
-              <a href="tools/sound-shape-visualizer/">Sound + Shape</a>
-              <a href="tools/postcard-studio/">Postcard</a>
-              <a href="tools/game-state-starter/">Game State</a>
-              <a href="tools/particle-system-seed/">Particles</a>
-            </div>
-            <a class="sequence-bridge" href="concept-bridges/state-machines-sketches-have-modes/">⬡ Bridge: State Machines</a>
-          </div>
+      <!-- ── THE CAMP ARC ── -->
+      <section class="hp-sec">
+        <div class="hp-sec-h">
+          <div><div class="hp-k">The camp arc</div><h2>Five sessions, first marks to open studio.</h2></div>
+          <a class="hp-more" href="sessions/">All sessions →</a>
         </div>
-        <p style="margin-top:18px;font-size:13px;color:var(--ink-light)">
-          <a href="https://sustaining-boursin-d41.notion.site/3349950a7da981dd939ad16078343178" style="color:var(--accent)">Read the full cohort roadmap and session recaps →</a>
-          &nbsp;·&nbsp;
-          <a href="https://sustaining-boursin-d41.notion.site/3339950a7da9819a9b73d83d97eaf2c2" style="color:var(--accent)">Teaching notes for every tool →</a>
-        </p>
+        <div class="hp-arc" id="hp-arc"></div>
       </section>
 
-      <section class="start-here panel" id="start-here" aria-label="Where to start">
-        <div class="start-here-header">
-          <div class="section-label">Where to start</div>
-          <div class="library-stat-bar">
-            <a href="#concept-bridges">21 concept bridges</a>
-            <span aria-hidden="true">·</span>
-            <a href="#interactive-tools">70 workshop tools</a>
-            <span aria-hidden="true">·</span>
-            <a href="#starter-sketches">44 starter sketches</a>
-          </div>
+      <!-- ── BROWSE BY GOAL ── -->
+      <section class="hp-sec" id="hp-start">
+        <div class="hp-sec-h">
+          <div><div class="hp-k">Where to start</div><h2>Browse by goal.</h2></div>
         </div>
-        <div class="catalog-shelves" aria-label="Browse by goal"></div>
+        <p class="hp-intro">Pick the shelf that sounds like you. Every shelf mixes bridges, tools, and sketches so you can go from idea to making in a few clicks.</p>
+        <div class="hp-shelf">
+          <div class="hp-shelf-h"><span class="hp-st">New here?</span><span class="hp-sd">Your first marks on the canvas.</span></div>
+          <div class="hp-shelf-row" id="shelf-new"></div>
+        </div>
+        <div class="hp-shelf">
+          <div class="hp-shelf-h"><span class="hp-st">Make something move</span><span class="hp-sd">Animation, interaction, response.</span></div>
+          <div class="hp-shelf-row" id="shelf-move"></div>
+        </div>
+        <div class="hp-shelf">
+          <div class="hp-shelf-h"><span class="hp-st">I'm stuck</span><span class="hp-sd">Unstick a specific idea.</span></div>
+          <div class="hp-shelf-row" id="shelf-stuck"></div>
+        </div>
       </section>
 
-      <div class="tool-norms" role="note" aria-label="How to use these tools">
-        <span class="tool-norms-label">How to use these</span>
-        <span class="tool-norm">Change one thing at a time.</span>
-        <span class="tool-norm">Predict before you move the slider.</span>
-        <span class="tool-norm">Try a value that breaks your guess — knowing what breaks is knowing how it works.</span>
-        <span class="tool-norm">You don't need to understand everything to make something.</span>
-        <span class="tool-norm">Unfinished work counts.</span>
+      <!-- ── CARD GRAMMAR GALLERY ── -->
+      <section class="hp-sec" id="hp-library">
+        <div class="hp-sec-h">
+          <div><div class="hp-k">The library</div><h2>One card grammar, three resource types.</h2></div>
+          <span class="hp-more">135 resources</span>
+        </div>
+        <p class="hp-intro">Every card shares a family — kind, title, a short description, a type-specific cue, and a clear action. The cue tells you what you're looking at before you read a word.</p>
+        <div class="hp-cards" id="hp-gallery"></div>
+      </section>
+
+      <!-- ── TOOL NORMS ── -->
+      <div class="hp-norms" role="note">
+        <span class="hp-nl">How to use these</span>
+        <span class="hp-n">Change one thing at a time.</span>
+        <span class="hp-n">Predict before you move the slider.</span>
+        <span class="hp-n">Try a value that breaks your guess.</span>
+        <span class="hp-n">You don't need to understand everything to make something.</span>
+        <span class="hp-n">Unfinished work counts.</span>
       </div>
+
+      <!-- ── CLOSING BAND ── -->
+      <section class="hp-closing">
+        <h2>The canvas is already running. <em>Move something.</em></h2>
+        <div class="hp-closing-cta">
+          <a class="hp-btn-l" href="#hp-start">Find where to start</a>
+          <a class="hp-btn-o" href="sessions/">See the sessions</a>
+        </div>
+      </section>
+
+      <!-- ── CATALOG BROWSER ── -->
+      <div class="hp-catalog-divider" id="full-library"><span>Full library · 135 resources</span></div>
 
       <div class="global-search-wrap">
         <input class="global-search" type="search" placeholder="Search tools, concept bridges, and starter sketches — noise, arrays, text, game…" aria-label="Search all resources" autocomplete="off" spellcheck="false">
@@ -1564,8 +1483,136 @@
       </nav>
     </footer>
   </div>
-  <script src="preview-sketches.js?v=20260602-phase18-circle"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <script src="home-hero-sketches.js?v=20260604-camppress-catalog"></script>
   <script src="catalog-data.js?v=20260603-audit-freshness"></script>
-  <script src="site.js?v=20260603-phase7-filters"></script>
+  <script>
+  (function () {
+    // ── hero sketch ──
+    var host = document.getElementById('hp-hero-host');
+    if (host && window.CCHeroSketches) CCHeroSketches.livingGrid(host);
+
+    var CAT = (window.CCFestCatalog && window.CCFestCatalog.items) || [];
+    var FAC = (window.CCFestCatalog && window.CCFestCatalog.facets) || { suits:[], types:[], pathways:[], sessions:[] };
+    var byId = {}; CAT.forEach(function(it){ byId[it.id] = it; });
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    var SUIT_COLOR = { marks:'#f5a800', motion:'#e07a5f', systems:'#7f9d7a', data:'#49627a', open:'#7a5ea8', support:'#9a8c7a' };
+    var suitMeta = {}; FAC.suits.forEach(function(s){ suitMeta[s.id] = s; });
+    var typeMeta = {}; FAC.types.forEach(function(t){ typeMeta[t.id] = t; });
+    function suitColor(id){ return SUIT_COLOR[id]||'#9a8c7a'; }
+    function suitLabel(id){ return (suitMeta[id]&&suitMeta[id].label)||id; }
+    function suitGlyph(id){ return (suitMeta[id]&&suitMeta[id].glyph)||'●'; }
+    function kindShort(t){ return t==='bridge'?'Bridge':t==='tool'?'Tool':'Sketch'; }
+    function kindLong(t){ return (typeMeta[t]&&typeMeta[t].label)||kindShort(t); }
+
+    // ── counts ribbon ──
+    function count(type){ return CAT.filter(function(i){ return i.type===type; }).length; }
+    var sessCount = FAC.sessions.filter(function(s){ return s.id!=='support'; }).length||5;
+    if (CAT.length) {
+      document.getElementById('c-bridge').textContent = count('bridge');
+      document.getElementById('c-tool').textContent   = count('tool');
+      document.getElementById('c-sketch').textContent = count('sketch');
+      document.getElementById('c-session').textContent = sessCount;
+    }
+
+    // ── arc ──
+    var suitOrder = ['marks','motion','systems','data','open'];
+    var arcEl = document.getElementById('hp-arc');
+    if (arcEl) {
+      var sessions = FAC.sessions.filter(function(s){ return s.id!=='support'; });
+      arcEl.innerHTML = sessions.map(function(s,i){
+        var suit = suitOrder[i]||'marks';
+        return '<a class="hp-acol" href="sessions/">' +
+          '<span class="hp-aln"></span>' +
+          '<span class="hp-and" style="background:'+suitColor(suit)+'">'+suitGlyph(suit)+'</span>' +
+          '<span class="hp-ann">'+s.id+'</span>' +
+          '<span class="hp-att">'+esc(s.title)+'</span></a>';
+      }).join('');
+    }
+
+    // ── shelves ──
+    function shelfItems(pathway, max) {
+      var pool = CAT.filter(function(i){ return (i.pathways||[]).indexOf(pathway)!==-1; });
+      var lvlRank = { beginner:0, extension:1, capstone:2 };
+      pool.sort(function(a,b){
+        var la=lvlRank[a.level]==null?1:lvlRank[a.level], lb=lvlRank[b.level]==null?1:lvlRank[b.level];
+        if(la!==lb) return la-lb;
+        return (parseInt(a.session,10)||9)-(parseInt(b.session,10)||9);
+      });
+      var buckets = {bridge:[],tool:[],sketch:[]};
+      pool.forEach(function(i){ if(buckets[i.type]) buckets[i.type].push(i); });
+      var out=[],guard=0;
+      while(out.length<(max||6)&&guard<30){
+        ['bridge','tool','sketch'].forEach(function(t){ if(out.length<(max||6)&&buckets[t].length) out.push(buckets[t].shift()); });
+        guard++;
+      }
+      return out;
+    }
+    function scard(it) {
+      var c = suitColor(it.suit), sketch = it.type==='sketch';
+      var dotStyle = sketch?'border:1.5px solid '+c:'background:'+c;
+      var meta = suitLabel(it.suit)+' · '+(it.level||'any');
+      return '<a class="hp-scard" href="'+it.url+'">' +
+        '<span class="hp-sk '+(sketch?'sketch':'')+'" style="color:'+c+'"><span class="hp-dot" style="'+dotStyle+'"></span>'+kindShort(it.type)+'</span>' +
+        '<span class="hp-snm">'+esc(it.title)+'</span>' +
+        '<span class="hp-smeta">'+esc(meta)+'</span>' +
+        '<span class="hp-sgo">Open ↗</span></a>';
+    }
+    function fillShelf(elId, pathway) {
+      var el = document.getElementById(elId); if(!el) return;
+      el.innerHTML = shelfItems(pathway,6).map(scard).join('');
+    }
+    fillShelf('shelf-new',  'first-time');
+    fillShelf('shelf-move', 'animation');
+    fillShelf('shelf-stuck','stuck');
+
+    // ── card grammar gallery ──
+    function highlightCode(src){
+      var s=esc(src);
+      s=s.replace(/(&quot;[^&]*?&quot;|'[^']*?'|\b\d+(?:\.\d+)?\b)/,'<span class="hp-hl">$1</span>');
+      return s;
+    }
+    function bridgeCue(it){
+      var fns=it.bridgeConcept||(it.tags||[]).slice(0,2).join(' · ');
+      return '<div class="hp-cue"><div class="hp-cue-bridge"><span class="hp-ca">the idea</span><span class="hp-cx">→</span>' +
+        '<span style="margin-left:auto;font-family:\'DM Mono\',monospace;color:var(--ink)">'+esc(fns)+'</span></div></div>';
+    }
+    function toolCue(){
+      return '<div class="hp-cue"><div class="hp-cue-tool">' +
+        '<div class="hp-ctrl-row"><span class="hp-rl">Input</span><span class="hp-sl"><i style="left:42%"></i></span></div>' +
+        '<div class="hp-ctrl-row"><span class="hp-rl">Output</span><span class="hp-sl"><i style="left:68%"></i></span></div>' +
+        '</div></div>';
+    }
+    function sketchCue(it){
+      var code=it.codePeek||'let value = 10;';
+      return '<div class="hp-cue"><div class="hp-cue-code"><span class="hp-cm">// change this</span>\n'+highlightCode(code)+'</div></div>';
+    }
+    function galleryCard(it){
+      var verb=it.type==='bridge'?'Open bridge ↗':it.type==='tool'?'Open tool ↗':'Open sketch ↗';
+      var cue=it.type==='bridge'?bridgeCue(it):it.type==='tool'?toolCue():sketchCue(it);
+      var tags=(it.tags||[]).slice(0,2).map(function(t){ return '<span class="hp-tag">'+esc(t)+'</span>'; }).join('');
+      return '<article class="hp-card">' +
+        '<div class="hp-pills">' +
+          '<span class="hp-pill hp-kind hp-'+it.type+'">'+kindLong(it.type)+'</span>' +
+          '<span class="hp-pill hp-suit">'+suitLabel(it.suit)+'</span>' +
+        '</div>' +
+        '<h3>'+esc(it.title)+'</h3>' +
+        '<p class="hp-desc">'+esc(it.summary)+'</p>' +
+        cue +
+        '<div class="hp-act"><span class="hp-tags">'+tags+'</span><a class="hp-open" href="'+it.url+'">'+verb+'</a></div>' +
+        '</article>';
+    }
+    var feat = [
+      byId['color-numbers-become-feeling'] || CAT.find(function(i){ return i.type==='bridge'&&i.bridgeConcept; }),
+      byId['map-explorer']                  || CAT.find(function(i){ return i.type==='tool'; }),
+      byId['draw-your-name-seed']           || CAT.find(function(i){ return i.type==='sketch'&&i.codePeek; })
+    ].filter(Boolean);
+    var gal = document.getElementById('hp-gallery');
+    if (gal) gal.innerHTML = feat.map(galleryCard).join('');
+  })();
+  </script>
+  <script src="preview-sketches.js?v=20260602-phase18-circle"></script>
+  <script src="site.js?v=20260604-camppress-catalog"></script>
 </body>
 </html>
