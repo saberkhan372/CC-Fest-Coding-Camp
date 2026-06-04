@@ -222,7 +222,7 @@
             (fns ? '<span class="bf">' + esc(fns) + '</span>' : '') +
           '</a>') : '';
         return (
-          '<section class="card" id="session-' + s.id + '" style="--sa:' + s.accent + '">' +
+          '<section class="card" id="session-' + s.id + '" data-screen-label="Session ' + s.id + '" style="--sa:' + s.accent + '">' +
             '<a class="poster" href="' + s.id + '/" id="thumb-' + s.id + '" aria-label="Open Session ' + s.id + ': ' + esc(s.title) + '"></a>' +
             '<div class="cbody">' +
               '<div class="cmeta"><span class="g" style="color:' + s.accent + '">' + (s.suitGlyph || '●') + '</span> ' + suitName(s) + ' · Session ' + (i + 1) + ' of ' + N + '</div>' +
