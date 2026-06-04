@@ -4,7 +4,7 @@ Generated from `cc-fest-coding-camp-pages`.
 
 ## Counts
 
-- HTML pages: 146
+- HTML pages: 147
 - Concept bridge pages: 21
 - Tool directories/pages total: 114
 - Static workshop tools: 59

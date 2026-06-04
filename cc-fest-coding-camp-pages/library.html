@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CC Fest Coding Camp — The Library</title>
+<meta name="description" content="The full CC Fest Coding Camp library: 21 concept bridges, 70 workshop tools, and 44 starter sketches. Browse by category or session, filter by type, level, and goal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="site.css?v=20260603-phase7-filters">
+<script data-goatcounter="https://ccfesttools.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<link rel="icon" type="image/svg+xml" href="/CC-Fest-Coding-Camp/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/CC-Fest-Coding-Camp/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/CC-Fest-Coding-Camp/apple-touch-icon.png">
+<style>
+  /* ── Library page styles ── */
+  :root{--paper:#f6f0e7;--panel:#fffdf7;--ink:#201c1a;--ink2:#5c5751;--line:#d8cdbf;--red:#c8391d;--gold:#f5a800;--maxw:1240px;
+    --marks:#f5a800;--motion:#e07a5f;--systems:#7f9d7a;--data:#49627a;--open:#7a5ea8;--support:#9a8c7a}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  a{color:inherit}
+  h1,h2,h3{font-family:"Fraunces",serif;letter-spacing:-.025em;text-wrap:balance}
+  button{font-family:inherit;cursor:pointer}
+
+  /* topbar */
+  .lib-top{border-bottom:2px solid var(--ink);background:var(--paper);position:sticky;top:0;z-index:60}
+  .lib-top-in{max-width:var(--maxw);margin:0 auto;padding:15px 40px;display:flex;align-items:center;gap:24px}
+  .lib-brand{font:700 14.5px/1 "DM Sans",system-ui,sans-serif;color:var(--red);text-decoration:none;margin-right:auto;letter-spacing:-.01em}
+  .lib-tlinks{display:flex;gap:22px}
+  .lib-tlinks a{font:500 12px/1 "DM Mono",ui-monospace,monospace;color:var(--ink2);text-decoration:none}
+  .lib-tlinks a:hover{color:var(--red)}
+  .lib-tlinks a.here{color:var(--ink);border-bottom:2px solid var(--red);padding-bottom:3px}
+  @media(max-width:780px){.lib-tlinks a:not(.gh):not(.here){display:none}}
+
+  .lib-wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+  @media(max-width:680px){.lib-wrap{padding:0 22px}.lib-top-in{padding:14px 22px}}
+
+  /* ── masthead ── */
+  .mast{margin:30px 0 0;border:2.5px solid var(--ink);background:var(--panel);box-shadow:12px 12px 0 rgba(32,28,26,.13)}
+  .mast-bar{background:var(--gold);display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:2.5px solid var(--ink)}
+  .mast-bar span{font:500 10px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;color:#3a2a08}
+  .mast-body{padding:34px 34px 0}
+  .mast-eye{font:600 11px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--red)}
+  .mast h1{font-weight:900;font-size:clamp(34px,4.6vw,56px);line-height:.92;letter-spacing:-.035em;margin:14px 0 0}
+  .mast h1 em{font-style:normal;color:var(--red)}
+  .mast .lede{margin:16px 0 28px;max-width:56ch;font-size:15.5px;line-height:1.55;color:var(--ink2)}
+  .mast-ribbon{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--ink)}
+  @media(max-width:680px){.mast-ribbon{grid-template-columns:repeat(2,1fr)}}
+  .mast-ribbon>div{padding:16px 22px;border-left:1px solid var(--line)}
+  .mast-ribbon>div:first-child{border-left:none}
+  .mast-ribbon strong{font-family:"Fraunces",serif;font-weight:900;font-size:30px;letter-spacing:-.03em;color:var(--red);display:block;line-height:.9}
+  .mast-ribbon span{display:block;margin-top:6px;font:600 12px/1.2 "DM Sans",system-ui,sans-serif}
+  .mast-ribbon small{display:block;margin-top:3px;font:500 10px/1.3 "DM Mono",ui-monospace,monospace;color:var(--ink2)}
+
+  /* ── layout ── */
+  .lib-layout{display:grid;grid-template-columns:228px minmax(0,1fr);gap:38px;align-items:start;padding:30px 0 90px}
+  @media(max-width:880px){.lib-layout{grid-template-columns:1fr;gap:24px}}
+
+  /* ── sidebar ── */
+  .lib-side{position:sticky;top:78px}
+  @media(max-width:880px){.lib-side{position:static}}
+  .lib-axis{display:flex;border:1.5px solid var(--ink);margin-bottom:18px}
+  .lib-axis button{flex:1;border:none;border-left:1px solid var(--line);background:transparent;color:var(--ink);
+    font:600 11.5px/1 "DM Sans",system-ui,sans-serif;padding:9px 6px}
+  .lib-axis button:first-child{border-left:none}
+  .lib-axis button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .lib-side-k{font:600 10px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin:0 0 11px}
+  .lib-navlist{display:flex;flex-direction:column}
+  .lib-nav-i{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:none;background:transparent;
+    padding:9px 10px;border-left:2px solid transparent;color:var(--ink)}
+  .lib-nav-i:hover{background:rgba(32,28,26,.04)}
+  .lib-nav-i[aria-current="true"]{background:var(--panel);border-left-color:var(--red);box-shadow:inset 0 0 0 1px var(--line)}
+  .lib-nav-i .gl{width:22px;text-align:center;font-size:15px;flex-shrink:0}
+  .lib-nav-i .nm{flex:1;font:600 13.5px/1.15 "DM Sans",system-ui,sans-serif;letter-spacing:-.01em}
+  .lib-nav-i .ct{font:500 11px/1 "DM Mono",ui-monospace,monospace;color:var(--ink2)}
+  .lib-nav-i[aria-current="true"] .ct{color:var(--red)}
+  .lib-nav-i.all .nm{font-weight:700}
+
+  /* ── refine bar ── */
+  .lib-refine{position:sticky;top:78px;z-index:20;border:2px solid var(--ink);background:var(--panel);
+    box-shadow:5px 5px 0 rgba(32,28,26,.1);margin-bottom:26px}
+  @media(max-width:880px){.lib-refine{top:0}}
+  .ref-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:13px 15px}
+  .ref-row+.ref-row{border-top:1px solid var(--line)}
+  .lib-search{position:relative;flex:1;min-width:200px}
+  .lib-search .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink2);font-size:14px;pointer-events:none}
+  .lib-search input{width:100%;padding:10px 12px 10px 32px;border:1.5px solid var(--ink);background:var(--paper);
+    color:var(--ink);font:500 14px/1 "DM Sans",system-ui,sans-serif;outline:none}
+  .lib-search input::placeholder{color:var(--ink2)}
+  .lib-search input:focus{box-shadow:0 0 0 3px rgba(200,57,29,.16)}
+  .lib-seg{display:inline-flex;border:1.5px solid var(--ink)}
+  .lib-seg button{border:none;border-left:1px solid var(--line);background:transparent;color:var(--ink);
+    font:600 12.5px/1 "DM Sans",system-ui,sans-serif;padding:9px 13px;white-space:nowrap}
+  .lib-seg button:first-child{border-left:none}
+  .lib-seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .ref-lbl{font:600 9.5px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--ink2)}
+  .lib-chips{display:flex;gap:7px;flex-wrap:wrap}
+  .lib-chip{border:1.5px solid var(--line);background:transparent;color:var(--ink);font:600 11.5px/1 "DM Sans",system-ui,sans-serif;
+    padding:7px 11px;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+  .lib-chip:hover{border-color:var(--ink)}
+  .lib-chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .lib-count{margin-left:auto;font:500 12px/1 "DM Mono",ui-monospace,monospace;color:var(--ink2);white-space:nowrap}
+  .lib-count b{color:var(--red);font-weight:600}
+  .lib-clear{border:none;background:transparent;color:var(--red);font:600 11.5px/1 "DM Mono",ui-monospace,monospace;
+    text-decoration:underline;text-underline-offset:3px;padding:4px 0}
+  .lib-density{display:inline-flex;align-items:center;gap:8px}
+  .lib-density .lib-seg button{padding:7px 11px;font-size:11.5px}
+
+  /* ── group section ── */
+  .lib-grp{margin-bottom:42px}
+  .lib-grp-h{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:18px}
+  .lib-grp-h .gsym{font-size:21px;line-height:1;align-self:center}
+  .lib-grp-h h2{margin:0;font-weight:800;font-size:24px;letter-spacing:-.025em}
+  .lib-grp-h .gsub{font:500 12.5px/1.3 "DM Sans",system-ui,sans-serif;color:var(--ink2)}
+  .lib-grp-h .gct{margin-left:auto;font-family:"Fraunces",serif;font-weight:900;font-size:24px;color:var(--red);letter-spacing:-.03em}
+
+  /* ── cards ── */
+  .lib-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  @media(max-width:1080px){.lib-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:560px){.lib-cards{grid-template-columns:minmax(0,1fr)}}
+  .lib-card{border:2px solid var(--ink);background:var(--panel);box-shadow:6px 6px 0 rgba(32,28,26,.12);
+    padding:17px 17px 15px;display:flex;flex-direction:column;text-decoration:none;color:inherit;min-width:0;
+    transition:transform .14s,box-shadow .14s}
+  .lib-card:hover{transform:translate(-2px,-2px);box-shadow:9px 9px 0 rgba(32,28,26,.16)}
+  .lib-pills{display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap}
+  .lib-pill{font:600 9px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;padding:5px 8px;border:1.5px solid var(--line);white-space:nowrap}
+  .lib-pill.kind{color:#fff;border-color:transparent}
+  .lib-pill.kind.bridge{background:var(--open)}
+  .lib-pill.kind.tool{background:var(--motion)}
+  .lib-pill.kind.sketch{background:var(--systems)}
+  .lib-pill.suit{color:var(--ink2);display:inline-flex;align-items:center;gap:6px}
+  .lib-pill.suit .dot{width:7px;height:7px;border-radius:50%}
+  .lib-pill.lvl{color:var(--ink2)}
+  .lib-card h3{font-family:"Fraunces",serif;font-weight:700;font-size:18px;line-height:1.1;margin:0;letter-spacing:-.015em}
+  .lib-card .desc{margin:9px 0 0;font-size:13px;line-height:1.45;color:var(--ink2);
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .lib-cue{margin-top:13px;border-top:1px dashed var(--line);padding-top:12px}
+  .lib-cue-bridge{display:flex;align-items:center;gap:9px;font:500 11.5px/1.3 "DM Mono",ui-monospace,monospace;color:var(--ink2)}
+  .lib-cue-bridge .ca{color:var(--ink)}
+  .lib-cue-bridge .cx{color:var(--red)}
+  .lib-cue-bridge .cc{margin-left:auto;color:var(--ink);text-align:right}
+  .lib-cue-tool{display:flex;flex-direction:column;gap:7px}
+  .lib-cue-tool .clbl{font:500 10px/1 "DM Mono",ui-monospace,monospace;color:var(--ink2)}
+  .lib-cue-tool .sl{position:relative;height:3px;background:var(--line)}
+  .lib-cue-tool .sl i{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:var(--motion);
+    transform:translate(-50%,-50%);border:2px solid var(--panel);box-shadow:0 0 0 1px var(--ink)}
+  .lib-cue-code{font-family:"DM Mono",ui-monospace,monospace;font-size:11px;line-height:1.55;background:#241f1c;color:#e8dfd4;
+    padding:10px 12px;white-space:pre;overflow:auto;border:1.5px solid var(--ink)}
+  .lib-cue-code .hl{background:rgba(245,168,0,.26);color:#ffd27a;padding:1px 4px;border-radius:3px}
+  .lib-cue-code .cm{color:#7e756b}
+  .lib-act{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .lib-tags{display:flex;gap:6px;flex-wrap:wrap;overflow:hidden;max-height:20px}
+  .lib-tag{font:500 10px/1 "DM Mono",ui-monospace,monospace;color:var(--ink2);border:1px solid var(--line);padding:3px 6px;white-space:nowrap}
+  .lib-open{font:700 11px/1 "DM Mono",ui-monospace,monospace;color:var(--ink);white-space:nowrap}
+  .lib-card:hover .lib-open{color:var(--red)}
+
+  /* compact density */
+  .lib-compact .lib-cards{gap:11px}
+  .lib-compact .lib-card{padding:14px 14px 12px;box-shadow:4px 4px 0 rgba(32,28,26,.1)}
+  .lib-compact .lib-card h3{font-size:16px}
+  .lib-compact .lib-cue,.lib-compact .lib-tags{display:none}
+  .lib-compact .lib-act{margin-top:11px;border-top:1px dashed var(--line);padding-top:10px}
+
+  /* empty */
+  .lib-empty{border:2px dashed var(--line);background:var(--panel);padding:54px 24px;text-align:center}
+  .lib-empty h3{margin:0;font-size:21px;font-weight:700}
+  .lib-empty p{margin:8px 0 0;font-size:14px;color:var(--ink2)}
+  .lib-empty button{margin-top:16px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);
+    font:700 12.5px/1 "DM Sans",system-ui,sans-serif;padding:11px 18px}
+  .lib-empty button:hover{background:var(--red);border-color:var(--red)}
+
+  /* scope header */
+  .lib-scope{border:2px solid var(--ink);background:var(--panel);box-shadow:6px 6px 0 rgba(32,28,26,.1);
+    padding:20px 22px;margin-bottom:26px;display:flex;align-items:center;gap:18px}
+  .lib-scope .big{font-size:34px;line-height:1;flex-shrink:0}
+  .lib-scope .sn{font-family:"Fraunces",serif;font-weight:900;font-size:40px;line-height:.85;letter-spacing:-.04em;color:var(--red);flex-shrink:0}
+  .lib-scope h2{margin:0;font-weight:800;font-size:clamp(22px,2.6vw,30px);letter-spacing:-.025em}
+  .lib-scope p{margin:6px 0 0;font-size:13.5px;color:var(--ink2);line-height:1.45;max-width:52ch}
+  .lib-scope .sk{font:600 9.5px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--ink2);margin-bottom:7px}
+
+  /* footer */
+  .lib-foot{border-top:2px solid var(--ink);padding:26px 0 64px}
+  .lib-foot-in{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font:500 11px/1.5 "DM Mono",ui-monospace,monospace;color:var(--ink2)}
+  .lib-foot-in a{color:var(--ink2);text-decoration:none}
+  .lib-foot-in a:hover{color:var(--red)}
+</style>
+</head>
+<body>
+  <header class="lib-top">
+    <div class="lib-top-in">
+      <a class="lib-brand" href="index.html">CC Fest · Coding Camp Tools</a>
+      <nav class="lib-tlinks">
+        <a class="here" href="library.html">Library</a>
+        <a href="sessions/">Sessions</a>
+        <a href="concept-map.html">Map</a>
+        <a href="about.html">About</a>
+        <a href="https://ccfest.rocks">ccfest.rocks</a>
+        <a class="gh" href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="lib-wrap">
+    <!-- ── MASTHEAD ── -->
+    <section class="mast">
+      <div class="mast-bar"><span>CC Fest · Coding Camp</span><span>The library · 2026</span></div>
+      <div class="mast-body">
+        <div class="mast-eye">Every resource in the camp</div>
+        <h1>The whole library, <em>one shelf at a time.</em></h1>
+        <p class="lede">Concept bridges to build intuition, workshop tools to play and predict, and starter sketches to remix. Browse by category or by session, then narrow by type, level, or what you're trying to make.</p>
+        <div class="mast-ribbon">
+          <div><strong id="c-bridge">21</strong><span>Concept bridges</span><small>intuition first</small></div>
+          <div><strong id="c-tool">70</strong><span>Workshop tools</span><small>play &amp; predict</small></div>
+          <div><strong id="c-sketch">44</strong><span>Starter sketches</span><small>edit &amp; remix</small></div>
+          <div><strong id="c-total">135</strong><span>Total resources</span><small>free &amp; open</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── LAYOUT ── -->
+    <div class="lib-layout">
+      <aside class="lib-side">
+        <div class="lib-axis" id="lib-axis">
+          <button data-axis="suit" aria-pressed="true">By category</button>
+          <button data-axis="session" aria-pressed="false">By session</button>
+        </div>
+        <div class="lib-side-k" id="lib-side-k">Categories</div>
+        <div class="lib-navlist" id="lib-navlist"></div>
+      </aside>
+
+      <section>
+        <div class="lib-refine">
+          <div class="ref-row">
+            <div class="lib-search">
+              <span class="ic">⌕</span>
+              <input id="lib-q" type="search" placeholder="Search the library — titles, tags, ideas…" autocomplete="off">
+            </div>
+            <div class="lib-seg" id="lib-typeseg">
+              <button data-type="all" aria-pressed="true">All</button>
+              <button data-type="bridge" aria-pressed="false">Bridges</button>
+              <button data-type="tool" aria-pressed="false">Tools</button>
+              <button data-type="sketch" aria-pressed="false">Sketches</button>
+            </div>
+            <span class="lib-count" id="lib-count"><b>135</b> shown</span>
+          </div>
+          <div class="ref-row">
+            <span class="ref-lbl">Level</span>
+            <div class="lib-chips" id="lib-levelchips"></div>
+            <span class="ref-lbl" style="margin-left:6px">Goal</span>
+            <div class="lib-chips" id="lib-pathchips"></div>
+            <div class="lib-density">
+              <span class="ref-lbl">Cards</span>
+              <div class="lib-seg" id="lib-densityseg">
+                <button data-density="regular" aria-pressed="true">Detailed</button>
+                <button data-density="compact" aria-pressed="false">Compact</button>
+              </div>
+            </div>
+            <button class="lib-clear" id="lib-clear" style="display:none">Clear all</button>
+          </div>
+        </div>
+
+        <div id="lib-results"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="lib-foot">
+    <div class="lib-wrap lib-foot-in">
+      <span>CC Fest Coding Camp · creative coding for all · made by Saber Khan</span>
+      <span><a href="https://ccfest.rocks">ccfest.rocks</a> · <a href="https://github.com/saberkhan372/CC-Fest-Coding-Camp">GitHub ↗</a></span>
+    </div>
+  </footer>
+
+  <script src="catalog-data.js?v=20260603-audit-freshness"></script>
+  <script>
+  (function () {
+    var CAT = (window.CCFestCatalog && window.CCFestCatalog.items) || [];
+    var FAC = (window.CCFestCatalog && window.CCFestCatalog.facets) || { suits:[], types:[], levels:[], pathways:[], sessions:[] };
+
+    var SUIT_COLOR = { marks:'#f5a800', motion:'#e07a5f', systems:'#7f9d7a', data:'#49627a', open:'#7a5ea8', support:'#9a8c7a' };
+    var suitMeta = {}; FAC.suits.forEach(function(s){ suitMeta[s.id] = s; });
+    var typeMeta = {}; FAC.types.forEach(function(t){ typeMeta[t.id] = t; });
+    var sessMeta = {}; FAC.sessions.forEach(function(s){ sessMeta[s.id] = s; });
+    var pathMeta = {}; FAC.pathways.forEach(function(p){ pathMeta[p.id] = p; });
+    var levelMeta = {}; FAC.levels.forEach(function(l){ levelMeta[l.id] = l; });
+
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function suitColor(id){ return SUIT_COLOR[id]||'#9a8c7a'; }
+    function suitLabel(id){ return (suitMeta[id]&&suitMeta[id].label)||id; }
+    function suitGlyph(id){ return (suitMeta[id]&&suitMeta[id].glyph)||'●'; }
+    function suitSummary(id){ return (suitMeta[id]&&suitMeta[id].summary)||''; }
+    function levelLabel(id){ return (levelMeta[id]&&levelMeta[id].label)||id; }
+    function kindShort(t){ return t==='bridge'?'Concept Bridge':t==='tool'?'Workshop Tool':'Starter Sketch'; }
+
+    // ── live ribbon counts ──
+    function count(type){ return CAT.filter(function(i){ return i.type===type; }).length; }
+    if (CAT.length) {
+      document.getElementById('c-bridge').textContent = count('bridge');
+      document.getElementById('c-tool').textContent   = count('tool');
+      document.getElementById('c-sketch').textContent = count('sketch');
+      document.getElementById('c-total').textContent  = CAT.length;
+    }
+
+    // ── state ──
+    var state = { axis:'suit', scope:null, q:'', type:'all', levels:new Set(), paths:new Set(), density:'regular' };
+
+    var suitOrder = FAC.suits.map(function(s){ return s.id; });
+    var sessOrder = FAC.sessions.map(function(s){ return s.id; });
+
+    // ── filtering ──
+    function passesFilters(it) {
+      if (state.type !== 'all' && it.type !== state.type) return false;
+      if (state.levels.size && !state.levels.has(it.level)) return false;
+      if (state.paths.size) {
+        var ok = (it.pathways||[]).some(function(p){ return state.paths.has(p); });
+        if (!ok) return false;
+      }
+      var qq = state.q.trim().toLowerCase();
+      if (qq) {
+        var hay = (it.title+' '+it.summary+' '+(it.tags||[]).join(' ')+' '+(it.group||'')+' '+
+          (it.bridgeConcept||'')+' '+(it.controlCue||'')+' '+(it.codePeek||'')).toLowerCase();
+        if (hay.indexOf(qq)===-1) return false;
+      }
+      return true;
+    }
+
+    function scopedField(it){ return state.axis==='suit' ? it.suit : it.session; }
+
+    function matched() {
+      return CAT.filter(function(it) {
+        if (state.scope!==null && scopedField(it)!==state.scope) return false;
+        return passesFilters(it);
+      });
+    }
+
+    // ── card cues ──
+    function highlightCode(src) {
+      var s = esc(src);
+      s = s.replace(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;|'[^']*?'|\b\d+(?:\.\d+)?\b)/, '<span class="hl">$1</span>');
+      return s;
+    }
+    function bridgeCue(it) {
+      var c = it.bridgeConcept||(it.tags||[]).slice(0,2).join(' · ');
+      return '<div class="lib-cue"><div class="lib-cue-bridge"><span class="ca">the idea</span><span class="cx">→</span>' +
+        '<span class="cc">'+esc(c)+'</span></div></div>';
+    }
+    function toolCue(it) {
+      var lbl = it.controlCue||(it.tags||[]).slice(0,2).join(' / ');
+      return '<div class="lib-cue"><div class="lib-cue-tool">' +
+        '<div class="clbl">'+esc(lbl)+'</div>' +
+        '<div class="sl"><i style="left:38%"></i></div>' +
+        '<div class="sl"><i style="left:66%;background:'+suitColor(it.suit)+'"></i></div>' +
+        '</div></div>';
+    }
+    function sketchCue(it) {
+      var code = it.codePeek||'let value = 10;';
+      return '<div class="lib-cue"><div class="lib-cue-code"><span class="cm">// change this</span>\n'+highlightCode(code)+'</div></div>';
+    }
+    function cueFor(it) {
+      return it.type==='bridge' ? bridgeCue(it) : it.type==='tool' ? toolCue(it) : sketchCue(it);
+    }
+
+    function card(it) {
+      var verb = it.type==='bridge'?'Open bridge ↗':it.type==='tool'?'Open tool ↗':'Open sketch ↗';
+      var c = suitColor(it.suit);
+      var tags = (it.tags||[]).slice(0,3).map(function(t){ return '<span class="lib-tag">'+esc(t)+'</span>'; }).join('');
+      return '<a class="lib-card" href="'+esc(it.url)+'">' +
+        '<div class="lib-pills">' +
+          '<span class="lib-pill kind '+it.type+'">'+esc(kindShort(it.type))+'</span>' +
+          '<span class="lib-pill suit"><span class="dot" style="background:'+c+'"></span>'+esc(suitLabel(it.suit))+'</span>' +
+          '<span class="lib-pill lvl">'+esc(levelLabel(it.level))+'</span>' +
+        '</div>' +
+        '<h3>'+esc(it.title)+'</h3>' +
+        '<p class="desc">'+esc(it.summary)+'</p>' +
+        cueFor(it) +
+        '<div class="lib-act"><span class="lib-tags">'+tags+'</span><span class="lib-open">'+verb+'</span></div>' +
+      '</a>';
+    }
+
+    function grid(items){ return '<div class="lib-cards">'+items.map(card).join('')+'</div>'; }
+
+    function emptyState() {
+      return '<div class="lib-empty"><h3>Nothing on this shelf… yet.</h3>' +
+        '<p>Loosen a filter, clear the search, or jump back to everything.</p>' +
+        '<button id="lib-empty-reset">Reset filters</button></div>';
+    }
+
+    // ── render ──
+    function render() {
+      var R = document.getElementById('lib-results');
+      var items = matched();
+
+      document.getElementById('lib-count').innerHTML = '<b>'+items.length+'</b> of '+CAT.length+' shown';
+
+      if (!items.length) { R.innerHTML = emptyState(); wireEmpty(); R.className=''; return; }
+      R.className = state.density==='compact' ? 'lib-compact' : '';
+
+      // scoped → scope header + flat grid
+      if (state.scope !== null) {
+        var head;
+        if (state.axis === 'suit') {
+          head = '<div class="lib-scope"><span class="big" style="color:'+suitColor(state.scope)+'">'+suitGlyph(state.scope)+'</span>' +
+            '<div><div class="sk">Category · '+items.length+' resources</div>' +
+            '<h2>'+esc(suitLabel(state.scope))+'</h2>' +
+            '<p>'+esc(suitSummary(state.scope))+'</p></div></div>';
+        } else {
+          var sm = sessMeta[state.scope] || { title:state.scope, focus:'' };
+          var sn = state.scope === 'support' ? '·' : state.scope;
+          head = '<div class="lib-scope"><span class="sn">'+esc(sn)+'</span>' +
+            '<div><div class="sk">Session · '+items.length+' resources</div>' +
+            '<h2>'+esc(sm.title)+'</h2>' +
+            '<p>'+esc(sm.focus)+'</p></div></div>';
+        }
+        R.innerHTML = head + grid(items);
+        return;
+      }
+
+      // grouped
+      var order = state.axis==='suit' ? suitOrder : sessOrder;
+      var html = order.map(function(key) {
+        var sub = items.filter(function(it){ return scopedField(it)===key; });
+        if (!sub.length) return '';
+        if (state.axis === 'suit') {
+          return '<section class="lib-grp"><div class="lib-grp-h">' +
+            '<span class="gsym" style="color:'+suitColor(key)+'">'+suitGlyph(key)+'</span>' +
+            '<h2>'+esc(suitLabel(key))+'</h2>' +
+            '<span class="gsub">'+esc(suitSummary(key))+'</span>' +
+            '<span class="gct">'+String(sub.length).padStart(2,'0')+'</span></div>' +
+            grid(sub)+'</section>';
+        } else {
+          var s = sessMeta[key] || { title:key, focus:'' };
+          return '<section class="lib-grp"><div class="lib-grp-h">' +
+            '<span class="gsym" style="color:var(--red);font-family:Fraunces,serif;font-weight:900;font-size:24px">'+esc(key==='support'?'⊕':key)+'</span>' +
+            '<h2>'+esc(s.title)+'</h2>' +
+            '<span class="gsub">'+esc(s.focus)+'</span>' +
+            '<span class="gct">'+String(sub.length).padStart(2,'0')+'</span></div>' +
+            grid(sub)+'</section>';
+        }
+      }).join('');
+      R.innerHTML = html;
+    }
+
+    function wireEmpty() {
+      var b = document.getElementById('lib-empty-reset');
+      if (b) b.addEventListener('click', resetAll);
+    }
+
+    // ── sidebar nav ──
+    function buildNav() {
+      var k = document.getElementById('lib-side-k');
+      var list = document.getElementById('lib-navlist');
+      var order = state.axis==='suit' ? suitOrder : sessOrder;
+      k.textContent = state.axis==='suit' ? 'Categories' : 'The arc';
+
+      function tally(key) {
+        return CAT.filter(function(it){ return scopedField(it)===key && passesFilters(it); }).length;
+      }
+      var total = CAT.filter(passesFilters).length;
+
+      var html = '<button class="lib-nav-i all" data-scope="" aria-current="'+(state.scope===null)+'">' +
+        '<span class="gl">◆</span><span class="nm">Everything</span><span class="ct">'+total+'</span></button>';
+
+      html += order.map(function(key) {
+        var n = tally(key);
+        var glyph, name;
+        if (state.axis==='suit') { glyph=suitGlyph(key); name=suitLabel(key); }
+        else { glyph=key==='support'?'⊕':key; name=(sessMeta[key]&&sessMeta[key].title)||key; }
+        var col = state.axis==='suit' ? suitColor(key) : 'var(--ink2)';
+        return '<button class="lib-nav-i" data-scope="'+esc(key)+'" aria-current="'+(state.scope===key)+'"' +
+          (n?'':' style="opacity:.42"')+'>' +
+          '<span class="gl" style="color:'+col+'">'+esc(glyph)+'</span>' +
+          '<span class="nm">'+esc(name)+'</span><span class="ct">'+n+'</span></button>';
+      }).join('');
+
+      list.innerHTML = html;
+      list.querySelectorAll('.lib-nav-i').forEach(function(b) {
+        b.addEventListener('click', function() {
+          var sc = b.getAttribute('data-scope');
+          state.scope = sc==='' ? null : sc;
+          buildNav(); render(); updateClear();
+          window.scrollTo({ top:Math.max(0, document.querySelector('.lib-layout').offsetTop-70), behavior:'smooth' });
+        });
+      });
+    }
+
+    // ── chips ──
+    function buildChips() {
+      document.getElementById('lib-levelchips').innerHTML = FAC.levels.map(function(l) {
+        return '<button class="lib-chip" data-level="'+l.id+'" aria-pressed="false">'+esc(l.label)+'</button>';
+      }).join('');
+      document.getElementById('lib-pathchips').innerHTML = FAC.pathways.map(function(p) {
+        return '<button class="lib-chip" data-path="'+p.id+'" aria-pressed="false">'+esc(p.label)+'</button>';
+      }).join('');
+      document.querySelectorAll('#lib-levelchips .lib-chip').forEach(function(b) {
+        b.addEventListener('click', function() {
+          var id = b.getAttribute('data-level');
+          state.levels.has(id) ? state.levels.delete(id) : state.levels.add(id);
+          b.setAttribute('aria-pressed', state.levels.has(id));
+          afterFilterChange();
+        });
+      });
+      document.querySelectorAll('#lib-pathchips .lib-chip').forEach(function(p) {
+        p.addEventListener('click', function() {
+          var id = p.getAttribute('data-path');
+          state.paths.has(id) ? state.paths.delete(id) : state.paths.add(id);
+          p.setAttribute('aria-pressed', state.paths.has(id));
+          afterFilterChange();
+        });
+      });
+    }
+
+    function afterFilterChange(){ buildNav(); render(); updateClear(); }
+
+    function updateClear() {
+      var active = state.q || state.type!=='all' || state.levels.size || state.paths.size || state.scope!==null;
+      document.getElementById('lib-clear').style.display = active ? '' : 'none';
+    }
+
+    function resetAll() {
+      state.scope=null; state.q=''; state.type='all'; state.levels.clear(); state.paths.clear();
+      document.getElementById('lib-q').value='';
+      document.querySelectorAll('#lib-typeseg button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-type')==='all'); });
+      document.querySelectorAll('.lib-chip').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+      afterFilterChange();
+    }
+
+    // ── controls ──
+    document.getElementById('lib-q').addEventListener('input', function(e) {
+      state.q = e.target.value; afterFilterChange();
+    });
+    document.querySelectorAll('#lib-typeseg button').forEach(function(b) {
+      b.addEventListener('click', function() {
+        state.type = b.getAttribute('data-type');
+        document.querySelectorAll('#lib-typeseg button').forEach(function(x){ x.setAttribute('aria-pressed', x===b); });
+        afterFilterChange();
+      });
+    });
+    document.querySelectorAll('#lib-axis button').forEach(function(b) {
+      b.addEventListener('click', function() {
+        state.axis = b.getAttribute('data-axis'); state.scope=null;
+        document.querySelectorAll('#lib-axis button').forEach(function(x){ x.setAttribute('aria-pressed', x===b); });
+        buildNav(); render(); updateClear();
+      });
+    });
+    document.querySelectorAll('#lib-densityseg button').forEach(function(b) {
+      b.addEventListener('click', function() {
+        state.density = b.getAttribute('data-density');
+        document.querySelectorAll('#lib-densityseg button').forEach(function(x){ x.setAttribute('aria-pressed', x===b); });
+        render();
+      });
+    });
+    document.getElementById('lib-clear').addEventListener('click', resetAll);
+
+    // ── init ──
+    buildChips();
+    buildNav();
+    render();
+    updateClear();
+  })();
+  </script>
+</body>
+</html>
