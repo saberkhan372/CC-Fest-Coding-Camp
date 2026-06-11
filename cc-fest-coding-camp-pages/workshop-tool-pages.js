@@ -436,7 +436,7 @@
       return;
     }
 
-    const lessonCards = workshopLessons(tool).map(([heading, body]) => `<div class="lesson-card"><h3>${heading}</h3><p>${body}</p></div>`).join("");
+    const lessonCards = teachingPrompts(tool).map(([heading, body]) => `<div class="lesson-card"><h3>${heading}</h3><p>${body}</p></div>`).join("");
     const relatedPanel = renderRelatedResources(tool, slug);
     const teachingPanel = renderTeachingNote(tool);
     const state = stateFrom(tool);
@@ -479,7 +479,7 @@
           <aside class="stack-panel">
             <article class="card"><div class="card-inner"><div class="card-header"><div><h2>Change One Thing</h2><p>Small changes, visible consequences.</p></div></div><div class="controls-grid" id="controls"></div></div></article>
             <article class="card"><div class="card-inner"><div class="card-header"><div><h2>What Changed?</h2><p>Watch the values change as the sketch runs.</p></div></div><div class="stat-list" id="stats"></div></div></article>
-            <article class="card"><div class="card-inner"><div class="card-header"><div><h2>Open / Change / Predict / Remix / Teach</h2><p>A workshop rhythm for using the tool with beginners.</p></div></div><div class="lesson-grid">${lessonCards}</div></div></article>
+            <article class="card"><div class="card-inner"><div class="card-header"><div><h2>Teaching prompts</h2><p>Tool-specific moves to try after the rhythm strip.</p></div></div><div class="lesson-grid">${lessonCards}</div></div></article>
             ${relatedPanel}
             ${teachingPanel}
           </aside>
@@ -656,17 +656,12 @@
     return slug.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
   }
 
-  function workshopLessons(tool) {
-    const find = (name, fallback) => {
-      const hit = tool.lessons.find(([heading]) => heading.toLowerCase() === name);
-      return hit ? hit[1] : fallback;
-    };
+  function teachingPrompts(tool) {
+    if (Array.isArray(tool.lessons) && tool.lessons.length) return tool.lessons;
     return [
-      ["Open", find("try", "Start with the running sketch and describe what the canvas is doing before touching the code.")],
-      ["Change", "Adjust one control or value, then pause long enough to see the consequence."],
-      ["Predict", find("notice", "Name the relationship between the control, the code, and the visible behavior.")],
-      ["Remix", find("remix", "Borrow the pattern for a personal sketch, classroom prompt, or tiny experiment.")],
-      ["Teach", "Invite learners to explain the change in their own words before moving to the next idea."]
+      ["Try", "Start with the running sketch and describe what the canvas is doing before touching the code."],
+      ["Notice", "Name the relationship between the control, the code, and the visible behavior."],
+      ["Remix", "Borrow the pattern for a personal sketch, classroom prompt, or tiny experiment."]
     ];
   }
 
