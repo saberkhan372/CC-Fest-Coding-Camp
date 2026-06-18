@@ -59,6 +59,26 @@ const NORMAL_CHECK = () => {
   return { n: links.length, blank: !!(a && a.target === "_blank"), focus: document.documentElement.classList.contains("embed-mode") };
 };
 
+const FULLSCREEN_CHECK = () => {
+  const shell = document.querySelector(".cc-fullscreen-shell");
+  const shown = (el) => {
+    if (!el) return false;
+    const s = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    return s.display !== "none" && s.visibility !== "hidden" && r.width > 0 && r.height > 0;
+  };
+  const anyShown = (selector) => !!(shell && [...shell.querySelectorAll(selector)].some(shown));
+  return {
+    shell: !!shell,
+    workspace: !!(shell && shell.querySelector("canvas, iframe#preview-frame")),
+    controls: shell ? shell.querySelectorAll("button, input, select, textarea").length : 0,
+    exit: shown(shell && shell.querySelector(".cc-fullscreen-exit")),
+    title: shown(shell && shell.querySelector("h1")),
+    leak: anyShown(".tool-header,.sketch-header,.teaching-note,.lesson-grid,.related-group,.related-grid,.p5-export-bar"),
+    actionBarVisible: shown(shell && shell.querySelector(".canvas-action-bar")),
+  };
+};
+
 const FOCUS_CHECK = () => {
   const shown = (sel) => { const el = document.querySelector(sel); if (!el) return false; const s = getComputedStyle(el); return s.display !== "none" && s.visibility !== "hidden" && el.offsetParent !== null; };
   const anyShown = (sel) => [...document.querySelectorAll(sel)].some((el) => { const s = getComputedStyle(el); return s.display !== "none" && s.visibility !== "hidden" && el.offsetParent !== null; });
@@ -89,6 +109,50 @@ for (const slug of slugs) {
     if (n.n === 1 && !n.blank) failures.push(`${slug} [normal]: Project link not target=_blank`);
     if (n.focus) failures.push(`${slug} [normal]: embed-mode active without a focus param`);
 
+    const fsButton = page.getByRole("button", { name: "⛶ Fullscreen" });
+    const fsCount = await fsButton.count();
+    const visibleWorkspace = await page.evaluate(() => {
+      const shown = (el) => {
+        if (!el) return false;
+        const s = getComputedStyle(el);
+        const r = el.getBoundingClientRect();
+        return s.display !== "none" && s.visibility !== "hidden" && r.width > 0 && r.height > 0;
+      };
+      return [...document.querySelectorAll("canvas, iframe#preview-frame")].some(shown);
+    });
+    if (visibleWorkspace && !NO_WORKSPACE_EXPECTED.has(slug) && fsCount !== 1) {
+      failures.push(`${slug} [fullscreen]: expected 1 Fullscreen button, found ${fsCount}`);
+    }
+    if (fsCount === 1) {
+      // Starter canvases live in an iframe and can take a beat to initialize.
+      // If they never do, the click's "Run first" feedback is itself a failure.
+      if (await page.locator("iframe#preview-frame").count()) {
+        try {
+          await page.waitForFunction(() => {
+            const frame = document.querySelector("iframe#preview-frame");
+            return !!(frame && frame.contentDocument && frame.contentDocument.querySelector("canvas"));
+          }, null, { timeout: 4000 });
+        } catch {}
+      }
+      await fsButton.click();
+      await page.waitForTimeout(120);
+      const fs = await page.evaluate(FULLSCREEN_CHECK);
+      if (!fs.shell) failures.push(`${slug} [fullscreen]: focused shell did not open`);
+      if (!fs.workspace) failures.push(`${slug} [fullscreen]: canvas/preview missing`);
+      if (fs.controls < 1) failures.push(`${slug} [fullscreen]: controls missing`);
+      if (!fs.exit) failures.push(`${slug} [fullscreen]: Exit control missing`);
+      if (fs.title) failures.push(`${slug} [fullscreen]: page title leaked`);
+      if (fs.leak || fs.actionBarVisible) failures.push(`${slug} [fullscreen]: nonessential chrome leaked`);
+      const exit = page.getByRole("button", { name: "Exit fullscreen workspace" });
+      if (await exit.count() === 1) {
+        await exit.click();
+        await page.waitForTimeout(80);
+        if (await page.locator(".cc-fullscreen-shell").count()) {
+          failures.push(`${slug} [fullscreen]: shell did not restore on exit`);
+        }
+      }
+    }
+
     await page.goto(base + "?project=1", { waitUntil: "load" });
     await page.waitForTimeout(500);
     const f = await page.evaluate(FOCUS_CHECK);
@@ -107,7 +171,7 @@ for (const slug of slugs) {
 await browser.close();
 server.close();
 
-console.log(`Runtime-audited ${checked} tool pages (normal + project views).`);
+console.log(`Runtime-audited ${checked} tool pages (normal + fullscreen + project views).`);
 if (failures.length) {
   console.error(`\nFAIL — ${failures.length} issue(s):`);
   for (const f of failures) console.error("  - " + f);

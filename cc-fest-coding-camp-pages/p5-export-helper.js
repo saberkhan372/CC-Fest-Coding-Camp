@@ -237,15 +237,12 @@
     fsBtn.type = "button";
     fsBtn.textContent = "⛶ Fullscreen";
     fsBtn.addEventListener("click", () => {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        const fsTarget = canvas.closest(".stage, .canvas-wrap") || canvas;
-        (fsTarget.requestFullscreen || canvas.requestFullscreen).call(fsTarget).catch(() => {});
+      if (window.CCFullscreen) {
+        window.CCFullscreen.toggle({ trigger: fsBtn, canvas, kind: "tool" });
+        return;
       }
-    });
-    document.addEventListener("fullscreenchange", () => {
-      fsBtn.textContent = document.fullscreenElement ? "✕ Exit full" : "⛶ Fullscreen";
+      fsBtn.textContent = "Fullscreen unavailable";
+      window.setTimeout(() => { fsBtn.textContent = "⛶ Fullscreen"; }, 1400);
     });
 
     // Copy link
@@ -264,16 +261,19 @@
 
   function initCanvasBar() {
     if (document.querySelector(".canvas-action-bar")) return;
-    let tries = 0;
     const tryInsert = () => {
       insertCanvasBar();
       return !!document.querySelector(".canvas-action-bar");
     };
     if (tryInsert()) return;
-    const interval = window.setInterval(() => {
-      tries += 1;
-      if (tryInsert() || tries > 40) window.clearInterval(interval);
-    }, 100);
+    // p5/WebGL canvases may arrive after fonts, libraries, or GPU setup. Watch
+    // actual DOM changes instead of giving up after a timer loop; this is also
+    // reliable in throttled/background classroom tabs.
+    const observer = new MutationObserver(() => {
+      if (tryInsert()) observer.disconnect();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.setTimeout(() => observer.disconnect(), 15000);
   }
 
   // ── Boot ──────────────────────────────────────────────────────────────

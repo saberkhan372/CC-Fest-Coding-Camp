@@ -13,6 +13,12 @@
  *      "data-embed-hide" pass so teaching/related blocks collapse cleanly
  *      instead of leaving empty card shells.
  *
+ * This file also owns the shared fullscreen workspace used by both generated
+ * tools and starter sketches. Fullscreen is deliberately stricter than Project:
+ * it temporarily moves the live canvas/editor and its actual controls into a
+ * focused shell, so listeners and state survive, while titles, teaching chrome,
+ * export links, and page navigation stay behind.
+ *
  * Public interface:
  *   ?project=1   canonical focused URL (opened by the Project link)
  *   ?embed=1     existing alias — same focused layout (iframe embeds)
@@ -118,6 +124,73 @@
     }
     .cc-projector-exit{color:#6b6760;font-weight:600;}
     .cc-projector-exit:hover{color:#c8391d;border-color:#c8391d;}
+
+    /* Fullscreen workspace — canvas/editor + controls, with no page chrome. */
+    .cc-fullscreen-shell{
+      box-sizing:border-box;width:100%;height:100%;min-height:100vh;
+      overflow:auto;padding:clamp(18px,3vw,48px);
+      color:#2c2a26;background:#f7f3ea;
+      font-family:inherit;color-scheme:light;
+    }
+    .cc-fullscreen-shell.cc-fullscreen-fallback{
+      position:fixed;inset:0;z-index:2147483000;
+    }
+    .cc-fullscreen-workspace{
+      width:min(1800px,100%);min-height:calc(100vh - clamp(36px,6vw,96px));
+      margin:0 auto;display:grid;
+      grid-template-columns:minmax(0,1.7fr) minmax(270px,.72fr);
+      gap:clamp(16px,2vw,32px);align-items:stretch;
+    }
+    .cc-fullscreen-canvas-column,
+    .cc-fullscreen-controls-column{min-width:0;display:flex;flex-direction:column;gap:14px;}
+    .cc-fullscreen-canvas-column>[data-cc-fullscreen-part="canvas"]{flex:1;}
+    .cc-fullscreen-shell [data-cc-fullscreen-part="canvas"]{
+      min-height:0;display:flex;flex-direction:column;justify-content:center;
+    }
+    .cc-fullscreen-shell canvas{
+      display:block;width:100% !important;height:auto !important;
+      max-width:100% !important;max-height:calc(100vh - 96px) !important;
+      margin:auto;object-fit:contain;
+    }
+    .cc-fullscreen-shell .cc-fullscreen-starter{grid-column:1/-1;min-width:0;}
+    .cc-fullscreen-shell .cc-fullscreen-starter>.editor-card{margin:0;}
+    .cc-fullscreen-shell .editor-layout{min-height:calc(100vh - 150px);}
+    .cc-fullscreen-shell .preview-frame{min-height:clamp(360px,66vh,900px);}
+    .cc-fullscreen-shell .tool-header,
+    .cc-fullscreen-shell .sketch-header,
+    .cc-fullscreen-shell .card-header,
+    .cc-fullscreen-shell .editor-hint,
+    .cc-fullscreen-shell .teaching-note,
+    .cc-fullscreen-shell .lesson-grid,
+    .cc-fullscreen-shell .lessons,
+    .cc-fullscreen-shell .related-group,
+    .cc-fullscreen-shell .related-grid,
+    .cc-fullscreen-shell .p5-export-bar,
+    .cc-fullscreen-shell .canvas-action-bar,
+    .cc-fullscreen-shell #p5-export-button{display:none !important;}
+    .cc-fullscreen-shell [data-cc-fullscreen-part] > h1,
+    .cc-fullscreen-shell [data-cc-fullscreen-part] > h2,
+    .cc-fullscreen-shell [data-cc-fullscreen-part] > .title,
+    .cc-fullscreen-shell [data-cc-fullscreen-part] > .subtitle,
+    .cc-fullscreen-shell [data-cc-fullscreen-part] > p:first-of-type{display:none !important;}
+    .cc-fullscreen-exit{
+      position:fixed;top:12px;right:12px;z-index:2147483647;
+      appearance:none;border:1px solid rgba(44,42,38,.24);border-radius:999px;
+      padding:8px 12px;background:rgba(255,255,255,.94);color:#2c2a26;
+      box-shadow:0 2px 10px rgba(0,0,0,.12);cursor:pointer;
+      font:700 12px "DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    }
+    .cc-fullscreen-exit:hover{color:#c8391d;border-color:#c8391d;}
+    .cc-fullscreen-notice{
+      position:fixed;left:50%;bottom:16px;z-index:2147483647;
+      transform:translateX(-50%);padding:8px 12px;border-radius:999px;
+      background:#2c2a26;color:#fff;font-size:12px;box-shadow:0 2px 10px rgba(0,0,0,.18);
+    }
+    @media (max-width:900px){
+      .cc-fullscreen-workspace{grid-template-columns:1fr;min-height:0;}
+      .cc-fullscreen-shell canvas{max-height:none !important;}
+      .cc-fullscreen-shell .editor-layout{min-height:0;}
+    }
     @media print{.cc-projector-exit,.cc-project-link{display:none;}}
   `;
 
@@ -227,6 +300,195 @@
     a.title = "Return to the full tool page";
     document.body.appendChild(a);
   }
+
+  // ── Fullscreen workspace: stricter than Project mode ─────────────────
+  const FULLSCREEN_CONTAINER_SELECTOR =
+    ".controls, .controls-panel, .control-panel, .controls-grid, .control-card, " +
+    ".settings, .settings-panel, .card, .panel, article, aside, section";
+  let fullscreenSession = null;
+
+  function isVisible(el) {
+    if (!el || !el.isConnected) return false;
+    const rect = el.getBoundingClientRect();
+    const style = getComputedStyle(el);
+    return rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden";
+  }
+
+  function nativeFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function compactRoots(nodes) {
+    const unique = Array.from(new Set(nodes.filter(Boolean)));
+    return unique.filter((node) => !unique.some((other) => other !== node && other.contains(node)));
+  }
+
+  function controlRoots(canvasRoot) {
+    const ignored =
+      ".canvas-action-bar, .p5-export-bar, .tool-topbar, nav, .page-topbar, " +
+      ".sketch-topbar, .cc-project-link, .cc-projector-exit, .tool-header, .sketch-header";
+    const controls = Array.from(document.querySelectorAll("button, input, select, textarea"))
+      .filter((el) => isVisible(el) && !el.closest(ignored))
+      .filter((el) => el.id !== "p5-export-button" && el.id !== "fullscreen-btn")
+      .filter((el) => !/copy link|save image|p5 editor|fullscreen/i.test(el.textContent || ""));
+    const roots = controls.map((el) => el.closest(FULLSCREEN_CONTAINER_SELECTOR) || el.parentElement);
+    return compactRoots(roots)
+      .filter((root) => root && root !== canvasRoot && !canvasRoot.contains(root))
+      .filter((root) => !root.closest(".lessons-card, .teaching-note, .related-group, .related-grid"))
+      // Copy/export buttons can make a code card look interactive. Keep actual
+      // form controls; discard read-only code cards whose only controls are
+      // export conveniences.
+      .filter((root) => !(
+        root.querySelector("pre, .code-panel, .code-output") &&
+        !root.querySelector("input, select, textarea")
+      ));
+  }
+
+  function moveInto(node, destination, part, moved) {
+    const marker = document.createComment("cc-fullscreen-placeholder");
+    node.parentNode.insertBefore(marker, node);
+    node.setAttribute("data-cc-fullscreen-part", part);
+    destination.appendChild(node);
+    moved.push({ node, marker });
+  }
+
+  function restoreFullscreenSession(session) {
+    if (!session || session.restored) return;
+    session.restored = true;
+    for (const { node, marker } of session.moved) {
+      node.removeAttribute("data-cc-fullscreen-part");
+      if (marker.parentNode) marker.parentNode.insertBefore(node, marker);
+      marker.remove();
+    }
+    session.shell.remove();
+    document.documentElement.classList.remove("cc-fullscreen-active");
+    document.body.style.overflow = session.bodyOverflow;
+    session.trigger.textContent = session.originalLabel;
+    session.trigger.removeAttribute("aria-pressed");
+    fullscreenSession = null;
+    window.removeEventListener("keydown", session.onKeydown);
+    try { session.trigger.focus({ preventScroll: true }); } catch (_) {}
+  }
+
+  async function closeFullscreenWorkspace() {
+    const session = fullscreenSession;
+    if (!session) return;
+    const active = nativeFullscreenElement();
+    if (active) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) {
+        try { await exit.call(document); } catch (_) { restoreFullscreenSession(session); }
+        return;
+      }
+    }
+    restoreFullscreenSession(session);
+  }
+
+  function fullscreenChanged() {
+    if (fullscreenSession && fullscreenSession.nativeStarted && !nativeFullscreenElement()) {
+      restoreFullscreenSession(fullscreenSession);
+    }
+  }
+
+  document.addEventListener("fullscreenchange", fullscreenChanged);
+  document.addEventListener("webkitfullscreenchange", fullscreenChanged);
+
+  async function openFullscreenWorkspace(options = {}) {
+    if (fullscreenSession) return closeFullscreenWorkspace();
+    const trigger = options.trigger;
+    if (!trigger) return;
+
+    const canvas = options.canvas || Array.from(document.querySelectorAll("canvas")).find(isVisible);
+    const starterRoot = options.kind === "starter"
+      ? (options.preferredRoot || document.querySelector(".editor-card"))
+      : null;
+    const canvasRoot = starterRoot ? null : canvas && (canvas.closest(".card, .panel, article, section") || canvas.parentElement);
+    if (!starterRoot && !canvasRoot) {
+      trigger.textContent = "Canvas unavailable";
+      window.setTimeout(() => { trigger.textContent = "⛶ Fullscreen"; }, 1400);
+      return;
+    }
+
+    const shell = document.createElement("div");
+    shell.className = "cc-fullscreen-shell";
+    shell.setAttribute("role", "dialog");
+    shell.setAttribute("aria-modal", "true");
+    shell.setAttribute("aria-label", "Fullscreen interactive workspace");
+    const workspace = document.createElement("div");
+    workspace.className = "cc-fullscreen-workspace";
+    const exitButton = document.createElement("button");
+    exitButton.type = "button";
+    exitButton.className = "cc-fullscreen-exit";
+    exitButton.textContent = "✕ Exit fullscreen";
+    exitButton.setAttribute("aria-label", "Exit fullscreen workspace");
+    shell.append(workspace, exitButton);
+
+    const moved = [];
+    if (starterRoot) {
+      const starterColumn = document.createElement("div");
+      starterColumn.className = "cc-fullscreen-starter";
+      workspace.appendChild(starterColumn);
+      moveInto(starterRoot, starterColumn, "editor", moved);
+    } else {
+      const canvasColumn = document.createElement("div");
+      canvasColumn.className = "cc-fullscreen-canvas-column";
+      const controlsColumn = document.createElement("div");
+      controlsColumn.className = "cc-fullscreen-controls-column";
+      workspace.append(canvasColumn, controlsColumn);
+      const controls = controlRoots(canvasRoot);
+      moveInto(canvasRoot, canvasColumn, "canvas", moved);
+      for (const root of controls) moveInto(root, controlsColumn, "controls", moved);
+      if (!controls.length) controlsColumn.remove();
+    }
+
+    const session = {
+      shell, moved, trigger,
+      originalLabel: trigger.textContent,
+      bodyOverflow: document.body.style.overflow,
+      nativeStarted: false,
+      restored: false,
+      onKeydown: (event) => {
+        if (event.key === "Escape" && fullscreenSession && !fullscreenSession.nativeStarted) {
+          event.preventDefault();
+          closeFullscreenWorkspace();
+        }
+      }
+    };
+    fullscreenSession = session;
+    trigger.textContent = "✕ Exit full";
+    trigger.setAttribute("aria-pressed", "true");
+    document.documentElement.classList.add("cc-fullscreen-active");
+    document.body.style.overflow = "hidden";
+    document.body.appendChild(shell);
+    exitButton.addEventListener("click", closeFullscreenWorkspace);
+    window.addEventListener("keydown", session.onKeydown);
+
+    const request = shell.requestFullscreen || shell.webkitRequestFullscreen;
+    if (request) {
+      try {
+        await request.call(shell);
+        session.nativeStarted = true;
+        exitButton.focus();
+        return;
+      } catch (_) {}
+    }
+
+    shell.classList.add("cc-fullscreen-fallback");
+    const notice = document.createElement("div");
+    notice.className = "cc-fullscreen-notice";
+    notice.setAttribute("role", "status");
+    notice.textContent = "Browser blocked native fullscreen — focus view is active";
+    shell.appendChild(notice);
+    window.setTimeout(() => notice.remove(), 2600);
+    exitButton.textContent = "✕ Exit focus view";
+    exitButton.focus();
+  }
+
+  window.CCFullscreen = {
+    toggle: openFullscreenWorkspace,
+    close: closeFullscreenWorkspace,
+    isActive: () => !!fullscreenSession
+  };
 
   // ── Boot ───────────────────────────────────────────────────────────────
   injectStyle();

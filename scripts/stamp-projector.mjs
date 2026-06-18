@@ -5,8 +5,10 @@ import path from "node:path";
 // "Project" button + ?view=project classroom view work everywhere, without
 // editing 114 tool HTML files by hand. Idempotent — safe to re-run.
 
-const CACHE_KEY = "20260617-projector5";
+const CACHE_KEY = "20260617-projector6-fullscreen";
 const TAG = `<script src="../../projector-mode.js?v=${CACHE_KEY}"></script>`;
+const P5_HELPER_KEY = "20260617-fullscreen-workspace";
+const STARTER_KEY = "20260617-fullscreen-workspace";
 
 const roots = [
   path.join(process.cwd(), "cc-fest-coding-camp-pages"),
@@ -29,13 +31,21 @@ let updated = 0;
 
 for (const root of roots) {
   for (const file of toolPages(root)) {
-    let html = fs.readFileSync(file, "utf8");
+    const original = fs.readFileSync(file, "utf8");
+    let html = original;
+
+    // Fullscreen is shared by projector-mode and the two tool-family helpers;
+    // refresh their cache keys together so a deploy cannot mix old canvas-only
+    // handlers with the new workspace controller.
+    html = html
+      .replace(/p5-export-helper\.js\?v=[^"']+/g, `p5-export-helper.js?v=${P5_HELPER_KEY}`)
+      .replace(/starter-seed-pages\.js\?v=[^"']+/g, `starter-seed-pages.js?v=${STARTER_KEY}`);
 
     // Refresh the cache key if an older tag is already present.
     const existing = /<script src="\.\.\/\.\.\/projector-mode\.js[^"]*"><\/script>\n?/;
     if (existing.test(html)) {
       const next = html.replace(existing, `${TAG}\n`);
-      if (next !== html) {
+      if (next !== original) {
         fs.writeFileSync(file, next);
         updated += 1;
       }

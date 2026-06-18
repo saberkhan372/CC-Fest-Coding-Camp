@@ -37,6 +37,10 @@ const SCRIPT_MUST_INCLUDE = [
   "semanticHidePass",           // teaching/related collapse pass
   'searchParams.set("project"', // canonical focused URL
   "injectFallbackButton",       // guaranteed button on nonstandard layouts
+  "window.CCFullscreen",        // one shared fullscreen controller
+  "cc-fullscreen-shell",        // strict canvas/control workspace
+  "cc-fullscreen-fallback",     // usable when the browser blocks native fullscreen
+  "data-cc-fullscreen-part",    // live nodes are moved, not cloned
 ];
 
 for (const root of roots) {
@@ -54,6 +58,21 @@ for (const root of roots) {
       if (!src.includes(needle)) {
         failures.push(`${path.basename(root)}: projector-mode.js missing "${needle}"`);
       }
+    }
+  }
+
+
+  // Both tool families must delegate to the same controller. This prevents a
+  // regression to canvas-only fullscreen in either generated or starter tools.
+  for (const helper of ["p5-export-helper.js", "starter-seed-pages.js"]) {
+    const helperFile = path.join(root, helper);
+    if (!fs.existsSync(helperFile)) {
+      failures.push(`${path.basename(root)}: ${helper} missing`);
+      continue;
+    }
+    const helperSrc = fs.readFileSync(helperFile, "utf8");
+    if (!helperSrc.includes("window.CCFullscreen.toggle")) {
+      failures.push(`${path.basename(root)}: ${helper} does not use shared fullscreen`);
     }
   }
 
