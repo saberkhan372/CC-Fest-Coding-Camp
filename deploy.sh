@@ -32,6 +32,9 @@ node scripts/stamp-brand-cache-keys.mjs
 echo "Stamping projector-view loader ..."
 node scripts/stamp-projector.mjs
 
+echo "Stamping concept-bridge layout loader ..."
+node scripts/stamp-bridge-layout.mjs
+
 echo "Syncing root assets from $SRC to $DST ..."
 for f in "$SRC"/*.css "$SRC"/*.js "$SRC"/*.html; do
   [ -f "$f" ] || continue
