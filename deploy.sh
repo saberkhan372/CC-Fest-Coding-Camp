@@ -29,6 +29,9 @@ node scripts/stamp-brand-topbars.mjs
 echo "Stamping branded topbar cache keys ..."
 node scripts/stamp-brand-cache-keys.mjs
 
+echo "Stamping projector-view loader ..."
+node scripts/stamp-projector.mjs
+
 echo "Syncing root assets from $SRC to $DST ..."
 for f in "$SRC"/*.css "$SRC"/*.js "$SRC"/*.html; do
   [ -f "$f" ] || continue

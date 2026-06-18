@@ -278,3 +278,23 @@ Representative starter sketches:
 8. Static workshop tools by suit station.
 9. Starter sketches.
 10. Final mobile and console sweep.
+
+## Audit Pass 11 - Findings
+
+```text
+Page: tools/hover-data-bar-chart-seed/
+Viewport: desktop / mobile
+Severity: P0
+Issue: Renders only the static "Enable JavaScript" fallback even with JS on — no
+  canvas, controls, or code. The page calls renderStarterSeedPage(
+  "hover-data-bar-chart-seed"), but that slug is not a key in the `seeds` dataset
+  in starter-seed-pages.js, so the renderer bails to the static fallback.
+Expected: An interactive starter sketch (canvas + editable code + Run), like the
+  other starter sketches.
+Evidence: Found during the projector-view rollout; starter-seed audit shows this
+  is the only seed slug missing from the dataset.
+Suggested fix: Either add a proper seed entry for "hover-data-bar-chart-seed" to
+  the `seeds` object in starter-seed-pages.js (match a neighbor like
+  "angle-to-mouse-seed"), or remove the dead tools/hover-data-bar-chart-seed/
+  directory and any catalog references. Then run scripts/audit-static.mjs.
+```
