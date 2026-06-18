@@ -32,6 +32,23 @@
     /* Backup for the responsive canvas (JS inline styles are authoritative) */
     .canvas-panel canvas, .canvas-wrap canvas { width: 100%; height: auto; }
 
+    /* Phase 2 (safe, universal): give the canvas more of the row on wide
+       screens so it scales up to fill the reclaimed space. Aspect ratio is
+       preserved and no per-page coordinates change — the canvas just renders
+       larger. Below the 980px breakpoint the original single-column layout
+       (and the callout band's own breakpoint) take over. */
+    @media (min-width: 981px) {
+      /* Widen the whole page container so the canvas column has room to grow
+         into the side margins (prose keeps its own narrower max-width, so
+         reading line-length is unaffected). */
+      .page { max-width: 1320px; }
+      .main-grid { grid-template-columns: minmax(0, 1.5fr) minmax(330px, 0.8fr); }
+    }
+    /* Let the event-type tabs shrink to fit a narrower rail instead of
+       forcing a few px of horizontal overflow (e.g. world-vs-local at 1000px). */
+    .tabs { min-width: 0; }
+    .tabs .tab, .tabs button { min-width: 0; }
+
     /* Teaching callouts relocated into a full-width band below the grid */
     .bridge-callouts {
       display: grid;
@@ -81,10 +98,16 @@
   function makeCanvasResponsive() {
     const canvas = document.querySelector(".canvas-wrap canvas, .canvas-panel canvas");
     if (!canvas) return;
-    const fixed = canvas.style.width; // e.g. "620px", set by the page's inline setup
-    if (fixed && fixed.endsWith("px")) canvas.style.maxWidth = fixed;
+    // Read each page's own display cap (most set the canvas to max-width:620px
+    // via an id selector that a shared class rule can't beat) and raise it ~1.3×
+    // as an inline style, which always wins. Only 2 of 21 pages set
+    // canvas.style.width, so reading the COMPUTED max-width is what makes the
+    // enlargement consistent across all bridges. width:100% / height:auto keep
+    // it responsive against the 2× DPR backing, so it never clips on mobile.
+    const cap = parseInt(getComputedStyle(canvas).maxWidth, 10); // e.g. 620
     canvas.style.width = "100%";
     canvas.style.height = "auto";
+    if (cap) canvas.style.maxWidth = Math.round(cap * 1.3) + "px";
   }
 
   function run() {

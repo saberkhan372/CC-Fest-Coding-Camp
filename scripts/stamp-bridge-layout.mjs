@@ -5,7 +5,7 @@ import path from "node:path";
 // (Phase 0+1: responsive canvas + callout relocation), without hand-editing 21
 // pages. Idempotent — safe to re-run; refreshes the cache key in place.
 
-const CACHE_KEY = "20260617-bridgelayout1";
+const CACHE_KEY = "20260617-bridgelayout7";
 const TAG = `<script src="../bridge-layout.js?v=${CACHE_KEY}"></script>`;
 
 const roots = [
