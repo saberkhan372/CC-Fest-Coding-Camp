@@ -1,16 +1,18 @@
-/* bridge-layout.js — Phase 0+1 layout fix for all concept-bridge pages.
+/* bridge-layout.js — Phase 0/1/2 layout fix for all concept-bridge pages.
  *
- * Two safe, universal improvements applied at runtime so we don't have to hand-
- * edit 21 pages' inline styles/markup (which load after the shared stylesheet
- * and would otherwise win the cascade):
+ * Three safe, universal improvements applied at runtime so we don't have to
+ * hand-edit 21 pages' inline styles/markup (which load after the shared
+ * stylesheet and would otherwise win the cascade). The runtime <style> is
+ * appended to <head> so it beats the inline rules, and the canvas display size
+ * is set via JS inline styles, which beat any per-page id-selector cap:
  *
  *   Phase 0 — Responsive canvas. The per-page inline script hard-sets
  *     `canvas.style.width = CW + 'px'`, which overrides the stylesheet's
  *     `width:100%` and makes the canvas a fixed pixel size — so it overflows and
  *     gets clipped by `.canvas-panel { overflow:hidden }` on narrow screens
  *     (a pre-existing mobile bug). The pointer handlers already map coordinates
- *     via getBoundingClientRect, so we can safely let CSS drive the display size:
- *     cap the width at the original logical width, then width:100% / height:auto.
+ *     via getBoundingClientRect, so we can safely let CSS drive the display size
+ *     (width:100% / height:auto, with the cap set in Phase 2 below).
  *
  *   Phase 1 — Layout rebalance. The three teaching callouts (Big idea / Common
  *     mistake / Try this) sit in the tall right control rail, leaving dead space
@@ -19,7 +21,15 @@
  *     balance. Callouts are located by their stable ids/classes, so this works
  *     on all 21 bridges including the 5 without a #bridge-panel wrapper.
  *
- * Canvas dimensions are NOT changed here — that's Phase 2, done per page.
+ *   Phase 2 — Canvas enlargement. Widen the page container (1120 -> 1320px) and
+ *     the canvas column at >=981px, then raise each canvas's display cap ~1.3x
+ *     (read from its computed max-width) so it grows uniformly to ~779px at
+ *     1440px. The backing buffer is NOT changed: this scales each canvas up at
+ *     its native aspect ratio, so no per-page coordinate or createCanvas() edits
+ *     are needed. Trade-off: because the backing buffer stays the original size
+ *     (e.g. 620px logical), the scaled-up canvas is slightly soft on 1x displays
+ *     — acceptable here, and the reason the cap is held at 1.3x. A crisper result
+ *     would require a true per-page backing-resolution pass.
  */
 (() => {
   "use strict";
